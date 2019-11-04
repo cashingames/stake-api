@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Triva\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
