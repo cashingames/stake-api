@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
 
 
@@ -25,6 +25,7 @@ class UserController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        return $this->sendResponse(auth()->user(), 'User details');
+
     }
 }
