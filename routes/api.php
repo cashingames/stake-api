@@ -36,16 +36,19 @@ Route::middleware('auth:api')->group( function () {
 // });
 
 Route::group([
-
     'middleware' => 'api',
     'prefix' => 'auth'
-
 ], function ($router) {
-
     Route::post('login', 'Auth\LoginController@login');
     Route::post('register', 'Auth\RegisterController@register');
     Route::post('logout', 'Auth\LoginController@logout');
     Route::post('refresh', 'Auth\Login@refresh');
-    Route::post('me', 'UserController@me');
+});
 
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'v1'
+], function ($router) {
+    Route::get('user/me', 'UserController@me');
+    Route::get('profile/me', 'ProfileController@me');
 });
