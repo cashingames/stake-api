@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Profile;
 use App\User;
+use App\Wallet;
+use App\WalletTransaction;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -69,13 +72,31 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
-        return User::create([
+
+        $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
             'phone' => $data['phone'],
             'email' => $data['email'],
             'password' => $data['password'],
         ]);
+
+        $wallet = Wallet::create([
+            'user_id' => $user->id,
+            'bonus' => 0,
+            'cash' => 0,
+            'balance' => 0
+        ]);
+
+        WalletTransaction::create([
+            'wallet_id' => $wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 150,
+            'description' => 'Signup bonus for a register customer',
+            'reference' => new Guid
+        ]);
+
+        return $user;
     }
 
     /**
@@ -87,6 +108,20 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
+        //When user is registered
+
+        //Create Profile
+        // Profile:create([
+
+        // ]);
+
+        //Create Wallet
+        // Wallet::create([
+
+        // ]);
+
+        //Give Bonus
+
         return $this->sendResponse($user, 'User register successfully.');
     }
 }

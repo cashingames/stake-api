@@ -19,7 +19,7 @@ class CreateWalletTransactionsTable extends Migration
             $table->enum('transaction_type', ['DEBIT', 'CREDIT']);
             $table->decimal('amount', 10, 2);
             $table->string('description');
-            $table->string('reference');
+            $table->string('reference')->unique();
             $table->timestamps();
 
             $table->foreign('wallet_id')->references('id')->on('wallets');
