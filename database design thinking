@@ -1,0 +1,90 @@
+When a new user is registered, create a wallet
+Create endpoint to return wallet information for the current user
+When a user is registered add a bonus of 15 to wallet
+
+Bonus wallet cannot be withdrawn
+Normal wallet can be withdrawn
+
+
+Users
+ - Username
+ - Phone Number
+ - Email Address
+ - Password
+
+Profiles
+ - User
+ - FIrst Name
+ - Last Name
+ - Gender
+ - Date of Birth
+ - Address
+ - State
+ - Avatar
+ - Account Name
+ - Bank Name
+ - Account Number
+ - Currency
+
+Categories
+ - Name
+ - Description
+ - Instruction
+ - Primary Color
+ - Icon Name
+ - GameBackgroundUrl
+ 
+Questions
+ - Question
+ - Level ( enum )
+ - Category
+  
+Options
+ - Title
+ - IsCorrect
+ - Question
+  
+Plans
+ - Name
+ - Description
+ - Price
+ - GamesCount
+ - PointPerQuestion
+ - MinimumWinPoints
+ - PricePerPoint
+ 
+UserPlans
+ - User
+ - Plan
+ - Used
+ - IsActive 
+ 
+Wallets
+ - User
+ - Bonus
+ - Cash
+ - Balance
+
+WalletTransactions
+ - Wallet
+ - Type
+ - Amount
+ - Description
+ - Reference
+
+Games
+ - User
+ - Plan
+ - Session
+ - CorrectCount
+ - FailedCount
+ - Status
+ - CurrentTime
+ - StartTime
+ - EndTime
+ - ExpectedEndTime
+ 
+GameQuestions
+ - Game
+ - Question
+ - IsCorrect
