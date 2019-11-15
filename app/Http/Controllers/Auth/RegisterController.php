@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Str;
 
 class RegisterController extends BaseController
 {
@@ -93,7 +94,7 @@ class RegisterController extends BaseController
             'transaction_type' => 'CREDIT',
             'amount' => 150,
             'description' => 'Signup bonus for a register customer',
-            'reference' => new Guid
+            'reference' => Str::random(10)
         ]);
 
         return $user;
