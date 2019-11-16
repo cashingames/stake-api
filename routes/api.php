@@ -43,6 +43,7 @@ Route::group([
     Route::post('register', 'Auth\RegisterController@register');
     Route::post('logout', 'Auth\LoginController@logout');
     Route::post('refresh', 'Auth\Login@refresh');
+    Route::post('email/is-valid', 'ProfileController@checkEmail');
 });
 
 Route::group([
@@ -52,3 +53,4 @@ Route::group([
     Route::get('user/me', 'UserController@me');
     Route::get('profile/me', 'ProfileController@me');
 });
+
