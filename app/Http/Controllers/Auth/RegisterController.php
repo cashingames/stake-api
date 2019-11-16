@@ -45,7 +45,7 @@ class RegisterController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('auth:api', ['except' => ['register']]);
     }
 
     /**
@@ -92,7 +92,7 @@ class RegisterController extends BaseController
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
-            'amount' => 150,
+            'amount' => 150.00,
             'description' => 'Signup bonus for a register customer',
             'reference' => Str::random(10)
         ]);
