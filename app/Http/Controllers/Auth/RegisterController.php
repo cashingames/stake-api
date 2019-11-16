@@ -3,17 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Controllers\Controller;
-use App\Profile;
 use App\User;
 use App\Wallet;
 use App\WalletTransaction;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 
 class RegisterController extends BaseController
@@ -109,20 +104,14 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        //When user is registered
-
-        //Create Profile
-        // Profile:create([
-
-        // ]);
-
-        //Create Wallet
-        // Wallet::create([
-
-        // ]);
-
-        //Give Bonus
-
-        return $this->sendResponse($user, 'User register successfully.');
+        return response()->json([
+            'user' => $user,
+            'token' => [
+                'access_token' => auth()->tokenById($user->id),
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]
+        ]);
+        // return $this->sendResponse($user, 'User register successfully.');
     }
 }
