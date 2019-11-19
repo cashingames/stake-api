@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Wallet;
 
 class WalletTransaction extends Model
 {
@@ -13,6 +14,11 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id', 'transaction_type', 'amount', 'description', 'reference',  
+        'wallet_id', 'transaction_type', 'amount', 'description', 'reference',
     ];
+
+
+    public function wallet(){
+        return $this->belongsTo(Wallet::class);
+    }
 }

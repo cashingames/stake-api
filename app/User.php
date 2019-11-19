@@ -6,6 +6,7 @@ namespace App;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Wallet;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -56,5 +57,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function profile(){
         return $this->hasOne(Profile::class);
+    }
+
+    public function wallet(){
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function transactions(){
+        return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 }
