@@ -21,7 +21,7 @@ Route::group([
 ], function ($router) {
     Route::get('user/me', 'UserController@me');
     Route::get('profile/me', 'ProfileController@me');
-    Route::get('wallet/transactions', 'WalletController@transactions');
+    Route::get('wallet/me/transactions', 'WalletController@transactions');
     Route::get('wallet/me', 'WalletController@me');
 });
 

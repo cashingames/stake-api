@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\WalletTransaction;
-use Illuminate\Http\Request;
-
-class WalletController extends Controller
+class WalletController extends BaseController
 {
-    //
 
     public function me(){
-        return auth()->user()->wallet;
+        $data = [
+            'wallet' => auth()->user()->wallet
+        ];
+        return $this->sendResponse($data, 'User wallet details');
     }
+
     public function transactions(){
-        return auth()->user()->transactions;
+        $data = [
+            'transactions' => auth()->user()->transactions
+        ];
+        return $this->sendResponse($data, 'Wallet transactions information');
     }
+
 }

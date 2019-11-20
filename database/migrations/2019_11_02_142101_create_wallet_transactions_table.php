@@ -17,8 +17,10 @@ class CreateWalletTransactionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('wallet_id');
             $table->enum('transaction_type', ['DEBIT', 'CREDIT']);
+            $table->enum('wallet_type', ['BONUS', 'CASH']);
             $table->decimal('amount', 10, 2);
-            $table->string('description');
+            $table->decimal('balance', 10, 2)->default(0);
+            $table->string('description')->nullable();
             $table->string('reference')->unique();
             $table->timestamps();
 

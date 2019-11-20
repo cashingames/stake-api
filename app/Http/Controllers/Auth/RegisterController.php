@@ -68,29 +68,25 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
+        $user =
+            User::create([
+                'name' => $data['name'],
+                'username' => $data['username'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+            ]);
 
-        $user = User::create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-        ]);
-
-        $wallet = Wallet::create([
-            'user_id' => $user->id,
-            'bonus' => 0,
-            'cash' => 0,
-            'balance' => 0
-        ]);
-
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => 150.00,
-            'description' => 'Signup bonus for a register customer',
-            'reference' => Str::random(10)
-        ]);
+        $user->wallet()
+            ->create([])
+            ->transactions()
+            ->create([
+                'transaction_type' => 'CREDIT',
+                'amount' => 150.00,
+                'wallet_type' => 'BONUS',
+                'description' => 'Signup bonus for a register customer',
+                'reference' => Str::random(10)
+            ]);
 
         return $user;
     }
