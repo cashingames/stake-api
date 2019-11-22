@@ -21,6 +21,7 @@ Route::group([
 ], function ($router) {
     Route::get('user/me', 'UserController@me');
     Route::get('profile/me', 'ProfileController@me');
+    Route::post('wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction');
     Route::get('wallet/me/transactions', 'WalletController@transactions');
     Route::get('wallet/me', 'WalletController@me');
 });
