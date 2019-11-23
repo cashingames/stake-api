@@ -51,7 +51,7 @@ class WalletController extends BaseController
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
-            'amount' => $result->data->amount,
+            'amount' => ($result->data->amount/100),
             'wallet_type' => 'CASH',
             'description' => 'Game live purchase',
             'reference' => $result->data->reference,
