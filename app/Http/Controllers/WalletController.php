@@ -28,7 +28,7 @@ class WalletController extends BaseController
     {
 
         $client = new Client();
-        $url = 'https://api.paystack.co/transaction/verify/946778697' ;
+        $url = 'https://api.paystack.co/transaction/verify/'.$reference ;
         $response = null;
         try{
 
