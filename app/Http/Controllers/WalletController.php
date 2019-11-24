@@ -53,7 +53,7 @@ class WalletController extends BaseController
             'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount/100),
             'wallet_type' => 'CASH',
-            'description' => 'Game live purchase',
+            'description' => 'Fund wallet cash balance',
             'reference' => $result->data->reference,
         ]);
         return $this->sendResponse(true, 'Payment was successful');

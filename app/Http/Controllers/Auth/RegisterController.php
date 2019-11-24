@@ -52,7 +52,8 @@ class RegisterController extends BaseController
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -70,12 +71,16 @@ class RegisterController extends BaseController
     {
         $user =
             User::create([
-                'name' => $data['name'],
                 'username' => $data['username'],
                 'phone' => $data['phone'],
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
+
+        $user->profile()->create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+        ]);
 
         $user->wallet()
             ->create([])
@@ -84,7 +89,7 @@ class RegisterController extends BaseController
                 'transaction_type' => 'CREDIT',
                 'amount' => 150.00,
                 'wallet_type' => 'BONUS',
-                'description' => 'Signup bonus for a register customer',
+                'description' => 'Signup bonus',
                 'reference' => Str::random(10)
             ]);
 

@@ -18,15 +18,15 @@ class CreateProfilesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('first_name');
             $table->string('last_name');
-            $table->enum('gender', ['male', 'female']);
+            $table->enum('gender', ['male', 'female'])->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->string('address');
-            $table->string('state');
-            $table->string('avatar');
-            $table->string('account_name');
-            $table->string('bank_name');
-            $table->string('account_number');
-            $table->string('currency');
+            $table->string('address')->nullable();
+            $table->string('state')->nullable();
+            $table->string('avatar')->nullable();
+            $table->string('account_name')->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('currency')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

@@ -9,7 +9,7 @@ class ProfileController extends BaseController
 {
     //
     public function me(){
-        return $this->sendResponse(auth()->user()->profile(), "Current user profile");
+        return $this->sendResponse(auth()->user()->profile, "Current user profile");
     }
 
     public function checkEmail(Request $request){
