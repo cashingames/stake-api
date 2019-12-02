@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\BaseController;
-use App\User;
-use App\Wallet;
-use App\WalletTransaction;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\RegistersUsers;
+
+use App\User;
+use App\Http\Controllers\BaseController;
 
 class RegisterController extends BaseController
 {
@@ -77,10 +76,12 @@ class RegisterController extends BaseController
                 'password' => $data['password'],
             ]);
 
-        $user->profile()->create([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-        ]);
+        $user
+            ->profile()
+            ->create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+            ]);
 
         $user->wallet()
             ->create([])
@@ -105,14 +106,16 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        return response()->json([
-            'user' => $user,
-            'token' => [
-                'access_token' => auth()->tokenById($user->id),
-                'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
-            ]
-        ]);
+        return
+            response()
+            ->json([
+                'user' => $user,
+                'token' => [
+                    'access_token' => auth()->tokenById($user->id),
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ]
+            ]);
         // return $this->sendResponse($user, 'User register successfully.');
     }
 }
