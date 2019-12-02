@@ -19,10 +19,11 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'v1'
 ], function ($router) {
-    Route::get('user/me', 'UserController@me');
-    Route::get('profile/me', 'ProfileController@me');
+    Route::get('user/me/plans', 'UserController@plans');
     Route::get('wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction');
     Route::get('wallet/me/transactions', 'WalletController@transactions');
     Route::get('wallet/me', 'WalletController@me');
+    Route::get('profile/me', 'ProfileController@me');
+    Route::get('user/me', 'UserController@me');
 });
 

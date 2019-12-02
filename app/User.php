@@ -66,4 +66,8 @@ class User extends Authenticatable implements JWTSubject
     public function transactions(){
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
+
+    public function plans(){
+        return $this->belongsToMany(Plan::class, 'user_plan');
+    }
 }
