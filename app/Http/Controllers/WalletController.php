@@ -28,22 +28,21 @@ class WalletController extends BaseController
     {
 
         $client = new Client();
-        $url = 'https://api.paystack.co/transaction/verify/'.$reference ;
+        $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
-        try{
+        try {
 
             $response = $client->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer sk_test_a0d0725ffd8124018859083fe04d77eeec41407f'
                 ]
             ]);
-
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return $this->_failedPaymentVerification();
         }
 
         $result = \json_decode((string) $response->getBody());
-        if(!$result->status){
+        if (!$result->status) {
             return $this->_failedPaymentVerification();
         }
 
@@ -51,7 +50,7 @@ class WalletController extends BaseController
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
-            'amount' => ($result->data->amount/100),
+            'amount' => ($result->data->amount / 100),
             'wallet_type' => 'CASH',
             'description' => 'Fund wallet cash balance',
             'reference' => $result->data->reference,
@@ -59,7 +58,8 @@ class WalletController extends BaseController
         return $this->sendResponse(true, 'Payment was successful');
     }
 
-    private function _failedPaymentVerification(){
+    private function _failedPaymentVerification()
+    {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
 }

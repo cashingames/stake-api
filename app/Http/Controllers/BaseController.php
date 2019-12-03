@@ -24,25 +24,42 @@ class BaseController extends Controller
         return response()->json($response, 200);
     }
 
+    public function SendError($errors, $message){
+        $response = [
+            'success' => false,
+            'errors'    => $errors,
+            'message' => $message,
+        ];
+        // {
+        //     "message": "The given data was invalid.",
+        //     "errors": {
+        //         "plan_id": [
+        //             "The plan id field is required."
+        //         ]
+        //     }
+        // }
+
+        return response()->json($response, 400);
+    }
 
     /**
      * return error response.
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendError($error, $errorMessages = [], $code = 404)
-    {
-    	$response = [
-            'success' => false,
-            'message' => $error,
-        ];
+    // public function sendError($error, $errorMessages = [], $code = 404)
+    // {
+    // 	$response = [
+    //         'success' => false,
+    //         'message' => $error,
+    //     ];
 
 
-        if(!empty($errorMessages)){
-            $response['data'] = $errorMessages;
-        }
+    //     if(!empty($errorMessages)){
+    //         $response['data'] = $errorMessages;
+    //     }
 
 
-        return response()->json($response, $code);
-    }
+    //     return response()->json($response, $code);
+    // }
 }

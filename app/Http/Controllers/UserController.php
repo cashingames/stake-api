@@ -28,7 +28,8 @@ class UserController extends BaseController
         return $this->sendResponse(auth()->user(), 'User details');
     }
 
-    public function plans(){
+    public function plans()
+    {
         return $this->sendResponse(auth()->user()->plans, 'User active plans');
     }
 }

@@ -21,25 +21,43 @@ class Wallet extends Model
     ];
 
 
-    public function owner(){
+    public function owner()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function transactions(){
+    public function transactions()
+    {
         return $this->hasMany(WalletTransaction::class);
     }
 
 
-    protected static function changeWalletBalance(WalletTransaction $model){
+    protected static function changeWalletBalance(WalletTransaction $model)
+    {
         $wallet = $model->wallet;
-        if($model->transaction_type == "CREDIT" && $model->wallet_type == "BONUS"){
+        if ($model->transaction_type == "CREDIT" && $model->wallet_type == "BONUS") {
             $wallet->bonus += $model->amount;
-        }else if($model->transaction_type == "DEBIT" && $model->wallet_type == "BONUS"){
-            $wallet->bonus -= $model->amount;
-        }else if($model->transaction_type == "CREDIT" && $model->wallet_type == "CASH"){
+        } else if ($model->transaction_type == "CREDIT" && $model->wallet_type == "CASH") {
             $wallet->cash += $model->amount;
-        }else if($model->transaction_type == "DEBIT" && $model->wallet_type == "CASH"){
-            $wallet->cash -= $model->amount;
+        } else if ($model->transaction_type == "DEBIT") {
+
+            //find first remove from bonus if it has balance
+            //then remove the remaining from cash
+            $remain = $wallet->bonus - $model->amount;
+            if($wallet->bonus == 0.00 || $remain < 0.00){
+                $wallet->cash -= \abs($remain);
+            }
+
+            if($wallet->bonus > 0.00 && $remain < 0){
+                $wallet->bonus = 0;
+            }
+
+            if($remain >= 0.00){
+                $wallet->bonus -= $model->amount;
+            }
+
+
+
         }
 
         $wallet->balance = $wallet->bonus + $wallet->cash;
@@ -48,5 +66,6 @@ class Wallet extends Model
         $wallet->update();
         $model->update();
     }
+
 
 }
