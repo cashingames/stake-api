@@ -28,25 +28,31 @@ class PlanController extends BaseController
         $user = auth()->user();
         $wallet = $user->wallet;
 
-        if($wallet->balance < $plan->price){
+        if ($wallet->balance < $plan->price) {
             $errors = [
                 'balance' => "Insufficient balance"
             ];
-            return $this->SendError($errors, "Error message");
+            return $this->SendError($errors, "The given data was invalid.");
         }
 
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
-            'amount' => $plan->price ,
+            'amount' => $plan->price,
             'wallet_type' => 'CASH',
             'description' => 'Purchase of games lives',
             'reference' => Str::random(10)
         ]);
 
-        $user->plans()->attach($plan->id, ['used'=>false, 'is_active'=>true]);
+        $user->plans()->attach($plan->id, ['used' => 0, 'is_active' => true]);
 
 
-        return $this->sendResponse($user->plans, "Current user plans");
+        return $this->sendResponse(
+            [
+                'wallet' => $user->wallet,
+                'plans' => $user->plans
+            ],
+            "Current user plans"
+        );
     }
 }

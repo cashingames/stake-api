@@ -30,14 +30,6 @@ class BaseController extends Controller
             'errors'    => $errors,
             'message' => $message,
         ];
-        // {
-        //     "message": "The given data was invalid.",
-        //     "errors": {
-        //         "plan_id": [
-        //             "The plan id field is required."
-        //         ]
-        //     }
-        // }
 
         return response()->json($response, 400);
     }

@@ -17,7 +17,7 @@ class CreateUserPlanTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('plan_id');
-            $table->tinyInteger('used')->default(false);
+            $table->tinyInteger('used')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
