@@ -9,6 +9,7 @@ class CategoryController extends BaseController
 {
     //
     public function get(){
-        return Category::all();
+        $categories = Category::all();
+        return $this->sendResponse($categories, "All categories");
     }
 }
