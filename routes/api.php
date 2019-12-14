@@ -19,6 +19,7 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'v1'
 ], function ($router) {
+    Route::get('categories', 'CategoryController@get');
     Route::post('plans/me/subscribe', 'PlanController@subscribe');
     Route::get('plans', 'PlanController@get');
     Route::get('wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction');

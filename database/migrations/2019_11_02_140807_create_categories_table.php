@@ -18,9 +18,9 @@ class CreateCategoriesTable extends Migration
             $table->string('name');
             $table->string('description');
             $table->string('instruction');
-            $table->string('primary_color');
-            $table->string('icon_name');
-            $table->string('game_background_url');
+            $table->string('primary_color')->nullable();
+            $table->string('icon_name')->nullable();
+            $table->string('game_background_url')->nullable();
             $table->timestamps();
         });
     }
