@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Triva\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Triva\Models\Question;
+use App\Question;
 
 class Option extends Model
 {

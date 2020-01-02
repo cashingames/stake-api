@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Triva\Model\Category;
+use App\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController

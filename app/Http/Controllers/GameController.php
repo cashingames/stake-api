@@ -36,9 +36,10 @@ class GameController extends BaseController
     }
 
     //
-    public function fetchQuestion(String $sessionId)
+    public function fetchQuestion(String $sessionToken)
     {
-        //fetch the session record
+        $game = auth()->user()->games->where('session_token', $sessionToken)->first();
+
         //determine the level of question to fetch
         //find a random question in the detected
         //return random question

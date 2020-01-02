@@ -21,6 +21,7 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'v1'
 ], function ($router) {
+    Route::get('game/fetch-question/{sessionToken}', 'GameController@fetchQuestion');
     Route::post('game/start', 'GameController@start');
     Route::get('categories', 'CategoryController@get');
     Route::post('plans/me/subscribe', 'PlanController@subscribe');

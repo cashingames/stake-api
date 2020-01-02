@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Triva\Models;
+namespace App;
 
-use App\Triva\Models\Category;
+use App\Category;
 use Illuminate\Database\Eloquent\Model;
-use App\Triva\Models\Option;
+use App\Option;
 
 class Question extends Model
 {
