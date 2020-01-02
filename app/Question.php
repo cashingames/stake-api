@@ -8,6 +8,9 @@ use App\Option;
 
 class Question extends Model
 {
+    protected $with = [
+        'options'
+    ];
     //
     public function options(){
         return $this->hasMany(Option::class);

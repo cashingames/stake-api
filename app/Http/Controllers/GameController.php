@@ -40,7 +40,7 @@ class GameController extends BaseController
     {
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();
-        return $question;
+        return $this->sendResponse($question, "Question fetched");
     }
 
     //
