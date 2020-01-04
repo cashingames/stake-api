@@ -26,6 +26,7 @@ class CreateGamesTable extends Migration
             $table->timestamp('end_time')->nullable();
             $table->tinyInteger('correct_count')->nullable()->default(0);
             $table->tinyInteger('wrong_count')->nullable()->default(0);
+            $table->tinyInteger('total_count')->nullable()->default(0);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

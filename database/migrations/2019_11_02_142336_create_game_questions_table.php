@@ -17,10 +17,12 @@ class CreateGameQuestionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('game_id');
             $table->unsignedBigInteger('question_id');
+            $table->unsignedBigInteger('option_id');
             $table->boolean('is_correct');
             $table->timestamps();
 
             $table->foreign('game_id')->references('id')->on('games');
+            $table->foreign('option_id')->references('id')->on('options');
             $table->foreign('question_id')->references('id')->on('questions');
         });
     }

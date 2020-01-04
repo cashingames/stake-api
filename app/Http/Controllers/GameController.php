@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Game;
 use App\Plan;
+use App\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ class GameController extends BaseController
         $plan = $user->plans()->find($request->planId);
         $category = Category::find($request->categoryId);
 
-        //@TODO - Check if the used filed is exhausted
+        //@TODO - Check if the used field is exhausted
         $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot_used+1]);
 
         $game = new Game();
@@ -30,6 +31,7 @@ class GameController extends BaseController
         $game->start_time = Carbon::now();
         $game->expected_end_time = Carbon::now()->addMinutes(1);
         $game->state = 'ONGOING';
+        $game->total_count = 10;
         $game->save();
 
         return $this->sendResponse($game, "Game started");
@@ -39,21 +41,40 @@ class GameController extends BaseController
     public function fetchQuestion(String $sessionToken)
     {
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        if(!$game){
+            return $this->SendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
+        }
+
         $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();
+
+        //check if the user already saw this question for this session
+        //if true, try again
+
         return $this->sendResponse($question, "Question fetched");
     }
 
     //
-    public function saveQuestionResponse(Request $request)
+    public function saveQuestionResponse(Request $request, String $sessionToken)
     {
-        //get the session information
-        //determine if response is correct
-        //update game session table
-        //return success
+        $question = Question::find($request->questionId);
+        $correctOption = $question->options()->where('is_correct',1)->first();
+        $isCorrect = $correctOption->id == $request->optionId;
+
+        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        if($isCorrect){
+            $game->correct_count += 1;
+        }else{
+            $game->wrong_count += 1;
+        }
+
+        $game->questions()->save($question,['is_correct'=> $isCorrect,'option_id'=>$request->optionId]);
+        $game->save();
+
+        $this->sendResponse(true, 'Response saved');
     }
 
     //
-    public function end(String $sessionId)
+    public function end(String $sessionToken)
     {
         //get the session information
         //check if won or loss

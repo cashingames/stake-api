@@ -13,10 +13,16 @@ class Question extends Model
     ];
     //
     public function options(){
-        return $this->hasMany(Option::class);
+        return $this->hasMany(Option::class)->inRandomOrder();
     }
 
     public function category(){
         return $this->belongsTo(Category::class);
     }
+
+    public function games(){
+        return $this->hasMany(Game::class);
+    }
+
+
 }
