@@ -27,6 +27,10 @@ class CreateGamesTable extends Migration
             $table->tinyInteger('correct_count')->nullable()->default(0);
             $table->tinyInteger('wrong_count')->nullable()->default(0);
             $table->tinyInteger('total_count')->nullable()->default(0);
+            $table->tinyInteger('points_gained')->nullable()->default(0);
+            $table->decimal('amount_gained', 10, 2)->nullable()->default(0.00);
+            $table->boolean('is_winning')->nullable()->default(false);
+            $table->decimal('payment_reference')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

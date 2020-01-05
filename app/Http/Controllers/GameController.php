@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Game;
-use App\Plan;
 use App\Question;
+use App\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -21,7 +21,7 @@ class GameController extends BaseController
         $category = Category::find($request->categoryId);
 
         //@TODO - Check if the used field is exhausted
-        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot_used+1]);
+        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot_used + 1]);
 
         $game = new Game();
         $game->user_id = $user->id;
@@ -41,7 +41,7 @@ class GameController extends BaseController
     public function fetchQuestion(String $sessionToken)
     {
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
-        if(!$game){
+        if (!$game) {
             return $this->SendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
@@ -57,17 +57,18 @@ class GameController extends BaseController
     public function saveQuestionResponse(Request $request, String $sessionToken)
     {
         $question = Question::find($request->questionId);
-        $correctOption = $question->options()->where('is_correct',1)->first();
+        $correctOption = $question->options()->where('is_correct', 1)->first();
         $isCorrect = $correctOption->id == $request->optionId;
 
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
-        if($isCorrect){
+        if ($isCorrect) {
             $game->correct_count += 1;
-        }else{
+            $game->setWinnings();
+        } else {
             $game->wrong_count += 1;
         }
 
-        $game->questions()->save($question,['is_correct'=> $isCorrect,'option_id'=>$request->optionId]);
+        $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
         $game->save();
 
         $this->sendResponse(true, 'Response saved');
@@ -77,9 +78,30 @@ class GameController extends BaseController
     public function end(String $sessionToken)
     {
         //get the session information
-        //check if won or loss
-        //credit wallet with equivalent of points if won
-        //return points won and amount won
-    }
+        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        $game->end_time = Carbon::now();
+        $game->state = 'COMPLETED';
 
+        $game->setWinnings();
+
+        $game->save();
+
+        if($game->is_winning){
+            $transaction = WalletTransaction::create([
+                'wallet_id' => auth()->user()->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' =>  $game->amount_gained,
+                'wallet_type' => 'CASH',
+                'description' => 'Winnings',
+                'reference' => Str::random(10)
+            ]);
+        }
+
+        return $this->sendResponse(
+            [
+                'game' => $game,
+            ],
+            'Game finished'
+        );
+    }
 }

@@ -11,5 +11,7 @@ class Plan extends Model
         return $this->hasMany(User::class);
     }
 
-
+    public function games(){
+        return $this->hasMany(Game::class);
+    }
 }
