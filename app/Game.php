@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Game extends Model
 {
+    protected $appends = ['duration'];
+
     //
     public function category(){
         return $this->belongsTo(Category::class);
@@ -17,6 +20,14 @@ class Game extends Model
 
     public function plan(){
         return $this->belongsTo(Plan::class);
+    }
+
+    public function getDurationAttribute(){
+        $start = $this->start_time;
+        $end = $this->end_time ?
+            $this->end_time : $this->expected_end_time;
+
+        return Carbon::parse($start)->diffInSeconds(Carbon::parse($end));
     }
 
     public function setWinnings(){
