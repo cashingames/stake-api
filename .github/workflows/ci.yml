@@ -1,4 +1,4 @@
-name: Laravel
+name: Cashhingames CI
 
 on: [push]
 
@@ -17,6 +17,7 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
+        php artisan migrate --seed
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DB_CONNECTION: sqlite
