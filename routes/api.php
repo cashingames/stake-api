@@ -21,6 +21,7 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'v1'
 ], function ($router) {
+    Route::get('game/leaders', 'GameController@leaders');
     Route::post('game/end/{sessionToken}', 'GameController@end');
     Route::post('game/fetch-question/{sessionToken}', 'GameController@saveQuestionResponse');
     Route::get('game/fetch-question/{sessionToken}', 'GameController@fetchQuestion');

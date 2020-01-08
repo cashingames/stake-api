@@ -100,8 +100,27 @@ class GameController extends BaseController
         return $this->sendResponse(
             [
                 'game' => $game,
+                'leaders' => $this->_leaders(),
             ],
             'Game finished'
         );
+    }
+
+    public function leaders(){
+        return $this->sendResponse($this->_leaders(), 'Leaderboard data');
+    }
+
+    private function _leaders(){
+        $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
+        $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
+
+        $games = Game::with(['user:id,username'])
+                ->selectRaw('user_id, start_time, end_time, MAX(correct_count) as score')
+                ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
+                ->groupBy('user_id')
+                ->orderBy('score', 'desc')
+                ->take(10)
+                ->get();
+        return $games;
     }
 }
