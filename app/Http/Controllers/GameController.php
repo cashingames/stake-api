@@ -69,6 +69,7 @@ class GameController extends BaseController
         }
 
         $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
+        $game->end_time = Carbon::now()->subSeconds(1);
         $game->save();
 
         $this->sendResponse(true, 'Response saved');
@@ -79,7 +80,7 @@ class GameController extends BaseController
     {
         //get the session information
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
-        $game->end_time = Carbon::now();
+        $game->end_time = Carbon::now()->subSeconds(1);;
         $game->state = 'COMPLETED';
 
         $game->setWinnings();
