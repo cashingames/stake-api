@@ -1,14 +1,16 @@
 name: Cashhingames CI
 
-on: [push]
+on:
+  push: branches: [master]
+  release: types: [published, created, edited]
 
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
+    # - name: Copy .env
+      # run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
     - name: Generate key
@@ -23,8 +25,8 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: vendor/bin/phpunit
-  FTP-Deploy-Action:
-    name: FTP-Deploy-Action
+  laravel-ftp-deploy:
+    needs: laravel-tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -34,4 +36,3 @@ jobs:
         FTP_SERVER: ftp.cashingames.com
         FTP_USERNAME: api-user@cashingames.com
         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        ARGS: --delete
