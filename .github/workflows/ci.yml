@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - master
-  release: types: [published, created, edited]
+  release:
+    types:
+      - published
+      - created
+      - edited
 
 jobs:
   laravel-tests:
