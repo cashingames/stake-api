@@ -23,3 +23,15 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: vendor/bin/phpunit
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@2.0.0
+      env:
+        FTP_SERVER: ftp.cashingames.com
+        FTP_USERNAME: api-user@cashingames.com
+        FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        ARGS: --delete
