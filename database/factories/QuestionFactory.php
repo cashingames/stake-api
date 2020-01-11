@@ -9,6 +9,6 @@ $factory->define(Question::class, function (Faker $faker) {
     return [
         'label'=>$faker->sentence(5),
         'level'=>$faker->randomElement(array('easy', 'medium', 'hard') ),
-        'category_id'=>$faker->randomElement(array(1,2,3))
+        'category_id'=>$faker->randomElement(array(2,3))
     ];
 });

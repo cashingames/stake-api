@@ -21,6 +21,7 @@ class CreateCategoriesTable extends Migration
             $table->string('primary_color')->nullable();
             $table->string('icon_name')->nullable();
             $table->string('game_background_url')->nullable();
+            $table->bigInteger('category_id')->nullable();
             $table->timestamps();
         });
     }
