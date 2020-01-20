@@ -13,7 +13,7 @@ class Profile extends Model
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'gender', 'date_of_birth', 'address', 'state', '',
+        'first_name', 'last_name', 'gender', 'date_of_birth', 'address', 'state', 'account_name', 'avatar','bank_name','account_number','currency'
     ];
 
     //

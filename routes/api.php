@@ -15,6 +15,8 @@ Route::group([
     Route::post('logout', 'Auth\LoginController@logout');
     Route::post('refresh', 'Auth\Login@refresh');
     Route::post('email/is-valid', 'ProfileController@checkEmail');
+    //update profile
+    Route::post('update-profile', 'ProfileController@editProfile');
 });
 
 Route::group([
