@@ -15,8 +15,7 @@ Route::group([
     Route::post('logout', 'Auth\LoginController@logout');
     Route::post('refresh', 'Auth\Login@refresh');
     Route::post('email/is-valid', 'ProfileController@checkEmail');
-    //update profile
-    Route::post('update-profile', 'ProfileController@editProfile');
+    
 });
 
 Route::group([
@@ -34,6 +33,7 @@ Route::group([
     Route::get('wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction');
     Route::get('wallet/me/transactions', 'WalletController@transactions');
     Route::get('wallet/me', 'WalletController@me');
+    Route::post('profile/me/edit', 'ProfileController@edit');
     Route::get('profile/me', 'ProfileController@me');
     Route::get('user/me/plans', 'UserController@plans');
     Route::get('user/me', 'UserController@me');

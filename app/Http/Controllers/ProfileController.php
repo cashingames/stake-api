@@ -21,43 +21,38 @@ class ProfileController extends BaseController
         ])->validate();
     }
 
-    public function editProfile(Request $request){
+    public function edit(Request $request){
 
         $data = $request->validate([
             'gender' => ['nullable', 'string', 'max:20'],
-            'date_of_birth' => ['nullable', 'date'],
+            'dateOfBirth' => ['nullable', 'date'],
             'address' =>['nullable', 'string', 'between:10,300'],
             'state' => ['nullable', 'string', 'max:100'],
             'avatar' => ['nullable'],
-            'account_name' => ['nullable', 'string', 'max:255'],
-            'bank_name' => ['nullable', 'string', 'max:255'],
-            'account_number'=> ['nullable', 'string', 'max:255'],
+            'accountName' => ['nullable', 'string', 'max:255'],
+            'bankName' => ['nullable', 'string', 'max:255'],
+            'accountNumber'=> ['nullable', 'string', 'max:255'],
             'currency' =>['nullable', 'string', 'max:100'],
             ]);
 
 
-         $profile = auth()->user()->profile()
-                            ->update([
-                                        'gender' => $data['gender'],
-                                        'date_of_birth'=> new Carbon($data['date_of_birth']),
-                                         'address' => $data['address'],
-                                        'state' => $data['state'],
-                                        'avatar' => $data['avatar'],
-                                        'account_name' => $data['account_name'],
-                                        'bank_name'  => $data['bank_name' ],
-                                        'account_number'  => $data['account_number'],
-                                        'currency'  => $data['currency' ],
-                                    ]);
-            $getProfile = auth()->user()->profile()->get();
-            if($profile){
-                return $this->sendResponse($getProfile, "Profile Updated.");           
-            }
+        $profile = auth()->user()->profile;
+        
+        if($profile == null){
+            return $this->sendError(['Profile not found'], "Unable to update profile");
+        }
 
-            else{
-                return response()->json('Unable to update profile', 400);
-            }
-            
-       
+        $profile->gender =  $data['gender'];
+        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
+        $profile->address = $data['address'];
+        $profile->state = $data['state'];
+        $profile->avatar = $data['avatar'];
+        $profile->account_name =$data['accountName'];
+        $profile->bank_name = $data['bankName'];
+        $profile->account_number = $data['accountNumber'];
+        $profile->currency = $data['currency'];
+        $profile->save();
 
+        return $this->sendResponse($profile, "Profile Updated.");           
     }
 }
