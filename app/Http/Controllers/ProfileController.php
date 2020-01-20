@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 
 class ProfileController extends BaseController
 {
@@ -38,7 +39,7 @@ class ProfileController extends BaseController
          $profile = auth()->user()->profile()
                             ->update([
                                         'gender' => $data['gender'],
-                                        'date_of_birth'=> $data['date_of_birth'],
+                                        'date_of_birth'=> new Carbon($data['date_of_birth']),
                                          'address' => $data['address'],
                                         'state' => $data['state'],
                                         'avatar' => $data['avatar'],
