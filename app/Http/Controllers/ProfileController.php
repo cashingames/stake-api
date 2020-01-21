@@ -25,11 +25,11 @@ class ProfileController extends BaseController
     public function edit(Request $request){
 
         $data = $request->validate([
-            'firstName' =>['nullable', 'string', 'max:20'],
-            'lastName' =>['nullable', 'string', 'max:20'],
-            'username'=>['nullable', 'string', 'max:20'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'email' => ['nullable', 'string', 'email', 'max:150'],
+            'firstName' =>['required', 'string', 'max:20'],
+            'lastName' =>['required', 'string', 'max:20'],
+            'username'=>['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'email', 'max:150'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
             'address' =>['nullable', 'string', 'between:10,300'],
