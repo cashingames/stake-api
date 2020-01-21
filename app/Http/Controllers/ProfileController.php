@@ -51,10 +51,7 @@ class ProfileController extends BaseController
 
         
         
-        $user->update(['username'=> $data['username'],
-                        'phone' => $data['phone'],
-                        'email' => $data['email'],
-                    ]);
+        
 
         $profile->first_name= $data['firstName'];
         $profile->last_name= $data['lastName'];
@@ -69,6 +66,11 @@ class ProfileController extends BaseController
         $profile->currency = $data['currency'];
         $profile->save();
 
+        $user->update(['username'=> $data['username'],
+                        'phone' => $data['phone'],
+                        'email' => $data['email'],
+                    ]);
+        
         return $this->sendResponse($user, "Profile Updated.");           
     }
 }
