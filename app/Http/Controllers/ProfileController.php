@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use App\User;
 
 class ProfileController extends BaseController
 {
@@ -24,6 +25,11 @@ class ProfileController extends BaseController
     public function edit(Request $request){
 
         $data = $request->validate([
+            'firstName' =>['nullable', 'string', 'max:20'],
+            'lastName' =>['nullable', 'string', 'max:20'],
+            'username'=>['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'email' => ['nullable', 'string', 'email', 'max:150'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
             'address' =>['nullable', 'string', 'between:10,300'],
@@ -36,12 +42,22 @@ class ProfileController extends BaseController
             ]);
 
 
-        $profile = auth()->user()->profile;
+        $user = auth()->user();
+        $profile = $user->profile;        
         
         if($profile == null){
             return $this->sendError(['Profile not found'], "Unable to update profile");
         }
 
+        
+        
+        $user->update(['username'=> $data['username'],
+                        'phone' => $data['phone'],
+                        'email' => $data['email'],
+                    ]);
+
+        $profile->first_name= $data['firstName'];
+        $profile->last_name= $data['lastName'];
         $profile->gender =  $data['gender'];
         $profile->date_of_birth = new Carbon($data['dateOfBirth']);
         $profile->address = $data['address'];
@@ -53,6 +69,6 @@ class ProfileController extends BaseController
         $profile->currency = $data['currency'];
         $profile->save();
 
-        return $this->sendResponse($profile, "Profile Updated.");           
+        return $this->sendResponse($user, "Profile Updated.");           
     }
 }
