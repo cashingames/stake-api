@@ -120,10 +120,9 @@ class GameController extends BaseController
 
         $games = Game::with(['user:id,username'])
                 ->selectRaw('user_id, MAX(correct_count) as score, duration')
-                // ->select('user_id', DB::raw(MIN'DATEDIFF (second,start_time,end_time) as duration'), )
                 // ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
                 ->groupBy('user_id')
-                ->orderBy('score', 'desc')
+                ->orderBy('score','desc')
                 ->take(10)
                 ->get();
         return $games;
