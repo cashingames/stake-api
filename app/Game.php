@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 
 class Game extends Model
 {
-    protected $appends = ['duration'];
+    // protected $appends = ['duration'];
 
     public function user(){
         return $this->belongsTo(User::class);
@@ -25,13 +25,12 @@ class Game extends Model
         return $this->belongsTo(Plan::class);
     }
 
-    public function getDurationAttribute(){
-        $start = $this->start_time;
-        $end = $this->end_time ?
-            $this->end_time : $this->expected_end_time;
+    // public function getDurationAttribute(){
+    //     $start = $this->start_time;
+    //     $end = $this->end_time ?: $this->expected_end_time;
 
-        return Carbon::parse($start)->diffInSeconds(Carbon::parse($end));
-    }
+    //     return Carbon::parse($start)->diffInSeconds(Carbon::parse($end));
+    // }
 
     public function setWinnings(){
         $this->points_gained = $this->plan->point_per_question * $this->correct_count;

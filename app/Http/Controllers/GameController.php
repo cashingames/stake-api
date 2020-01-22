@@ -8,6 +8,7 @@ use App\Question;
 use App\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GameController extends BaseController
@@ -70,6 +71,7 @@ class GameController extends BaseController
 
         $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
         $game->end_time = Carbon::now()->subSeconds(1);
+        $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->save();
 
         $this->sendResponse(true, 'Response saved');
@@ -80,7 +82,8 @@ class GameController extends BaseController
     {
         //get the session information
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
-        $game->end_time = Carbon::now()->subSeconds(1);;
+        $game->end_time = Carbon::now()->subSeconds(1);
+        $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
 
         $game->setWinnings();
@@ -116,9 +119,10 @@ class GameController extends BaseController
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
         $games = Game::with(['user:id,username'])
-                ->selectRaw('user_id, start_time, end_time, MAX(correct_count) as score')
-                ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
-                ->groupBy('user_id', 'start_time', 'end_time')
+                ->selectRaw('user_id, MAX(correct_count) as score, duration')
+                // ->select('user_id', DB::raw(MIN'DATEDIFF (second,start_time,end_time) as duration'), )
+                // ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
+                ->groupBy('user_id')
                 ->orderBy('score', 'desc')
                 ->take(10)
                 ->get();
