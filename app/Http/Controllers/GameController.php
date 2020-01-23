@@ -90,6 +90,10 @@ class GameController extends BaseController
 
         $game->save();
 
+        //@TODO: remove hack
+        if($game->duration > 60)
+            $game->duration = 60;
+
         if($game->is_winning){
             $transaction = WalletTransaction::create([
                 'wallet_id' => auth()->user()->wallet->id,

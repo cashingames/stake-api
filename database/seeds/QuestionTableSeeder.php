@@ -17,25 +17,25 @@ class QuestionTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Question::class, 100)->create()->each(function ($question) {
-            $options = factory(Option::class,4)->make();
-            $option = $options->random();
-            $optionIndex = $options->search($option);
+        // factory(Question::class, 100)->create()->each(function ($question) {
+        //     $options = factory(Option::class,4)->make();
+        //     $option = $options->random();
+        //     $optionIndex = $options->search($option);
 
-            $option->is_correct = true;
-            $options = $options->replace([$optionIndex => $option]);
+        //     $option->is_correct = true;
+        //     $options = $options->replace([$optionIndex => $option]);
 
-            $question->options()->createMany( $options->toArray() );
-          });
+        //     $question->options()->createMany( $options->toArray() );
+        //   });
 
-    //   $inputFileName = base_path('Questions.xlsx');
-    //   $reader = IOFactory::createReader('Xlsx');
-    //   $reader->setReadDataOnly(TRUE);
-    //   $spreadsheet = $reader->load($inputFileName);
+      $inputFileName = base_path('Questions.xlsx');
+      $reader = IOFactory::createReader('Xlsx');
+      $reader->setReadDataOnly(TRUE);
+      $spreadsheet = $reader->load($inputFileName);
 
-    //   $workSheet  = $spreadsheet->getActiveSheet();
+      $workSheet  = $spreadsheet->getActiveSheet();
 
-    //   $this->readWorkSheet($workSheet);
+      $this->readWorkSheet($workSheet);
     }
 
     private function readWorkSheet(Worksheet $workSheet){
