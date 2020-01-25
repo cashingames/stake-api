@@ -26,7 +26,13 @@ class GameController extends BaseController
                 ['plan' => 'This plan has been exhaused'], 'Game cannot start'
             );
         }
-        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot->used + 1]);
+
+        $user->plans()->updateExistingPivot($plan->id,
+            [
+                'used' => $plan->pivot->used + 1,
+                'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+            ]
+        );
 
         $game = new Game();
         $game->user_id = $user->id;
