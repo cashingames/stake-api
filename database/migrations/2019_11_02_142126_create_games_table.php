@@ -20,8 +20,8 @@ class CreateGamesTable extends Migration
             $table->unsignedBigInteger('category_id');
             $table->string('session_token');
             $table->string('level')->nullable()->default('easy');
-            $table->timestamp('start_time');
-            $table->timestamp('expected_end_time');
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('expected_end_time')->nullable();
             $table->enum('state', ['PENDING', 'ONGOING', 'PAUSED', 'COMPLETED']);
             $table->timestamp('end_time')->nullable();
             $table->tinyInteger('correct_count')->nullable()->default(0);

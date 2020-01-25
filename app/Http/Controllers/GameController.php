@@ -56,6 +56,9 @@ class GameController extends BaseController
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
+        $level = 'easy';
+        //check if the level of the
+
         $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();
 
         //check if the user already saw this question for this session
@@ -78,6 +81,7 @@ class GameController extends BaseController
         } else {
             $game->wrong_count += 1;
         }
+
 
         $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
         $game->end_time = Carbon::now()->subSeconds(1);

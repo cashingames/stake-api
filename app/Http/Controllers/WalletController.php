@@ -31,10 +31,9 @@ class WalletController extends BaseController
         $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
         try {
-
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer '.env('PAYSTACK_KEY')
+                    'Authorization' => 'Bearer ' .  config('app.payment_key')
                 ]
             ]);
         } catch (\Exception $ex) {
