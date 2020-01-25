@@ -34,7 +34,7 @@ class WalletController extends BaseController
 
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer sk_test_a0d0725ffd8124018859083fe04d77eeec41407f'
+                    'Authorization' => 'Bearer '.env('PAYSTACK_KEY')
                 ]
             ]);
         } catch (\Exception $ex) {
