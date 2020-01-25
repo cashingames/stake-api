@@ -21,7 +21,11 @@ class GameController extends BaseController
         $plan = $user->plans()->find($request->planId);
         $category = Category::find($request->categoryId);
 
-        //@TODO - Check if the used field is exhausted
+        if($plan->pivot->used <= 0){
+            return $this->SendError(
+                ['plan' => 'This plan has been exhaused'], 'Game cannot start'
+            );
+        }
         $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot->used + 1]);
 
         $game = new Game();
