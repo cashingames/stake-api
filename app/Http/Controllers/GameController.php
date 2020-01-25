@@ -22,7 +22,7 @@ class GameController extends BaseController
         $category = Category::find($request->categoryId);
 
         //@TODO - Check if the used field is exhausted
-        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot_used + 1]);
+        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot->used + 1]);
 
         $game = new Game();
         $game->user_id = $user->id;
