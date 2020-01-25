@@ -21,8 +21,8 @@ class GameController extends BaseController
         $plan = $user->plans()->find($request->planId);
         $category = Category::find($request->categoryId);
 
-        if($plan->pivot->used <= 0){
-            return $this->SendError(
+        if($plan->pivot->used >= $plan->games_count){
+            return $this->sendError(
                 ['plan' => 'This plan has been exhaused'], 'Game cannot start'
             );
         }
@@ -53,7 +53,7 @@ class GameController extends BaseController
     {
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
-            return $this->SendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
+            return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
         $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();

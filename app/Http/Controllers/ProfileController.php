@@ -43,15 +43,15 @@ class ProfileController extends BaseController
 
 
         $user = auth()->user();
-        $profile = $user->profile;        
-        
+        $profile = $user->profile;
+
         if($profile == null){
             return $this->sendError(['Profile not found'], "Unable to update profile");
         }
 
-        
-        
-        
+
+
+
 
         $profile->first_name= $data['firstName'];
         $profile->last_name= $data['lastName'];
@@ -70,7 +70,7 @@ class ProfileController extends BaseController
                         'phone' => $data['phone'],
                         'email' => $data['email'],
                     ]);
-        
-        return $this->sendResponse($user, "Profile Updated.");           
+
+        return $this->sendResponse($user, "Profile Updated.");
     }
 }

@@ -32,7 +32,7 @@ class PlanController extends BaseController
             $errors = [
                 'balance' => "Insufficient balance"
             ];
-            return $this->SendError($errors, "The given data was invalid.");
+            return $this->sendError($errors, "The given data was invalid.");
         }
 
         WalletTransaction::create([
