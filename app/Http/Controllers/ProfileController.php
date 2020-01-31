@@ -79,9 +79,13 @@ class ProfileController extends BaseController
     {
             // try{
 
-                $request->validate([
+                $data  = $request->validate([
                     'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
                 ]);
+
+                if(!$data){
+                    return $this->sendError("The file must be an image", "The file must be an image");
+                }
 
                 $user = auth()->user();
                 $profile = $user->profile;   
