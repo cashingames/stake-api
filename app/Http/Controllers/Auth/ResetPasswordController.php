@@ -20,10 +20,14 @@ class ResetPasswordController extends Controller
 
     use ResetsPasswords;
 
-    /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+    protected function sendResetResponse(Request $request, $response)
+    {
+        return $this->sendResponse("Message sent", 'Message Sent');
+    }
+
+    protected function sendResetFailedResponse(Request $request, $response)
+    {
+         return $this->sendError('Message not sent', 'Message not sent');
+    }
+
 }

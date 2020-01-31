@@ -16,6 +16,9 @@ Route::group([
     Route::post('refresh', 'Auth\Login@refresh');
     Route::post('email/is-valid', 'ProfileController@checkEmail');
     
+    Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+    Route::get('password/reset/{token}', 'ResetPasswordController@reset')->name('password.reset');
+    
 });
 
 Route::group([
@@ -34,6 +37,7 @@ Route::group([
     Route::get('wallet/me/transactions', 'WalletController@transactions');
     Route::get('wallet/me', 'WalletController@me');
     Route::post('profile/me/edit', 'ProfileController@edit');
+    Route::post('profile/me/picture', 'ProfileController@addProfilePic');
     Route::get('profile/me', 'ProfileController@me');
     Route::get('user/me/plans', 'UserController@plans');
     Route::get('user/me', 'UserController@me');
