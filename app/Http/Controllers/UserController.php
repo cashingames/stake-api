@@ -25,7 +25,13 @@ class UserController extends BaseController
      */
     public function me()
     {
-        return $this->sendResponse(auth()->user(), 'User details');
+        $user = auth()->user();
+        $result = [
+            'user' => auth()->user(),
+            'plans' => $user->plans()->wherePivot('is_active', true)->get(),
+            'wallet' => $user->wallet
+        ];
+        return $this->sendResponse($result, 'User details');
     }
 
     public function plans()

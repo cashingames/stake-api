@@ -49,7 +49,7 @@ class PlanController extends BaseController
         return $this->sendResponse(
             [
                 'wallet' => $user->wallet,
-                'plans' => $user->plans
+                'plans' => $user->plans()->wherePivot('is_active', true)->get(),
             ],
             "Current user plans"
         );
