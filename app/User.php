@@ -6,6 +6,7 @@ namespace App;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Notifications\PasswordResetNotification;
 use App\Wallet;
 
 class User extends Authenticatable implements JWTSubject
@@ -73,5 +74,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function games(){
         return $this->hasMany(Game::class);
+    }
+
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new PasswordResetNotification($token));
     }
 }

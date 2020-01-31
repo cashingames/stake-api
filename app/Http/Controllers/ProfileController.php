@@ -45,32 +45,64 @@ class ProfileController extends BaseController
         $user = auth()->user();
         $profile = $user->profile;        
         
-        if($profile == null){
-            return $this->sendError(['Profile not found'], "Unable to update profile");
-        }
+           if($profile == null){
+                return $this->sendError(['Profile not found'], "Unable to update profile");
+            }
 
-        
-        
-        
+           
+                $profile->first_name= $data['firstName'];
+                $profile->last_name= $data['lastName'];
+                $profile->gender =  $data['gender'];
+                $profile->date_of_birth = new Carbon($data['dateOfBirth']);
+                $profile->address = $data['address'];
+                $profile->state = $data['state'];   
+                $profile->avatar = $data['avatar'] ;            
+                $profile->account_name =$data['accountName'];
+                $profile->bank_name = $data['bankName'];
+                $profile->account_number = $data['accountNumber'];
+                $profile->currency = $data['currency'];
+                $profile->save();
 
-        $profile->first_name= $data['firstName'];
-        $profile->last_name= $data['lastName'];
-        $profile->gender =  $data['gender'];
-        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
-        $profile->address = $data['address'];
-        $profile->state = $data['state'];
-        $profile->avatar = $data['avatar'];
-        $profile->account_name =$data['accountName'];
-        $profile->bank_name = $data['bankName'];
-        $profile->account_number = $data['accountNumber'];
-        $profile->currency = $data['currency'];
-        $profile->save();
+                $user->update(['username'=> $data['username'],
+                                'phone' => $data['phone'],
+                                'email' => $data['email'],
+                            ]);
+           
 
-        $user->update(['username'=> $data['username'],
-                        'phone' => $data['phone'],
-                        'email' => $data['email'],
-                    ]);
-        
-        return $this->sendResponse($user, "Profile Updated.");           
+            return $this->sendResponse($user, "Profile Updated.");
+ 
     }
+
+
+    public function addProfilePic(Request $request)
+    {
+            try{
+
+                $request->validate([
+                    'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+                ]);
+
+                $user = auth()->user();
+                $profile = $user->profile;   
+
+                if ($request->hasFile('avatar')) {
+                $image = $request->file('avatar');
+                $name = $image->getClientOriginalName();
+                $destinationPath = public_path('/uploads');
+                $image->move($destinationPath, $name);
+
+                }
+
+                $profile->avatar = $name;
+                $profile->save();
+
+                return $this->sendResponse($profile, "Profile Updated.");
+            }
+            catch(\Exception $e){
+                return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
+            }
+
+    }
+
+
 }
