@@ -121,8 +121,7 @@ class GameController extends BaseController
 
         return $this->sendResponse(
             [
-                'game' => $game,
-                'leaders' => $this->_leaders(),
+                'game' => $game
             ],
             'Game finished'
         );
