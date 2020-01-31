@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
 use App\User;
+use App\Profile;
 
 class ProfileController extends BaseController
 {
@@ -76,7 +77,7 @@ class ProfileController extends BaseController
 
     public function addProfilePic(Request $request)
     {
-            try{
+            // try{
 
                 $request->validate([
                     'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
@@ -97,10 +98,11 @@ class ProfileController extends BaseController
                 $profile->save();
 
                 return $this->sendResponse($profile, "Profile Updated.");
-            }
-            catch(\Exception $e){
-                return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
-            }
+            // }
+            // catch(\Exception $e){
+            //     return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
+            // }
+
 
     }
 

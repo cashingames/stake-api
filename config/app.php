@@ -14,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-
+    'payment_key' => env('PAYSTACK_KEY', null),
     /*
     |--------------------------------------------------------------------------
     | Application Environment

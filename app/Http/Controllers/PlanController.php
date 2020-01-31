@@ -32,7 +32,7 @@ class PlanController extends BaseController
             $errors = [
                 'balance' => "Insufficient balance"
             ];
-            return $this->SendError($errors, "The given data was invalid.");
+            return $this->sendError($errors, "The given data was invalid.");
         }
 
         WalletTransaction::create([
@@ -49,7 +49,7 @@ class PlanController extends BaseController
         return $this->sendResponse(
             [
                 'wallet' => $user->wallet,
-                'plans' => $user->plans
+                'plans' => $user->plans()->wherePivot('is_active', true)->get(),
             ],
             "Current user plans"
         );

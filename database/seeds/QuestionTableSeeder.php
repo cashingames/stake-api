@@ -17,40 +17,45 @@ class QuestionTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Question::class, 100)->create()->each(function ($question) {
-            $options = factory(Option::class,4)->make();
-            $option = $options->random();
-            $optionIndex = $options->search($option);
 
-            $option->is_correct = true;
-            $options = $options->replace([$optionIndex => $option]);
 
-            $question->options()->createMany( $options->toArray() );
-          });
+        if (env('APP_ENV') == 'testing') {
+            factory(Question::class, 100)->create()->each(function ($question) {
+                $options = factory(Option::class, 4)->make();
+                $option = $options->random();
+                $optionIndex = $options->search($option);
 
-    //   $inputFileName = base_path('Questions.xlsx');
-    //   $reader = IOFactory::createReader('Xlsx');
-    //   $reader->setReadDataOnly(TRUE);
-    //   $spreadsheet = $reader->load($inputFileName);
+                $option->is_correct = true;
+                $options = $options->replace([$optionIndex => $option]);
 
-    //   $workSheet  = $spreadsheet->getActiveSheet();
+                $question->options()->createMany($options->toArray());
+            });
+        } else {
+            $inputFileName = base_path('Questions.xlsx');
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(TRUE);
+            $spreadsheet = $reader->load($inputFileName);
 
-    //   $this->readWorkSheet($workSheet);
+            $workSheet  = $spreadsheet->getActiveSheet();
+
+            $this->readWorkSheet($workSheet);
+        }
     }
 
-    private function readWorkSheet(Worksheet $workSheet){
+    private function readWorkSheet(Worksheet $workSheet)
+    {
         $categoryName = $workSheet->getTitle();
         $category = Category::where('name', $categoryName)->first();
 
-        if($category == null){
-            return ;
+        if ($category == null) {
+            return;
         }
 
-        for($i=2; $i<500; $i++){
+        for ($i = 2; $i < 500; $i++) {
             $question = new Question;
 
             $level = $workSheet->getCellByColumnAndRow(1, $i)->getValue();
-            if(!isset($level) || trim($level) === ''){
+            if (!isset($level) || trim($level) === '') {
                 continue;
             }
 
@@ -60,14 +65,13 @@ class QuestionTableSeeder extends Seeder
 
             $question->save();
 
-            for($j=3; $j<=6; $j++){
-              $option = new  Option();
-              $option->title = $workSheet->getCellByColumnAndRow($j, $i)->getValue();
-              $option->question_id = $question->id;
-              $option->is_correct = $option->title == $workSheet->getCellByColumnAndRow(7, $i)->getValue();
-              $option->save();
+            for ($j = 3; $j <= 6; $j++) {
+                $option = new  Option();
+                $option->title = $workSheet->getCellByColumnAndRow($j, $i)->getValue();
+                $option->question_id = $question->id;
+                $option->is_correct = $option->title == $workSheet->getCellByColumnAndRow(7, $i)->getValue();
+                $option->save();
             }
-
-          }
+        }
     }
 }

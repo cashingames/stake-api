@@ -8,6 +8,7 @@ use App\Question;
 use App\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GameController extends BaseController
@@ -20,8 +21,18 @@ class GameController extends BaseController
         $plan = $user->plans()->find($request->planId);
         $category = Category::find($request->categoryId);
 
-        //@TODO - Check if the used field is exhausted
-        $user->plans()->updateExistingPivot($plan->id, ['used' => $plan->pivot_used + 1]);
+        if($plan->pivot->used >= $plan->games_count){
+            return $this->sendError(
+                ['plan' => 'This plan has been exhaused'], 'Game cannot start'
+            );
+        }
+
+        $user->plans()->updateExistingPivot($plan->id,
+            [
+                'used' => $plan->pivot->used + 1,
+                'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+            ]
+        );
 
         $game = new Game();
         $game->user_id = $user->id;
@@ -42,8 +53,11 @@ class GameController extends BaseController
     {
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
-            return $this->SendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
+            return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
+
+        $level = 'easy';
+        //check if the level of the
 
         $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();
 
@@ -68,8 +82,10 @@ class GameController extends BaseController
             $game->wrong_count += 1;
         }
 
+
         $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
         $game->end_time = Carbon::now()->subSeconds(1);
+        $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->save();
 
         $this->sendResponse(true, 'Response saved');
@@ -80,12 +96,17 @@ class GameController extends BaseController
     {
         //get the session information
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
-        $game->end_time = Carbon::now()->subSeconds(1);;
+        $game->end_time = Carbon::now()->subSeconds(1);
+        $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
 
         $game->setWinnings();
 
         $game->save();
+
+        //@TODO: remove hack
+        if($game->duration > 60)
+            $game->duration = 60;
 
         if($game->is_winning){
             $transaction = WalletTransaction::create([
@@ -100,8 +121,7 @@ class GameController extends BaseController
 
         return $this->sendResponse(
             [
-                'game' => $game,
-                'leaders' => $this->_leaders(),
+                'game' => $game
             ],
             'Game finished'
         );
@@ -116,10 +136,10 @@ class GameController extends BaseController
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
         $games = Game::with(['user:id,username'])
-                ->selectRaw('user_id, start_time, end_time, MAX(correct_count) as score')
-                ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
-                ->groupBy('user_id', 'start_time', 'end_time')
-                ->orderBy('score', 'desc')
+                ->selectRaw('user_id, MAX(correct_count) as score, MIN(duration) as duration')
+                // ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
+                ->groupBy('user_id')
+                ->orderBy('score','desc')
                 ->take(10)
                 ->get();
         return $games;
