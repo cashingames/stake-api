@@ -22,12 +22,12 @@ class ResetPasswordController extends Controller
 
     protected function sendResetResponse(Request $request, $response)
     {
-        return $this->sendResponse("Message sent", 'Message Sent');
+        return $this->sendResponse("Password has been reset", "Password has been reset");
     }
 
     protected function sendResetFailedResponse(Request $request, $response)
     {
-         return $this->sendError('Message not sent', 'Message not sent');
+         return $this->sendError("Password reset failed", "Password reset failed");
     }
 
 }

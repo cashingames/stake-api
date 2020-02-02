@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\BaseController;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
+use App\Notifications\PasswordResetNotification;
+use App\Notifications\DatabaseNotification;
+
 
 class ForgotPasswordController extends BaseController
 {
@@ -22,8 +25,10 @@ class ForgotPasswordController extends BaseController
     use SendsPasswordResetEmails;
 
     protected function sendResetLinkResponse(Request $request, $response)
-    {
-        return $this->sendResponse("Link sent", 'Link Sent');
+    {   
+        
+
+        return $this->sendResponse('Link Sent ' , 'Link Sent');
     }
 
     protected function sendResetLinkFailedResponse(Request $request, $response)
