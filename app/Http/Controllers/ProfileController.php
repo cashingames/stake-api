@@ -93,15 +93,20 @@ class ProfileController extends BaseController
                 if ($request->hasFile('avatar')) {
                 $image = $request->file('avatar');
                 $name = $image->getClientOriginalName();
-                $destinationPath = public_path('/uploads');
+                $destinationPath = public_path('/uploads/');
                 $image->move($destinationPath, $name);
 
                 }
 
-                $profile->avatar = $name;
+                $profile->avatar = $destinationPath.$name;
                 $profile->save();
 
-                return $this->sendResponse($profile, "Profile Updated.");
+                $info  = [
+                    'profile' => $profile,
+                    'image_path'=> $destinationPath.$name,
+                    ];
+
+                return $this->sendResponse($info, "Profile Updated.");
             // }
             // catch(\Exception $e){
             //     return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
