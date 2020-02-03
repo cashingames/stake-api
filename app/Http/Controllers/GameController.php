@@ -18,7 +18,7 @@ class GameController extends BaseController
     {
         //get the user information
         $user = auth()->user();
-        $plan = $user->plans()->find($request->planId);
+        $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
         $category = Category::find($request->categoryId);
 
         if($plan->pivot->used >= $plan->games_count){
@@ -27,12 +27,15 @@ class GameController extends BaseController
             );
         }
 
-        $user->plans()->updateExistingPivot($plan->id,
-            [
-                'used' => $plan->pivot->used + 1,
-                'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-            ]
-        );
+        DB::table('user_plan')
+            ->where('id', $plan->pivot->id)
+            ->update(
+                [
+                    'used' => $plan->pivot->used + 1,
+                    'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+                ]
+            );
+
 
         $game = new Game();
         $game->user_id = $user->id;

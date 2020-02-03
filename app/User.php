@@ -68,10 +68,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function plans(){
-        return $this->belongsToMany(Plan::class, 'user_plan')->withPivot('used');
+        return $this->belongsToMany(Plan::class, 'user_plan')->withPivot('used','id');
     }
 
     public function games(){
         return $this->hasMany(Game::class);
+    }
+
+    public function activePlans(){
+        return $this->plans()->wherePivot('is_active', true);
     }
 }
