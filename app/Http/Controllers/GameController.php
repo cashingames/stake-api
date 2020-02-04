@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Game;
 use App\Question;
+use App\User;
 use App\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -98,13 +99,12 @@ class GameController extends BaseController
     public function end(String $sessionToken)
     {
         //get the session information
-        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        $user = auth()->user();
+        $game = $user->games()->where('session_token', $sessionToken)->first();
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
-
         $game->setWinnings();
-
         $game->save();
 
         //@TODO: remove hack
@@ -113,7 +113,7 @@ class GameController extends BaseController
 
         if($game->is_winning){
             $transaction = WalletTransaction::create([
-                'wallet_id' => auth()->user()->wallet->id,
+                'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' =>  $game->amount_gained,
                 'wallet_type' => 'CASH',
