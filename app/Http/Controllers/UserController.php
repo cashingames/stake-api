@@ -28,7 +28,7 @@ class UserController extends BaseController
         $user = auth()->user();
         $result = [
             'user' => auth()->user(),
-            'plans' => $user->plans()->wherePivot('is_active', true)->get(),
+            'plans' => $user->activePlans()->get(),
             'wallet' => $user->wallet
         ];
         return $this->sendResponse($result, 'User details');
@@ -36,7 +36,7 @@ class UserController extends BaseController
 
     public function plans()
     {
-        $myPlans = auth()->user()->plans()->wherePivot('is_active', true)->get();
+        $myPlans = auth()->user()->activePlans()->get();
         return $this->sendResponse($myPlans, 'User active plans');
     }
 }

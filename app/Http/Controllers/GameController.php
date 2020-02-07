@@ -18,7 +18,7 @@ class GameController extends BaseController
     {
         //get the user information
         $user = auth()->user();
-        $plan = $user->plans()->find($request->planId);
+        $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
         $category = Category::find($request->categoryId);
 
         if($plan->pivot->used >= $plan->games_count){
@@ -27,16 +27,20 @@ class GameController extends BaseController
             );
         }
 
-        $user->plans()->updateExistingPivot($plan->id,
-            [
-                'used' => $plan->pivot->used + 1,
-                'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-            ]
-        );
+        DB::table('user_plan')
+            ->where('id', $plan->pivot->id)
+            ->update(
+                [
+                    'used' => $plan->pivot->used + 1,
+                    'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+                ]
+            );
+
 
         $game = new Game();
         $game->user_id = $user->id;
         $game->plan_id = $plan->id;
+        $game->live_id = $plan->pivot->id;
         $game->category_id = $category->id;
         $game->session_token = Str::random(40);
         $game->start_time = Carbon::now();
@@ -95,13 +99,12 @@ class GameController extends BaseController
     public function end(String $sessionToken)
     {
         //get the session information
-        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        $user = auth()->user();
+        $game = $user->games()->where('session_token', $sessionToken)->first();
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
-
         $game->setWinnings();
-
         $game->save();
 
         //@TODO: remove hack
@@ -110,7 +113,7 @@ class GameController extends BaseController
 
         if($game->is_winning){
             $transaction = WalletTransaction::create([
-                'wallet_id' => auth()->user()->wallet->id,
+                'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' =>  $game->amount_gained,
                 'wallet_type' => 'CASH',
