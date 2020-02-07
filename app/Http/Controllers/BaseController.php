@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller as Controller;
 
 class BaseController extends Controller
 {  
-   
+    public $token;
      /**
      * success response method.
      *
