@@ -16,8 +16,8 @@ Route::group([
     Route::post('refresh', 'Auth\Login@refresh');
     Route::post('email/is-valid', 'ProfileController@checkEmail');
     
-    Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
-    Route::get('password/reset/{token}', 'ResetPasswordController@reset')->name('password.reset');
+    Route::post('password/email', 'Auth\ForgotPasswordController@sendEmail');
+    Route::post('password/reset', 'Auth\ResetPasswordController@reset');
     
 });
 
