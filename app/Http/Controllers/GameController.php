@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Game;
 use App\Question;
-use App\User;
 use App\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -41,6 +40,7 @@ class GameController extends BaseController
         $game = new Game();
         $game->user_id = $user->id;
         $game->plan_id = $plan->id;
+        $game->live_id = $plan->pivot->id;
         $game->category_id = $category->id;
         $game->session_token = Str::random(40);
         $game->start_time = Carbon::now();

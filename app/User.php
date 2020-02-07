@@ -79,8 +79,10 @@ class User extends Authenticatable implements JWTSubject
     public function activePlans(){
         return $this->plans()->wherePivot('is_active', true);
     }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new PasswordResetNotification($token));
     }
+
 }
