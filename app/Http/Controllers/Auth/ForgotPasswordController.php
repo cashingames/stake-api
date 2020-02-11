@@ -29,7 +29,7 @@ class ForgotPasswordController extends BaseController
     public function sendEmail(Request $request)
     {   
         $data = $request->validate([
-            'email' =>['required', 'string', 'email', 'max:100']
+            'email' =>['required', 'string', 'email']
         ]);
 
         $user = User::where('email', request()->input('email'))->first();
