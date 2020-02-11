@@ -79,34 +79,31 @@ class ProfileController extends BaseController
     {
             // try{
 
-                $data  = $request->validate([
-                    'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
-                ]);
+            $data  = $request->validate([
+                'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+            ]);
 
-                if(!$data){
-                    return $this->sendError("The file must be an image", "The file must be an image");
-                }
+            if(!$data){
+                return $this->sendError("The file must be an image", "The file must be an image");
+            }
 
-                $user = auth()->user();
-                $profile = $user->profile;   
+            $user = auth()->user();
+            $profile = $user->profile;   
 
-                if ($request->hasFile('avatar')) {
-                $image = $request->file('avatar');
-                $name = $image->getClientOriginalName();
-                $destinationPath = public_path('/uploads/');
-                $image->move($destinationPath, $name);
+            if ($request->hasFile('avatar')) {
+            $image = $request->file('avatar');
+            $name = $image->getClientOriginalName();
+            $destinationPath = public_path('/avatar/');
+            $image->move($destinationPath, $name);
 
-                }
+            }
 
-                $profile->avatar = $destinationPath.$name;
-                $profile->save();
+            $profile->avatar = "/avatar/".$name;
+            $profile->save();
 
-                $info  = [
-                    'profile' => $profile,
-                    'image_path'=> $destinationPath.$name,
-                    ];
+        
 
-                return $this->sendResponse($info, "Profile Updated.");
+            return $this->sendResponse($profile, "Profile Updated.");
             // }
             // catch(\Exception $e){
             //     return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
