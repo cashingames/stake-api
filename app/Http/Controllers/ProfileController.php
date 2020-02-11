@@ -80,7 +80,7 @@ class ProfileController extends BaseController
             // try{
 
             $data  = $request->validate([
-                'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+                'avatar'     =>  'image|mimes:jpeg,png,jpg,gif,base64|max:2048'
             ]);
 
             if(!$data){
