@@ -35,7 +35,6 @@ class ProfileController extends BaseController
             'dateOfBirth' => ['nullable', 'date'],
             'address' =>['nullable', 'string', 'between:10,300'],
             'state' => ['nullable', 'string', 'max:100'],
-            'avatar' => ['nullable'],
             'accountName' => ['nullable', 'string', 'max:255'],
             'bankName' => ['nullable', 'string', 'max:255'],
             'accountNumber'=> ['nullable', 'string', 'max:255'],
@@ -57,7 +56,7 @@ class ProfileController extends BaseController
                 $profile->date_of_birth = new Carbon($data['dateOfBirth']);
                 $profile->address = $data['address'];
                 $profile->state = $data['state'];   
-                $profile->avatar = $data['avatar'] ;            
+                $profile->avatar = $profile->avatar;           
                 $profile->account_name =$data['accountName'];
                 $profile->bank_name = $data['bankName'];
                 $profile->account_number = $data['accountNumber'];
@@ -80,7 +79,7 @@ class ProfileController extends BaseController
             // try{
 
             $data  = $request->validate([
-                'avatar'     =>  'image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+                'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
             ]);
 
             if(!$data){
