@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-
+use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\User;
 use App\Http\Controllers\BaseController;
 
@@ -57,6 +57,7 @@ class RegisterController extends BaseController
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
 
