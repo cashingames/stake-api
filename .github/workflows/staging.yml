@@ -36,6 +36,6 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@2.0.0
       env:
-        FTP_SERVER: ftp.cashingames.com
+        FTP_SERVER: 198.38.94.115
         FTP_USERNAME: api-user@stg.cashingames.com
         FTP_PASSWORD: ${{ secrets.STG_FTP_PASSWORD }}
