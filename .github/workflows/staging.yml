@@ -13,7 +13,7 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
     - name: Install Dependencies
-      run: composer install --optimize-autoloader --no-dev -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
     - name: Generate keys
       run: |
         php artisan key:generate
@@ -30,6 +30,7 @@ jobs:
       run: vendor/bin/phpunit
     - name: Optimize for production
       run: |
+        composer install --optimize-autoloader --no-dev
         php -r "file_exists('.env.staging') || copy('.env.staging', '.env');"
         composer dump-autoload
         php artisan config:cache
