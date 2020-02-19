@@ -15,10 +15,10 @@ Route::group([
     Route::post('logout', 'Auth\LoginController@logout');
     Route::post('refresh', 'Auth\Login@refresh');
     Route::post('email/is-valid', 'ProfileController@checkEmail');
-    
+
     Route::post('password/email', 'Auth\ForgotPasswordController@sendEmail');
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-    
+
 });
 
 Route::group([

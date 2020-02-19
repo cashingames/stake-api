@@ -30,6 +30,8 @@ jobs:
       run: vendor/bin/phpunit
     - name: Optimize for production
       run: |
+        php -r "file_exists('.env.staging') || copy('.env.staging', '.env');"
+        composer dump-autoload
         php artisan config:cache
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@2.0.0
@@ -37,4 +39,4 @@ jobs:
         FTP_SERVER: ${{ secrets.FTP_HOST }}
         FTP_USERNAME: api-user@stg.cashingames.com
         FTP_PASSWORD: ${{ secrets.STG_FTP_PASSWORD }}
-        # ARGS: --delete
+        ARGS: --delete
