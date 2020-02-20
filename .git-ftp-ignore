@@ -1,0 +1,19 @@
+.gitignore
+*/.gitignore      # ignore files in sub directories
+*/.gitkeep
+.git-ftp-ignore
+.git-ftp-include
+.gitlab-ci.yml
+.vscode
+.github
+vendor/
+.editorconfig
+.env.ci
+.env.example
+.env.staging
+.gitattributes
+.phpunit.result.cache
+.styleci.yml
+database design thinking
+Procfile
+Questions.xlsx

@@ -1,59 +1,43 @@
-# name: Staging Pipeline
+name: Staging Pipeline
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
 
-# jobs:
-#   laravel-tests:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v1
-#     - name: Copy .env
-#       run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
-#     - name: Install Dependencies
-#       run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-#     - name: Generate keys
-#       run: |
-#         php artisan key:generate
-#         php artisan jwt:secret
-#     - name: Create Database
-#       run: |
-#         mkdir -p database
-#         touch database/database.sqlite
-#         php artisan migrate --seed
-#     - name: Execute tests (Unit and Feature tests) via PHPUnit
-#       env:
-#         DB_CONNECTION: sqlite
-#         DB_DATABASE: database/database.sqlite
-#       run: vendor/bin/phpunit
-#     - name: Optimize for production
-#       run: |
-#         composer install --optimize-autoloader --no-dev
-#         php -r "file_exists('.env.staging') || copy('.env.staging', '.env');"
-#         composer dump-autoload
-#         php artisan config:cache
-#     - name: FTP-Deploy-Action
-#       uses: SamKirkland/FTP-Deploy-Action@2.0.0
-#       env:
-#         FTP_SERVER: ${{ secrets.FTP_HOST }}
-#         FTP_USERNAME: api-user@stg.cashingames.com
-#         FTP_PASSWORD: ${{ secrets.STG_FTP_PASSWORD }}
-#         ARGS: --delete
-name: remote ssh command
-on: [push]
 jobs:
-
-  build:
-    name: Build
+  laravel-tests:
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
-      with:
-        host: 198.38.94.115
-        username: cashinga
-        password: bFU4P0v9yj**G1
-        port: 4747
-        script: whoami
+    - uses: actions/checkout@v1
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: Generate keys
+      run: |
+        php artisan key:generate
+        php artisan jwt:secret
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+        php artisan migrate --seed
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: vendor/bin/phpunit
+    - name: Optimize for production
+      run: |
+        composer update
+        composer install --optimize-autoloader --no-dev
+        php -r "file_exists('.env.staging') || copy('.env.staging', '.env');"
+        composer dump-autoload
+        php artisan config:cache
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@2.0.0
+      env:
+        FTP_SERVER: ${{ secrets.FTP_HOST }}
+        FTP_USERNAME: api-user@stg.cashingames.com
+        FTP_PASSWORD: ${{ secrets.STG_FTP_PASSWORD }}
