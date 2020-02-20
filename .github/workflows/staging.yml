@@ -32,7 +32,6 @@ jobs:
       run: |
         composer update
         composer install --optimize-autoloader --no-dev
-        php -r "file_exists('.env.staging') || copy('.env.staging', '.env');"
         composer dump-autoload
         php artisan config:cache
     - name: FTP-Deploy-Action

@@ -6,7 +6,7 @@
 .gitlab-ci.yml
 .vscode
 .github
-vendor/
+/vendor
 .editorconfig
 .env.ci
 .env.example
