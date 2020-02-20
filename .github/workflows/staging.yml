@@ -28,12 +28,11 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: vendor/bin/phpunit
-    - name: Optimize for production
-      run: |
-        composer update
-        composer install --optimize-autoloader --no-dev
-        composer dump-autoload
-        php artisan config:cache
+  laravel-ftp-deploy:
+    needs: laravel-tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@2.0.0
       env:
