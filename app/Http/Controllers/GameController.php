@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Cast\String_;
 
 class GameController extends BaseController
 {
@@ -55,18 +56,26 @@ class GameController extends BaseController
     //
     public function fetchQuestion(String $sessionToken)
     {
+        $levels  = array('easy' => 0, 'medium' => 1, 'hard' => 2 );
+        $currentLevel = 'easy';
+
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
-        $level = 'easy';
-        //check if the level of the
+        $lastQuestion = $game->questions()->latest()->first();
+        if($lastQuestion){
+            $currentLevel = $lastQuestion->level;
+        }
 
-        $question = $game->category->questions()->where('level', 'easy')->inRandomOrder()->take(1)->first();
+        //check if last two corect questions are of the same level
+        $correctQuestionCount =  $game->questions()->latest()->take(2)->where(['is_correct'=> 1, 'level' => $currentLevel])->get()->count();
+        if($correctQuestionCount == 2 && $currentLevel != 'hard' ){
+            $currentLevel = $levels[$currentLevel] + 1;
+        }
 
-        //check if the user already saw this question for this session
-        //if true, try again
+        $question = $game->category->questions()->where('level', $currentLevel)->inRandomOrder()->take(1)->first();
 
         return $this->sendResponse($question, "Question fetched");
     }

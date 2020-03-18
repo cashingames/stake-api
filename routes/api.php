@@ -17,6 +17,7 @@ Route::group([
     Route::post('email/is-valid', 'ProfileController@checkEmail');
 
     Route::post('password/email', 'Auth\ForgotPasswordController@sendEmail');
+    Route::post('password/verify-token', 'Auth\ForgotPasswordController@verifyToken');
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
 });
