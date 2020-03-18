@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\BaseController;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use App\Mail\TokenGenerated;
 use Illuminate\Http\Request;
-use App\Notifications\PasswordResetNotification;
-use App\Notifications\DatabaseNotification;
 use App\User;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ForgotPasswordController extends BaseController
 {
@@ -27,35 +26,57 @@ class ForgotPasswordController extends BaseController
     // use SendsPasswordResetEmails;
 
     public function sendEmail(Request $request)
-    {   
+    {
         $data = $request->validate([
-            'email' =>['required', 'string', 'email']
+            'email' => ['required', 'string', 'email']
         ]);
 
-        $user = User::where('email', request()->input('email'))->first();
+        $user = User::where('email', $data['email'])->first();
 
-        if (!$user){
-
+        if (!$user) {
             return $this->sendError('Please enter your registered email address', 'Please enter your registered email address');
         }
 
-       
-        $token = md5(uniqid(rand(),true));
-        
-        $mail = new PHPMailer(true);
-        $mail->setFrom('noreply@cashingames.com');
-        $mail->addAddress($data['email']);
-        $mail->isSMTP();
-        $mail->Host = "smtp.mailtrap.io";
-        $mail->SMTPAuth = true;
-        $mail->Username = '8813df984fe70a';
-        $mail->Password = 'b4c7e475644605';
-        $mail->Subject = 'Reset your password';
-        $mail->Body    = "<p>You are recieving this because you requested for a password change.To change your password please use:  $token  </p>";
-        $mail->send();
+        $token = strtoupper(substr(md5(time()), 0, 7));
+        Mail::to($data['email'])->send(new TokenGenerated($token));
 
-        
+        // update user's password token and token expiry time
+        $now = Carbon::now();
+        $expiry_time =  Carbon::now()->addMinutes(10);
+        $exists = DB::select('select * from password_resets where email = ?', [$data['email']]);
+
+        if ($exists) {
+            DB::update('update password_resets set token = ?, token_expiry = ?  where email = ?', [$token, $expiry_time, $data['email']]);
+        } else {
+            DB::insert('insert into password_resets (email, token, created_at, token_expiry) values (?, ?, ?, ?)', [$data['email'], $token, $now, $expiry_time]);
+        }
+
         return $this->sendResponse($token, 'Email Sent');
-    
+    }
+
+
+    public function verifyToken(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'string', 'email'],
+            'token' => ['required', 'string']
+        ]);
+
+        if ($data) {
+            $user = DB::selectOne('select * from password_resets where email = ?', [$data['email']]);
+
+            if (!$user) {
+                return $this->sendError('Invalid verification code', 'Invalid verification code');
+            }
+
+            $now = Carbon::now();
+            if ($now->greaterThan($user->token_expiry)) {
+                return $this->sendError('Verification code has expired,  try again later', 'Verification code has expired,  try again later');
+            }
+
+            return $this->sendResponse("Verification successful", 'Verification successful');
+        } else {
+            return $this->sendError('Verification failed', 'verification failed');
+        }
     }
 }
