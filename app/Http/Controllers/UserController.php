@@ -27,7 +27,8 @@ class UserController extends BaseController
     {
         $user = auth()->user();
         $result = [
-            'user' => auth()->user(),
+            'user' => $user,
+            'profile' => $user->profile,
             'plans' => $user->activePlans()->get(),
             'wallet' => $user->wallet
         ];
