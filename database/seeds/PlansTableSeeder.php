@@ -16,8 +16,8 @@ class PlansTableSeeder extends Seeder
         //
         DB::table('plans')->insert(
             [
-                'name' => 'Silver',
-                'description' => 'Silver band',
+                'name' => 'Bronze',
+                'description' => 'Bronze band',
                 'price' => 150.00,
                 'games_count' => 4,
                 'point_per_question' => 1,
@@ -28,8 +28,8 @@ class PlansTableSeeder extends Seeder
 
         DB::table('plans')->insert(
             [
-                'name' => 'Bronze',
-                'description' => 'Bronze band',
+                'name' => 'Silver',
+                'description' => 'Silver band',
                 'price' => 250.00,
                 'games_count' => 6,
                 'point_per_question' => 2,
