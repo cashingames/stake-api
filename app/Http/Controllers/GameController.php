@@ -17,6 +17,11 @@ class GameController extends BaseController
     //
     public function start(Request $request)
     {
+        if(!$request->liveId){
+            return $this->sendError([
+                'plan' => 'Invalid live supplied'
+            ], "Failed game attempt");
+        }
         //get the user information
         $user = auth()->user();
         $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
