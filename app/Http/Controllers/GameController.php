@@ -22,9 +22,10 @@ class GameController extends BaseController
         $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
         $category = Category::find($request->categoryId);
 
-        if($plan->pivot->used >= $plan->games_count){
+        if ($plan->pivot->used >= $plan->games_count) {
             return $this->sendError(
-                ['plan' => 'This plan has been exhaused'], 'Game cannot start'
+                ['plan' => 'This plan has been exhaused'],
+                'Game cannot start'
             );
         }
 
@@ -56,15 +57,18 @@ class GameController extends BaseController
     public function get_last_question(String $token)
     {
         $game = auth()->user()->games()->where('session_token', $token)->first();
-        $last_question = $game->questions()->latest()->first();
+        $last_question = $game->questions()
+            ->orderBy('game_questions.created_at', 'desc')
+            ->first();
         return $last_question;
     }
 
     //
     public function fetchQuestion(String $sessionToken)
     {
-        $levels  = array('easy' => 0, 'medium' => 1, 'hard' => 2 );
         $current_level = 'easy';
+        $next_level = '';
+        $correct_consecutive_count = 0;
 
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
@@ -72,20 +76,49 @@ class GameController extends BaseController
         }
 
         $last_question = $this->get_last_question($sessionToken);
-        if($last_question){
-            $this->$current_level = $last_question->level;
+        if ($last_question) {
+            $current_level = $last_question->level;
         }
 
-        //check if last two corect questions are of the same level
-        $correct_answer_count =  $game->questions()->latest()->take(2)->where(['is_correct'=> 1, 'level' => $current_level])->get()->count();
-        if($correct_answer_count == 2 && $current_level != 'hard' ){
-            $this->$current_level = $levels[$current_level] + 1;
+        //get last two questions
+        $last_two_questions = $game->questions()
+            ->orderBy('game_questions.created_at', 'desc')
+            ->take(2)
+            ->get();
+
+        foreach ($last_two_questions as $question) {
+            if ($question->level == $current_level && $question->pivot->is_correct == "1") {
+                $correct_consecutive_count += 1;
+            }
+        }
+
+        if ($correct_consecutive_count == 2 && $current_level != 'hard') {
+            if ($current_level == 'easy') {
+                $next_level = 'medium';
+            } else if ($current_level == 'medium') {
+                $next_level = 'hard';
+            } else {
+                $next_level = $current_level;
+            }
+
+            $current_level = $next_level;
         }
 
         $question = $game->category->questions()->where('level', $current_level)->inRandomOrder()->take(1)->first();
 
         //check if the user already saw this question for this session
         //if true, try again
+        $attempted_question = $game->questions()->where(['id', $question->id])->first();
+        while ($attempted_question) {
+            error_log("caught a repitition ". $question);
+            $random_question = $game->category->questions()->where('level', $current_level)->inRandomOrder()->take(1)->first();
+            $random_question_exists = $game->questions()->where(['id', $random_question->id])->first();
+
+            if (!$random_question_exists) {
+                $question = $random_question;
+                break;
+            }
+        }
 
         return $this->sendResponse($question, "Question fetched");
     }
@@ -106,7 +139,7 @@ class GameController extends BaseController
         }
 
 
-        $game->questions()->save($question, ['is_correct' => $isCorrect, 'option_id' => $request->optionId]);
+        $game->questions()->save($question, ['question_id' => $question->id, 'is_correct' => $isCorrect, 'option_id' => $request->optionId, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->save();
@@ -127,10 +160,10 @@ class GameController extends BaseController
         $game->save();
 
         //@TODO: remove hack
-        if($game->duration > 60)
+        if ($game->duration > 60)
             $game->duration = 60;
 
-        if($game->is_winning){
+        if ($game->is_winning) {
             $transaction = WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
@@ -149,21 +182,23 @@ class GameController extends BaseController
         );
     }
 
-    public function leaders(){
+    public function leaders()
+    {
         return $this->sendResponse($this->_leaders(), 'Leaderboard data');
     }
 
-    private function _leaders(){
+    private function _leaders()
+    {
         $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
         $games = Game::with(['user:id,username'])
-                ->selectRaw('user_id, MAX(correct_count) as score, MIN(duration) as duration')
-                // ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
-                ->groupBy('user_id')
-                ->orderBy('score','desc')
-                ->take(10)
-                ->get();
+            ->selectRaw('user_id, MAX(correct_count) as score, MIN(duration) as duration')
+            // ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
+            ->groupBy('user_id')
+            ->orderBy('score', 'desc')
+            ->take(10)
+            ->get();
         return $games;
     }
 }
