@@ -83,16 +83,15 @@ class GameController extends BaseController
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
-        $previousQuestion = $game->questions()->orderBy('game_questions.created_at', 'desc')->first();
+        $seenGameQuestions = $game->questions()->orderBy('game_questions.created_at', 'desc')->get();
+
+        $previousQuestion = $seenGameQuestions->first();
         if ($previousQuestion) {
             $level = $previousQuestion->level;
         }
 
         //get last two questions
-        $lastTwoConsecutiveQuestions = $game->questions()
-            ->orderBy('game_questions.created_at', 'desc')
-            ->take(2)
-            ->get();
+        $lastTwoConsecutiveQuestions = $seenGameQuestions->take(2);
 
         foreach ($lastTwoConsecutiveQuestions as $question) {
             if ($question->level == $level && $question->pivot->is_correct == "1") {
@@ -116,11 +115,11 @@ class GameController extends BaseController
 
         //check if the user already saw this question for this session
         //if true, try again
-        $exists = $game->questions()->find($question->id);
+        $exists = $seenGameQuestions->find($question->id);
         while ($exists) {
             error_log("caught a repitition ". $question);
             $newQuestion = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
-            $exists = $game->questions()->find($newQuestion->id);
+            $exists = $seenGameQuestions->find($newQuestion->id);
 
             if (!$exists) {
                 $question = $newQuestion;
