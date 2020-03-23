@@ -17,8 +17,9 @@ class Game extends Model
     }
 
     public function questions(){
-        return $this->belongsToMany(Question::class, 'game_questions')->withPivot('is_correct');
+        return $this->belongsToMany(Question::class, 'game_questions')->withPivot('is_correct', 'created_at');
     }
+
 
     public function plan(){
         return $this->belongsTo(Plan::class);
