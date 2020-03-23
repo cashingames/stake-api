@@ -17,15 +17,27 @@ class GameController extends BaseController
     //
     public function start(Request $request)
     {
-        if(!$request->liveId){
+        if (!$request->liveId) {
             return $this->sendError([
-                'plan' => 'Invalid live supplied'
+                'live' => 'Please select a live to play'
             ], "Failed game attempt");
         }
         //get the user information
         $user = auth()->user();
         $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
+        if (!$plan) {
+            return $this->sendError([
+                'live' => 'Invalid live supplied'
+            ], "Failed game attempt");
+        }
+
         $category = Category::find($request->categoryId);
+        if (!$category) {
+            return $this->sendError([
+                'category' => 'Invalid category supplied'
+            ], "Failed game attempt");
+        }
+
 
         if ($plan->pivot->used >= $plan->games_count) {
             return $this->sendError(
