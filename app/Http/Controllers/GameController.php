@@ -54,68 +54,59 @@ class GameController extends BaseController
         return $this->sendResponse($game, "Game started");
     }
 
-    public function get_last_question(String $token)
-    {
-        $game = auth()->user()->games()->where('session_token', $token)->first();
-        $last_question = $game->questions()
-            ->orderBy('game_questions.created_at', 'desc')
-            ->first();
-        return $last_question;
-    }
-
     //
     public function fetchQuestion(String $sessionToken)
     {
-        $current_level = 'easy';
-        $next_level = '';
-        $correct_consecutive_count = 0;
+        $level = 'easy';
+        $nextLevel = '';
+        $correctConsecutiveCount = 0;
 
         $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
-        $last_question = $this->get_last_question($sessionToken);
-        if ($last_question) {
-            $current_level = $last_question->level;
+        $previousQuestion = $game->questions()->orderBy('game_questions.created_at', 'desc')->first();
+        if ($previousQuestion) {
+            $level = $previousQuestion->level;
         }
 
         //get last two questions
-        $last_two_questions = $game->questions()
+        $lastTwoConsecutiveQuestions = $game->questions()
             ->orderBy('game_questions.created_at', 'desc')
             ->take(2)
             ->get();
 
-        foreach ($last_two_questions as $question) {
-            if ($question->level == $current_level && $question->pivot->is_correct == "1") {
-                $correct_consecutive_count += 1;
+        foreach ($lastTwoConsecutiveQuestions as $question) {
+            if ($question->level == $level && $question->pivot->is_correct == "1") {
+                $correctConsecutiveCount += 1;
             }
         }
 
-        if ($correct_consecutive_count == 2 && $current_level != 'hard') {
-            if ($current_level == 'easy') {
-                $next_level = 'medium';
-            } else if ($current_level == 'medium') {
-                $next_level = 'hard';
+        if ($correctConsecutiveCount == 2 && $level != 'hard') {
+            if ($level == 'easy') {
+                $nextLevel = 'medium';
+            } else if ($level == 'medium') {
+                $nextLevel = 'hard';
             } else {
-                $next_level = $current_level;
+                $nextLevel = $level;
             }
 
-            $current_level = $next_level;
+            $level = $nextLevel;
         }
 
-        $question = $game->category->questions()->where('level', $current_level)->inRandomOrder()->take(1)->first();
+        $question = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
 
         //check if the user already saw this question for this session
         //if true, try again
-        $attempted_question = $game->questions()->where(['id', $question->id])->first();
-        while ($attempted_question) {
+        $question = $game->questions()->where(['id', $question->id])->first();
+        while ($question) {
             error_log("caught a repitition ". $question);
-            $random_question = $game->category->questions()->where('level', $current_level)->inRandomOrder()->take(1)->first();
-            $random_question_exists = $game->questions()->where(['id', $random_question->id])->first();
+            $newQuestion = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
+            $exists = $game->questions()->where(['id', $newQuestion->id])->first();
 
-            if (!$random_question_exists) {
-                $question = $random_question;
+            if (!$exists) {
+                $question = $newQuestion;
                 break;
             }
         }
