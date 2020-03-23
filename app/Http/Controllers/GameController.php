@@ -99,11 +99,11 @@ class GameController extends BaseController
 
         //check if the user already saw this question for this session
         //if true, try again
-        $question = $game->questions()->where(['id', $question->id])->first();
-        while ($question) {
+        $exists = $game->questions()->find($question->id);
+        while ($exists) {
             error_log("caught a repitition ". $question);
             $newQuestion = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
-            $exists = $game->questions()->where(['id', $newQuestion->id])->first();
+            $exists = $game->questions()->find($newQuestion->id);
 
             if (!$exists) {
                 $question = $newQuestion;
