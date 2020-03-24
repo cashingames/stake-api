@@ -3,16 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\BaseController;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use App\Mail\TokenGenerated;
 use Illuminate\Http\Request;
-use App\Notifications\PasswordResetNotification;
-use App\Notifications\DatabaseNotification;
 use App\User;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use Illuminate\Support\Facades\DB;
 
 class ForgotPasswordController extends BaseController
 {
@@ -35,7 +31,7 @@ class ForgotPasswordController extends BaseController
             'email' => ['required', 'string', 'email']
         ]);
 
-        $user = User::where('email', request()->input('email'))->first();
+        $user = User::where('email', $data['email'])->first();
 
         if (!$user) {
             return $this->sendError('Please enter your registered email address', 'Please enter your registered email address');
@@ -43,7 +39,6 @@ class ForgotPasswordController extends BaseController
 
         $token = strtoupper(substr(md5(time()), 0, 7));
         $subject = "Reset Password";
-        // $mail = "You are recieving this because you requested for a password reset.To reset your password please use this code: " . $token;
         $email_content = array(
             'username'=>$user->username,
             'token'=>$token,
@@ -58,6 +53,8 @@ class ForgotPasswordController extends BaseController
         if (Mail::failures()) {
             return $this->sendError('Sorry! Please try again latter', 'Sorry! Please try again latter');
         }
+
+        // Mail::to($data['email'])->send(new TokenGenerated($token));
 
         // update user's password token and token expiry time
         $now = Carbon::now();

@@ -111,6 +111,17 @@
             display: block;
             color: #fff;
         }
+
+        ::-moz-selection {
+            /* Code for Firefox */
+            color: red;
+            background: yellow;
+        }
+
+        ::selection {
+            color: red;
+            background: yellow;
+        }
     </style>
 </head>
 
@@ -128,9 +139,9 @@
                     <h2>Hi {{$username}}, </h2>
                     <p class="lead">You have requested to change your password.</p>
                     <p class="py-2">
-                        Copy the link below to reset your password. If you did'nt request a new password, you can safely delete the email .
+                        Copy the link below to reset your password. If you did'nt request for a new password, you can safely delete the email .
                     </p>
-                    <span class="bg-primary px-4 py-2 text-lightb lock text-center token ">{{$token}}</span>
+                    <span class="bg-primary px-4 py-2 text-light text-center token ">{{$token}}</span>
                 </div>
             </div>
         </div>

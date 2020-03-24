@@ -2,45 +2,28 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Route::middleware('auth:api')->group( function () {
-//     Route::resource('products', 'API\ProductController');
-// });
+Route::post('auth/login', 'Auth\LoginController@login')->middleware('api');
+Route::post('auth/register', 'Auth\RegisterController@register')->middleware('api');
+Route::post('auth/logout', 'Auth\LoginController@logout')->middleware('api');
+Route::post('auth/refresh', 'Auth\Login@refresh')->middleware('api');
+Route::post('auth/email/is-valid', 'ProfileController@checkEmail')->middleware('api');
+Route::post('auth/password/email', 'Auth\ForgotPasswordController@sendEmail')->middleware('api');
+Route::post('auth/password/verify-token', 'Auth\ForgotPasswordController@verifyToken')->middleware('api');
+Route::post('auth/password/reset', 'Auth\ResetPasswordController@reset')->middleware('api');
 
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'auth'
-], function ($router) {
-    Route::post('login', 'Auth\LoginController@login');
-    Route::post('register', 'Auth\RegisterController@register');
-    Route::post('logout', 'Auth\LoginController@logout');
-    Route::post('refresh', 'Auth\Login@refresh');
-    Route::post('email/is-valid', 'ProfileController@checkEmail');
-
-    Route::post('password/email', 'Auth\ForgotPasswordController@sendEmail');
-    Route::post('password/verifyToken', 'Auth\ForgotPasswordController@verifyToken');
-    Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-
-});
-
-Route::group([
-    'middleware' => 'auth:api',
-    'prefix' => 'v1'
-], function ($router) {
-    Route::get('game/leaders', 'GameController@leaders');
-    Route::post('game/end/{sessionToken}', 'GameController@end');
-    Route::post('game/fetch-question/{sessionToken}', 'GameController@saveQuestionResponse');
-    Route::get('game/fetch-question/{sessionToken}', 'GameController@fetchQuestion');
-    Route::post('game/start', 'GameController@start');
-    Route::get('categories', 'CategoryController@get');
-    Route::post('plans/me/subscribe', 'PlanController@subscribe');
-    Route::get('plans', 'PlanController@get');
-    Route::get('wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction');
-    Route::get('wallet/me/transactions', 'WalletController@transactions');
-    Route::get('wallet/me', 'WalletController@me');
-    Route::post('profile/me/edit', 'ProfileController@edit');
-    Route::post('profile/me/picture', 'ProfileController@addProfilePic');
-    Route::get('profile/me', 'ProfileController@me');
-    Route::get('user/me/plans', 'UserController@plans');
-    Route::get('user/me', 'UserController@me');
-});
-
+Route::get('v1/game/leaders', 'GameController@leaders')->middleware('auth:api');
+Route::post('v1/game/end/{sessionToken}', 'GameController@end')->middleware('auth:api');
+Route::post('v1/game/fetch-question/{sessionToken}', 'GameController@saveQuestionResponse')->middleware('auth:api');
+Route::get('v1/game/fetch-question/{sessionToken}', 'GameController@fetchQuestion')->middleware('auth:api');
+Route::post('v1/game/start', 'GameController@start')->middleware('auth:api');
+Route::get('v1/categories', 'CategoryController@get')->middleware('auth:api');
+Route::post('v1/plans/me/subscribe', 'PlanController@subscribe')->middleware('auth:api');
+Route::get('v1/plans', 'PlanController@get')->middleware('auth:api');
+Route::get('v1/wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction')->middleware('auth:api');
+Route::get('v1/wallet/me/transactions', 'WalletController@transactions')->middleware('auth:api');
+Route::get('v1/wallet/me', 'WalletController@me')->middleware('auth:api');
+Route::post('v1/profile/me/edit', 'ProfileController@edit')->middleware('auth:api');
+Route::post('v1/profile/me/picture', 'ProfileController@addProfilePic')->middleware('auth:api');
+Route::get('v1/profile/me', 'ProfileController@me')->middleware('auth:api');
+Route::get('v1/user/me/plans', 'UserController@plans')->middleware('auth:api');
+Route::get('v1/user/me', 'UserController@me')->middleware('auth:api');

@@ -9,6 +9,15 @@ class WalletTransaction extends Model
 {
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+    ];
+
+    /**
      * The event map for the model.
      *
      * @var array
@@ -43,9 +52,14 @@ class WalletTransaction extends Model
 
     // }
 
-    public function wallet(){
+    public function wallet()
+    {
         return $this->belongsTo(Wallet::class);
     }
 
+    // public function getFirstNameAttribute($value)
+    // {
+    //     return ucfirst($value);
+    // }
 
 }
