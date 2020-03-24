@@ -43,9 +43,14 @@ class ForgotPasswordController extends BaseController
 
         $token = strtoupper(substr(md5(time()), 0, 7));
         $subject = "Reset Password";
-        $mail = "You are recieving this because you requested for a password reset.To reset your password please use this code: " . $token;
+        // $mail = "You are recieving this because you requested for a password reset.To reset your password please use this code: " . $token;
+        $email_content = array(
+            'username'=>$user->username,
+            'token'=>$token,
+            'current_year'=>$now = Carbon::now()->year
+        );
 
-        Mail::raw($mail, function ($message) use ($data, $user, $subject) {
+        Mail::send([ 'html'=>'email.reset_password'], $email_content, function ($message) use ($data, $user, $subject) {
             $message->to($data['email'], $user->username)
                 ->subject($subject);
         });
