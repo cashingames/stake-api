@@ -15,6 +15,3 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/email', function () {
-    return view('emails/users/token',  ['token' => '1883749EF']);
-});
