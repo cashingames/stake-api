@@ -32,13 +32,12 @@ class ForgotPasswordController extends BaseController
         ]);
 
         $user = User::where('email', $data['email'])->first();
-
         if (!$user) {
             return $this->sendError('Please enter your registered email address', 'Please enter your registered email address');
         }
 
         $token = strtoupper(substr(md5(time()), 0, 7));
-        Mail::to($data['email'])->send(new TokenGenerated($token));
+        Mail::send(new TokenGenerated($token, $user));
 
         // update user's password token and token expiry time
         $now = Carbon::now();

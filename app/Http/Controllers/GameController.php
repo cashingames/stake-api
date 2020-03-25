@@ -83,7 +83,7 @@ class GameController extends BaseController
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
 
-        $seenGameQuestions = $game->questions()->orderBy('game_questions.created_at', 'desc')->get();
+        $seenGameQuestions = $game->questions()->without('options')->orderBy('game_questions.created_at', 'desc')->get();
 
         $previousQuestion = $seenGameQuestions->first();
         if ($previousQuestion) {
@@ -111,21 +111,11 @@ class GameController extends BaseController
             $level = $nextLevel;
         }
 
-        $question = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
-
-        //check if the user already saw this question for this session
-        //if true, try again
-        $exists = $seenGameQuestions->find($question->id);
-        while ($exists) {
-            error_log("caught a repitition ". $question);
-            $newQuestion = $game->category->questions()->where('level', $level)->inRandomOrder()->take(1)->first();
-            $exists = $seenGameQuestions->find($newQuestion->id);
-
-            if (!$exists) {
-                $question = $newQuestion;
-                break;
-            }
-        }
+        $question = $game->category->questions()
+            ->where('level', $level)
+            ->whereNotIn('id', $seenGameQuestions->pluck('id'))
+            ->inRandomOrder()
+            ->first();
 
         return $this->sendResponse($question, "Question fetched");
     }
