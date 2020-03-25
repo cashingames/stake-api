@@ -28,7 +28,8 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'first_login', 'password_token', 'token_expiry',
+        'created_at', 'updated_at', 'phone_verified_at', 'email_verified_at'
     ];
 
     /**
@@ -38,6 +39,17 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'show_bonus' => 'boolean',
+        'first_login' => 'boolean'
+    ];
+
+     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'show_bonus'
     ];
 
     public function getJWTIdentifier()
@@ -49,6 +61,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
     public function setPasswordAttribute($password)
     {
         if ( !empty($password) ) {
@@ -83,6 +96,10 @@ class User extends Authenticatable implements JWTSubject
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new PasswordResetNotification($token));
+    }
+
+    public function getShowBonusAttribute(){
+        return $this->wallet->bonus == 150;
     }
 
 }
