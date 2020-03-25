@@ -28,7 +28,6 @@ class AddLiveColumnGamesTable extends Migration
     public function down()
     {
         Schema::table('games', function (Blueprint $table) {
-            $table->dropIndex('live_id');
             $table->dropColumn('live_id');
         });
     }
