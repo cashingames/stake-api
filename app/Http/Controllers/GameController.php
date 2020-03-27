@@ -190,7 +190,7 @@ class GameController extends BaseController
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
         $games = Game::with(['user:id,username'])
-            ->selectRaw('user_id, SUM(correct_count) as score, MIN(duration) as duration')
+            ->selectRaw('user_id, SUM(points_gained) as score, MIN(duration) as duration')
             ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
             ->groupBy('user_id')
             ->orderBy('score', 'desc')
