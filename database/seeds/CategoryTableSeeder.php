@@ -13,7 +13,6 @@ class CategoryTableSeeder extends Seeder
      */
     public function run()
     {
-        // factory(Category::class, 5)->create();
         DB::table('categories')->insert(
             [
                 'name' => 'Movies',
@@ -38,5 +37,41 @@ class CategoryTableSeeder extends Seeder
                 'category_id' => 1,
             ]
         );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Sports',
+                'description' => 'Sport Questions',
+                'instruction' => 'All ranges of sports',
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Football',
+                'description' => 'Football questions',
+                'instruction' => 'Football questions',
+                'category_id' => 4,
+            ]
+        );
+
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Entertainment',
+                'description' => 'Answer hollyood related questions',
+                'instruction' => 'For hollywood guys',
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Music',
+                'description' => 'Answer hollyood related questions',
+                'instruction' => 'For hollywood guys',
+                'category_id' => 6,
+            ]
+        );
+
     }
 }
