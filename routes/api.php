@@ -15,6 +15,7 @@ Route::get('v1/game/leaders', 'GameController@leaders')->middleware('auth:api');
 Route::post('v1/game/end/{sessionToken}', 'GameController@end')->middleware('auth:api');
 Route::post('v1/game/fetch-question/{sessionToken}', 'GameController@saveQuestionResponse')->middleware('auth:api');
 Route::get('v1/game/fetch-question/{sessionToken}', 'GameController@fetchQuestion')->middleware('auth:api');
+Route::post('v1/game/fetch-submit-question/{sessionToken}', 'GameController@fetchSubmitQuestion')->middleware('auth:api');
 Route::post('v1/game/start', 'GameController@start')->middleware('auth:api');
 Route::get('v1/categories', 'CategoryController@get')->middleware('auth:api');
 Route::post('v1/plans/me/subscribe', 'PlanController@subscribe')->middleware('auth:api');
