@@ -13,10 +13,10 @@ class UserController extends BaseController
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api');
+    // }
 
     /**
      * Get the authenticated User.
@@ -25,7 +25,7 @@ class UserController extends BaseController
      */
     public function me()
     {
-        $user = auth()->user();
+        $user = $this->user;
         $result = [
             'user' => $user,
             'profile' => $user->profile,
@@ -37,7 +37,7 @@ class UserController extends BaseController
 
     public function plans()
     {
-        $myPlans = auth()->user()->activePlans()->get();
+        $myPlans = $this->user->activePlans()->get();
         return $this->sendResponse($myPlans, 'User active plans');
     }
 }

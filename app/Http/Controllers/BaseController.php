@@ -6,8 +6,14 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 
 class BaseController extends Controller
-{  
+{
     public $token;
+    public $user;
+
+    function __construct (){
+        $this->user = auth()->user();
+    }
+
      /**
      * success response method.
      *
@@ -35,24 +41,4 @@ class BaseController extends Controller
         return response()->json($response, 400);
     }
 
-    /**
-     * return error response.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function sendError($error, $errorMessages = [], $code = 404)
-    // {
-    // 	$response = [
-    //         'success' => false,
-    //         'message' => $error,
-    //     ];
-
-
-    //     if(!empty($errorMessages)){
-    //         $response['data'] = $errorMessages;
-    //     }
-
-
-    //     return response()->json($response, $code);
-    // }
 }

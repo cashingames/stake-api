@@ -6,11 +6,11 @@ use App\Category;
 use App\Game;
 use App\Question;
 use App\WalletTransaction;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\String_;
 
 class GameController extends BaseController
 {
@@ -22,9 +22,9 @@ class GameController extends BaseController
                 'live' => 'Please select a live to play'
             ], "Failed game attempt");
         }
+
         //get the user information
-        $user = auth()->user();
-        $plan = $user->activePlans()->wherePivot('id', $request->liveId)->first();
+        $plan = $this->user->activePlans()->wherePivot('id', $request->liveId)->first();
         if (!$plan) {
             return $this->sendError([
                 'live' => 'Invalid live supplied'
@@ -37,7 +37,6 @@ class GameController extends BaseController
                 'category' => 'Invalid category supplied'
             ], "Failed game attempt");
         }
-
 
         if ($plan->pivot->used >= $plan->games_count) {
             return $this->sendError(
@@ -57,7 +56,7 @@ class GameController extends BaseController
 
 
         $game = new Game();
-        $game->user_id = $user->id;
+        $game->user_id = $this->user->id;
         $game->plan_id = $plan->id;
         $game->live_id = $plan->pivot->id;
         $game->category_id = $category->id;
@@ -72,13 +71,14 @@ class GameController extends BaseController
     }
 
     //
-    public function fetchQuestion(String $sessionToken)
+    public function fetchQuestion(Request $request, String $sessionToken)
     {
+
         $level = 'easy';
         $nextLevel = '';
         $correctConsecutiveCount = 0;
 
-        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        $game = $this->user->games()->where('session_token', $sessionToken)->first();
         if (!$game) {
             return $this->sendError(['session_token' => 'Game session token does not exist'], "No ongoing game");
         }
@@ -127,7 +127,7 @@ class GameController extends BaseController
         $correctOption = $question->options()->where('is_correct', 1)->first();
         $isCorrect = $correctOption->id == $request->optionId;
 
-        $game = auth()->user()->games()->where('session_token', $sessionToken)->first();
+        $game = $this->user->games()->where('session_token', $sessionToken)->first();
         if ($isCorrect) {
             $game->correct_count += 1;
             $game->setWinnings();
@@ -144,12 +144,23 @@ class GameController extends BaseController
         $this->sendResponse(true, 'Response saved');
     }
 
+    public function fetchSubmitQuestion(Request $request, String $sessionToken)
+    {
+
+        try {
+            $this->saveQuestionResponse($request, $sessionToken);
+        } catch (Exception $ex) {
+        }
+
+        return $this->fetchQuestion($request, $sessionToken);
+    }
+
+
     //
     public function end(String $sessionToken)
     {
         //get the session information
-        $user = auth()->user();
-        $game = $user->games()->where('session_token', $sessionToken)->first();
+        $game = $this->user->games()->where('session_token', $sessionToken)->first();
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
@@ -162,7 +173,7 @@ class GameController extends BaseController
 
         if ($game->is_winning) {
             $transaction = WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
+                'wallet_id' => $this->user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' =>  $game->amount_gained,
                 'wallet_type' => 'CASH',
@@ -189,13 +200,16 @@ class GameController extends BaseController
         $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
-        $games = Game::with(['user:id,username'])
-            ->selectRaw('user_id, SUM(points_gained) as score, MIN(duration) as duration')
-            ->whereBetween('created_at', [$firstDayTimeThisWeek, $firstDayTimeNextWeek])
-            ->groupBy('user_id')
-            ->orderBy('score', 'desc')
-            ->take(10)
-            ->get();
-        return $games;
+        $results = DB::select(
+            'select SUM(points_gained) as score, username from games
+            inner join users on users.id = games.user_id
+            where games.created_at between ? and ?
+            group by username
+            order by score desc
+            limit 10 ',
+            [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
+        );
+
+        return $results;
     }
 }
