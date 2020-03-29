@@ -28,7 +28,14 @@ class QuestionTableSeeder extends Seeder
                 $option->is_correct = true;
                 $options = $options->replace([$optionIndex => $option]);
 
-                $question->options()->createMany($options->toArray());
+                $question
+                    ->options()
+                    ->createMany(
+                    $options->makeVisible('is_correct')
+                        ->makeVisible('created_at')
+                        ->makeVisible('updated_at')
+                    ->toArray()
+                );
             });
         } else {
             $inputFileName = base_path('Questions.xlsx');
