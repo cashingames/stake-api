@@ -11,6 +11,16 @@ class Question extends Model
     protected $with = [
         'options'
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'level', 'category_id', 'created_at', 'updated_at'
+    ];
+
     //
     public function options(){
         return $this->hasMany(Option::class)->inRandomOrder();
