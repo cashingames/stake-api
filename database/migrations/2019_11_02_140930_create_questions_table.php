@@ -16,7 +16,7 @@ class CreateQuestionsTable extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('label');
-            $table->enum('level', ['easy', 'medium', 'hard']);
+            $table->enum('level', ['easy', 'medium', 'hard'])->index();
             $table->unsignedBigInteger('category_id');
             $table->timestamps();
 

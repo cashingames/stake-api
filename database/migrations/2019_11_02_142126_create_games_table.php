@@ -18,7 +18,7 @@ class CreateGamesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('category_id');
-            $table->string('session_token');
+            $table->string('session_token')->unique();
             $table->string('level')->nullable()->default('easy');
             $table->timestamp('start_time')->nullable();
             $table->timestamp('expected_end_time')->nullable();
@@ -27,7 +27,7 @@ class CreateGamesTable extends Migration
             $table->tinyInteger('correct_count')->nullable()->default(0);
             $table->tinyInteger('wrong_count')->nullable()->default(0);
             $table->tinyInteger('total_count')->nullable()->default(0);
-            $table->tinyInteger('points_gained')->nullable()->default(0);
+            $table->tinyInteger('points_gained')->nullable()->default(0)->index();
             $table->decimal('amount_gained', 10, 2)->nullable()->default(0.00);
             $table->boolean('is_winning')->nullable()->default(false);
             $table->decimal('payment_reference')->nullable();

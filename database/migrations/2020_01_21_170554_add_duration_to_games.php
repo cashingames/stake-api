@@ -14,7 +14,7 @@ class AddDurationToGames extends Migration
     public function up()
     {
         Schema::table('games', function (Blueprint $table) {
-            $table->smallInteger('duration')->nullable();
+            $table->smallInteger('duration')->nullable()->default(0)->index();
         });
     }
 
