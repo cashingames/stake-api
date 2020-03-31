@@ -14,7 +14,9 @@ use Illuminate\Support\Str;
 
 class GameController extends BaseController
 {
-    //
+    /**
+     *
+     */
     public function start(Request $request)
     {
         if (!$request->liveId) {
@@ -54,7 +56,6 @@ class GameController extends BaseController
                 ]
             );
 
-
         $game = new Game();
         $game->user_id = $this->user->id;
         $game->plan_id = $plan->id;
@@ -67,10 +68,27 @@ class GameController extends BaseController
         $game->total_count = 10;
         $game->save();
 
-        return $this->sendResponse($game, "Game started");
+        $result = [
+            'game' => $game
+        ];
+
+        if ($request->loadQuestions) {
+            $easyQuestions = $category->questions()->where('level', 'easy')->inRandomOrder()->take(10);
+            $mediumQuestions =  $category->questions()->where('level', 'medium')->inRandomOrder()->take(10);
+            $hardQuestions = $category->questions()->where('level', 'hard')->inRandomOrder()->take(10);
+
+            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get();
+
+            $result['questions'] = $questions;
+        }
+
+        return $this->sendResponse($result, "Game started");
     }
 
-    //
+
+    /**
+     *
+     */
     public function fetchQuestion(Request $request, String $sessionToken)
     {
 
@@ -120,7 +138,9 @@ class GameController extends BaseController
         return $this->sendResponse($question, "Question fetched");
     }
 
-    //
+    /**
+     *
+     */
     public function saveQuestionResponse(Request $request, String $sessionToken)
     {
         $question = Question::find($request->questionId);
@@ -144,6 +164,9 @@ class GameController extends BaseController
         $this->sendResponse(true, 'Response saved');
     }
 
+    /**
+     *
+     */
     public function fetchSubmitQuestion(Request $request, String $sessionToken)
     {
 
@@ -156,14 +179,46 @@ class GameController extends BaseController
     }
 
 
-    //
-    public function end(String $sessionToken)
+    /**'
+     *
+     */
+    public function end(Request $request, String $sessionToken)
     {
         //get the session information
         $game = $this->user->games()->where('session_token', $sessionToken)->first();
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->duration = Carbon::parse($game->start_time)->diffInSeconds(Carbon::parse($game->end_time));
         $game->state = 'COMPLETED';
+
+        if ($request->answers) {
+
+            $questions = Question::whereIn('id', array_column($request->answers, 'questionId'))->get();
+            foreach ($request->answers as $a) {
+
+                if (!$a || !$a['questionId']) {
+                    continue;
+                }
+
+                $question = $questions->find($a['questionId']);
+                $correctOption = $question->options->where('is_correct', 1)->first();
+                $isCorrect = $correctOption->id == $a['optionId'];
+
+                if ($isCorrect) {
+                    $game->correct_count += 1;
+                } else {
+                    $game->wrong_count += 1;
+                }
+
+                $game->questions()->save(
+                    $question,
+                    [
+                        'question_id' => $question->id, 'is_correct' => $isCorrect, 'option_id' => $a['optionId'],
+                        'created_at' => Carbon::now(), 'updated_at' => Carbon::now()
+                    ]
+                );
+            }
+        }
+
         $game->setWinnings();
         $game->save();
 

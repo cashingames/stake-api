@@ -49,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $appends = [
-        'show_bonus'
+        'show_bonus', 'lite_client'
     ];
 
     public function getJWTIdentifier()
@@ -100,6 +100,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function getShowBonusAttribute(){
         return $this->wallet->bonus == 150;
+    }
+
+    public function getLiteClientAttribute(){
+        return config('app.use_lite_client');
     }
 
 }
