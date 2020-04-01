@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class GameController extends BaseController
@@ -47,14 +48,14 @@ class GameController extends BaseController
             );
         }
 
-        DB::table('user_plan')
-            ->where('id', $plan->pivot->id)
-            ->update(
-                [
-                    'used' => $plan->pivot->used + 1,
-                    'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-                ]
-            );
+        // DB::table('user_plan')
+        //     ->where('id', $plan->pivot->id)
+        //     ->update(
+        //         [
+        //             'used' => $plan->pivot->used + 1,
+        //             'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+        //         ]
+        //     );
 
         $game = new Game();
         $game->user_id = $this->user->id;
@@ -201,7 +202,14 @@ class GameController extends BaseController
 
                 $question = $questions->find($a['questionId']);
                 $correctOption = $question->options->where('is_correct', 1)->first();
-                $isCorrect = $correctOption->id == $a['optionId'];
+                
+                if(!$correctOption){
+                  $isCorrect = true;
+                  Log::critical($question->id + ' has not correct answer');
+                }else{
+                  $isCorrect = $correctOption->id == $a['optionId'];
+                }
+
 
                 if ($isCorrect) {
                     $game->correct_count += 1;
