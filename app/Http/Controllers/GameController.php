@@ -48,14 +48,16 @@ class GameController extends BaseController
             );
         }
 
-        // DB::table('user_plan')
-        //     ->where('id', $plan->pivot->id)
-        //     ->update(
-        //         [
-        //             'used' => $plan->pivot->used + 1,
-        //             'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-        //         ]
-        //     );
+        if(!env('APP_DEBUG')){
+          DB::table('user_plan')
+              ->where('id', $plan->pivot->id)
+              ->update(
+                  [
+                      'used' => $plan->pivot->used + 1,
+                      'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+                  ]
+              );
+        }
 
         $game = new Game();
         $game->user_id = $this->user->id;
