@@ -73,11 +73,11 @@ class GameController extends BaseController
         ];
 
         if ($request->loadQuestions) {
-            $easyQuestions = $category->questions()->where('level', 'easy')->inRandomOrder()->take(10);
-            $mediumQuestions =  $category->questions()->where('level', 'medium')->inRandomOrder()->take(10);
-            $hardQuestions = $category->questions()->where('level', 'hard')->inRandomOrder()->take(10);
+            $easyQuestions = $category->questions()->where('level', 'easy')->inRandomOrder()->take(5);
+            $mediumQuestions =  $category->questions()->where('level', 'medium')->inRandomOrder()->take(5);
+            $hardQuestions = $category->questions()->where('level', 'hard')->inRandomOrder()->take(5);
 
-            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get();
+            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
             $result['questions'] = $questions;
         }
