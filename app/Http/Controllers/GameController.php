@@ -207,7 +207,7 @@ class GameController extends BaseController
                 
                 if(!$correctOption){
                   $isCorrect = true;
-                  Log::critical($question->id + ' has not correct answer');
+                  Log::critical($question->id.' has not correct answer');
                 }else{
                   $isCorrect = $correctOption->id == $a['optionId'];
                 }
