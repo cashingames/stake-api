@@ -12,6 +12,7 @@ Route::post('auth/password/verify-token', 'Auth\ForgotPasswordController@verifyT
 Route::post('auth/password/reset', 'Auth\ResetPasswordController@reset')->middleware('api');
 
 Route::get('v1/game/leaders', 'GameController@leaders')->middleware('auth:api');
+Route::get('v1/game/rank', 'GameController@rank')->middleware('auth:api');
 Route::post('v1/game/end/{sessionToken}', 'GameController@end')->middleware('auth:api');
 Route::post('v1/game/fetch-question/{sessionToken}', 'GameController@saveQuestionResponse')->middleware('auth:api');
 Route::get('v1/game/fetch-question/{sessionToken}', 'GameController@fetchQuestion')->middleware('auth:api');
@@ -26,5 +27,6 @@ Route::get('v1/wallet/me', 'WalletController@me')->middleware('auth:api');
 Route::post('v1/profile/me/edit', 'ProfileController@edit')->middleware('auth:api');
 Route::post('v1/profile/me/picture', 'ProfileController@addProfilePic')->middleware('auth:api');
 Route::get('v1/profile/me', 'ProfileController@me')->middleware('auth:api');
+
 Route::get('v1/user/me/plans', 'UserController@plans')->middleware('auth:api');
 Route::get('v1/user/me', 'UserController@me')->middleware('auth:api');

@@ -48,15 +48,15 @@ class GameController extends BaseController
             );
         }
 
-        if(!env('APP_DEBUG')){
-          DB::table('user_plan')
-              ->where('id', $plan->pivot->id)
-              ->update(
-                  [
-                      'used' => $plan->pivot->used + 1,
-                      'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-                  ]
-              );
+        if (!env('APP_DEBUG')) {
+            DB::table('user_plan')
+                ->where('id', $plan->pivot->id)
+                ->update(
+                    [
+                        'used' => $plan->pivot->used + 1,
+                        'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+                    ]
+                );
         }
 
         $game = new Game();
@@ -204,12 +204,12 @@ class GameController extends BaseController
 
                 $question = $questions->find($a['questionId']);
                 $correctOption = $question->options->where('is_correct', 1)->first();
-                
-                if(!$correctOption){
-                  $isCorrect = true;
-                  Log::critical($question->id.' has not correct answer');
-                }else{
-                  $isCorrect = $correctOption->id == $a['optionId'];
+
+                if (!$correctOption) {
+                    $isCorrect = true;
+                    Log::critical($question->id . ' has not correct answer');
+                } else {
+                    $isCorrect = $correctOption->id == $a['optionId'];
                 }
 
 
@@ -276,5 +276,33 @@ class GameController extends BaseController
         );
 
         return $results;
+    }
+
+    public function rank()
+    {
+        $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
+        $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
+
+        $results = DB::select(
+            'select SUM(points_gained) as score, user_id from games
+            where games.created_at between ? and ?
+            group by user_id
+            order by score desc
+            limit 100',
+            [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
+        );
+
+        $user_index = '';
+
+       if (count($results) > 0) {
+            $user_index = collect($results)->search(function ($user) {
+                return $user->user_id == $this->user->id;
+            });
+        }
+
+        if ($user_index === false) {
+            return $this->sendResponse(0, "User rank");
+        }
+        return $this->sendResponse($user_index + 1, "User rank");
     }
 }
