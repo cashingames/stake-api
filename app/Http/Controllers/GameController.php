@@ -249,7 +249,8 @@ class GameController extends BaseController
 
         return $this->sendResponse(
             [
-                'game' => $game
+                'game' => $game,
+                'rank' => $this->_rank()
             ],
             'Game finished'
         );
@@ -280,6 +281,11 @@ class GameController extends BaseController
 
     public function rank()
     {
+        return $this->sendResponse($this->_rank(), 'User rankbloaded successfully');
+    }
+
+    private function _rank()
+    {
         $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
         $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
 
@@ -301,8 +307,8 @@ class GameController extends BaseController
         }
 
         if ($user_index === false) {
-            return $this->sendResponse(0, "User rank");
+            return $user_index;
         }
-        return $this->sendResponse($user_index + 1, "User rank");
+        return $user_index + 1;
     }
 }
