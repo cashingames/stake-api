@@ -281,7 +281,7 @@ class GameController extends BaseController
 
     public function rank()
     {
-        return $this->sendResponse($this->_rank(), 'User rankbloaded successfully');
+        return $this->sendResponse($this->_rank(), 'User rank');
     }
 
     private function _rank()
@@ -298,7 +298,7 @@ class GameController extends BaseController
             [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
         );
 
-        $user_index = false;
+        $user_index = 0;
 
        if (count($results) > 0) {
             $user_index = collect($results)->search(function ($user) {
@@ -307,7 +307,7 @@ class GameController extends BaseController
         }
 
         if ($user_index === false) {
-            return $user_index;
+            return 0;
         }
         return $user_index + 1;
     }

@@ -19,7 +19,7 @@ class WalletController extends BaseController
     public function transactions()
     {
         $data = [
-            'transactions' => auth()->user()->transactions
+            'transactions' => auth()->user()->transactions()->orderBy('created_at', 'desc')->get()
         ];
         return $this->sendResponse($data, 'Wallet transactions information');
     }

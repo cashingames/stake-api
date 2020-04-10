@@ -18,15 +18,6 @@ class WalletTransaction extends Model
     ];
 
     /**
-     * The event map for the model.
-     *
-     * @var array
-     */
-    // protected $dispatchesEvents = [
-    //     'created' => WalletUpdated::class,
-    // ];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -43,23 +34,11 @@ class WalletTransaction extends Model
             Wallet::changeWalletBalance($model);
         });
 
-        // WalletTransaction::creating(function ($model) {
-        //     WalletTransaction::setBalance($model);
-        // });
     }
-
-    // protected static function setBalance(WalletTransaction $transaction){
-
-    // }
 
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);
     }
-
-    // public function getFirstNameAttribute($value)
-    // {
-    //     return ucfirst($value);
-    // }
 
 }
