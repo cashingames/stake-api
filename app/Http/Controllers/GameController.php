@@ -292,7 +292,7 @@ class GameController extends BaseController
             [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
         );
 
-        $user_index = '';
+        $user_index = false;
 
        if (count($results) > 0) {
             $user_index = collect($results)->search(function ($user) {
