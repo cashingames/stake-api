@@ -263,18 +263,27 @@ class GameController extends BaseController
 
     private function _leaders()
     {
-        $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
-        $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
+        // $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
+        // $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
+
+        // $results = DB::select(
+        //     'select SUM(points_gained) as score, username from games
+        //     inner join users on users.id = games.user_id
+        //     where games.created_at between ? and ?
+        //     group by username
+        //     order by score desc
+        //     limit 10 ',
+        //     [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
+        // );
 
         $results = DB::select(
             'select SUM(points_gained) as score, username from games
             inner join users on users.id = games.user_id
-            where games.created_at between ? and ?
             group by username
             order by score desc
-            limit 10 ',
-            [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
+            limit 10 '
         );
+
 
         return $results;
     }
@@ -286,29 +295,23 @@ class GameController extends BaseController
 
     private function _rank()
     {
-        $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
-        $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
-
         $results = DB::select(
             'select SUM(points_gained) as score, user_id from games
-            where games.created_at between ? and ?
             group by user_id
             order by score desc
-            limit 100',
-            [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
+            limit 100'
         );
 
         $user_index = 0;
-
-       if (count($results) > 0) {
+        if (count($results) > 0) {
             $user_index = collect($results)->search(function ($user) {
                 return $user->user_id == $this->user->id;
             });
         }
 
-        if ($user_index === false) {
-            return 0;
-        }
+        if ($user_index === false)
+            return 786;
+
         return $user_index + 1;
     }
 }
