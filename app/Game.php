@@ -33,4 +33,25 @@ class Game extends Model
         return $this;
     }
 
+    public function getRankAttribute($user_id){
+        $results = Game::select(
+            'select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100'
+        );
+
+        $user_index = 0;
+        // if (count($results) > 0) {
+        //     $user_index = collect($results)->search(function ($user) {
+        //         return $user->user_id == $user_id;
+        //     });
+        // }
+
+        if ($user_index === false)
+            return 786;
+
+        return $user_index + 1;
+    }
+
 }

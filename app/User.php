@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Notifications\PasswordResetNotification;
 use App\Wallet;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -43,13 +44,13 @@ class User extends Authenticatable implements JWTSubject
         'first_login' => 'boolean'
     ];
 
-     /**
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
     protected $appends = [
-        'show_bonus', 'lite_client'
+        'show_bonus', 'lite_client', 'rank'
     ];
 
     public function getJWTIdentifier()
@@ -64,32 +65,38 @@ class User extends Authenticatable implements JWTSubject
 
     public function setPasswordAttribute($password)
     {
-        if ( !empty($password) ) {
+        if (!empty($password)) {
             $this->attributes['password'] = bcrypt($password);
         }
     }
 
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(Profile::class);
     }
 
-    public function wallet(){
+    public function wallet()
+    {
         return $this->hasOne(Wallet::class);
     }
 
-    public function transactions(){
+    public function transactions()
+    {
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class)->orderBy('created_at', 'desc');
     }
 
-    public function plans(){
-        return $this->belongsToMany(Plan::class, 'user_plan')->withPivot('used','id');
+    public function plans()
+    {
+        return $this->belongsToMany(Plan::class, 'user_plan')->withPivot('used', 'id');
     }
 
-    public function games(){
+    public function games()
+    {
         return $this->hasMany(Game::class);
     }
 
-    public function activePlans(){
+    public function activePlans()
+    {
         return $this->plans()->wherePivot('is_active', true);
     }
 
@@ -98,12 +105,36 @@ class User extends Authenticatable implements JWTSubject
         $this->notify(new PasswordResetNotification($token));
     }
 
-    public function getShowBonusAttribute(){
+    public function getShowBonusAttribute()
+    {
         return $this->wallet->bonus == 150;
     }
 
-    public function getLiteClientAttribute(){
+    public function getLiteClientAttribute()
+    {
         return config('app.use_lite_client');
+    }
+
+    public function getRankAttribute()
+    {
+        $results = DB::select(
+            'select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100'
+        );
+
+        $user_index = 0;
+        if (count($results) > 0) {
+            $user_index = collect($results)->search(function ($user) {
+                return $user->user_id == $this->id;
+            });
+        }
+
+        if ($user_index === false)
+            return 786;
+
+        return $user_index + 1;
     }
 
 }

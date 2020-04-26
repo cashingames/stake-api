@@ -51,13 +51,16 @@ class LoginController extends BaseController
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
-            'user' => auth()->user(),
+        $user =  auth()->user();
+        $result = [
             'token' => [
                 'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
-            ]
-        ]);
+            ],
+            'user' => $user,
+            'profile' => $user->profile,
+            'plans' => $user->activePlans()->get(),
+            'wallet' => $user->wallet
+        ];
+        return $this->sendResponse($result, 'User details');
     }
 }

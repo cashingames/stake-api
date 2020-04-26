@@ -107,16 +107,17 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        return
-            response()
-            ->json([
-                'user' => $user,
-                'token' => [
-                    'access_token' => auth()->tokenById($user->id),
-                    'token_type' => 'bearer',
-                    'expires_in' => auth()->factory()->getTTL() * 60
-                ]
-            ]);
-        // return $this->sendResponse($user, 'User register successfully.');
+        $user =  auth()->user();
+        $token = auth()->tokenById($user->id);
+        $result = [
+            'token' => [
+                'access_token' => $token,
+            ],
+            'user' => $user,
+            'profile' => $user->profile,
+            'plans' => $user->activePlans()->get(),
+            'wallet' => $user->wallet,
+        ];
+        return $this->sendResponse($result, 'User details');
     }
 }
