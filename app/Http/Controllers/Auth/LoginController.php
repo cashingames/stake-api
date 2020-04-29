@@ -56,10 +56,9 @@ class LoginController extends BaseController
             'token' => [
                 'access_token' => $token,
             ],
-            'user' => $user,
-            'profile' => $user->profile,
+            'user' => $user->load('profile'),
             'plans' => $user->activePlans()->get(),
-            'wallet' => $user->wallet
+            'wallet' => $user->wallet,
         ];
         return $this->sendResponse($result, 'User details');
     }

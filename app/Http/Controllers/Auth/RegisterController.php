@@ -113,8 +113,7 @@ class RegisterController extends BaseController
             'token' => [
                 'access_token' => $token,
             ],
-            'user' => $user,
-            'profile' => $user->profile,
+            'user' => $user->load('profile'),
             'plans' => $user->activePlans()->get(),
             'wallet' => $user->wallet,
         ];

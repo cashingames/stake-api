@@ -28,10 +28,9 @@ class UserController extends BaseController
      */
     public function me()
     {
-        $user = $this->user;
+        $user = $this->user->load('profile');
         $result = [
             'user' => $user,
-            'profile' => $user->profile,
             'plans' => $user->activePlans()->get(),
             'wallet' => $user->wallet
         ];

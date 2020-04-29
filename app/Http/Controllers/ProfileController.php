@@ -29,17 +29,17 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'username' => ['required', 'string', 'max:20'],
-            'phone' => ['required', 'string', 'max:20'],
-            'email' => ['required', 'string', 'email', 'max:150'],
-            'gender' => ['nullable', 'string', 'max:20'],
-            'dateOfBirth' => ['nullable', 'date'],
-            'address' => ['nullable', 'string', 'between:10,300'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'accountName' => ['nullable', 'string', 'max:255'],
-            'bankName' => ['nullable', 'string', 'max:255'],
-            'accountNumber' => ['nullable', 'string', 'max:255'],
-            'currency' => ['nullable', 'string', 'max:100'],
+            // 'username' => ['required', 'string', 'max:20'],
+            // 'phone' => ['required', 'string', 'max:20'],
+            // 'email' => ['required', 'string', 'email', 'max:150'],
+            // 'gender' => ['nullable', 'string', 'max:20'],
+            // 'dateOfBirth' => ['nullable', 'date'],
+            // 'address' => ['nullable', 'string', 'between:10,300'],
+            // 'state' => ['nullable', 'string', 'max:100'],
+            // 'accountName' => ['nullable', 'string', 'max:255'],
+            // 'bankName' => ['nullable', 'string', 'max:255'],
+            // 'accountNumber' => ['nullable', 'string', 'max:255'],
+            // 'currency' => ['nullable', 'string', 'max:100'],
         ]);
 
 
@@ -53,22 +53,22 @@ class ProfileController extends BaseController
 
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        $profile->gender =  $data['gender'];
-        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
-        $profile->address = $data['address'];
-        $profile->state = $data['state'];
-        $profile->avatar = $profile->avatar;
-        $profile->account_name = $data['accountName'];
-        $profile->bank_name = $data['bankName'];
-        $profile->account_number = $data['accountNumber'];
-        $profile->currency = $data['currency'];
+        // $profile->gender =  $data['gender'];
+        // $profile->date_of_birth = new Carbon($data['dateOfBirth']);
+        // $profile->address = $data['address'];
+        // $profile->state = $data['state'];
+        // $profile->avatar = $profile->avatar;
+        // $profile->account_name = $data['accountName'];
+        // $profile->bank_name = $data['bankName'];
+        // $profile->account_number = $data['accountNumber'];
+        // $profile->currency = $data['currency'];
         $profile->save();
 
-        $user->update([
-            'username' => $data['username'],
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-        ]);
+        // $user->update([
+        //     'username' => $data['username'],
+        //     'phone' => $data['phone'],
+        //     'email' => $data['email'],
+        // ]);
 
 
         return $this->sendResponse($user, "Profile Updated.");
@@ -91,14 +91,12 @@ class ProfileController extends BaseController
 
         if ($request->hasFile('avatar')) {
             $image = $request->file('avatar');
-            $destinationPath = public_path('/avatar/');
-            $image->move($destinationPath, $this->user->id);
+            $name = $this->user->id.".".$image->guessExtension();
+            $destinationPath = public_path('avatar');
+            $profile->avatar = $name;
+            $image->move($destinationPath, $name);
+            $profile->save();
         }
-
-        $profile->avatar = "/avatar/" . $this->user->id;
-        $profile->save();
-
-
 
         return $this->sendResponse($profile, "Profile Updated.");
         // }
