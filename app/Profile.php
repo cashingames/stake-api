@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Profile extends Model
 {
@@ -23,6 +24,8 @@ class Profile extends Model
 
     public function getAvatarAttribute($value)
     {
+        if( is_null($value) || $value == "")
+            return "";
         return asset('avatar/'.$value."?".rand());
     }
 }
