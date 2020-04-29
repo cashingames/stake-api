@@ -44,8 +44,8 @@ class UserController extends BaseController
         return $this->sendResponse($myPlans, 'User active plans');
     }
 
-    public function logError($data){
-        Log::error($data);
+    public function logError(Request $request){
+        Log::error($request->data);
         return "";
     }
 }
