@@ -263,29 +263,26 @@ class GameController extends BaseController
 
     private function _leaders()
     {
-        // $firstDayTimeThisWeek = date('Y-m-d H:i:s', strtotime("last sunday"));
-        // $firstDayTimeNextWeek = date('Y-m-d H:i:s', strtotime("next sunday"));
-
-        // $results = DB::select(
-        //     'select SUM(points_gained) as score, username from games
-        //     inner join users on users.id = games.user_id
-        //     where games.created_at between ? and ?
-        //     group by username
-        //     order by score desc
-        //     limit 10 ',
-        //     [$firstDayTimeThisWeek, $firstDayTimeNextWeek]
-        // );
-
         $results = DB::select(
-            'select SUM(points_gained) as score, username from games
-            inner join users on users.id = games.user_id
-            group by username
-            order by score desc
-            limit 10 '
+            'SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id'
         );
 
-
-        return $results;
+        $mapResult = collect($results)->map(function($item){
+            $avatar = $item->avatar;
+            if( !is_null($avatar) && $avatar != ""){
+               $item->avatar = asset('avatar/'.$avatar."?".rand());
+            }
+            return $item;
+        });
+        return $mapResult;
     }
 
     public function rank()
