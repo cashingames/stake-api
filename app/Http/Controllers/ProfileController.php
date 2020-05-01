@@ -22,24 +22,23 @@ class ProfileController extends BaseController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         ])->validate();
     }
-
     public function edit(Request $request)
     {
 
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            // 'username' => ['required', 'string', 'max:20'],
-            // 'phone' => ['required', 'string', 'max:20'],
-            // 'email' => ['required', 'string', 'email', 'max:150'],
-            // 'gender' => ['nullable', 'string', 'max:20'],
-            // 'dateOfBirth' => ['nullable', 'date'],
-            // 'address' => ['nullable', 'string', 'between:10,300'],
-            // 'state' => ['nullable', 'string', 'max:100'],
-            // 'accountName' => ['nullable', 'string', 'max:255'],
-            // 'bankName' => ['nullable', 'string', 'max:255'],
-            // 'accountNumber' => ['nullable', 'string', 'max:255'],
-            // 'currency' => ['nullable', 'string', 'max:100'],
+            'username' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'email', 'max:150'],
+            'gender' => ['nullable', 'string', 'max:20'],
+            'dateOfBirth' => ['nullable', 'date'],
+            'address' => ['nullable', 'string', 'between:10,300'],
+            'state' => ['nullable', 'string', 'max:100'],
+            'accountName' => ['nullable', 'string', 'max:255'],
+            'bankName' => ['nullable', 'string', 'max:255'],
+            'accountNumber' => ['nullable', 'string', 'max:255'],
+            'currency' => ['nullable', 'string', 'max:100'],
         ]);
 
 
@@ -53,27 +52,84 @@ class ProfileController extends BaseController
 
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        // $profile->gender =  $data['gender'];
-        // $profile->date_of_birth = new Carbon($data['dateOfBirth']);
-        // $profile->address = $data['address'];
-        // $profile->state = $data['state'];
-        // $profile->avatar = $profile->avatar;
-        // $profile->account_name = $data['accountName'];
-        // $profile->bank_name = $data['bankName'];
-        // $profile->account_number = $data['accountNumber'];
-        // $profile->currency = $data['currency'];
+        $profile->gender =  $data['gender'];
+        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
+        $profile->address = $data['address'];
+        $profile->state = $data['state'];
+        $profile->avatar = $profile->avatar;
+        $profile->account_name = $data['accountName'];
+        $profile->bank_name = $data['bankName'];
+        $profile->account_number = $data['accountNumber'];
+        $profile->currency = $data['currency'];
         $profile->save();
 
-        // $user->update([
-        //     'username' => $data['username'],
-        //     'phone' => $data['phone'],
-        //     'email' => $data['email'],
-        // ]);
-
+        $user->update([
+            'username' => $data['username'],
+            'phone' => $data['phone'],
+            'email' => $data['email'],
+        ]);
 
         return $this->sendResponse($user, "Profile Updated.");
     }
 
+    public function editPersonalInformation(Request $request)
+    {
+
+        $data = $request->validate([
+            'firstName' => ['required', 'string', 'max:20'],
+            'lastName' => ['required', 'string', 'max:20'],
+            'gender' => ['nullable', 'string', 'max:20'],
+            'dateOfBirth' => ['nullable', 'date'],
+            'address' => ['nullable', 'string', 'between:10,300'],
+            'state' => ['nullable', 'string', 'max:100'],
+        ]);
+
+
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if ($profile == null) {
+            return $this->sendError(['Profile not found'], "Unable to update profile");
+        }
+
+
+        $profile->first_name = $data['firstName'];
+        $profile->last_name = $data['lastName'];
+        $profile->gender =  $data['gender'];
+        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
+        $profile->address = $data['address'];
+        $profile->state = $data['state'];
+        $profile->save();
+
+        return $this->sendResponse($user, "Profile Updated.");
+    }
+
+    public function editBank(Request $request)
+    {
+
+        $data = $request->validate([
+            'accountName' => ['required', 'string', 'max:255'],
+            'bankName' => ['required', 'string', 'max:255'],
+            'accountNumber' => ['required', 'string', 'max:255'],
+            'currency' => ['nullable', 'string', 'max:100'],
+        ]);
+
+
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if ($profile == null) {
+            return $this->sendError(['Profile not found'], "Unable to update profile");
+        }
+
+        $profile->account_name = $data['accountName'];
+        $profile->bank_name = $data['bankName'];
+        $profile->account_number = $data['accountNumber'];
+        $profile->currency = $data['currency'];
+        $profile->save();
+
+        return $this->sendResponse($user, "Profile Updated.");
+    }
 
     public function addProfilePic(Request $request)
     {

@@ -26,6 +26,8 @@ Route::get('v1/wallet/me/transactions', 'WalletController@transactions')->middle
 Route::get('v1/wallet/me', 'WalletController@me')->middleware('auth:api');
 Route::get('v1/wallet/banks', 'WalletController@getBanks')->middleware('auth:api');
 Route::post('v1/profile/me/edit', 'ProfileController@edit')->middleware('auth:api');
+Route::post('v1/profile/me/edit-personal', 'ProfileController@editPersonalInformation')->middleware('auth:api');
+Route::post('v1/profile/me/edit-bank', 'ProfileController@editBank')->middleware('auth:api');
 Route::post('v1/profile/me/picture', 'ProfileController@addProfilePic')->middleware('auth:api');
 Route::get('v1/profile/me', 'ProfileController@me')->middleware('auth:api');
 
