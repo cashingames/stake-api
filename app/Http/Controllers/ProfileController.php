@@ -95,10 +95,10 @@ class ProfileController extends BaseController
 
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        $profile->gender =  $data['gender'];
-        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
-        $profile->address = $data['address'];
-        $profile->state = $data['state'];
+        $profile->gender =  $profile->gender ?? null;
+        $profile->date_of_birth = $profile->date_of_birth ? new Carbon($data['dateOfBirth']): null ;
+        $profile->address = $data['address'] ?? '';
+        $profile->state = $data['state'] ?? '';
         $profile->save();
 
         return $this->sendResponse($user, "Profile Updated.");
@@ -125,7 +125,7 @@ class ProfileController extends BaseController
         $profile->account_name = $data['accountName'];
         $profile->bank_name = $data['bankName'];
         $profile->account_number = $data['accountNumber'];
-        $profile->currency = $data['currency'];
+        $profile->currency = $data['currency'] ?? '';
         $profile->save();
 
         return $this->sendResponse($user, "Profile Updated.");
