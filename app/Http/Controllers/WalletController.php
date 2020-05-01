@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\WalletTransaction;
 use GuzzleHttp\Client;
+use stdClass;
 
 class WalletController extends BaseController
 {
@@ -55,6 +56,29 @@ class WalletController extends BaseController
             'reference' => $result->data->reference,
         ]);
         return $this->sendResponse(true, 'Payment was successful');
+    }
+
+    public function getBanks(){
+        $client = new Client();
+        $url = 'https://api.paystack.co/bank';
+        $response = null;
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' .  config('app.payment_key')
+                ]
+            ]);
+        } catch (\Exception $ex) {
+            return $this->_failedPaymentVerification();
+        }
+
+        $result = \json_decode((string) $response->getBody());
+        // $result->map(function($x){
+        //     $y = new stdClass;
+        //     $y->
+        // });
+        return response()->json($result, 200);
+
     }
 
     private function _failedPaymentVerification()
