@@ -272,7 +272,8 @@ class GameController extends BaseController
                 ORDER BY score DESC
                 LIMIT 10
             ) g
-            INNER JOIN profiles p ON g.user_id = p.user_id'
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC'
         );
 
         $mapResult = collect($results)->map(function($item){
