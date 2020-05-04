@@ -46,6 +46,7 @@ class PlanController extends BaseController
 
         $user->plans()->attach($plan->id, ['used' => 0, 'is_active' => true]);
 
+        $user->refresh();
         return $this->sendResponse(
             [
                 'wallet' => $user->wallet,
