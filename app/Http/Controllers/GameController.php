@@ -245,11 +245,13 @@ class GameController extends BaseController
                 'description' => 'Winnings',
                 'reference' => Str::random(10)
             ]);
+            $this->user->wallet->refresh();
         }
 
         return $this->sendResponse(
             [
                 'game' => $game,
+                'wallet' => $this->user->wallet,
                 'rank' => $this->_rank()
             ],
             'Game finished'

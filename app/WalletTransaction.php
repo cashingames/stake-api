@@ -30,6 +30,8 @@ class WalletTransaction extends Model
     protected static function boot()
     {
         parent::boot();
+
+        //@TODO: This operation is expensive
         WalletTransaction::created(function ($model) {
             Wallet::changeWalletBalance($model);
         });

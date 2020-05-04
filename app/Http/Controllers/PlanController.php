@@ -25,8 +25,7 @@ class PlanController extends BaseController
 
         $plan = Plan::find($request->plan_id);
 
-        $user = auth()->user();
-        $wallet = $user->wallet;
+        $wallet = $this->user->wallet;
 
         if ($wallet->balance < $plan->price) {
             $errors = [
@@ -44,13 +43,13 @@ class PlanController extends BaseController
             'reference' => Str::random(10)
         ]);
 
-        $user->plans()->attach($plan->id, ['used' => 0, 'is_active' => true]);
+        $this->user->plans()->attach($plan->id, ['used' => 0, 'is_active' => true]);
 
-        $user->refresh();
+        $this->user->wallet->refresh();
         return $this->sendResponse(
             [
-                'wallet' => $user->wallet,
-                'plans' => $user->plans()->wherePivot('is_active', true)->get(),
+                'wallet' => $this->user->wallet,
+                'plans' => $this->user->plans()->wherePivot('is_active', true)->get(),
             ],
             "Current user plans"
         );
