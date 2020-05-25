@@ -56,10 +56,12 @@ class ProfileController extends BaseController
         $profile->last_name = $data['lastName'];
         $profile->avatar = $profile->avatar;
         $profile->account_name = $data['accountName'];
-        $profile->bank_name = $data['bankName'];
         $profile->account_number = $data['accountNumber'];
         $profile->currency = $data['currency'];
 
+        if(isset($data['bankName']) && !is_null($data['bankName'])){
+            $profile->bank_name = $data['bankName'] ;
+        }
         if(isset($data['gender']) &&  !is_null($data['gender'])){
             $profile->gender =  $data['gender'];
         }
