@@ -39,6 +39,7 @@ class ProfileController extends BaseController
             'bankName' => ['nullable', 'string', 'max:255'],
             'accountNumber' => ['nullable', 'string', 'max:255'],
             'currency' => ['nullable', 'string', 'max:100'],
+            'avatar' => ['nullable', 'string', 'max:1000']
         ]);
 
 
