@@ -28,7 +28,7 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'username' => ['required', 'string', 'max:20'],
+            'username' => ['nullable', 'string', 'max:20'],
             'phone' => ['required', 'string', 'max:20'],
             'email' => ['required', 'string', 'email', 'max:150'],
             'gender' => ['nullable', 'string', 'max:20'],
@@ -39,7 +39,6 @@ class ProfileController extends BaseController
             'bankName' => ['nullable', 'string', 'max:255'],
             'accountNumber' => ['nullable', 'string', 'max:255'],
             'currency' => ['nullable', 'string', 'max:100'],
-            'avatar' => ['nullable', 'image|mimes:jpeg,png,jpg,gif,base64', 'max:2048']
         ]);
 
 
@@ -57,7 +56,6 @@ class ProfileController extends BaseController
         $profile->avatar = $profile->avatar;
         $profile->account_name = $data['accountName'];
         $profile->account_number = $data['accountNumber'];
-        $profile->currency = $data['currency'];
 
         if(isset($data['bankName']) && !is_null($data['bankName'])){
             $profile->bank_name = $data['bankName'] ;
@@ -81,7 +79,6 @@ class ProfileController extends BaseController
         $profile->save();
 
         $user->update([
-            'username' => $data['username'],
             'phone' => $data['phone'],
             'email' => $data['email'],
         ]);
