@@ -28,7 +28,7 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'username' => ['required', 'string', 'max:20'],
+            'username' => ['nullable', 'string', 'max:20'],
             'phone' => ['required', 'string', 'max:20'],
             'email' => ['required', 'string', 'email', 'max:150'],
             'gender' => ['nullable', 'string', 'max:20'],
@@ -50,21 +50,35 @@ class ProfileController extends BaseController
         }
 
 
+
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        $profile->gender =  $data['gender'];
-        $profile->date_of_birth = new Carbon($data['dateOfBirth']);
-        $profile->address = $data['address'];
-        $profile->state = $data['state'];
         $profile->avatar = $profile->avatar;
         $profile->account_name = $data['accountName'];
-        $profile->bank_name = $data['bankName'];
         $profile->account_number = $data['accountNumber'];
-        $profile->currency = $data['currency'];
+
+        if(isset($data['bankName']) && !is_null($data['bankName'])){
+            $profile->bank_name = $data['bankName'] ;
+        }
+        if(isset($data['gender']) &&  !is_null($data['gender'])){
+            $profile->gender =  $data['gender'];
+        }
+
+        if(isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])){
+            $profile->date_of_birth = new Carbon($data['dateOfBirth']) ;
+        }
+
+        if(isset($data['address']) && !is_null($data['address'])){
+            $profile->address = $data['address'] ;
+        }
+
+        if(isset($data['state']) && !is_null($data['state'])){
+            $profile->state = $data['state'] ;
+        }
+
         $profile->save();
 
         $user->update([
-            'username' => $data['username'],
             'phone' => $data['phone'],
             'email' => $data['email'],
         ]);
@@ -95,10 +109,23 @@ class ProfileController extends BaseController
 
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        $profile->gender =  $profile->gender ?? null;
-        $profile->date_of_birth = $profile->date_of_birth ? new Carbon($data['dateOfBirth']): null ;
-        $profile->address = $data['address'] ?? '';
-        $profile->state = $data['state'] ?? '';
+
+        if(isset($data['gender']) &&  !is_null($data['gender'])){
+            $profile->gender =  $data['gender'];
+        }
+
+        if(isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])){
+            $profile->date_of_birth = new Carbon($data['dateOfBirth']) ;
+        }
+
+        if(isset($data['address']) && !is_null($data['address'])){
+            $profile->address = $data['address'] ;
+        }
+
+        if(isset($data['state']) && !is_null($data['state'])){
+            $profile->state = $data['state'] ;
+        }
+
         $profile->save();
 
         return $this->sendResponse($user, "Profile Updated.");
