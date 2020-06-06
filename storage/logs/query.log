@@ -1,8 +1,1323 @@
-436.52 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 10) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 10) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 10) [5, hard, 5, medium, 5, easy]
-436.49 | select * from `options` where `options`.`question_id` in (344, 345, 361, 363, 364, 366, 374, 375, 377, 379, 384, 386, 388, 391, 404, 405, 407, 409, 412, 413, 414, 415, 416, 419, 420, 421, 422, 424, 425, 426) order by RAND() []
-2678.23 | select * from `users` where `id` = ? limit 1 [3]
-462.84 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 53]
-747.52 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
-440.57 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 53, 5, Z7OuM5k6gqanFx8ST4XZdfkGAwtOqMNbJKQX0Lja, 2020-04-01 03:45:40, 2020-04-01 03:46:40, ONGOING, 10, 2020-04-01 03:45:40, 2020-04-01 03:45:40]
-443.43 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
-441.28 | select * from `options` where `options`.`question_id` in (345, 355, 357, 364, 370, 398, 400, 406, 408, 413, 417, 418, 420, 422, 423) order by RAND() []
+3092.89 | select * from `users` where `id` = ? limit 1 [3]
+445.42 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+440.38 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+439.18 | insert into `wallet_transactions` (`wallet_id`, `transaction_type`, `amount`, `wallet_type`, `description`, `reference`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?) [3, DEBIT, 150.00, CASH, Purchase of games lives, xahhzwX5Vv, 2020-05-04 21:47:42, 2020-05-04 21:47:42]
+435.48 | select * from `wallets` where `wallets`.`id` = ? limit 1 [3]
+886.27 | update `wallets` set `cash` = ?, `balance` = ?, `wallets`.`updated_at` = ? where `id` = ? [4542, 4542, 2020-05-04 21:47:43, 3]
+436.19 | update `wallet_transactions` set `wallet_id` = ?, `transaction_type` = ?, `amount` = ?, `wallet_type` = ?, `description` = ?, `reference` = ?, `created_at` = ?, `id` = ?, `balance` = ?, `wallet_transactions`.`updated_at` = ? where `id` = ? [3, DEBIT, 150.00, CASH, Purchase of games lives, xahhzwX5Vv, 2020-05-04 21:47:42, 175, 4542, 2020-05-04 21:47:42, 175]
+442.66 | insert into `user_plan` (`is_active`, `plan_id`, `used`, `user_id`) values (?, ?, ?, ?) [1, 1, 0, 3]
+443.42 | select * from `wallets` where `wallets`.`id` = ? limit 1 [3]
+449.48 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+2221.15 | select * from `users` where `id` = ? limit 1 [3]
+452.02 | select * from `profiles` where `profiles`.`user_id` in (3) []
+448.19 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+444.61 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+444.25 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2200.57 | select * from `users` where `id` = ? limit 1 [3]
+454.63 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2422.49 | select * from `users` where `username` = ? limit 1 [oyekunmi]
+458.64 | select * from `profiles` where `profiles`.`user_id` in (3) []
+474.78 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+460.3 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+468.17 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2398.96 | select * from `users` where `id` = ? limit 1 [3]
+447.57 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2157.55 | select * from `users` where `id` = ? limit 1 [3]
+432.87 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2411.52 | select * from `users` where `id` = ? limit 1 [3]
+431.07 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2200.25 | select * from `users` where `id` = ? limit 1 [3]
+443.53 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2233.48 | select * from `users` where `id` = ? limit 1 [3]
+452.96 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2169.5 | select * from `users` where `id` = ? limit 1 [3]
+438.98 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2231.75 | select * from `users` where `id` = ? limit 1 [3]
+2564.61 | select * from `users` where `id` = ? limit 1 [3]
+805.11 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2318.82 | select * from `users` where `id` = ? limit 1 [3]
+459.8 | select * from `profiles` where `profiles`.`user_id` in (3) []
+455.09 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+434.74 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+445.43 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2212.11 | select * from `users` where `id` = ? limit 1 [3]
+437.13 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+3824.35 | select * from `users` where `id` = ? limit 1 [3]
+445.06 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2264.83 | select * from `users` where `id` = ? limit 1 [3]
+428.77 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2353.34 | select * from `users` where `id` = ? limit 1 [3]
+541.16 | select * from `profiles` where `profiles`.`user_id` in (3) []
+440.87 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+436.77 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+432.29 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2225.08 | select * from `users` where `id` = ? limit 1 [3]
+449.48 | select * from `profiles` where `profiles`.`user_id` = ? and `profiles`.`user_id` is not null limit 1 [3]
+2212.83 | select * from `users` where `id` = ? limit 1 [3]
+447.59 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2209.11 | select * from `users` where `id` = ? limit 1 [3]
+445.74 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2221.48 | select * from `users` where `id` = ? limit 1 [3]
+442.92 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2349.73 | select * from `users` where `id` = ? limit 1 [3]
+433.25 | select * from `profiles` where `profiles`.`user_id` in (3) []
+436.67 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+434.88 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+440.43 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2153.63 | select * from `users` where `id` = ? limit 1 [3]
+428.45 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2153.94 | select * from `users` where `id` = ? limit 1 [3]
+437.78 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+3133.73 | select * from `users` where `id` = ? limit 1 [3]
+590.16 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2297.38 | select * from `users` where `id` = ? limit 1 [3]
+442.55 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2331.8 | select * from `users` where `id` = ? limit 1 [3]
+483.92 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2168.95 | select * from `users` where `id` = ? limit 1 [3]
+439.7 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2263.91 | select * from `users` where `id` = ? limit 1 [3]
+447.35 | select * from `profiles` where `profiles`.`user_id` in (3) []
+435.79 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+438.96 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+434.72 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2187.2 | select * from `users` where `id` = ? limit 1 [3]
+434.61 | select * from `profiles` where `profiles`.`user_id` in (3) []
+439.89 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+436.22 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+440.17 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2190.75 | select * from `users` where `id` = ? limit 1 [3]
+435.89 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2178.93 | select * from `users` where `id` = ? limit 1 [3]
+448.48 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2202.29 | select * from `users` where `id` = ? limit 1 [3]
+436.98 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2168.29 | select * from `users` where `id` = ? limit 1 [3]
+442.16 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2192.15 | select * from `users` where `id` = ? limit 1 [3]
+3329.59 | select * from `users` where `username` = ? limit 1 [oyekunmi]
+454.74 | select * from `profiles` where `profiles`.`user_id` in (3) []
+466.64 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+461.05 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+463.88 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3130.62 | select * from `users` where `id` = ? limit 1 [3]
+867.27 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2289.65 | select * from `users` where `id` = ? limit 1 [3]
+445.25 | select * from `profiles` where `profiles`.`user_id` in (3) []
+446.66 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+451.77 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+444.32 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2798.65 | select * from `users` where `id` = ? limit 1 [3]
+434.38 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2241.67 | select * from `users` where `id` = ? limit 1 [3]
+448.92 | select * from `profiles` where `profiles`.`user_id` in (3) []
+437.48 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+439.48 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+448.02 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2192.63 | select * from `users` where `id` = ? limit 1 [3]
+434.85 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2443.06 | select * from `users` where `id` = ? limit 1 [3]
+454.05 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 69]
+450.55 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+449.17 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 69, 3, zdWonm6MWtT1M32XTiFwSwcxml1a7ZIfRY3U5fwg, 2020-05-06 01:22:46, 2020-05-06 01:23:46, ONGOING, 10, 2020-05-06 01:22:46, 2020-05-06 01:22:46]
+489.19 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+484.01 | select * from `options` where `options`.`question_id` in (5, 12, 25, 29, 39, 58, 63, 65, 80, 89, 108, 110, 124, 130, 142) order by RAND() []
+2232.45 | select * from `users` where `id` = ? limit 1 [3]
+448.23 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, zdWonm6MWtT1M32XTiFwSwcxml1a7ZIfRY3U5fwg]
+442.57 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [39, 58, 110, 65, 25, 124, 29, 89, 5, 63]
+455.98 | select * from `options` where `options`.`question_id` in (5, 25, 29, 39, 58, 63, 65, 89, 110, 124) order by RAND() []
+451.81 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:22, 349, 1, 154, 39, 2020-05-06 01:23:22]
+444.34 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:22, 349, 1, 232, 58, 2020-05-06 01:23:22]
+443.99 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:22, 349, 1, 440, 110, 2020-05-06 01:23:22]
+448.33 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:23, 349, 1, 259, 65, 2020-05-06 01:23:23]
+444.6 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:23, 349, , 97, 25, 2020-05-06 01:23:23]
+444.86 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:24, 349, 1, 494, 124, 2020-05-06 01:23:24]
+443.25 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:24, 349, , 113, 29, 2020-05-06 01:23:24]
+438.58 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:25, 349, , 354, 89, 2020-05-06 01:23:25]
+441.97 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:25, 349, , 19, 5, 2020-05-06 01:23:25]
+447.09 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:23:26, 349, , 252, 63, 2020-05-06 01:23:26]
+441.32 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+451.82 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:23:20, 5, 5, 5, 0, , 34, 2020-05-06 01:23:27, 349]
+441.85 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+442.42 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3574.88 | select * from `users` where `id` = ? limit 1 [3]
+430.41 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+2177.16 | select * from `users` where `id` = ? limit 1 [3]
+438.69 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 69]
+431.04 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
+436.59 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 69, 5, 7nKOqMBwJ7ZWMKfARArNjXalnfcJPFEcTB7WkBu0, 2020-05-06 01:24:25, 2020-05-06 01:25:25, ONGOING, 10, 2020-05-06 01:24:25, 2020-05-06 01:24:25]
+435.11 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
+439.56 | select * from `options` where `options`.`question_id` in (352, 367, 376, 379, 380, 381, 385, 390, 391, 413, 414, 415, 421, 424, 425) order by RAND() []
+2163.37 | select * from `users` where `id` = ? limit 1 [3]
+1146.01 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, 7nKOqMBwJ7ZWMKfARArNjXalnfcJPFEcTB7WkBu0]
+690.85 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+529.99 | update `games` set `state` = ?, `end_time` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:25:32, 0, , 67, 2020-05-06 01:25:33, 350]
+640.56 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+688.32 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2210.13 | select * from `users` where `id` = ? limit 1 [3]
+437.57 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+2567 | select * from `users` where `id` = ? limit 1 [3]
+442.22 | select * from `profiles` where `profiles`.`user_id` in (3) []
+440.42 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+437.33 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+435.21 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2186.4 | select * from `users` where `id` = ? limit 1 [3]
+450.04 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2165.3 | select * from `users` where `id` = ? limit 1 [3]
+423.71 | select * from `profiles` where `profiles`.`user_id` in (3) []
+422.77 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+437.96 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+423.15 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2264.83 | select * from `users` where `id` = ? limit 1 [3]
+451.74 | select * from `profiles` where `profiles`.`user_id` in (3) []
+449.69 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+449.07 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+450.58 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2240.67 | select * from `users` where `id` = ? limit 1 [3]
+447.16 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2311.28 | select * from `users` where `id` = ? limit 1 [3]
+449.62 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+454.66 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+457.52 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, aUIn2M5RFOJUqnx4o77LwGmYr5bfjWYkDIyRGJPI, 2020-05-06 01:38:21, 2020-05-06 01:39:21, ONGOING, 10, 2020-05-06 01:38:21, 2020-05-06 01:38:21]
+458.23 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+466.58 | select * from `options` where `options`.`question_id` in (8, 9, 24, 25, 48, 61, 75, 83, 86, 97, 104, 105, 108, 118, 119) order by RAND() []
+2224.82 | select * from `users` where `id` = ? limit 1 [3]
+442.96 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, aUIn2M5RFOJUqnx4o77LwGmYr5bfjWYkDIyRGJPI]
+446.24 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [75, 104, 118, 83, 86, 61, 24, 9, 97, 25]
+442.12 | select * from `options` where `options`.`question_id` in (9, 24, 25, 61, 75, 83, 86, 97, 104, 118) order by RAND() []
+447.52 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:43, 353, , 298, 75, 2020-05-06 01:38:43]
+442.9 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:44, 353, , 413, 104, 2020-05-06 01:38:44]
+442.59 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:44, 353, , 469, 118, 2020-05-06 01:38:44]
+443.94 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:45, 353, , 332, 83, 2020-05-06 01:38:45]
+441.55 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:45, 353, , 343, 86, 2020-05-06 01:38:45]
+440.09 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:46, 353, , 244, 61, 2020-05-06 01:38:46]
+441.84 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:46, 353, , 93, 24, 2020-05-06 01:38:46]
+438.52 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:47, 353, 1, 33, 9, 2020-05-06 01:38:47]
+444.02 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:47, 353, , 387, 97, 2020-05-06 01:38:47]
+440.43 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:38:48, 353, , 98, 25, 2020-05-06 01:38:48]
+444.32 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+439.2 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:38:41, 1, 9, 1, 0, , 20, 2020-05-06 01:38:49, 353]
+449.19 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+442.24 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2425.23 | select * from `users` where `id` = ? limit 1 [3]
+450.46 | select * from `profiles` where `profiles`.`user_id` in (3) []
+448.4 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+447.33 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+443.75 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2226.2 | select * from `users` where `id` = ? limit 1 [3]
+450.7 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2165.7 | select * from `users` where `id` = ? limit 1 [3]
+442.86 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+428.38 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+427.81 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, moFFMZ79FQoS6TNyXQKhqz1g1E0JEgENLmmanP6m, 2020-05-06 01:45:25, 2020-05-06 01:46:25, ONGOING, 10, 2020-05-06 01:45:25, 2020-05-06 01:45:25]
+454.39 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+438.85 | select * from `options` where `options`.`question_id` in (1, 27, 31, 39, 41, 62, 68, 73, 80, 81, 106, 110, 112, 125, 126) order by RAND() []
+2191.23 | select * from `users` where `id` = ? limit 1 [3]
+436.07 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, moFFMZ79FQoS6TNyXQKhqz1g1E0JEgENLmmanP6m]
+440.79 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [81, 39, 125, 62, 73, 126, 106, 112, 110, 27]
+441.21 | select * from `options` where `options`.`question_id` in (27, 39, 62, 73, 81, 106, 110, 112, 125, 126) order by RAND() []
+437.33 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:44, 354, , 321, 81, 2020-05-06 01:45:44]
+434.8 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:44, 354, , 155, 39, 2020-05-06 01:45:44]
+432.58 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:45, 354, , 500, 125, 2020-05-06 01:45:45]
+434.3 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:45, 354, , 247, 62, 2020-05-06 01:45:45]
+438.13 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:46, 354, , 290, 73, 2020-05-06 01:45:46]
+434.7 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:46, 354, 1, 504, 126, 2020-05-06 01:45:46]
+438.66 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:47, 354, , 422, 106, 2020-05-06 01:45:47]
+432.56 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:47, 354, , 448, 112, 2020-05-06 01:45:47]
+434.35 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:48, 354, , 438, 110, 2020-05-06 01:45:48]
+441.81 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:45:48, 354, , 108, 27, 2020-05-06 01:45:48]
+442.96 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+434.07 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:45:42, 1, 9, 1, 0, , 17, 2020-05-06 01:45:49, 354]
+443.09 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+434.93 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2203.49 | select * from `users` where `id` = ? limit 1 [3]
+435.09 | select * from `profiles` where `profiles`.`user_id` in (3) []
+439.8 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+436.55 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+430.91 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2506.95 | select * from `users` where `id` = ? limit 1 [3]
+434.72 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2147.66 | select * from `users` where `id` = ? limit 1 [3]
+428.63 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+427.69 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+429.47 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, vaWxCm5Cnd2inPfK5y5a4j7uYBPLQBf4b6NYh111, 2020-05-06 01:49:58, 2020-05-06 01:50:58, ONGOING, 10, 2020-05-06 01:49:58, 2020-05-06 01:49:58]
+433.86 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+431.41 | select * from `options` where `options`.`question_id` in (6, 8, 19, 40, 41, 64, 66, 86, 91, 98, 104, 120, 132, 136, 147) order by RAND() []
+2203.55 | select * from `users` where `id` = ? limit 1 [3]
+443.91 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, vaWxCm5Cnd2inPfK5y5a4j7uYBPLQBf4b6NYh111]
+448.32 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [132, 6, 86, 40, 136, 41, 104, 66, 64, 120]
+458.43 | select * from `options` where `options`.`question_id` in (6, 40, 41, 64, 66, 86, 104, 120, 132, 136) order by RAND() []
+438.1 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:26, 355, , 527, 132, 2020-05-06 01:50:26]
+439.06 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:26, 355, , 21, 6, 2020-05-06 01:50:26]
+435.67 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:27, 355, , 343, 86, 2020-05-06 01:50:27]
+438.33 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:27, 355, , 158, 40, 2020-05-06 01:50:27]
+442.71 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:27, 355, , 544, 136, 2020-05-06 01:50:27]
+439.59 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:28, 355, , 164, 41, 2020-05-06 01:50:28]
+435.75 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:28, 355, , 415, 104, 2020-05-06 01:50:28]
+436.3 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:29, 355, , 261, 66, 2020-05-06 01:50:29]
+435.65 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:29, 355, , 253, 64, 2020-05-06 01:50:29]
+437.64 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:50:30, 355, , 480, 120, 2020-05-06 01:50:30]
+454.04 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+436.46 | update `games` set `state` = ?, `end_time` = ?, `wrong_count` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:50:24, 10, 0, , 26, 2020-05-06 01:50:31, 355]
+439.15 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+439.85 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2291.94 | select * from `users` where `id` = ? limit 1 [3]
+439.81 | select * from `profiles` where `profiles`.`user_id` in (3) []
+442.27 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+444.15 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+436.55 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2215.44 | select * from `users` where `id` = ? limit 1 [3]
+442.21 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2313.05 | select * from `users` where `id` = ? limit 1 [3]
+447.13 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 80]
+438.97 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
+441.58 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 80, 5, THzgkj2AvL7PoORnUPAZGYBRK2qNkLmxEf28rwDf, 2020-05-06 01:53:12, 2020-05-06 01:54:12, ONGOING, 10, 2020-05-06 01:53:12, 2020-05-06 01:53:12]
+443 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
+449.89 | select * from `options` where `options`.`question_id` in (359, 361, 364, 370, 378, 384, 387, 390, 395, 411, 414, 416, 419, 420, 421) order by RAND() []
+2182.52 | select * from `users` where `id` = ? limit 1 [3]
+437.75 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, THzgkj2AvL7PoORnUPAZGYBRK2qNkLmxEf28rwDf]
+434.43 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [395, 411, 364, 390, 387, 359, 420, 384, 421, 378]
+436.17 | select * from `options` where `options`.`question_id` in (359, 364, 378, 384, 387, 390, 395, 411, 420, 421) order by RAND() []
+432.65 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:35, 356, , 1575, 395, 2020-05-06 01:53:35]
+430.22 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:36, 356, , 1637, 411, 2020-05-06 01:53:36]
+430.29 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:36, 356, , 1450, 364, 2020-05-06 01:53:36]
+432.44 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:37, 356, , 1555, 390, 2020-05-06 01:53:37]
+429.61 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:37, 356, , 1544, 387, 2020-05-06 01:53:37]
+432.76 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:37, 356, 1, 1430, 359, 2020-05-06 01:53:37]
+429.95 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:38, 356, , 1673, 420, 2020-05-06 01:53:38]
+430.35 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:38, 356, , 1531, 384, 2020-05-06 01:53:38]
+429.05 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:39, 356, , 1679, 421, 2020-05-06 01:53:39]
+434.61 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:53:39, 356, , 1506, 378, 2020-05-06 01:53:39]
+433.69 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+431.38 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:53:33, 1, 9, 1, 0, , 21, 2020-05-06 01:53:40, 356]
+434.52 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+431.72 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2295.17 | select * from `users` where `id` = ? limit 1 [3]
+444.07 | select * from `profiles` where `profiles`.`user_id` in (3) []
+459.97 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+445.94 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+445.73 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2299.46 | select * from `users` where `id` = ? limit 1 [3]
+432.25 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2216.31 | select * from `users` where `id` = ? limit 1 [3]
+436.25 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+437.56 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
+440.53 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 5, aMqLAChirH3IOeBWNiQGgdxceFjzGNVWfktnqfbU, 2020-05-06 01:54:19, 2020-05-06 01:55:19, ONGOING, 10, 2020-05-06 01:54:19, 2020-05-06 01:54:19]
+438.8 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
+442.17 | select * from `options` where `options`.`question_id` in (345, 347, 348, 367, 368, 381, 391, 400, 405, 408, 420, 421, 422, 424, 425) order by RAND() []
+2194.15 | select * from `users` where `id` = ? limit 1 [3]
+447.84 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, aMqLAChirH3IOeBWNiQGgdxceFjzGNVWfktnqfbU]
+437.8 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?) [425, 420, 400, 421, 348, 367, 381, 391, 422]
+447.04 | select * from `options` where `options`.`question_id` in (348, 367, 381, 391, 400, 420, 421, 422, 425) order by RAND() []
+441.57 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:42, 357, , 1696, 425, 2020-05-06 01:54:42]
+432.2 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:42, 357, , 1673, 420, 2020-05-06 01:54:42]
+437.14 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:43, 357, , 1595, 400, 2020-05-06 01:54:43]
+438.43 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:43, 357, 1, 1677, 421, 2020-05-06 01:54:43]
+439.64 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:44, 357, 1, 1387, 348, 2020-05-06 01:54:44]
+437.06 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:44, 357, 1, 1462, 367, 2020-05-06 01:54:44]
+438.53 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:45, 357, , 1519, 381, 2020-05-06 01:54:45]
+437.73 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:45, 357, , 1557, 391, 2020-05-06 01:54:45]
+437.15 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-06 01:54:46, 357, , 1684, 422, 2020-05-06 01:54:46]
+440.99 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+438.4 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-06 01:54:40, 3, 6, 3, 0, , 21, 2020-05-06 01:54:47, 357]
+441.47 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+433.52 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2992.2 | select * from `users` where `id` = ? limit 1 [3]
+439.47 | select * from `profiles` where `profiles`.`user_id` in (3) []
+454.31 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+445.85 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+446.06 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2218.08 | select * from `users` where `id` = ? limit 1 [3]
+456.31 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2280.41 | select * from `users` where `id` = ? limit 1 [3]
+455.65 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2295.42 | select * from `users` where `id` = ? limit 1 [3]
+445.66 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2236.64 | select * from `users` where `id` = ? limit 1 [3]
+442.79 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2093.84 | select * from `users` where `id` = ? limit 1 [3]
+460.12 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2204.14 | select * from `users` where `id` = ? limit 1 [3]
+425.73 | select * from `profiles` where `profiles`.`user_id` in (3) []
+445.71 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+489.61 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+423.24 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2279.61 | select * from `users` where `id` = ? limit 1 [3]
+491.71 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2180.64 | select * from `users` where `id` = ? limit 1 [3]
+432.29 | select * from `profiles` where `profiles`.`user_id` in (3) []
+433.16 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+430.08 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+431.51 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2708.51 | select * from `users` where `id` = ? limit 1 [3]
+437.36 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2158.68 | select * from `users` where `id` = ? limit 1 [3]
+439.96 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2317.7 | select * from `users` where `id` = ? limit 1 [3]
+435.24 | select * from `profiles` where `profiles`.`user_id` in (3) []
+440.12 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+437.9 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+437.32 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2153.56 | select * from `users` where `id` = ? limit 1 [3]
+433.81 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2180.15 | select * from `users` where `id` = ? limit 1 [3]
+451.64 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2257.75 | select * from `users` where `id` = ? limit 1 [3]
+446.88 | select * from `profiles` where `profiles`.`user_id` in (3) []
+451.02 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+449.67 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+452.08 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2252.8 | select * from `users` where `id` = ? limit 1 [3]
+444.01 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+3338.31 | select * from `users` where `id` = ? limit 1 [3]
+426.43 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2246.03 | select * from `users` where `id` = ? limit 1 [3]
+436.55 | select * from `profiles` where `profiles`.`user_id` in (3) []
+442.72 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+438.25 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+434.01 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2309.59 | select * from `users` where `id` = ? limit 1 [3]
+431.76 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2169.95 | select * from `users` where `id` = ? limit 1 [3]
+444.08 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2101.11 | select * from `users` where `id` = ? limit 1 [3]
+412.76 | select * from `profiles` where `profiles`.`user_id` in (3) []
+433.33 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+415.59 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+417.38 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2286.25 | select * from `users` where `id` = ? limit 1 [3]
+846.38 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2679.02 | select * from `users` where `id` = ? limit 1 [3]
+423.12 | select * from `profiles` where `profiles`.`user_id` in (3) []
+425.45 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+425.77 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+425.01 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2263.37 | select * from `users` where `id` = ? limit 1 [3]
+462.77 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2154.05 | select * from `users` where `id` = ? limit 1 [3]
+431.96 | select * from `profiles` where `profiles`.`user_id` in (3) []
+437.72 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+428.12 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+425.35 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2332.37 | select * from `users` where `id` = ? limit 1 [3]
+451.56 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2142.6 | select * from `users` where `id` = ? limit 1 [3]
+440.49 | select * from `profiles` where `profiles`.`user_id` in (3) []
+432.42 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+426.25 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+429.01 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2279.38 | select * from `users` where `id` = ? limit 1 [3]
+441.85 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2157.69 | select * from `users` where `id` = ? limit 1 [3]
+445.98 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2152.58 | select * from `users` where `id` = ? limit 1 [3]
+420.78 | select * from `profiles` where `profiles`.`user_id` in (3) []
+421.84 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+428.57 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+423.9 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3092.27 | select * from `users` where `id` = ? limit 1 [3]
+489.16 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2254.91 | select * from `users` where `id` = ? limit 1 [3]
+454.69 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2249.92 | select * from `users` where `id` = ? limit 1 [3]
+434.81 | select * from `profiles` where `profiles`.`user_id` in (3) []
+454.5 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+431.34 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+471.67 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2263.56 | select * from `users` where `id` = ? limit 1 [3]
+450.08 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2706.17 | select * from `users` where `id` = ? limit 1 [3]
+469.65 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2222.89 | select * from `users` where `id` = ? limit 1 [3]
+434.94 | select * from `profiles` where `profiles`.`user_id` in (3) []
+487.79 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+486.55 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+514.54 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2831.64 | select * from `users` where `id` = ? limit 1 [3]
+451.2 | select * from `profiles` where `profiles`.`user_id` in (3) []
+443.94 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+442.99 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+441.33 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2230.81 | select * from `users` where `id` = ? limit 1 [3]
+449.37 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+3406.45 | select * from `users` where `id` = ? limit 1 [3]
+436.93 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2278.53 | select * from `users` where `id` = ? limit 1 [3]
+462.26 | select * from `profiles` where `profiles`.`user_id` in (3) []
+443.91 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+440.86 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+439.77 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2190.62 | select * from `users` where `id` = ? limit 1 [3]
+434.83 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2238.32 | select * from `users` where `id` = ? limit 1 [3]
+428.35 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2292.94 | select * from `users` where `id` = ? limit 1 [3]
+443.45 | select * from `profiles` where `profiles`.`user_id` in (3) []
+451.42 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+443.82 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+446.74 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2779.34 | select * from `users` where `id` = ? limit 1 [3]
+441.61 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2247.68 | select * from `users` where `id` = ? limit 1 [3]
+447.8 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2295.3 | select * from `users` where `id` = ? limit 1 [3]
+458.46 | select * from `profiles` where `profiles`.`user_id` in (3) []
+444.86 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+435.12 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+440.77 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2253.44 | select * from `users` where `id` = ? limit 1 [3]
+450.21 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2266.23 | select * from `users` where `id` = ? limit 1 [3]
+734.14 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2414.22 | select * from `users` where `id` = ? limit 1 [3]
+1004.28 | select * from `profiles` where `profiles`.`user_id` in (3) []
+438.5 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+441.72 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+438.06 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2232.55 | select * from `users` where `id` = ? limit 1 [3]
+458.37 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2196.76 | select * from `users` where `id` = ? limit 1 [3]
+500.26 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2302.08 | select * from `users` where `id` = ? limit 1 [3]
+444.01 | select * from `profiles` where `profiles`.`user_id` in (3) []
+461.1 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+453.88 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+450.06 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2279.62 | select * from `users` where `id` = ? limit 1 [3]
+446.63 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+4310.84 | select * from `users` where `id` = ? limit 1 [3]
+447.74 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2748.21 | select * from `users` where `id` = ? limit 1 [3]
+439.86 | select * from `profiles` where `profiles`.`user_id` in (3) []
+444.68 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+437.38 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+437.7 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2866.7 | select * from `users` where `id` = ? limit 1 [3]
+473.47 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+3183.27 | select * from `users` where `id` = ? limit 1 [3]
+437.97 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+10698.28 | select * from `users` where `id` = ? limit 1 [3]
+462.98 | select * from `profiles` where `profiles`.`user_id` in (3) []
+855.33 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+606.16 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+443.32 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3661.73 | select * from `users` where `id` = ? limit 1 [3]
+1079.58 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+11641.19 | select * from `users` where `id` = ? limit 1 [3]
+947.93 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+3984.19 | select * from `users` where `id` = ? limit 1 [3]
+1091.35 | select * from `profiles` where `profiles`.`user_id` in (3) []
+1354.84 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+1891.49 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+967.67 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3296.87 | select * from `users` where `id` = ? limit 1 [3]
+641.59 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+3189.36 | select * from `users` where `id` = ? limit 1 [3]
+443.14 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+7859.9 | select * from `users` where `id` = ? limit 1 [3]
+780.62 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+10344.78 | select * from `users` where `id` = ? limit 1 [3]
+489.99 | select * from `profiles` where `profiles`.`user_id` in (3) []
+670.5 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+604.48 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+581.2 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+4072.35 | select * from `users` where `id` = ? limit 1 [3]
+576.84 | select * from `profiles` where `profiles`.`user_id` = ? and `profiles`.`user_id` is not null limit 1 [3]
+8605.47 | select * from `users` where `id` = ? limit 1 [3]
+980.09 | select * from `profiles` where `profiles`.`user_id` in (3) []
+1064.33 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+839.05 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+517.78 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+10005.68 | select * from `users` where `id` = ? limit 1 [3]
+470.69 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+8499.41 | select * from `users` where `id` = ? limit 1 [3]
+1223.58 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+15363.18 | select * from `users` where `id` = ? limit 1 [3]
+450.75 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+3223.49 | select * from `users` where `id` = ? limit 1 [3]
+445.92 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+3092.8 | select * from `users` where `id` = ? limit 1 [3]
+564.56 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2235.76 | select * from `users` where `id` = ? limit 1 [3]
+444.51 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2775.38 | select * from `users` where `id` = ? limit 1 [3]
+439.34 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2232.56 | select * from `users` where `id` = ? limit 1 [3]
+451.68 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2226.86 | select * from `users` where `id` = ? limit 1 [3]
+461.69 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2161.66 | select * from `users` where `id` = ? limit 1 [3]
+438.91 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2649.23 | select * from `users` where `id` = ? limit 1 [3]
+446.24 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2162.31 | select * from `users` where `id` = ? limit 1 [3]
+433.86 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2881.22 | select * from `users` where `id` = ? limit 1 [3]
+481.15 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2376.61 | select * from `users` where `id` = ? limit 1 [3]
+445.8 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+442.93 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+440.36 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, 8ko5Be0l8lKl6S2mYrbZv4U57vY05BKdPZOdoFYl, 2020-05-09 00:31:49, 2020-05-09 00:32:49, ONGOING, 10, 2020-05-09 00:31:49, 2020-05-09 00:31:49]
+443.01 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+474.35 | select * from `options` where `options`.`question_id` in (16, 19, 23, 40, 48, 69, 75, 90, 92, 97, 122, 126, 132, 138, 141) order by RAND() []
+2260.03 | select * from `users` where `id` = ? limit 1 [3]
+452.87 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, 8ko5Be0l8lKl6S2mYrbZv4U57vY05BKdPZOdoFYl]
+450.41 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [23, 75, 122, 97, 132, 92, 141, 16, 69, 40]
+446.72 | select * from `options` where `options`.`question_id` in (16, 23, 40, 69, 75, 92, 97, 122, 132, 141) order by RAND() []
+462.51 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:31, 362, , 91, 23, 2020-05-09 00:32:31]
+446.97 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:32, 362, , 299, 75, 2020-05-09 00:32:32]
+443.47 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:32, 362, , 485, 122, 2020-05-09 00:32:32]
+442.88 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:32, 362, , 386, 97, 2020-05-09 00:32:32]
+446.4 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:33, 362, , 525, 132, 2020-05-09 00:32:33]
+443.55 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:33, 362, , 366, 92, 2020-05-09 00:32:33]
+443.71 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:34, 362, , 561, 141, 2020-05-09 00:32:34]
+446.28 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:34, 362, , 62, 16, 2020-05-09 00:32:34]
+444.46 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:35, 362, , 276, 69, 2020-05-09 00:32:35]
+445.05 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:32:35, 362, , 160, 40, 2020-05-09 00:32:35]
+447.45 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+446.7 | update `games` set `state` = ?, `end_time` = ?, `wrong_count` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-09 00:32:29, 10, 0, , 40, 2020-05-09 00:32:36, 362]
+442.47 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+447.08 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2236.95 | select * from `users` where `id` = ? limit 1 [3]
+436.22 | select * from `profiles` where `profiles`.`user_id` in (3) []
+437.45 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+440.61 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+436.82 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2311.34 | select * from `users` where `id` = ? limit 1 [3]
+466.92 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2241.96 | select * from `users` where `id` = ? limit 1 [3]
+441.34 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2195.05 | select * from `users` where `id` = ? limit 1 [3]
+445.17 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2180.1 | select * from `users` where `id` = ? limit 1 [3]
+441.11 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2197.19 | select * from `users` where `id` = ? limit 1 [3]
+433.48 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2176.27 | select * from `users` where `id` = ? limit 1 [3]
+450.41 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2204.05 | select * from `users` where `id` = ? limit 1 [3]
+443.15 | select * from `profiles` where `profiles`.`user_id` in (3) []
+446.36 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+437.63 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+447.27 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2136.98 | select * from `users` where `id` = ? limit 1 [3]
+425.4 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+2236.48 | select * from `users` where `id` = ? limit 1 [3]
+456.53 | select `wallet_transactions`.*, `wallets`.`user_id` as `laravel_through_key` from `wallet_transactions` inner join `wallets` on `wallets`.`id` = `wallet_transactions`.`wallet_id` where `wallets`.`user_id` = ? order by `created_at` desc, `created_at` desc [3]
+2200.89 | select * from `users` where `id` = ? limit 1 [3]
+448.93 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2240.31 | select * from `users` where `id` = ? limit 1 [3]
+453.01 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2194.53 | select * from `users` where `id` = ? limit 1 [3]
+427.55 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+434.01 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+427.69 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, DVxVVeosPgxjbI9f7s585JkCzBwdM9WlTQXT93Wn, 2020-05-09 00:48:30, 2020-05-09 00:49:30, ONGOING, 10, 2020-05-09 00:48:30, 2020-05-09 00:48:30]
+431.55 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+458.76 | select * from `options` where `options`.`question_id` in (4, 16, 25, 45, 47, 56, 70, 76, 79, 82, 107, 110, 118, 129, 134) order by RAND() []
+3092.13 | select * from `users` where `id` = ? limit 1 [3]
+576.18 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, DVxVVeosPgxjbI9f7s585JkCzBwdM9WlTQXT93Wn]
+592.13 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [25, 107, 56, 118, 129, 47, 134, 82, 79, 16]
+464.62 | select * from `options` where `options`.`question_id` in (16, 25, 47, 56, 79, 82, 107, 118, 129, 134) order by RAND() []
+438.85 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:48:58, 363, , 100, 25, 2020-05-09 00:48:58]
+434.3 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:48:58, 363, , 427, 107, 2020-05-09 00:48:58]
+433.16 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:48:59, 363, , 221, 56, 2020-05-09 00:48:59]
+440.44 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:48:59, 363, , 470, 118, 2020-05-09 00:48:59]
+429.93 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:00, 363, , 514, 129, 2020-05-09 00:49:00]
+431.07 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:00, 363, , 187, 47, 2020-05-09 00:49:00]
+430.7 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:00, 363, , 534, 134, 2020-05-09 00:49:00]
+431.76 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:01, 363, , 326, 82, 2020-05-09 00:49:01]
+430.45 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:01, 363, , 314, 79, 2020-05-09 00:49:01]
+431.45 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:49:02, 363, , 62, 16, 2020-05-09 00:49:02]
+430.85 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+432.14 | update `games` set `state` = ?, `end_time` = ?, `wrong_count` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-09 00:48:56, 10, 0, , 26, 2020-05-09 00:49:03, 363]
+435.59 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+432.84 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2158.98 | select * from `users` where `id` = ? limit 1 [3]
+428.45 | select * from `profiles` where `profiles`.`user_id` in (3) []
+423.24 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+424.52 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+430.01 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2271.51 | select * from `users` where `id` = ? limit 1 [3]
+451.81 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2372.52 | select * from `users` where `id` = ? limit 1 [3]
+477.75 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+478.13 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
+474.22 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 5, fSHFBPGtOw7RgraTIj3XhL6ZYXmbUVumQARiHWdr, 2020-05-09 00:49:47, 2020-05-09 00:50:47, ONGOING, 10, 2020-05-09 00:49:47, 2020-05-09 00:49:47]
+493.89 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
+479.77 | select * from `options` where `options`.`question_id` in (343, 345, 347, 369, 374, 389, 398, 399, 401, 403, 415, 416, 422, 425, 426) order by RAND() []
+2882.28 | select * from `users` where `id` = ? limit 1 [3]
+443.59 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, fSHFBPGtOw7RgraTIj3XhL6ZYXmbUVumQARiHWdr]
+435.01 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [399, 426, 416, 343, 345, 401, 347, 389, 425, 398]
+446.43 | select * from `options` where `options`.`question_id` in (343, 345, 347, 389, 398, 399, 401, 416, 425, 426) order by RAND() []
+433.39 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:08, 364, , 1592, 399, 2020-05-09 00:50:08]
+434.28 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:09, 364, , 1697, 426, 2020-05-09 00:50:09]
+439.36 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:09, 364, 1, 1659, 416, 2020-05-09 00:50:09]
+437.14 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:10, 364, , 1368, 343, 2020-05-09 00:50:10]
+433.16 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:10, 364, , 1375, 345, 2020-05-09 00:50:10]
+435.48 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:11, 364, , 1599, 401, 2020-05-09 00:50:11]
+435.12 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:11, 364, , 1381, 347, 2020-05-09 00:50:11]
+436.48 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:11, 364, , 1549, 389, 2020-05-09 00:50:11]
+433.94 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:12, 364, , 1694, 425, 2020-05-09 00:50:12]
+433.93 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:50:13, 364, 1, 1587, 398, 2020-05-09 00:50:13]
+441.51 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+436.25 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-09 00:50:06, 2, 8, 2, 0, , 19, 2020-05-09 00:50:14, 364]
+436.51 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+434.21 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+3312.42 | select * from `users` where `id` = ? limit 1 [3]
+556.37 | select * from `profiles` where `profiles`.`user_id` in (3) []
+570.19 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+497.96 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+435.98 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2181.36 | select * from `users` where `id` = ? limit 1 [3]
+431.18 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2225.81 | select * from `users` where `id` = ? limit 1 [3]
+439.55 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+446.72 | select * from `categories` where `categories`.`id` = ? limit 1 [5]
+440.01 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 5, E5433xY9ycymfS0a76S9PxGmdCRHRnLHPrshZzN7, 2020-05-09 00:52:36, 2020-05-09 00:53:36, ONGOING, 10, 2020-05-09 00:52:36, 2020-05-09 00:52:36]
+443.64 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [5, hard, 5, medium, 5, easy]
+448.99 | select * from `options` where `options`.`question_id` in (347, 348, 370, 371, 377, 388, 395, 397, 410, 411, 416, 420, 424, 425, 426) order by RAND() []
+2358.4 | select * from `users` where `id` = ? limit 1 [3]
+442.54 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, E5433xY9ycymfS0a76S9PxGmdCRHRnLHPrshZzN7]
+442.26 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?) [395, 426, 347, 370, 397, 348, 377, 424, 425]
+439.5 | select * from `options` where `options`.`question_id` in (347, 348, 370, 377, 395, 397, 424, 425, 426) order by RAND() []
+440.57 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:35, 365, , 1573, 395, 2020-05-09 00:53:35]
+436.94 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:35, 365, , 1697, 426, 2020-05-09 00:53:35]
+477.13 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:36, 365, , 1383, 347, 2020-05-09 00:53:36]
+438.92 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:36, 365, , 1474, 370, 2020-05-09 00:53:36]
+437.75 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:37, 365, 1, 1583, 397, 2020-05-09 00:53:37]
+439.2 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:37, 365, , 1388, 348, 2020-05-09 00:53:37]
+437.13 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:38, 365, 1, 1501, 377, 2020-05-09 00:53:38]
+437.01 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:38, 365, , 1691, 424, 2020-05-09 00:53:38]
+441.23 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:53:39, 365, 1, 1693, 425, 2020-05-09 00:53:39]
+440.73 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+438.53 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-09 00:53:33, 3, 6, 3, 0, , 57, 2020-05-09 00:53:40, 365]
+438.89 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+439.51 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2256.2 | select * from `users` where `id` = ? limit 1 [3]
+433.75 | select * from `profiles` where `profiles`.`user_id` in (3) []
+441.23 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+439.15 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+437.83 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2212.33 | select * from `users` where `id` = ? limit 1 [3]
+445.59 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+4514.74 | select * from `users` where `id` = ? limit 1 [3]
+419.03 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? and `user_plan`.`id` = ? limit 1 [3, 1, 78]
+425.1 | select * from `categories` where `categories`.`id` = ? limit 1 [3]
+419.5 | insert into `games` (`user_id`, `plan_id`, `live_id`, `category_id`, `session_token`, `start_time`, `expected_end_time`, `state`, `total_count`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [3, 1, 78, 3, DM0juYCRudCnMPb82uZrhj7o9HFButxbyUcFzADV, 2020-05-09 00:54:13, 2020-05-09 00:55:13, ONGOING, 10, 2020-05-09 00:54:13, 2020-05-09 00:54:13]
+435.15 | (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) union (select * from `questions` where `questions`.`category_id` = ? and `questions`.`category_id` is not null and `level` = ? order by RAND() limit 5) [3, hard, 3, medium, 3, easy]
+434.06 | select * from `options` where `options`.`question_id` in (21, 33, 36, 42, 49, 53, 55, 89, 96, 98, 102, 110, 129, 140, 144) order by RAND() []
+2158.6 | select * from `users` where `id` = ? limit 1 [3]
+431.86 | select * from `games` where `games`.`user_id` = ? and `games`.`user_id` is not null and `session_token` = ? limit 1 [3, DM0juYCRudCnMPb82uZrhj7o9HFButxbyUcFzADV]
+433.29 | select * from `questions` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [49, 110, 42, 33, 55, 98, 140, 53, 21, 89]
+441.43 | select * from `options` where `options`.`question_id` in (21, 33, 42, 49, 53, 55, 89, 98, 110, 140) order by RAND() []
+432.82 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:35, 366, , 194, 49, 2020-05-09 00:54:35]
+432.23 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:35, 366, , 438, 110, 2020-05-09 00:54:35]
+431.11 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:36, 366, 1, 168, 42, 2020-05-09 00:54:36]
+432.78 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:36, 366, , 130, 33, 2020-05-09 00:54:36]
+436.37 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:37, 366, 1, 217, 55, 2020-05-09 00:54:37]
+432.31 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:37, 366, , 392, 98, 2020-05-09 00:54:37]
+429.69 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:38, 366, , 559, 140, 2020-05-09 00:54:38]
+427.99 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:38, 366, 1, 211, 53, 2020-05-09 00:54:38]
+429.62 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:39, 366, , 81, 21, 2020-05-09 00:54:39]
+429.41 | insert into `game_questions` (`created_at`, `game_id`, `is_correct`, `option_id`, `question_id`, `updated_at`) values (?, ?, ?, ?, ?, ?) [2020-05-09 00:54:39, 366, , 355, 89, 2020-05-09 00:54:39]
+435.12 | select * from `plans` where `plans`.`id` = ? limit 1 [1]
+429.18 | update `games` set `state` = ?, `end_time` = ?, `correct_count` = ?, `wrong_count` = ?, `points_gained` = ?, `amount_gained` = ?, `is_winning` = ?, `duration` = ?, `games`.`updated_at` = ? where `id` = ? [COMPLETED, 2020-05-09 00:54:33, 3, 7, 3, 0, , 20, 2020-05-09 00:54:40, 366]
+428.16 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+431.3 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2221.05 | select * from `users` where `id` = ? limit 1 [3]
+441.03 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+2239.75 | select * from `users` where `id` = ? limit 1 [3]
+447.48 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2399.03 | select * from `users` where `id` = ? limit 1 [3]
+439.35 | select * from `profiles` where `profiles`.`user_id` in (3) []
+457.86 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+442.64 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+468.43 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2131.33 | select * from `users` where `id` = ? limit 1 [3]
+427.03 | SELECT g.*, p.avatar
+            FROM (
+                SELECT SUM(points_gained) AS score, username, user_id FROM games
+                INNER JOIN users ON users.id = games.user_id
+                GROUP BY username, user_id
+                ORDER BY score DESC
+                LIMIT 10
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.score DESC []
+2295.85 | select * from `users` where `id` = ? limit 1 [3]
+472.96 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2501.05 | select * from `users` where `id` = ? limit 1 [3]
+518.25 | select * from `profiles` where `profiles`.`user_id` in (3) []
+502.01 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+445.21 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+443.34 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2232.14 | select * from `users` where `id` = ? limit 1 [3]
+455.61 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []
+2641.27 | select * from `users` where `id` = ? limit 1 [3]
+443.03 | select * from `profiles` where `profiles`.`user_id` in (3) []
+497.74 | select `plans`.*, `user_plan`.`user_id` as `pivot_user_id`, `user_plan`.`plan_id` as `pivot_plan_id`, `user_plan`.`used` as `pivot_used`, `user_plan`.`id` as `pivot_id` from `plans` inner join `user_plan` on `plans`.`id` = `user_plan`.`plan_id` where `user_plan`.`user_id` = ? and `user_plan`.`is_active` = ? [3, 1]
+466.57 | select * from `wallets` where `wallets`.`user_id` = ? and `wallets`.`user_id` is not null limit 1 [3]
+514.56 | select SUM(points_gained) as score, user_id from games
+            group by user_id
+            order by score desc
+            limit 100 []
+2296.32 | select * from `users` where `id` = ? limit 1 [3]
+453.53 | select * from `categories` where (select count(*) from `questions` where `categories`.`id` = `questions`.`category_id`) > 0 []

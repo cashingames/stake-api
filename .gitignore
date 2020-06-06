@@ -17,3 +17,5 @@ Football.xlsx
 Hollywood.xlsx
 Music.xlsx
 .editorconfig
+/storage/logs
+storage/logs/query.log
