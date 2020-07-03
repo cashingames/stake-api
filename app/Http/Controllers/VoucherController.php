@@ -12,62 +12,7 @@ use Illuminate\Support\Str;
 
 class VoucherController extends BaseController
 {
-    // /**
-    //  * Validates that a coupon is valid
-    //  * and consume it if it is
-    //  */
-    // public function validate(string $code){
-        
-    // }
-
-    private function checkCode($code){
-        if ( Voucher::where('code', $code)->exists()){
-           $codeExists = true;
-        } else {
-            $codeExists = false;
-        }
-        return $codeExists;
-    }
-
-    public function generate(){
-    //Specify the number of coupons to be generated at a go (100 maybe?)\
-    // Specify the length each coupon will be
-    // Specify the selected characters for the coupons
-    /* From the selected characters, generate 100 random combinations of the characters not greater 
-    than the  length of each coupon
-    */
-    //check if code already exists
-        //if code exists, generate new code
-        //else
-    // Save the generated coupons in the vouchers table
-    
-    
-        for ($i = 0; $i <= 100; $i++){
-            $length = 10;
-            $characters = "123456789abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ";
-            $code = substr(str_shuffle($characters), 0, $length);
-            //   echo $code;
-            //   die();
-            $checkCode = $this->checkCode($code);
-
-            if($checkCode == true){
-                $code = substr(str_shuffle($characters), 0, $length); 
-                $checkCode = $this->checkCode($code);
-            }
-
-            //save to database
-            $voucher = new Voucher;
-            $voucher->code = $code;
-            $voucher->count = rand(1 , 3);
-            $voucher->expire = now()->addDays(1);
-            $voucher->unit = rand(150,2000);
-            $voucher->type='cash';
-            $voucher->save();
-
-            return $this->sendResponse($voucher, "100 Coupons generated ");
-        }
-    }
-
+  
     public function consume ($code){
 
         //Check if code exists 
@@ -128,10 +73,7 @@ class VoucherController extends BaseController
         
         //Return success message
         $this->user->wallet->refresh();
-        return $this->sendResponse($this->user->wallet, "Your wallet has been credited with " . $voucher->unit ." units.");
-        
-
-                        
+        return $this->sendResponse($this->user->wallet, "Your wallet has been credited with " . $voucher->unit ." units.");                 
     
     
     }
