@@ -34,3 +34,5 @@ Route::get('v1/profile/me', 'ProfileController@me')->middleware('auth:api');
 Route::get('v1/user/me/plans', 'UserController@plans')->middleware('auth:api');
 Route::get('v1/user/me', 'UserController@me')->middleware('auth:api');
 Route::post('v1/log/error', 'UserController@logError')->middleware('auth:api');
+Route::post('v1/voucher/consume/{code}','VoucherController@consume')->middleware('auth:api');
+Route::post('v1/voucher/generate', 'VoucherController@generate');
