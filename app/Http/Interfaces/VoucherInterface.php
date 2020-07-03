@@ -10,7 +10,7 @@ interface Voucher {
     /**
      * Inspect whether valid or not
      */
-    function validate(string $code);
+    // function validate(string $code);
 
     /**
      * Applies the voucher

@@ -11,6 +11,6 @@ $factory->define(App\Voucher::class, function (Faker $faker) {
         'expire' => now()->addDays(1),
         'count' => $faker->randomDigitNotNull(),
         'unit' => $faker->randomFloat(2, 150, 10000),
-        'type' => 'cash, live',
+        'type'=>$faker->randomElement(array('cash', 'cash') ),
     ];
 });
