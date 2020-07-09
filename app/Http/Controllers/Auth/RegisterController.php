@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\User;
+use App\Referral;
+use App\Wallet;
+use App\WalletTransaction;
 use App\Http\Controllers\BaseController;
 
 class RegisterController extends BaseController
@@ -56,7 +59,8 @@ class RegisterController extends BaseController
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed']
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'referral_code'=>['nullable', 'string']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -68,7 +72,8 @@ class RegisterController extends BaseController
      * @return \App\User
      */
     protected function create(array $data)
-    {
+    {   
+
         $user =
             User::create([
                 'username' => $data['username'],
@@ -84,17 +89,51 @@ class RegisterController extends BaseController
                 'last_name' => $data['last_name'],
             ]);
 
-        $user->wallet()
+        //If user signs up through reference  :
+
+        if(isset($data['referral_code']) &&  !is_null($data['referral_code'])){
+            //User bonus on sign up is 200 naira
+            $user->wallet()
             ->create([])
             ->transactions()
             ->create([
                 'transaction_type' => 'CREDIT',
-                'amount' => 150.00,
+                'amount' => 200.00,
                 'wallet_type' => 'BONUS',
-                'description' => 'Signup bonus',
+                'description' => 'Signup bonus on referral',
                 'reference' => Str::random(10)
             ]);
 
+            //credit the referee with additional 50 naira bonus
+            $referee = Referral::select('user_id')->where('referral_code', $data['referral_code'])->first();
+            $refereeWallet = Wallet::select('id','bonus')->where('user_id',$referee->user_id)->first();
+            // echo($refereeWallet->bonus);
+            // die();
+            
+            WalletTransaction::create([
+                'wallet_id' => $refereeWallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' =>  ($refereeWallet->bonus + 50.00) - $refereeWallet->bonus,
+                'wallet_type' => 'BONUS',
+                'description' => 'Bonus credit from signed up referral',
+                'reference' => Str::random(10)
+            ]);
+        }
+        //If user did not sign up by reference
+        else{
+
+            $user->wallet()
+                ->create([])
+                ->transactions()
+                ->create([
+                    'transaction_type' => 'CREDIT',
+                    'amount' => 150.00,
+                    'wallet_type' => 'BONUS',
+                    'description' => 'Signup bonus',
+                    'reference' => Str::random(10)
+                ]);
+
+        }        
         return $user;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Game;
+use App\Referral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -47,5 +48,35 @@ class UserController extends BaseController
     public function logError(Request $request){
         Log::error($request->data);
         return "";
+    }
+
+    public function generateReferralCode(){
+        // Specify the length the code will be
+        // Specify the selected characters for the coupons
+        /* From the selected characters, generate a random combination of the characters not greater 
+        than the  length of each coupon
+        */
+        //check if code exists
+        //if code does not exist
+        // Save the generated coupons in the referrals table
+
+        $length = 10;
+        $characters = "123456789abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ";
+        $referralCode = substr(str_shuffle($characters), 0, $length);
+        
+        //check if code exists
+        $codeExists= Referral::where('referral_code', $referralCode)->exists();
+
+        if ($codeExists !== null){
+            $referralCode = substr(str_shuffle($characters), 0, $length);
+        }
+
+        //save to database
+        $referral = new Referral;
+        $referral->referral_code = $referralCode;
+        $referral->user_id = $this->user->id;
+        $referral->save();
+
+        return $this->sendResponse($referral, "Referral code generated.");
     }
 }
