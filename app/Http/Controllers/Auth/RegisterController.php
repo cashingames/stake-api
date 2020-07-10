@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\User;
-use App\Referral;
+use App\Profile;
 use App\Wallet;
 use App\WalletTransaction;
 use App\Http\Controllers\BaseController;
@@ -81,12 +81,15 @@ class RegisterController extends BaseController
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
-
+                
         $user
             ->profile()
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
+                'referral_code' =>uniqid($data['username']),
+
+                
             ]);
 
         //If user signs up through reference  :
@@ -100,12 +103,18 @@ class RegisterController extends BaseController
                 'transaction_type' => 'CREDIT',
                 'amount' => 200.00,
                 'wallet_type' => 'BONUS',
-                'description' => 'Signup bonus on referral',
+                'description' => 'Signup bonus for using referral link',
                 'reference' => Str::random(10)
             ]);
 
             //credit the referee with additional 50 naira bonus
-            $referee = Referral::select('user_id')->where('referral_code', $data['referral_code'])->first();
+            $referee = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
+            
+            if($referee == null){
+
+                return $this->sendError(['The referral code is incorrect.'], "The referral code is incorrect.");
+            }
+
             $refereeWallet = Wallet::select('id','bonus')->where('user_id',$referee->user_id)->first();
             // echo($refereeWallet->bonus);
             // die();
@@ -119,21 +128,18 @@ class RegisterController extends BaseController
                 'reference' => Str::random(10)
             ]);
         }
-        //If user did not sign up by reference
-        else{
 
-            $user->wallet()
-                ->create([])
-                ->transactions()
-                ->create([
-                    'transaction_type' => 'CREDIT',
-                    'amount' => 150.00,
-                    'wallet_type' => 'BONUS',
-                    'description' => 'Signup bonus',
-                    'reference' => Str::random(10)
-                ]);
+        $user->wallet()
+            ->create([])
+            ->transactions()
+            ->create([
+                'transaction_type' => 'CREDIT',
+                'amount' => 150.00,
+                'wallet_type' => 'BONUS',
+                'description' => 'Signup bonus',
+                'reference' => Str::random(10)
+            ]);
 
-        }        
         return $user;
     }
 
