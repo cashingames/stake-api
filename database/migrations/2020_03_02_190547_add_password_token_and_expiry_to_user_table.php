@@ -29,8 +29,8 @@ class AddPasswordTokenAndExpiryToUserTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->dropColumn('password_token');
-            $table->dropColumn('token_expiry');
+            $table->dropColumn(['password_token', 'token_expiry']);
+            // $table->dropColumn('token_expiry');
         });
     }
 }

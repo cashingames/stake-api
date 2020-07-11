@@ -49,6 +49,7 @@ class VoucherController extends BaseController
         
         //Get the number of times the voucher has been used
         $codeCount = UserVoucher::where('voucher_id',$voucher->id)->count();
+        
         //If the number of times code has been used  equal to the code count
         if($codeCount == $voucher->count){
             return $this->sendError("Sorry, your voucher limit has been exhausted!", "Sorry, your voucher limit has been exhausted!");
@@ -65,7 +66,7 @@ class VoucherController extends BaseController
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'CREDIT',
-            'amount' =>  $this->user->wallet->bonus + $voucher->unit,
+            'amount' =>  ($this->user->wallet->bonus + $voucher->unit) - $this->user->wallet->bonus ,
             'wallet_type' => 'BONUS',
             'description' => 'Credit from voucher used',
             'reference' => Str::random(10)

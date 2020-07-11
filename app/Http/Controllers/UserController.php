@@ -48,4 +48,5 @@ class UserController extends BaseController
         Log::error($request->data);
         return "";
     }
+
 }

@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\User;
+use App\Profile;
+use App\Wallet;
+use App\WalletTransaction;
 use App\Http\Controllers\BaseController;
 
 class RegisterController extends BaseController
@@ -56,7 +59,8 @@ class RegisterController extends BaseController
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed']
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'referral_code'=>['nullable', 'string', 'exists:profiles,referral_code']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -68,7 +72,15 @@ class RegisterController extends BaseController
      * @return \App\User
      */
     protected function create(array $data)
-    {
+    {   
+
+        // $referee = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
+            
+        // if($referee == null){
+
+        //     return $this->sendError(['The referral code is incorrect.'], "The referral code is incorrect.");
+        // }
+
         $user =
             User::create([
                 'username' => $data['username'],
@@ -76,12 +88,15 @@ class RegisterController extends BaseController
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
-
+                
         $user
             ->profile()
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
+                'referral_code' =>uniqid($data['username']),
+
+                
             ]);
 
         $user->wallet()
@@ -94,6 +109,53 @@ class RegisterController extends BaseController
                 'description' => 'Signup bonus',
                 'reference' => Str::random(10)
             ]);
+
+
+        //If user signs up through reference  :
+
+
+        if(isset($data['referral_code']) &&  !is_null($data['referral_code'])){
+            //User bonus on sign up is 200 naira
+             WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' =>  50,
+                'wallet_type' => 'BONUS',
+                'description' => 'Signup bonus for using referral link',
+                'reference' => Str::random(10)
+            ]);
+
+
+            //credit the referrer with additional 50 naira bonus
+            $referrer = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
+
+            $referrerWallet = Wallet::select('id','bonus')->where('user_id',$referrer->user_id)->first();
+            // echo($refereeWallet->bonus);
+            // die();
+            
+            WalletTransaction::create([
+                'wallet_id' => $referrerWallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' =>  ($referrerWallet->bonus + 50.00) - $referrerWallet->bonus,
+                'wallet_type' => 'BONUS',
+                'description' => 'Bonus credit from signed up referral',
+                'reference' => Str::random(10)
+            ]);
+
+            $user->wallet->refresh();
+
+        }
+
+        // $user->wallet()
+        //     ->create([])
+        //     ->transactions()
+        //     ->create([
+        //         'transaction_type' => 'CREDIT',
+        //         'amount' => 150.00,
+        //         'wallet_type' => 'BONUS',
+        //         'description' => 'Signup bonus',
+        //         'reference' => Str::random(10)
+        //     ]);
 
         return $user;
     }

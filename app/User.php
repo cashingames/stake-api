@@ -8,6 +8,8 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Notifications\PasswordResetNotification;
 use App\Wallet;
+use App\Voucher;
+use App\Referral;
 use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements JWTSubject
@@ -90,9 +92,17 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Plan::class, 'user_plan')->withPivot('used', 'id');
     }
 
+    public function referrals(){
+        return $this->hasMany(Referral::class);
+    }
+    
     public function games()
     {
         return $this->hasMany(Game::class);
+    }
+
+    public function vouchers(){
+        return $this->hasMany(Voucher::class);
     }
 
     public function activePlans()
