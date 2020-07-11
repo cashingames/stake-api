@@ -28,6 +28,7 @@ class AddReferralCodeToProfilesTable extends Migration
     {
         Schema::table('profiles', function (Blueprint $table) {
             //
+            $table->dropColumn('referral_code');
         });
     }
 }
