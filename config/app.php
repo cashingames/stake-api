@@ -16,6 +16,7 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
     'payment_key' => env('PAYSTACK_KEY', null),
     'use_lite_client' => env('USE_LITE_FRONTEND', true),
+    'set_claims_active' => env('SET_CLAIMS_ACTIVE', true)
 
     /*
     |--------------------------------------------------------------------------
