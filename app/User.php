@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $appends = [
-        'show_bonus', 'lite_client', 'rank'
+        'show_bonus', 'lite_client', 'rank', 'is_claims_active'
     ];
 
     public function getJWTIdentifier()
@@ -123,6 +123,11 @@ class User extends Authenticatable implements JWTSubject
     public function getLiteClientAttribute()
     {
         return config('app.use_lite_client');
+    }
+
+    public function getIsClaimsActiveAttribute()
+    {
+        return config('app.set_claims_active');
     }
 
     public function getRankAttribute()
