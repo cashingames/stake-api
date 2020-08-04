@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\WalletTransaction;
 use GuzzleHttp\Client;
 use stdClass;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WithdrawalRequest;
+use Illuminate\Support\Str;
 
 class WalletController extends BaseController
 {
@@ -78,6 +81,30 @@ class WalletController extends BaseController
         //     $y->
         // });
         return response()->json($result, 200);
+
+    }
+
+    public function withdrawRequest($bankName,$accountName,$accountNumber,$amount){
+        Mail::send(new WithdrawalRequest($bankName,$accountName,$accountNumber,$amount));
+
+       
+        $wallet = auth()->user()->wallet;
+        // echo($wallet->cash);
+        // echo($amount);
+        // echo($wallet->cash - $amount);
+        // die();
+        WalletTransaction::create([
+            'wallet_id' => $wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => $amount,
+            'wallet_type' => 'CASH',
+            'description' => 'Cash Withdrawal',
+            'reference' => Str::random(10),
+        ]);
+
+        auth()->user()->wallet->refresh();
+
+        return $this->sendResponse($wallet, 'Withrawal Request sent.');
 
     }
 
