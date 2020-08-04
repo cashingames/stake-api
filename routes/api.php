@@ -22,7 +22,7 @@ Route::get('v1/categories', 'CategoryController@get')->middleware('auth:api');
 Route::post('v1/plans/me/subscribe', 'PlanController@subscribe')->middleware('auth:api');
 Route::get('v1/plans', 'PlanController@get')->middleware('auth:api');
 Route::get('v1/wallet/me/transaction/verify/{reference}', 'WalletController@verifyTransaction')->middleware('auth:api');
-Route::post('v1/wallet/me/transactions/withdrawal/{bankName}/{accountName}/{accountNumber}/{amount}', 'WalletController@withdrawRequest')->middleware('auth:api');
+Route::post('v1/wallet/me/withdrawal/{bankName}/{accountName}/{accountNumber}/{amount}', 'WalletController@withdrawRequest')->middleware('auth:api');
 Route::get('v1/wallet/me/transactions', 'WalletController@transactions')->middleware('auth:api');
 Route::get('v1/wallet/me', 'WalletController@me')->middleware('auth:api');
 Route::get('v1/wallet/banks', 'WalletController@getBanks')->middleware('auth:api');
