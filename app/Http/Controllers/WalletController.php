@@ -87,7 +87,7 @@ class WalletController extends BaseController
     public function withdrawRequest($bankName,$accountName,$accountNumber,$amount){
         Mail::send(new WithdrawalRequest($bankName,$accountName,$accountNumber,$amount));
 
-       
+        $user = auth()->user();
         $wallet = auth()->user()->wallet;
         // echo($wallet->cash);
         // echo($amount);
@@ -102,7 +102,9 @@ class WalletController extends BaseController
             'reference' => Str::random(10),
         ]);
 
-        auth()->user()->wallet->refresh();
+        $user->wallet->refresh();
+        // echo($user);
+        // die();
 
         return $this->sendResponse($wallet, 'Withrawal Request sent.');
 
