@@ -38,7 +38,7 @@ class WithdrawalRequest extends Mailable
      */
     public function build()
     {
-        return $this->to('hello@cashingames.com')
+        return $this->to(config('app.admin_withdrawal_request_email'))
         ->subject('Request: User withdrawal')
         ->view('emails.users.request');
         // ->with([
