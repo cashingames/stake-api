@@ -87,12 +87,12 @@ class WalletController extends BaseController
     public function withdrawRequest($bankName,$accountName,$accountNumber,$amount){
         Mail::send(new WithdrawalRequest($bankName,$accountName,$accountNumber,$amount));
 
-        $user = auth()->user();
         $wallet = auth()->user()->wallet;
-        // echo($wallet->cash);
-        // echo($amount);
-        // echo($wallet->cash - $amount);
+       // get user's bonus
+        // $initialBonus = $wallet->bonus ;
+        // echo($wallet);
         // die();
+       
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
@@ -101,8 +101,9 @@ class WalletController extends BaseController
             'description' => 'Cash Withdrawal',
             'reference' => Str::random(10),
         ]);
-
-        $user->wallet->refresh();
+            //put back user's bonus
+        // $wallet->update(['bonus' => $initialBonus]);
+        $wallet->refresh();
         // echo($user);
         // die();
 
