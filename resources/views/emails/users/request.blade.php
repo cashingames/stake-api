@@ -64,7 +64,9 @@
         </style>
     </head>
     <body>
-        <p>These are the withdrawal request details:</p>
+        <h4>Hello Admin!</h4>
+        <p>A user has just made a withdrawal request.</p>
+        <p>With the following details: </p>
         <div class="flex-center position-ref full-height">
            
             <p>Bank Name : {{$bankName}},
