@@ -54,8 +54,8 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount / 100),
-            'wallet_type' => 'CASH',
-            'description' => 'Fund wallet cash balance',
+            'wallet_type' => 'CREDITS',
+            'description' => 'Fund wallet credit balance',
             'reference' => $result->data->reference,
         ]);
         return $this->sendResponse(true, 'Payment was successful');
@@ -97,12 +97,11 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $amount,
-            'wallet_type' => 'CASH',
+            'wallet_type' => 'WINNINGS',
             'description' => 'Cash Withdrawal',
             'reference' => Str::random(10),
         ]);
-            //put back user's bonus
-        // $wallet->update(['bonus' => $initialBonus]);
+        
         $wallet->refresh();
         // echo($user);
         // die();

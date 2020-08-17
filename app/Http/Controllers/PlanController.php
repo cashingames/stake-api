@@ -38,7 +38,7 @@ class PlanController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
-            'wallet_type' => 'CASH',
+            'wallet_type' => 'CREDITS',
             'description' => 'Purchase of games lives',
             'reference' => Str::random(10)
         ]);
