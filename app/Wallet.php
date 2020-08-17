@@ -17,7 +17,7 @@ class Wallet extends Model
      * @var array
      */
     protected $fillable = [
-        'bonus', 'cash', 'bonus', 'user_id', 'balance'
+        'credits','winnings', 'user_id', 'balance'
     ];
 
 
@@ -35,32 +35,19 @@ class Wallet extends Model
     protected static function changeWalletBalance(WalletTransaction $model)
     {
         $wallet = $model->wallet;
-        if ($model->transaction_type == "CREDIT" && $model->wallet_type == "BONUS") {
-            $wallet->bonus += $model->amount;
-        } else if ($model->transaction_type == "CREDIT" && $model->wallet_type == "CASH") {
-            $wallet->cash += $model->amount;
-        } else if ($model->transaction_type == "DEBIT") {
-
-            //find first remove from bonus if it has balance
-            //then remove the remaining from cash
-            $remain = $wallet->bonus - $model->amount;
-            if($wallet->bonus == 0.00 || $remain < 0.00){
-                $wallet->cash -= \abs($remain);
-            }
-
-            if($wallet->bonus > 0.00 && $remain < 0){
-                $wallet->bonus = 0;
-            }
-
-            if($remain >= 0.00){
-                $wallet->bonus -= $model->amount;
-            }
-
-
-
+        if ($model->transaction_type == "CREDIT" && $model->wallet_type == "CREDITS") {
+            $wallet->credits += $model->amount;
+        } else if ($model->transaction_type == "CREDIT" && $model->wallet_type == "WINNINGS") {
+            $wallet->winnings += $model->amount;
+        } else if ($model->transaction_type == "DEBIT" && $model->wallet_type == "CREDITS") { 
+            //Subtract amount from credits  
+            $wallet->credits -= $model->amount;
+        } else if ($model->transaction_type == "DEBIT" && $model->wallet_type == "WINNINGS"){
+            //Subtract amount from winnings
+            $wallet->winnings -= $model->amount;
         }
 
-        $wallet->balance = $wallet->bonus + $wallet->cash;
+        $wallet->balance = $wallet->credits + $wallet->winnings;
         $model->balance = $wallet->balance;
 
         $wallet->update();
