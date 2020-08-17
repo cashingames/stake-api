@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RenameBonusAndCashColumnsOnWallets extends Migration
+class RenameCashColumnOnWallets extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,7 @@ class RenameBonusAndCashColumnsOnWallets extends Migration
     public function up()
     {
         Schema::table('wallets', function (Blueprint $table) {
-            //
-            $table->renameColumn('bonus', 'credits');
-            
+          $table->renameColumn('cash', 'winnings');
         });
     }
 
@@ -29,8 +27,7 @@ class RenameBonusAndCashColumnsOnWallets extends Migration
     {
         Schema::table('wallets', function (Blueprint $table) {
             //
-            $table->renameColumn('credits', 'bonus');
-            
+             $table->renameColumn( 'winnings', 'cash');
         });
     }
 }
