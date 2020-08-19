@@ -54,7 +54,8 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount / 100),
-            'wallet_type' => 'CREDITS',
+            'wallet_type' => 'CASH',
+            'wallet_kind' => 'CREDITS',
             'description' => 'Fund wallet credit balance',
             'reference' => $result->data->reference,
         ]);
@@ -97,7 +98,8 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $amount,
-            'wallet_type' => 'WINNINGS',
+            'wallet_type'=>'CASH',
+            'wallet_kind' => 'WINNINGS',
             'description' => 'Cash Withdrawal',
             'reference' => Str::random(10),
         ]);

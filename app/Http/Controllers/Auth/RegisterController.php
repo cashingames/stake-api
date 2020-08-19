@@ -105,7 +105,8 @@ class RegisterController extends BaseController
             ->create([
                 'transaction_type' => 'CREDIT',
                 'amount' => 150.00,
-                'wallet_type' => 'CREDITS',
+                'wallet_type' => 'BONUS',
+                'wallet_kind' => 'CREDITS',
                 'description' => 'Signup bonus',
                 'reference' => Str::random(10)
             ]);
@@ -120,7 +121,8 @@ class RegisterController extends BaseController
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' =>  50,
-                'wallet_type' => 'CREDITS',
+                'wallet_type' => 'BONUS',
+                'wallet_kind' => 'CREDITS',
                 'description' => 'Signup bonus for using referral link',
                 'reference' => Str::random(10)
             ]);
@@ -129,15 +131,16 @@ class RegisterController extends BaseController
             //credit the referrer with additional 50 naira bonus
             $referrer = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
 
-            $referrerWallet = Wallet::select('id','credits')->where('user_id',$referrer->user_id)->first();
+            $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrer->user_id)->first();
             // echo($refereeWallet->bonus);
             // die();
             
             WalletTransaction::create([
                 'wallet_id' => $referrerWallet->id,
                 'transaction_type' => 'CREDIT',
-                'amount' =>  ($referrerWallet->bonus + 50.00) - $referrerWallet->bonus,
-                'wallet_type' => 'CREDITS',
+                'amount' =>  50,
+                'wallet_type' => 'BONUS',
+                'wallet_kind' => 'CREDITS',
                 'description' => 'Bonus credit from signed up referral',
                 'reference' => Str::random(10)
             ]);

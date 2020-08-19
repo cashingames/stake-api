@@ -15,7 +15,14 @@ class RenameBonusAndCashColumnsOnWallets extends Migration
     {
         Schema::table('wallets', function (Blueprint $table) {
             //
-            $table->renameColumn('bonus', 'credits');
+            $table->renameColumn('bonus', 'account1');
+           
+            
+        });
+        Schema::table('wallets', function (Blueprint $table) {
+            //
+          
+            $table->renameColumn('cash', 'account2');
             
         });
     }
@@ -29,7 +36,14 @@ class RenameBonusAndCashColumnsOnWallets extends Migration
     {
         Schema::table('wallets', function (Blueprint $table) {
             //
-            $table->renameColumn('credits', 'bonus');
+            $table->renameColumn('account1', 'bonus');
+            // $table->renameColumn('account2', 'cash');
+            
+        });
+        Schema::table('wallets', function (Blueprint $table) {
+            //
+            // $table->renameColumn('account1', 'bonus');
+            $table->renameColumn('account2', 'cash');
             
         });
     }

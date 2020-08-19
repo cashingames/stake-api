@@ -117,7 +117,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getShowBonusAttribute()
     {
-        return $this->wallet->bonus == 150;
+        return $this->wallet->account1 == 150;
     }
 
     public function getLiteClientAttribute()

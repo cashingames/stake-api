@@ -14,11 +14,11 @@ class RenameEnumWalletType extends Migration
      */
     public function up()
     {
-        // Schema::table('wallet_transactions', function (Blueprint $table) {
-        //     //
-        //     $table->enum('wallet_type', ['CREDITS', 'WINNINGS'])->change();
-        DB::statement("ALTER TABLE wallet_transactions MODIFY wallet_type ENUM('WINNINGS' , 'CREDITS') NOT NULL");
-        //  });
+        Schema::table('wallet_transactions', function (Blueprint $table) {
+            //
+            $table->string('wallet_kind')->nullable();
+        
+         });
     }
 
     /**
@@ -28,10 +28,10 @@ class RenameEnumWalletType extends Migration
      */
     public function down()
     {
-        // Schema::table('wallet_transactions', function (Blueprint $table) {
-        //     //
-        //     $table->enum('wallet_type', ['BONUS', 'CASH'])->change();
-        // });
-        DB::statement("ALTER TABLE wallet_transactions MODIFY wallet_type ENUM('CASH' , 'BONUS') NOT NULL");
+        Schema::table('wallet_transactions', function (Blueprint $table) {
+            //
+            $table->dropColumn('wallet_kind');
+        });
+        // DB::statement("ALTER TABLE wallet_transactions MODIFY wallet_type ENUM('CASH' , 'BONUS') NOT NULL");
     }
 }

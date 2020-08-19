@@ -241,7 +241,8 @@ class GameController extends BaseController
                 'wallet_id' => $this->user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' =>  $game->amount_gained,
-                'wallet_type' => 'WINNINGS',
+                'wallet_type' => 'CASH',
+                'wallet_kind' => 'WINNINGS',
                 'description' => 'Winnings',
                 'reference' => Str::random(10)
             ]);

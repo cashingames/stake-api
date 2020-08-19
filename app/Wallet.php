@@ -17,7 +17,7 @@ class Wallet extends Model
      * @var array
      */
     protected $fillable = [
-        'credits','winnings', 'user_id', 'balance'
+        'account1','account2', 'user_id', 'balance'
     ];
 
 
@@ -35,19 +35,19 @@ class Wallet extends Model
     protected static function changeWalletBalance(WalletTransaction $model)
     {
         $wallet = $model->wallet;
-        if ($model->transaction_type == "CREDIT" && $model->wallet_type == "CREDITS") {
-            $wallet->credits += $model->amount;
-        } else if ($model->transaction_type == "CREDIT" && $model->wallet_type == "WINNINGS") {
-            $wallet->winnings += $model->amount;
-        } else if ($model->transaction_type == "DEBIT" && $model->wallet_type == "CREDITS") { 
+        if ($model->transaction_type == "CREDIT" && $model->wallet_kind == "CREDITS") {
+            $wallet->account1 += $model->amount;
+        } else if ($model->transaction_type == "CREDIT" && $model->wallet_kind == "WINNINGS") {
+            $wallet->account2 += $model->amount;
+        } else if ($model->transaction_type == "DEBIT" && $model->wallet_kind == "CREDITS") { 
             //Subtract amount from credits  
-            $wallet->credits -= $model->amount;
-        } else if ($model->transaction_type == "DEBIT" && $model->wallet_type == "WINNINGS"){
+            $wallet->account1 -= $model->amount;
+        } else if ($model->transaction_type == "DEBIT" && $model->wallet_kind == "WINNINGS"){
             //Subtract amount from winnings
-            $wallet->winnings -= $model->amount;
+            $wallet->account2 -= $model->amount;
         }
 
-        $wallet->balance = $wallet->credits + $wallet->winnings;
+        $wallet->balance = $wallet->account1 + $wallet->account2;
         $model->balance = $wallet->balance;
 
         $wallet->update();
