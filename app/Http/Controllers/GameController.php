@@ -232,7 +232,7 @@ class GameController extends BaseController
         $game->setWinnings();
         $game->save();
 
-        //@TODO: remove hack
+        //@TODO: remove hack.
         if ($game->duration > 60)
             $game->duration = 60;
 
