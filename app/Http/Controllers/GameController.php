@@ -6,6 +6,8 @@ use App\Category;
 use App\Game;
 use App\Question;
 use App\WalletTransaction;
+use App\Wallet;
+use App\Profile;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -57,6 +59,33 @@ class GameController extends BaseController
                         'is_active' => ($plan->pivot->used + 1) < $plan->games_count
                     ]
                 );
+        }
+
+        $referrer = $this->user->referrer;
+        
+        if ($referrer === null){
+            return ;
+        } else {
+            $isFirstTime = Game::where('user_id',$this->user->id)->first();
+            
+            if($isFirstTime === null){
+               
+                //credit the referrer with additional 50 naira bonus
+                $referrerId = Profile::select('user_id')->where('referral_code', $referrer)->first();
+
+                $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrerId->user_id)->first();
+            
+                
+                WalletTransaction::create([
+                    'wallet_id' => $referrerWallet->id,
+                    'transaction_type' => 'CREDIT',
+                    'amount' =>  50,
+                    'wallet_type' => 'BONUS',
+                    'wallet_kind' => 'CREDITS',
+                    'description' => 'Bonus credit from referral',
+                    'reference' => Str::random(10)
+                ]);
+            } 
         }
 
         $game = new Game();

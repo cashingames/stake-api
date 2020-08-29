@@ -74,13 +74,6 @@ class RegisterController extends BaseController
     protected function create(array $data)
     {   
 
-        // $referee = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
-            
-        // if($referee == null){
-
-        //     return $this->sendError(['The referral code is incorrect.'], "The referral code is incorrect.");
-        // }
-
         $user =
             User::create([
                 'username' => $data['username'],
@@ -99,23 +92,34 @@ class RegisterController extends BaseController
                 
             ]);
 
+        if ($user->id <= 1000){
+                $user->wallet()
+                ->create([])
+                ->transactions()
+                ->create([
+                    'transaction_type' => 'CREDIT',
+                    'amount' => 150.00,
+                    'wallet_type' => 'BONUS',
+                    'wallet_kind' => 'CREDITS',
+                    'description' => 'Signup bonus',
+                    'reference' => Str::random(10)
+                ]);
+        }
+
         $user->wallet()
-            ->create([])
-            ->transactions()
-            ->create([
-                'transaction_type' => 'CREDIT',
-                'amount' => 150.00,
-                'wallet_type' => 'BONUS',
-                'wallet_kind' => 'CREDITS',
-                'description' => 'Signup bonus',
-                'reference' => Str::random(10)
-            ]);
-
-
+        ->create([
+            'user_id' => $user->id,
+            'balance' => 0,
+            'account1' => 0,
+            'account2' => 0
+        ]);
         //If user signs up through reference  :
 
 
         if(isset($data['referral_code']) &&  !is_null($data['referral_code'])){
+            
+            $user->referrer = $data['referral_code'];
+            $user->save();
             //User bonus on sign up is 200 naira
              WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
@@ -127,38 +131,9 @@ class RegisterController extends BaseController
                 'reference' => Str::random(10)
             ]);
 
-
-            //credit the referrer with additional 50 naira bonus
-            $referrer = Profile::select('user_id')->where('referral_code', $data['referral_code'])->first();
-
-            $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrer->user_id)->first();
-            // echo($refereeWallet->bonus);
-            // die();
-            
-            WalletTransaction::create([
-                'wallet_id' => $referrerWallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' =>  50,
-                'wallet_type' => 'BONUS',
-                'wallet_kind' => 'CREDITS',
-                'description' => 'Bonus credit from signed up referral',
-                'reference' => Str::random(10)
-            ]);
-
             $user->wallet->refresh();
 
         }
-
-        // $user->wallet()
-        //     ->create([])
-        //     ->transactions()
-        //     ->create([
-        //         'transaction_type' => 'CREDIT',
-        //         'amount' => 150.00,
-        //         'wallet_type' => 'BONUS',
-        //         'description' => 'Signup bonus',
-        //         'reference' => Str::random(10)
-        //     ]);
 
         return $user;
     }
