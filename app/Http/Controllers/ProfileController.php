@@ -53,7 +53,7 @@ class ProfileController extends BaseController
 
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
-        $profile->avatar = $profile->avatar;
+        // $profile->avatar = $profile->avatar;
         $profile->account_name = $data['accountName'];
         $profile->account_number = $data['accountNumber'];
 
@@ -65,7 +65,7 @@ class ProfileController extends BaseController
         }
 
         if(isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])){
-            $profile->date_of_birth = new Carbon($data['dateOfBirth']) ;
+            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString() ;
         }
 
         if(isset($data['address']) && !is_null($data['address'])){
@@ -78,10 +78,10 @@ class ProfileController extends BaseController
 
         $profile->save();
 
-        $user->update([
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-        ]);
+        // $user->update([
+        //     'phone' => $data['phone'],
+        //     'email' => $data['email'],
+        // ]);
 
         return $this->sendResponse($user, "Profile Updated.");
     }
@@ -115,7 +115,7 @@ class ProfileController extends BaseController
         }
 
         if(isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])){
-            $profile->date_of_birth = new Carbon($data['dateOfBirth']) ;
+            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString() ;
         }
 
         if(isset($data['address']) && !is_null($data['address'])){

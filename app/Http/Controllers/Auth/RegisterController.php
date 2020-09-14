@@ -72,7 +72,7 @@ class RegisterController extends BaseController
      * @return \App\User
      */
     protected function create(array $data)
-    {   
+    {
 
         $user =
             User::create([
@@ -81,15 +81,13 @@ class RegisterController extends BaseController
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
-                
+
         $user
             ->profile()
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
                 'referral_code' =>uniqid($data['username']),
-
-                
             ]);
 
         if ($user->id <= 1000){
@@ -117,7 +115,7 @@ class RegisterController extends BaseController
 
 
         if(isset($data['referral_code']) &&  !is_null($data['referral_code'])){
-            
+
             $user->referrer = $data['referral_code'];
             $user->save();
             //User bonus on sign up is 200 naira

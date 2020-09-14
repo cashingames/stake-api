@@ -28,4 +28,12 @@ class Profile extends Model
             return "";
         return asset('avatar/'.$value."?".rand());
     }
+
+    public function getGenderAttribute($value){
+        return $value??'';
+    }
+
+    public function getStateAttribute($value){
+        return $value??'';
+    }
 }
