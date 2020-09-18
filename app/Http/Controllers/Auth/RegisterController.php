@@ -60,7 +60,7 @@ class RegisterController extends BaseController
             'phone' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referral_code'=>['nullable', 'string', 'exists:profiles,referral_code']
+            'referrer'=>['nullable', 'string', 'exists:profiles,referral_code']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -74,64 +74,56 @@ class RegisterController extends BaseController
     protected function create(array $data)
     {
 
-        $user =
-            User::create([
-                'username' => $data['username'],
-                'phone' => $data['phone'],
-                'email' => $data['email'],
-                'password' => $data['password'],
-            ]);
+      //create the user
+      $user =
+          User::create([
+              'username' => $data['username'],
+              'phone' => $data['phone'],
+              'email' => $data['email'],
+              'password' => $data['password'],
+              'referrer' => $data['referrer']??null
+          ]);
+      
+      //create the profile
+      $user
+          ->profile()
+          ->create([
+              'first_name' => $data['first_name'],
+              'last_name' => $data['last_name'],
+              'referral_code' =>uniqid($data['username']),
+          ]);
 
-        $user
-            ->profile()
-            ->create([
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'referral_code' =>uniqid($data['username']),
-            ]);
+      //create the wallet
+      $wallet = $user->wallet()
+        ->create([]);
 
-        if ($user->id <= 1000){
-                $user->wallet()
-                ->create([])
-                ->transactions()
-                ->create([
-                    'transaction_type' => 'CREDIT',
-                    'amount' => 150.00,
-                    'wallet_type' => 'BONUS',
-                    'wallet_kind' => 'CREDITS',
-                    'description' => 'Signup bonus',
-                    'reference' => Str::random(10)
-                ]);
-        }
-
-        $user->wallet()
-        ->create([
-            'user_id' => $user->id,
-            'balance' => 0,
-            'account1' => 0,
-            'account2' => 0
+      //give the user a signup bonus by creating a credit transaction
+      if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+        $wallet->transactions()
+          ->create([
+            'transaction_type' => 'CREDIT',
+            'amount' => config('trivia.bonus.signup.amount'),
+            'wallet_kind' => 'CREDITS',
+            'description' => 'SIGNUP BONUS',
+            'reference' => Str::random(10)
         ]);
-        //If user signs up through reference  :
+      }
 
-
-        if(isset($data['referral_code']) &&  !is_null($data['referral_code'])){
-
-            $user->referrer = $data['referral_code'];
-            $user->save();
-            //User bonus on sign up is 200 naira
-             WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' =>  50,
-                'wallet_type' => 'BONUS',
-                'wallet_kind' => 'CREDITS',
-                'description' => 'Signup bonus for using referral link',
-                'reference' => Str::random(10)
-            ]);
-
-            $user->wallet->refresh();
-
-        }
+      if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.referral') && isset($user->referrer)){
+        
+        $referrer_id = Profile::where('referral_code', $user->referrer)->value('user_id');
+          WalletTransaction::create([
+            'wallet_id' => $referrer_id,
+            'transaction_type' => 'CREDIT',
+            'amount' =>  config('trivia.bonus.signup.referral_amount'),
+            'wallet_kind' => 'CREDITS',
+            'description' => 'REFERRAL BONUS FOR '. $user->username,
+            'reference' => Str::random(10)
+        ]);
+      }
+            
+        
+        $user->wallet->refresh();
 
         return $user;
     }
