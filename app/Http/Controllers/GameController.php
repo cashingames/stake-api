@@ -322,36 +322,26 @@ class GameController extends BaseController
         return $user_index + 1;
     }
 
-    private function _referralOnFirstGame(){
-
-      if($this->user->games->count()==1){
-        echo "First Game";
-      }
+  private function _referralOnFirstGame(){
+    if($this->user->games->count()!=1){
+      return;
     }
-    
 
-    // $referrer = $this->user->referrer;
-             
-    // $gamesCount = Game::where('user_id',$this->user->id)->count();
-    
-    // if($gamesCount == 1){
-    
-    //     //credit the referrer with additional 50 naira bonus
-    //     $referrerId = Profile::select('user_id')->where('referral_code', $referrer)->first();
-
-    //     $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrerId->user_id)->first();
-    
-        
-    //     WalletTransaction::create([
-    //         'wallet_id' => $referrerWallet->id,
-    //         'transaction_type' => 'CREDIT',
-    //         'amount' =>  50,
-    //         'wallet_type' => 'BONUS',
-    //         'wallet_kind' => 'CREDITS',
-    //         'description' => 'Bonus credit from referral',
-    //         'reference' => Str::random(10)
-    //     ]);
-    // } 
-
+    if(config('trivia.bonus.enabled') && 
+      config('trivia.bonus.signup.referral') && 
+      config ('trivia.bonus.signup.referral_on_first_game') &&
+      isset($this->user->referrer)
+    ){
+      $referrerId = Profile::where('referral_code', $this->user->referrer)->value('user_id');
+        WalletTransaction::create([
+          'wallet_id' => $referrerId,
+          'transaction_type' => 'CREDIT',
+          'amount' =>  config('trivia.bonus.signup.referral_amount'),
+          'wallet_kind' => 'CREDITS',
+          'description' => 'REFERRAL BONUS FOR '. $this->user->username,
+          'reference' => Str::random(10)
+      ]);
+    }
+  }
 
 }
