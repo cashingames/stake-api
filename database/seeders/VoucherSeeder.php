@@ -1,8 +1,10 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Voucher;
 
-class VouchersTableSeeder extends Seeder
+class VoucherSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,6 +13,6 @@ class VouchersTableSeeder extends Seeder
      */
     public function run()
     {
-        factory('App\Voucher', 5)->create();
+        Voucher::factory()->times(5)->create();
     }
 }

@@ -17,81 +17,83 @@ use Illuminate\Support\Str;
 
 class GameController extends BaseController
 {
-    /**
-     *
-     */
-    public function start(Request $request)
-    {
-        if (!$request->liveId) {
-            return $this->sendError([
-                'live' => 'Please select a live to play'
-            ], "Failed game attempt");
-        }
+  /**
+   *
+   */
+  public function start(Request $request)
+  {
+      if (!$request->liveId) {
+          return $this->sendError([
+              'live' => 'Please select a live to play'
+          ], "Failed game attempt");
+      }
 
-        //get the user information
-        $plan = $this->user->activePlans()->wherePivot('id', $request->liveId)->first();
-        if (!$plan) {
-            return $this->sendError([
-                'live' => 'Invalid live supplied'
-            ], "Failed game attempt");
-        }
+      //get the user information
+      $plan = $this->user->activePlans()->wherePivot('id', $request->liveId)->first();
+      if (!$plan) {
+          return $this->sendError([
+              'live' => 'Invalid live supplied'
+          ], "Failed game attempt");
+      }
 
-        $category = Category::find($request->categoryId);
-        if (!$category) {
-            return $this->sendError([
-                'category' => 'Invalid category supplied'
-            ], "Failed game attempt");
-        }
+      $category = Category::find($request->categoryId);
+      if (!$category) {
+          return $this->sendError([
+              'category' => 'Invalid category supplied'
+          ], "Failed game attempt");
+      }
 
-        if ($plan->pivot->used >= $plan->games_count) {
-            return $this->sendError(
-                ['plan' => 'This plan has been exhaused'],
-                'Game cannot start'
-            );
-        }
+      if ($plan->pivot->used >= $plan->games_count) {
+          return $this->sendError(
+              ['plan' => 'This plan has been exhaused'],
+              'Game cannot start'
+          );
+      }
 
-        if (!env('APP_DEBUG')) {
-            DB::table('user_plan')
-                ->where('id', $plan->pivot->id)
-                ->update(
-                    [
-                        'used' => $plan->pivot->used + 1,
-                        'is_active' => ($plan->pivot->used + 1) < $plan->games_count
-                    ]
-                );
-        }
+      if (!env('APP_DEBUG')) {
+        DB::table('user_plan')
+          ->where('id', $plan->pivot->id)
+          ->update(
+            [
+                'used' => $plan->pivot->used + 1,
+                'is_active' => ($plan->pivot->used + 1) < $plan->games_count
+            ]
+          );
+      }
 
 
 
-        $game = new Game();
-        $game->user_id = $this->user->id;
-        $game->plan_id = $plan->id;
-        $game->live_id = $plan->pivot->id;
-        $game->category_id = $category->id;
-        $game->session_token = Str::random(40);
-        $game->start_time = Carbon::now();
-        $game->expected_end_time = Carbon::now()->addMinutes(1);
-        $game->state = 'ONGOING';
-        $game->total_count = 10;
-        $game->save();
+      $game = new Game();
+      $game->user_id = $this->user->id;
+      $game->plan_id = $plan->id;
+      $game->live_id = $plan->pivot->id;
+      $game->category_id = $category->id;
+      $game->session_token = Str::random(40);
+      $game->start_time = Carbon::now();
+      $game->expected_end_time = Carbon::now()->addMinutes(1);
+      $game->state = 'ONGOING';
+      $game->total_count = 10;
+      $game->save();
 
-        $result = [
-            'game' => $game
-        ];
+      $result = [
+        'game' => $game
+      ];
 
-        if ($request->loadQuestions) {
-            $easyQuestions = $category->questions()->where('level', 'easy')->inRandomOrder()->take(5);
-            $mediumQuestions =  $category->questions()->where('level', 'medium')->inRandomOrder()->take(5);
-            $hardQuestions = $category->questions()->where('level', 'hard')->inRandomOrder()->take(5);
+      if ($request->loadQuestions) {
+        $easyQuestions = $category->questions()->where('level', 'easy')->inRandomOrder()->take(5);
+        $mediumQuestions =  $category->questions()->where('level', 'medium')->inRandomOrder()->take(5);
+        $hardQuestions = $category->questions()->where('level', 'hard')->inRandomOrder()->take(5);
 
-            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
+        $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
-            $result['questions'] = $questions;
-        }
+        $result['questions'] = $questions;
+      }
 
-        return $this->sendResponse($result, "Game started");
+      //implement first game bonus here
+      $this->_referralOnFirstGame();
+
+      return $this->sendResponse($result, "Game started");
     }
-
 
     /**
      *
@@ -185,7 +187,6 @@ class GameController extends BaseController
         return $this->fetchQuestion($request, $sessionToken);
     }
 
-
     /**'
      *
      */
@@ -231,29 +232,7 @@ class GameController extends BaseController
                     ]
                 );
             }
-            $referrer = $this->user->referrer;
-             
-            $isFirstTime = Game::where('user_id',$this->user->id)->count();
-            
-            if($isFirstTime === 1){
-            
-                //credit the referrer with additional 50 naira bonus
-                $referrerId = Profile::select('user_id')->where('referral_code', $referrer)->first();
-
-                $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrerId->user_id)->first();
-            
-                
-                WalletTransaction::create([
-                    'wallet_id' => $referrerWallet->id,
-                    'transaction_type' => 'CREDIT',
-                    'amount' =>  50,
-                    'wallet_type' => 'BONUS',
-                    'wallet_kind' => 'CREDITS',
-                    'description' => 'Bonus credit from referral',
-                    'reference' => Str::random(10)
-                ]);
-            } 
-        
+          
         }
 
         $game->setWinnings();
@@ -342,4 +321,37 @@ class GameController extends BaseController
 
         return $user_index + 1;
     }
+
+    private function _referralOnFirstGame(){
+
+      if($this->user->games->count()==1){
+        echo "First Game";
+      }
+    }
+    
+
+    // $referrer = $this->user->referrer;
+             
+    // $gamesCount = Game::where('user_id',$this->user->id)->count();
+    
+    // if($gamesCount == 1){
+    
+    //     //credit the referrer with additional 50 naira bonus
+    //     $referrerId = Profile::select('user_id')->where('referral_code', $referrer)->first();
+
+    //     $referrerWallet = Wallet::select('id','account1')->where('user_id',$referrerId->user_id)->first();
+    
+        
+    //     WalletTransaction::create([
+    //         'wallet_id' => $referrerWallet->id,
+    //         'transaction_type' => 'CREDIT',
+    //         'amount' =>  50,
+    //         'wallet_type' => 'BONUS',
+    //         'wallet_kind' => 'CREDITS',
+    //         'description' => 'Bonus credit from referral',
+    //         'reference' => Str::random(10)
+    //     ]);
+    // } 
+
+
 }

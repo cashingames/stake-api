@@ -1,10 +1,11 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
-class PlansTableSeeder extends Seeder
+class PlanSeeder extends Seeder
 {
     /**
      * Run the database seeds.

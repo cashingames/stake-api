@@ -1,12 +1,13 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Wallet;
 
 class WalletTransaction extends Model
 {
+  use HasFactory;
 
     /**
      * The attributes that should be cast.

@@ -1,13 +1,32 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Option;
-use Faker\Generator as Faker;
+use App\Models\Option;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(Option::class, function (Faker $faker) {
+class OptionFactory extends Factory
+{
+  protected $model = Option::class;
+
+  /**
+   * Define the model's default state.
+   *
+   * @return array
+   */
+  public function definition()
+  {
     return [
-        'title'=> $faker->sentence(3),
-        'is_correct' => false,
+      'title'=> $this->faker->sentence(3),
+      'is_correct' => false,
     ];
-});
+  }
+
+}
+// $factory->define(Option::class, function (Faker $faker) {
+//     return [
+//         'title'=> $faker->sentence(3),
+//         'is_correct' => false,
+//     ];
+// });
