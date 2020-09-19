@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Voucher;
-use App\User;
+use App\Models\Voucher;
+use App\Models\User;
 use Carbon\Carbon;
-use App\UserVoucher;
-use App\WalletTransaction;
+use App\Models\UserVoucher;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Str;
 
 class VoucherController extends BaseController

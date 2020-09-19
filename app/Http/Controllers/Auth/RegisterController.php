@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
-use App\User;
-use App\Profile;
-use App\Wallet;
-use App\WalletTransaction;
 use App\Http\Controllers\BaseController;
+use App\Models\WalletTransaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\Profile;
+use App\Models\Wallet;
+use App\Models\User;
 
 class RegisterController extends BaseController
 {
@@ -140,12 +140,12 @@ class RegisterController extends BaseController
         $user =  auth()->user();
         $token = auth()->tokenById($user->id);
         $result = [
-            'token' => [
-                'access_token' => $token,
-            ],
-            'user' => $user->load('profile'),
-            'plans' => $user->activePlans()->get(),
-            'wallet' => $user->wallet,
+          'token' => [
+              'access_token' => $token,
+          ],
+          'user' => $user->load('profile'),
+          'plans' => $user->activePlans()->get(),
+          'wallet' => $user->wallet,
         ];
         return $this->sendResponse($result, 'User details');
     }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Plan;
-use App\WalletTransaction;
+use App\Models\Plan;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;

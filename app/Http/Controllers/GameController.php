@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
-use App\Game;
-use App\Question;
-use App\WalletTransaction;
-use App\Wallet;
-use App\Profile;
+use App\Models\Category;
+use App\Models\Game;
+use App\Models\Question;
+use App\Models\WalletTransaction;
+use App\Models\Wallet;
+use App\Models\Profile;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

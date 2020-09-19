@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\WalletTransaction;
+use App\Models\WalletTransaction;
 use GuzzleHttp\Client;
 use stdClass;
 use Illuminate\Support\Facades\Mail;
