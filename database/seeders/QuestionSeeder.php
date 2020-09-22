@@ -8,6 +8,7 @@ use Hamcrest\Core\IsNull;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Database\Seeder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class QuestionSeeder extends Seeder
 {
@@ -18,7 +19,7 @@ class QuestionSeeder extends Seeder
    */
   public function run()
   {
-    if ( env('APP_ENV') == 'testing' || env('APP_ENV') == 'local' ) {
+    if ( env('APP_ENV') == 'testing'  ) {
       Question::factory()->times(50)->create()->each(function ($question) {
         $options = Option::factory()->times(4)->make();
         $option = $options->random();
@@ -42,20 +43,48 @@ class QuestionSeeder extends Seeder
       $reader->setReadDataOnly(TRUE);
       $spreadsheet = $reader->load($inputFileName);
 
-      $workSheet  = $spreadsheet->getActiveSheet();
-
-      $this->readWorkSheet($workSheet);
+      // get the number of sheets in the file
+      $sheetCount = $spreadsheet->getSheetCount();
+      
+      // Loop through all sheets in the file
+      
+      for ($x = 0; $x <= $sheetCount; $x++) {
+        //get active sheet
+        $workSheet  = $spreadsheet->getActiveSheet();
+        
+        //seed the questions
+        $this->readWorkSheet($workSheet);
+      
+        //get the active sheet index
+        $ActivesheetIndex = $spreadsheet->getActiveSheetIndex();
+          
+        //End the program if all sheets have been seeded
+        if($ActivesheetIndex == $sheetCount-1){
+          return;
+        }
+        //set next sheet as the active sheet
+        $workSheet = $spreadsheet->setActiveSheetIndex($ActivesheetIndex + 1); 
+       
+      }
+      
     }
   }
 
-  private function readWorkSheet(Worksheet $workSheet)
-  {
+  private function readWorkSheet(Worksheet $workSheet){
     $categoryName = $workSheet->getTitle();
     $category = Category::where('name', $categoryName)->first();
 
     if ($category == null) {
-      return;
+      /**rename sheet title to "Music" or whatever category of questions to load**/
+      $NewCategoryName = $workSheet->setTitle("Music");
+
+      //get the new title  
+      $categoryName = $workSheet->getTitle();
+      //Query the categories table again:
+      $category = Category::where('name', $categoryName)->first();
+      
     }
+     
 
     for ($i = 2; $i < 500; $i++) {
       $question = new Question;
@@ -79,6 +108,12 @@ class QuestionSeeder extends Seeder
       }
 
     }
+    //Rename the active sheet title to prevent title conflicts maybe ('loaded'?)
+    $NewCategoryName = $workSheet->setTitle("Loaded");
+    
+   
+    
+    
 
   }
 }
