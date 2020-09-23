@@ -12,6 +12,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuestionSeeder extends Seeder
 {
+
+  private $categoryName = 'Music';
   /**
    * Run the database seeds.
    *
@@ -38,55 +40,25 @@ class QuestionSeeder extends Seeder
         );
       });
     } else {
-      $inputFileName = base_path('Music.xlsx');
+      $inputFileName = base_path($this->categoryName.'.xlsx');
       $reader = IOFactory::createReader('Xlsx');
       $reader->setReadDataOnly(TRUE);
       $spreadsheet = $reader->load($inputFileName);
-
-      // get the number of sheets in the file
-      $sheetCount = $spreadsheet->getSheetCount();
       
-      // Loop through all sheets in the file
-      
-      for ($x = 0; $x <= $sheetCount; $x++) {
-        //get active sheet
-        $workSheet  = $spreadsheet->getActiveSheet();
+      foreach ($spreadsheet->getAllSheets() as $currentSheet  ) {
+         
+        $this->readWorkSheet($currentSheet);
         
-        //seed the questions
-        $this->readWorkSheet($workSheet);
-      
-        //get the active sheet index
-        $ActivesheetIndex = $spreadsheet->getActiveSheetIndex();
-          
-        //End the program if all sheets have been seeded
-        if($ActivesheetIndex == $sheetCount-1){
-          return;
-        }
-        //set next sheet as the active sheet
-        $workSheet = $spreadsheet->setActiveSheetIndex($ActivesheetIndex + 1); 
-       
       }
       
     }
   }
 
   private function readWorkSheet(Worksheet $workSheet){
-    $categoryName = $workSheet->getTitle();
-    $category = Category::where('name', $categoryName)->first();
-
-    if ($category == null) {
-      /**rename sheet title to "Music" or whatever category of questions to load**/
-      $NewCategoryName = $workSheet->setTitle("Music");
-
-      //get the new title  
-      $categoryName = $workSheet->getTitle();
-      //Query the categories table again:
-      $category = Category::where('name', $categoryName)->first();
+   
+    $category = Category::where('name', $this->categoryName)->first();
       
-    }
-     
-
-    for ($i = 2; $i < 500; $i++) {
+    for ($i = 2; $i < 100000; $i++) {
       $question = new Question;
 
       $level = $workSheet->getCellByColumnAndRow(1, $i)->getValue();
@@ -107,13 +79,7 @@ class QuestionSeeder extends Seeder
         $option->save();
       }
 
-    }
-    //Rename the active sheet title to prevent title conflicts maybe ('loaded'?)
-    $NewCategoryName = $workSheet->setTitle("Loaded");
-    
-   
-    
-    
+    }    
 
   }
 }
