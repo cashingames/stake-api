@@ -61,12 +61,12 @@ class QuestionSeeder extends Seeder
     for ($i = 2; $i < 100000; $i++) {
       $question = new Question;
 
-      $level = $workSheet->getCellByColumnAndRow(1, $i)->getValue();
+      $level = ( $workSheet->getCellByColumnAndRow(1, $i)->getValue());
       if (!isset($level) || trim($level) === '') {
         continue;
       }
 
-      $question->level = $level;
+      $question->level = trim(strtolower($level));
       $question->label = $workSheet->getCellByColumnAndRow(2, $i)->getValue();
       $question->category_id = $category->id;
       $question->save();
