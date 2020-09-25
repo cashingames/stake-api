@@ -29,7 +29,7 @@ class AlterColumnWalletTypeWalletTransactions extends Migration
     {
       Schema::table('wallet_transactions', function (Blueprint $table) {
         //
-        $table->enum('wallet_type', ['BONUS', 'CASH']);
+        $table->enum('wallet_type', ['BONUS', 'CASH'])->nullable();
       });
     }
 }
