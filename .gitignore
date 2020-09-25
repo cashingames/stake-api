@@ -19,3 +19,6 @@ Music.xlsx
 .editorconfig
 /storage/logs
 storage/logs/query.log
+.vscode
+/.vscode
+**.session.sql
