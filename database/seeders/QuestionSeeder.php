@@ -21,7 +21,7 @@ class QuestionSeeder extends Seeder
    */
   public function run()
   {
-    if ( env('APP_ENV') == 'testing'  ) {
+    if ( env('APP_ENV') == 'testing' || env('APP_ENV') == 'local'  ) {
       Question::factory()->times(50)->create()->each(function ($question) {
         $options = Option::factory()->times(4)->make();
         $option = $options->random();
