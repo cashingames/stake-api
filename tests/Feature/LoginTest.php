@@ -9,7 +9,7 @@ use UserSeeder;
 
 class LoginTest extends TestCase
 {   
-    use RefreshDatabase;
+    // use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -20,7 +20,7 @@ class LoginTest extends TestCase
     public function login_fields_cannot_be_empty()
     {   
 
-        $this->seed(UserSeeder::class);
+        // $this->seed(UserSeeder::class);
         
         $response = $this->post('/api/auth/login',[
             "username" => " ",
@@ -28,12 +28,15 @@ class LoginTest extends TestCase
         ]);
         
         $response->assertStatus(400);
+        $response->assertJson([
+            'error' => 'Invalid username and password',
+        ]);
        
         
     }
 
     /** @test */
-    public function login_credentials_must_be_of_required_type()
+    public function login_with_invalid_credentials()
     {   
         
         $response = $this->post('/api/auth/login',[

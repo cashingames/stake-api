@@ -57,7 +57,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'min:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer'=>['nullable', 'string', 'exists:profiles,referral_code']
