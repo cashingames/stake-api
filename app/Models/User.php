@@ -120,12 +120,12 @@ class User extends Authenticatable implements JWTSubject
 
     public function getLiteClientAttribute()
     {
-        return config('app.use_lite_client');
+        return config('trivia.use_lite_client');
     }
 
     public function getIsClaimsActiveAttribute()
     {
-        return config('app.set_claims_active');
+        return config('trivia.set_claims_active');
     }
 
     public function getRankAttribute()

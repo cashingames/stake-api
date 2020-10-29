@@ -49,8 +49,6 @@ class ProfileController extends BaseController
             return $this->sendError(['Profile not found'], "Unable to update profile");
         }
 
-
-
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
         // $profile->avatar = $profile->avatar;

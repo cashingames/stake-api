@@ -14,10 +14,6 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'payment_key' => env('PAYSTACK_KEY', null),
-    'use_lite_client' => env('USE_LITE_FRONTEND', true),
-    'set_claims_active' => env('SET_CLAIMS_ACTIVE', true),
-    'admin_withdrawal_request_email'=>env('ADMIN_WITHDRAWAL_REQUEST_EMAIL','hello@cashingames.com' ),
 
     /*
     |--------------------------------------------------------------------------
@@ -44,7 +40,7 @@ return [
     */
 
     'debug' => env('APP_DEBUG', false),
-
+    'log_level' => env('APP_LOG_LEVEL', 'error'),
     /*
     |--------------------------------------------------------------------------
     | Application URL

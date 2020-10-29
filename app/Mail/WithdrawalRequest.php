@@ -38,14 +38,8 @@ class WithdrawalRequest extends Mailable
      */
     public function build()
     {
-        return $this->to(config('app.admin_withdrawal_request_email'))
-        ->subject('Request: User withdrawal')
+        return $this->to(config('trivia.admin_withdrawal_request_email'))
+        ->subject('REQUEST: CASH WITHDRAWAL REQUEST')
         ->view('emails.users.request');
-        // ->with([
-        //     'Account Name' =>$accountName,
-        //     'Account Number' =>$accountNumber,
-        //     'Amount'=>$amount,
-        //     'Bank Name'=> $bankName
-        // ]);
     }
 }

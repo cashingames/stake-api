@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plan;
-use App\Models\WalletTransaction;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\WalletTransaction;
+use Illuminate\Support\Facades\Validator;
 
 class PlanController extends BaseController
 {
@@ -18,7 +18,6 @@ class PlanController extends BaseController
 
     public function subscribe(Request $request)
     {
-
         Validator::make($request->all(), [
             'plan_id' => ['required', 'integer'],
         ])->validate();
@@ -39,7 +38,7 @@ class PlanController extends BaseController
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
             'wallet_kind' => 'CREDITS',
-            'description' => 'Purchase of games lives',
+            'description' => 'PURCHASE OF GAME LIVES',
             'reference' => Str::random(10)
         ]);
 

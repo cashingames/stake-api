@@ -15,7 +15,7 @@ class WalletController extends BaseController
     public function me()
     {
         $data = [
-            'wallet' => auth()->user()->wallet
+            'wallet' => $this->user->wallet
         ];
         return $this->sendResponse($data, 'User wallet details');
     }
@@ -23,21 +23,20 @@ class WalletController extends BaseController
     public function transactions()
     {
         $data = [
-            'transactions' => auth()->user()->transactions()->orderBy('created_at', 'desc')->get()
+            'transactions' => $this->user->transactions()->orderBy('created_at', 'desc')->get()
         ];
         return $this->sendResponse($data, 'Wallet transactions information');
     }
 
     public function verifyTransaction(string $reference)
     {
-
         $client = new Client();
         $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
         try {
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' .  config('app.payment_key')
+                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
                 ]
             ]);
         } catch (\Exception $ex) {
@@ -49,14 +48,14 @@ class WalletController extends BaseController
             return $this->_failedPaymentVerification();
         }
 
-        $wallet = auth()->user()->wallet;
+        $wallet = $this->user->wallet;
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount / 100),
             'wallet_type' => 'CASH',
             'wallet_kind' => 'CREDITS',
-            'description' => 'Fund wallet credit balance',
+            'description' => 'FUND WALLET FROM BANK',
             'reference' => $result->data->reference,
         ]);
         return $this->sendResponse(true, 'Payment was successful');
@@ -69,7 +68,7 @@ class WalletController extends BaseController
         try {
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' .  config('app.payment_key')
+                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
                 ]
             ]);
         } catch (\Exception $ex) {
@@ -77,10 +76,6 @@ class WalletController extends BaseController
         }
 
         $result = \json_decode((string) $response->getBody());
-        // $result->map(function($x){
-        //     $y = new stdClass;
-        //     $y->
-        // });
         return response()->json($result, 200);
 
     }
@@ -88,26 +83,18 @@ class WalletController extends BaseController
     public function withdrawRequest($bankName,$accountName,$accountNumber,$amount){
         Mail::send(new WithdrawalRequest($bankName,$accountName,$accountNumber,$amount));
 
-        $wallet = auth()->user()->wallet;
-       // get user's bonus
-        // $initialBonus = $wallet->bonus ;
-        // echo($wallet);
-        // die();
-       
+        $wallet = $this->user->wallet;
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $amount,
             'wallet_type'=>'CASH',
             'wallet_kind' => 'WINNINGS',
-            'description' => 'Cash Withdrawal',
+            'description' => 'WITHDRAW TO BANK',
             'reference' => Str::random(10),
         ]);
         
         $wallet->refresh();
-        // echo($user);
-        // die();
-
         return $this->sendResponse($wallet, 'Withrawal Request sent.');
 
     }
