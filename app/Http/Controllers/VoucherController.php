@@ -67,7 +67,6 @@ class VoucherController extends BaseController
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' =>  $voucher->unit,
-            'wallet_type'=>"BONUS",
             'wallet_kind' => 'CREDITS',
             'description' => 'Credit from voucher used',
             'reference' => Str::random(10)
