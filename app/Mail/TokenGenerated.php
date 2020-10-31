@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +35,7 @@ class TokenGenerated extends Mailable
     public function build()
     {
         return $this->to($this->user->email, $this->user->username)
-            ->subject('Cashingame: Reset Password')
+            ->subject('Cashingames: Reset Password')
             ->view('emails.users.token')
             ->with([
                 'username' => $this->user->username,
