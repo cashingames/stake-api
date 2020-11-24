@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {   
-    // use RefreshDatabase;
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -144,6 +144,8 @@ class RegisterTest extends TestCase
     /** @test */
     public function a_user_cannot_register_with_existing_username_email_or_phone()
     {   
+
+        $this->a_user_can_register();
        
         $response = $this->postjson('/api/auth/register',[
             'first_name' => 'Jane',
