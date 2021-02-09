@@ -29,30 +29,59 @@ class PlanTest extends TestCase
         $this->seed(PlanSeeder::class);
         
         $this->user = User::first();   
+        $this->actingAs($this->user);
     }
 
     /** @test */
-    public function a_user_can_subscribe_to_bronze_plan(){
+    public function a_user_can_subscribe_to_bronze_plan_if_balance_is_150(){
         
-        $wallet = $this->user->wallet()->create([
-            'balance' => 200,
+        $this->user->wallet()->update([
+            'balance' => 150,
         ]);
 
-        $response = $this->actingAs($this->user)->postJson(self::SUBSCRIBE_URL,[
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
             "plan_id" => 1,
-        ]);
-        
+        ]); 
         $response->assertStatus(200);
 
     }
-    /** @test */
-    public function a_user_can_subscribe_to_silver_plan(){
 
-        $wallet = $this->user->wallet()->create([
-            'balance' => 300,
+    /** @test */
+    public function a_user_can_subscribe_to_bronze_plan_if_balance_is_more_than_150(){
+    
+        $this->user->wallet()->update([
+            'balance' => 250,
         ]);
 
-        $response = $this->actingAs($this->user)->postJson(self::SUBSCRIBE_URL,[
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 1,
+        ]); 
+        $response->assertStatus(200);
+
+    }
+
+    /** @test */
+    public function a_user_cannot_subscribe_to_bronze_plan_if_balance_is_less_than_150(){
+    
+        $this->user->wallet()->update([
+            'balance' => 100,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 1,
+        ]); 
+        $response->assertStatus(400);
+
+    }
+
+    /** @test */
+    public function a_user_can_subscribe_to_silver_plan_if_balance_is_250(){
+
+        $this->user->wallet()->update([
+            'balance' => 250,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
             "plan_id" => 2,
         ]);
         
@@ -61,16 +90,71 @@ class PlanTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_subscribe_to_gold_plan(){
+    public function a_user_can_subscribe_to_silver_plan_if_balance_is_more_than_250(){
 
-        $wallet = $this->user->wallet()->create([
+        $this->user->wallet()->update([
+            'balance' => 300,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 2,
+        ]); 
+        $response->assertStatus(200);
+
+    }
+    /** @test */
+    public function a_user_cannot_subscribe_to_silver_plan_if_balance_is_less_than_250(){
+    
+        $this->user->wallet()->update([
+            'balance' => 200,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 2,
+        ]); 
+        $response->assertStatus(400);
+
+    }
+
+    /** @test */
+    public function a_user_can_subscribe_to_gold_plan_if_balance_is_500(){
+
+        $this->user->wallet()->update([
             'balance' => 500,
         ]);
 
-        $response = $this->actingAs($this->user)->postJson(self::SUBSCRIBE_URL,[
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
             "plan_id" => 3,
         ]);
         
+        $response->assertStatus(200);
+
+    }
+
+    /** @test */
+    public function a_user_cannot_subscribe_to_gold_plan_if_balance_is_less_than_500(){
+
+        $this->user->wallet()->update([
+            'balance' => 400,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 3,
+        ]); 
+        $response->assertStatus(400);
+
+    }
+    
+    /** @test */
+    public function a_user_can_subscribe_to_gold_plan_if_balance_is_more_than_500(){
+    
+        $this->user->wallet()->update([
+            'balance' => 1000,
+        ]);
+
+        $response = $this->postJson(self::SUBSCRIBE_URL,[
+            "plan_id" => 3,
+        ]); 
         $response->assertStatus(200);
 
     }
