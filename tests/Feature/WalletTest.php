@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\VoucherSeeder;
@@ -34,7 +35,25 @@ class WalletTest extends TestCase
 
         $this->actingAs($this->user);
     }
-   
+    
+    public function test_a_transaction_can_be_verified(){
+
+        $reference = uniqid();
+        Http::fake([
+            'https://api.paystack.co/transaction/verify/'.$reference =>Http::response([
+                "status"=> true,
+                "message"=> "Verification successful",
+                "data"=> [
+                  "reference"=> "nms6uvr1pl",
+                  "amount"=> 20000,
+                ],
+            ], 200)
+        ]);
+
+        $response = $this->get('/api/v1/wallet/me/transaction/verify/'.$reference);
+        $response->assertStatus(200);
+    }
+
     public function test_a_user_can_make_a_withdrawal_request(){
         $this->user->wallet()->update([
             'account2' => 2500,
