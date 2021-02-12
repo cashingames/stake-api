@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
         User::factory()
             ->count(10)
             ->hasWallet(1)
+            ->hasProfile(1)
             ->create();
     }
 }
