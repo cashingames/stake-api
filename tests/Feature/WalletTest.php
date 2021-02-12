@@ -7,9 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use Database\Seeders\UserSeeder;
-use Database\Seeders\VoucherSeeder;
 use App\Models\User;
-use App\Models\Voucher;
 
 class WalletTest extends TestCase
 {
@@ -20,18 +18,13 @@ class WalletTest extends TestCase
      * @return void
      */
 
-    const VOUCHER_URL = '/api/v1/voucher/consume/';
     protected $user;
-    protected $voucher;
 
     protected function setUp(): void{
         parent::setUp();
         
         $this->seed(UserSeeder::class);
-        $this->seed(VoucherSeeder::class);
-        
         $this->user = User::first(); 
-        $this->voucher = Voucher::first();
 
         $this->actingAs($this->user);
     }
@@ -54,6 +47,21 @@ class WalletTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_a_transaction_cannot_be_verified_with_invalid_reference_id(){
+
+        $reference = uniqid();
+        Http::fake([
+            'https://api.paystack.co/transaction/verify/'.$reference =>Http::response([
+                "status"=> false,
+            ])
+        ]);
+
+        $response = $this->get('/api/v1/wallet/me/transaction/verify/'.$reference);
+        $response->assertJson([
+            'message' => 'Payment could not be verified. Please wait for your balance to reflect.',
+        ]);
+    }
+
     public function test_a_user_can_make_a_withdrawal_request(){
         $this->user->wallet()->update([
             'account2' => 2500,
@@ -70,46 +78,5 @@ class WalletTest extends TestCase
         ]);
     }
 
-    public function test_a_voucher_can_be_consumed(){
-        
-        $response = $this->post(self::VOUCHER_URL.$this->voucher->code);
-        
-        $response->assertStatus(200);
-    }
 
-    public function test_a_user_cannot_consume_invalid_voucher(){
-        
-        $response = $this->post(self::VOUCHER_URL.'920038DGGBA');
-        
-        $response->assertStatus(400);
-    }
-
-    public function test_a_user_cannot_consume_expired_voucher(){
-        
-        $this->voucher->update([
-            'expire' => now(),
-        ]);
-
-        $response = $this->post(self::VOUCHER_URL.$this->voucher->code);
-        
-        $response->assertStatus(400);
-        $response->assertJson([
-            'message' => 'Sorry, your voucher code has expired!',
-        ]);
-    }
-
-    public function test_a_user_cannot_consume_voucher_with_exhausted_limit(){
-        
-        $this->voucher->update([
-            'count' => 0,
-        ]);
-
-        $response = $this->post(self::VOUCHER_URL.$this->voucher->code);
-        
-        $response->assertStatus(400);
-        $response->assertJson([
-            'message' => 'Sorry, your voucher limit has been exhausted!',
-        ]);
-        
-    }
 }
