@@ -96,7 +96,20 @@ class RegisterController extends BaseController
       //create the wallet
       $wallet = $user->wallet()
         ->create([]);
+      
 
+      //subscribe the user to free game plan
+      $wallet->transactions()->create([
+          'wallet_id' => $wallet->id,
+          'transaction_type' => 'CREDIT',
+          'amount' => 0.00,
+          'wallet_kind' => 'CREDITS',
+          'description' => 'SUBSCRIPTION TO FREE GAME PLAN',
+          'reference' => Str::random(10)
+      ]);
+
+      $user->plans()->attach(4, ['used' => 0, 'is_active' => true]);
+      
       //give the user a signup bonus by creating a credit transaction
       if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
         $wallet->transactions()

@@ -59,9 +59,9 @@ class PlanSeeder extends Seeder
                 'name' => 'Free',
                 'description' => 'Free plan',
                 'price' => 0.00,
-                'games_count' => 255,
+                'games_count' => 127,
                 'point_per_question' => 1,
-                'minimum_win_points' => 255,
+                'minimum_win_points' => 127,
                 'price_per_point' => 0.00,
                 'is_free' => true
             ]
