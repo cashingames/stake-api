@@ -28,31 +28,31 @@ class PlanSeeder extends Seeder
             ]
         );
 
-        // DB::table('plans')->insert(
-        //     [
-        //         'name' => 'Silver',
-        //         'description' => 'Silver band',
-        //         'price' => 250.00,
-        //         'games_count' => 6,
-        //         'point_per_question' => 2,
-        //         'minimum_win_points' => 16,
-        //         'price_per_point' => 1.00,
-        //         'is_free' => false
-        //     ]
-        // );
+        DB::table('plans')->insert(
+            [
+                'name' => 'Silver',
+                'description' => 'Silver band',
+                'price' => 250.00,
+                'games_count' => 6,
+                'point_per_question' => 2,
+                'minimum_win_points' => 16,
+                'price_per_point' => 1.00,
+                'is_free' => false
+            ]
+        );
 
-        // DB::table('plans')->insert(
-        //     [
-        //         'name' => 'Gold',
-        //         'description' => 'Gold band',
-        //         'price' => 500.00,
-        //         'games_count' => 8,
-        //         'point_per_question' => 3,
-        //         'minimum_win_points' => 24,
-        //         'price_per_point' => 1.00,
-        //         'is_free' => false
-        //     ]
-        // );
+        DB::table('plans')->insert(
+            [
+                'name' => 'Gold',
+                'description' => 'Gold band',
+                'price' => 500.00,
+                'games_count' => 8,
+                'point_per_question' => 3,
+                'minimum_win_points' => 24,
+                'price_per_point' => 1.00,
+                'is_free' => false
+            ]
+        );
 
         DB::table('plans')->insert(
             [
