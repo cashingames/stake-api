@@ -13,7 +13,7 @@ class PlanController extends BaseController
     //
     public function get()
     {
-        return $this->sendResponse(Plan::all(), "General plan list");
+        return $this->sendResponse(Plan::where('is_free',0)->get(), "Non-free plan list");
     }
 
     public function subscribe(Request $request)
