@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Database\Seeders\DatabaseSeeder;
+use App\Models\Plan;
 
 class RegisterTest extends TestCase
 {   
@@ -21,10 +23,15 @@ class RegisterTest extends TestCase
     //     $response->assertStatus(200);
     // }
 
+    protected function setUp(): void{
+        parent::setUp();
+        $this->seed();
+    
+    }
+    
     /** @test */
     public function a_user_can_register()
     {   
-    
         $response = $this->postjson('/api/auth/register',[
             'first_name' => 'User',
             'last_name'=>'Test',
@@ -35,7 +42,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'password'
            
         ]);
-    
+
         $response->assertStatus(200);
        
         
@@ -157,7 +164,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'password'
            
         ]);
-    
+        
         $response->assertStatus(422);
         $response->assertJson([
             'errors' => [
