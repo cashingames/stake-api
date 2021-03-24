@@ -15,7 +15,7 @@ class AddIsFreeColumnToPlans extends Migration
     {
         Schema::table('plans', function (Blueprint $table) {
             //
-            $table->boolean('is_free')->nullable();
+            $table->boolean('is_free')->default(false);
         });
     }
 
@@ -28,7 +28,7 @@ class AddIsFreeColumnToPlans extends Migration
     {
         Schema::table('plans', function (Blueprint $table) {
             //
-            $table->dropColumn('is_free');
+            $table->dropColumn('is_active');
         });
     }
 }
