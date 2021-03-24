@@ -24,7 +24,6 @@ class PlanSeeder extends Seeder
                 'point_per_question' => 1,
                 'minimum_win_points' => 8,
                 'price_per_point' => 1.00,
-                'is_free' => false
             ]
         );
 
@@ -37,7 +36,6 @@ class PlanSeeder extends Seeder
                 'point_per_question' => 2,
                 'minimum_win_points' => 16,
                 'price_per_point' => 1.00,
-                'is_free' => false
             ]
         );
 
@@ -50,7 +48,6 @@ class PlanSeeder extends Seeder
                 'point_per_question' => 3,
                 'minimum_win_points' => 24,
                 'price_per_point' => 1.00,
-                'is_free' => false
             ]
         );
 
