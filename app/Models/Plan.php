@@ -9,6 +9,10 @@ class Plan extends Model
 {
   use HasFactory;
 
+  protected $casts = [
+    'is_free' => 'boolean',
+  ];
+
   public function users(){
       return $this->hasMany(User::class);
   }
