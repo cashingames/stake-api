@@ -20,4 +20,6 @@ class Plan extends Model
   public function games(){
       return $this->hasMany(Game::class);
   }
+
+
 }

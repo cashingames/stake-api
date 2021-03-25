@@ -9,6 +9,8 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Carbon;
+use Illuminate\Config;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -50,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $appends = [
-        'show_bonus', 'lite_client', 'rank', 'is_claims_active'
+        'show_bonus', 'lite_client', 'rank', 'is_claims_active','can_play'
     ];
 
     public function getJWTIdentifier()
@@ -148,6 +150,29 @@ class User extends Authenticatable implements JWTSubject
             return 786;
 
         return $user_index + 1;
+    }
+
+    public function getIsOnCampaignAttribute()
+    {
+        return config('trivia.campaign.is_on_campaign');
+    }
+  
+    public function getCanPlayAttribute()
+    {   
+        //toggle can_play attribute based on time and if campaign is on:
+        if( config('trivia.campaign.enabled')){
+
+            $currentTime =Carbon::now('Africa/Lagos');
+            $campaignStartTime = Carbon::parse(config('trivia.campaign.start_time'))->toTimeString();
+            $campaignEndTime = Carbon::parse(config('trivia.campaign.end_time'))->toTimeString();
+                
+            if($currentTime->between($campaignStartTime,$campaignEndTime))
+                return config('trivia.can_play');
+            else
+                return false;
+                
+        } 
+            
     }
 
 }
