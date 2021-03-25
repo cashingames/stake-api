@@ -162,11 +162,11 @@ class User extends Authenticatable implements JWTSubject
         //toggle can_play attribute based on time and if campaign is on:
         if( config('trivia.campaign.enabled')){
 
-            $currentTime =Carbon::now('Africa/Lagos')->toTimeString();
+            $currentTime =Carbon::now('Africa/Lagos');
             $campaignStartTime = Carbon::parse(config('trivia.campaign.start_time'))->toTimeString();
             $campaignEndTime = Carbon::parse(config('trivia.campaign.end_time'))->toTimeString();
                 
-            if($campaignStartTime <= $currentTime && $campaignEndTime >= $currentTime)
+            if($currentTime->between($campaignStartTime,$campaignEndTime))
                 return config('trivia.can_play');
             else
                 return false;
