@@ -13,11 +13,25 @@ class Plan extends Model
     'is_free' => 'boolean',
   ];
 
+  protected $appends = [
+    'can_play', 'is_on_campaign'
+];
+
   public function users(){
       return $this->hasMany(User::class);
   }
 
   public function games(){
       return $this->hasMany(Game::class);
+  }
+
+  public function getIsOnCampaignAttribute()
+  {
+      return config('trivia.campaign.is_on_campaign');
+  }
+
+  public function getCanPlayAttribute()
+  {
+      return config('trivia.campaign.can_play');
   }
 }
