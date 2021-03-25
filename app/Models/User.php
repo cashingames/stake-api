@@ -151,11 +151,6 @@ class User extends Authenticatable implements JWTSubject
 
         return $user_index + 1;
     }
-
-    public function getIsOnCampaignAttribute()
-    {
-        return config('trivia.campaign.is_on_campaign');
-    }
   
     public function getCanPlayAttribute()
     {   
