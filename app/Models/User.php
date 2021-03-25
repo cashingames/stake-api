@@ -167,7 +167,7 @@ class User extends Authenticatable implements JWTSubject
             $campaignEndTime = Carbon::parse(config('trivia.campaign.campaign_end_time'))->toTimeString();
                 
             if($campaignStartTime <= $currentTime && $campaignEndTime >= $currentTime)
-                return (config('trivia.can_play'));
+                return config('trivia.can_play');
             else
                 return false;
                 
