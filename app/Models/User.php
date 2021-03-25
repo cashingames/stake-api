@@ -167,7 +167,8 @@ class User extends Authenticatable implements JWTSubject
                 return false;
                 
         } 
-            
+        //if campaign is not on, can play remains true
+        return config('trivia.can_play');
     }
 
 }
