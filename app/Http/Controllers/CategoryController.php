@@ -14,8 +14,13 @@ class CategoryController extends BaseController
             $categories = [];
             $campaignCategories = config('trivia.campaign.categories');
             foreach ($campaignCategories as $category){
-                $cat = Category::where('name',$category)->has('questions', '>', 0)->get();
-               array_push($categories,$cat);
+                $cat = Category::where('name',$category)->has('questions', '>', 0)->first();
+                
+                $categories[] = [
+                    'id' => $cat->id,
+                    'name'=> $cat->name,
+                    'category_id' => $cat->category_id,
+                ];
             }
             return $this->sendResponse($categories, "All campaign categories");
         }
