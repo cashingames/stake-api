@@ -8,7 +8,18 @@ use Illuminate\Http\Request;
 class CategoryController extends BaseController
 {
     //
-    public function get(){
+    public function get(){ 
+        
+        if( config('trivia.campaign.enabled')){
+            $categories = [];
+            $campaignCategories = config('trivia.campaign.categories');
+            foreach ($campaignCategories as $category){
+                $cat = Category::where('name',$category)->has('questions', '>', 0)->get();
+               array_push($categories,$cat);
+            }
+            return $this->sendResponse($categories, "All campaign categories");
+        }
+
         $categories = Category::has('questions', '>', 0)->get();
         return $this->sendResponse($categories, "All categories");
     }
