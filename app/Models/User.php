@@ -21,6 +21,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array
      */
+
     protected $fillable = [
         'username', 'name', 'email', 'phone', 'password', 'referrer'
     ];
@@ -150,6 +151,24 @@ class User extends Authenticatable implements JWTSubject
             return 786;
 
         return $user_index + 1;
+    }
+  
+    public function getCanPlayAttribute()
+    {   
+        //toggle can_play attribute based on time and if campaign is on:
+        if( config('trivia.campaign.enabled')){
+            $currentTime = Carbon::now('Africa/Lagos');
+            $campaignStartTime = Carbon::parse(config('trivia.campaign.start_time'))->toTimeString();
+            $campaignEndTime = Carbon::parse(config('trivia.campaign.end_time'))->toTimeString();
+        
+            if($currentTime->between($campaignStartTime,$campaignEndTime))
+                return config('trivia.can_play');
+            else
+                return false;
+                
+        } 
+        //if campaign is not on, can play remains true
+        return config('trivia.can_play');
     }
 
     public function getIsOnCampaignAttribute()
