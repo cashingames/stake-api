@@ -18,7 +18,7 @@ class CategoryController extends BaseController
             }
             return $this->sendResponse($categories, "All campaign categories");
         }
-
+        
         $categories = Category::has('questions', '>', 0)->get();
         return $this->sendResponse($categories, "All categories");
     }
