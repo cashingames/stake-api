@@ -16,7 +16,8 @@ return [
   'campaign' => [
     'enabled' => env('IS_ON_CAMPAIGN', false),
     'start_time' => env('CAMPAIGN_START_TIME',"00:00:00"),
-    'end_time' => env('CAMPAIGN_END_TIME', "00:00:00")
+    'end_time' => env('CAMPAIGN_END_TIME', "00:00:00"),
+    'categories' => [env('CAMPAIGN_CATEGORY1',''), env('CAMPAIGN_CATEGORY2', '')]
   ],
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),

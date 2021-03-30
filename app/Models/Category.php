@@ -16,4 +16,10 @@ class Category extends Model
   public function games(){
     return $this->hasMany(Game::class);
   }
+
+  public function getCampaignCategoryAttribute()
+  {
+      return config('trivia.campaign.categories');
+  }
+
 }

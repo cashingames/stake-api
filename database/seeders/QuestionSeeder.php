@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuestionSeeder extends Seeder
 {
-  private $categoryName = 'Music';
+  private $categoryName = 'Football';
   /**
    * Run the database seeds.
    *
