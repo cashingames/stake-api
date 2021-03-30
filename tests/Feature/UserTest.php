@@ -40,13 +40,4 @@ class UserTest extends TestCase
         $canPlay = $this->user->can_play;
         $this->assertTrue($canPlay);
     }
-
-    public function test_that_can_play_attribute_returns_false_if_time_is_not_within_time_range()
-    {   
-        config(['trivia.campaign.start_time' => Carbon::now()->addHours(3)]);
-        config(['trivia.campaign.end_time' => Carbon::now()->addHours(5)]);
-      
-        $canPlay = $this->user->can_play;
-        $this->assertFalse($canPlay);
-    }
 }
