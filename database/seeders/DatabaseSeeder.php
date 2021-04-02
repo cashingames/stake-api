@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
         //$this->call(WalletSeeder::class);
         $this->call(QuestionSeeder::class);
         $this->call(VoucherSeeder::class);
-        $this->call(UserSeeder::class);
+        // $this->call(UserSeeder::class);
     }
 }
