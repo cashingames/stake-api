@@ -182,14 +182,12 @@ class GameController extends BaseController
         try {
             $this->saveQuestionResponse($request, $sessionToken);
         } catch (Exception $ex) {
+            
         }
 
         return $this->fetchQuestion($request, $sessionToken);
     }
 
-    /**'
-     *
-     */
     public function end(Request $request, String $sessionToken)
     {
         //get the session information
@@ -239,8 +237,9 @@ class GameController extends BaseController
         $game->save();
 
         //@TODO: remove hack.
-        if ($game->duration > 60)
+        if ($game->duration > 60){
             $game->duration = 60;
+        }
 
         if ($game->is_winning) {
             $transaction = WalletTransaction::create([
@@ -308,15 +307,16 @@ class GameController extends BaseController
             limit 100'
         );
 
-        $user_index = 0;
+        $user_index = -1;
         if (count($results) > 0) {
             $user_index = collect($results)->search(function ($user) {
                 return $user->user_id == $this->user->id;
             });
         }
 
-        if ($user_index === false)
+        if ($user_index === false || $user_index === -1){
             return 786;
+        }
 
         return $user_index + 1;
     }

@@ -140,14 +140,14 @@ class User extends Authenticatable implements JWTSubject
             limit 100'
         );
 
-        $user_index = 0;
+        $user_index = -1;
         if (count($results) > 0) {
             $user_index = collect($results)->search(function ($user) {
                 return $user->user_id == $this->id;
             });
         }
 
-        if ($user_index === false || $user_index === 0){
+        if ($user_index === false || $user_index === -1){
             return 786;
         }
 
