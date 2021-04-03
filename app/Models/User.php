@@ -147,8 +147,9 @@ class User extends Authenticatable implements JWTSubject
             });
         }
 
-        if ($user_index === false)
+        if ($user_index === false || $user_index === 0){
             return 786;
+        }
 
         return $user_index + 1;
     }
