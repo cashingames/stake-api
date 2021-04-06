@@ -67,5 +67,16 @@ class MigrateDatabase extends Command
                     'updated_at' => $data->updated_at
                 ]);
             }
+
+        //subscribe all users to free plan
+        for($i = 1; $i<=71; $i++){
+            DB::table('user_plan')->insert([
+                'user_id' => $i,
+                'plan_id' => 4,
+                'used' => 0,
+                'is_active' => true
+                ]);
+        }
+              
     }
 }
