@@ -53,7 +53,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $appends = [
-        'show_bonus', 'lite_client', 'rank', 'is_claims_active','can_play'
+        'show_bonus', 'lite_client', 'rank', 'is_claims_active','can_play', 'is_on_campaign'
     ];
 
     public function getJWTIdentifier()
@@ -175,6 +175,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function getIsOnCampaignAttribute()
     {
-        return config('trivia.campaign.is_on_campaign');
+        return config('trivia.campaign.enabled');
     }
 }
