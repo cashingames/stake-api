@@ -39,4 +39,7 @@ class UserController extends BaseController
         return "";
     }
 
+    public function getCanPlayStatus(){
+        return $this->sendResponse($this->user->can_play, 'Can Play Status');
+    }
 }
