@@ -18,6 +18,7 @@ Route::post('v1/game/fetch-question/{sessionToken}', 'GameController@saveQuestio
 Route::get('v1/game/fetch-question/{sessionToken}', 'GameController@fetchQuestion')->middleware('auth:api');
 Route::post('v1/game/fetch-submit-question/{sessionToken}', 'GameController@fetchSubmitQuestion')->middleware('auth:api');
 Route::post('v1/game/start', 'GameController@start')->middleware('auth:api');
+Route::get('v1/game/can-play', 'UserController@getCanPlayStatus');
 Route::get('v1/categories', 'CategoryController@get')->middleware('auth:api');
 Route::post('v1/plans/me/subscribe', 'PlanController@subscribe')->middleware('auth:api');
 Route::get('v1/plans', 'PlanController@get')->middleware('auth:api');
@@ -36,4 +37,3 @@ Route::get('v1/user/me/plans', 'UserController@plans')->middleware('auth:api');
 Route::get('v1/user/me', 'UserController@me')->middleware('auth:api');
 Route::post('v1/log/error', 'UserController@logError')->middleware('auth:api');
 Route::post('v1/voucher/consume/{code}','VoucherController@consume')->middleware('auth:api');
-Route::get('v1/can-play/status', 'UserController@getCanPlayStatus');
