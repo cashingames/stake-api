@@ -41,7 +41,7 @@ class ResetPasswordController extends BaseController
 
                 $user->update(['password' => $data['password']]);
 
-                return $this->sendResponse("Password reset successful.", "Password reset successful.");
+                return $this->sendResponse($user, "Password reset successful.");
 
             }else{
 
