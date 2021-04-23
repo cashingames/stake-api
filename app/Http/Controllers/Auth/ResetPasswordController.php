@@ -40,8 +40,12 @@ class ResetPasswordController extends BaseController
                 $user->password = $data['password'];
 
                 $user->update(['password' => $data['password']]);
-
-                return $this->sendResponse($user, "Password reset successful.");
+                
+                $info = [
+                    'user' => $user,
+                    'token'=> auth()->tokenById($user->id)
+                ];
+                return $this->sendResponse($info, "Password reset successful.");
 
             }else{
 
