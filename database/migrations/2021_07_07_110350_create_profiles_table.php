@@ -14,22 +14,19 @@ class CreateProfilesTable extends Migration
     public function up()
     {
         Schema::create('profiles', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('first_name');
             $table->string('last_name');
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->string('address')->nullable();
             $table->string('state')->nullable();
             $table->string('avatar')->nullable();
             $table->string('account_name')->nullable();
             $table->string('bank_name')->nullable();
             $table->string('account_number')->nullable();
-            $table->string('currency')->nullable();
+            $table->string('referral_code');
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
