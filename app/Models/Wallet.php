@@ -16,4 +16,14 @@ class Wallet extends Model
         'balance'
     ];
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
 }
