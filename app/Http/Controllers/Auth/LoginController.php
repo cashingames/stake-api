@@ -23,10 +23,10 @@ class LoginController extends BaseController
      */
     public function login()
     {
-        $credentials = request(['username', 'password']);
+        $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid username and password'], 400);
+            return response()->json(['error' => 'Invalid email and password'], 400);
         }
 
         return $this->respondWithToken($token);

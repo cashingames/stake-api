@@ -81,6 +81,7 @@ class RegisterController extends BaseController
               'phone_number' => $data['phone_number'],
               'email' => $data['email'],
               'password' => $data['password'],
+              'is_on_line' => true,
               'referrer' => $data['referrer']??null
           ]);
       
