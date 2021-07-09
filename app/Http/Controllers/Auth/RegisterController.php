@@ -57,7 +57,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'min:11', 'unique:users'],
+            'phone_number' => ['nullable', 'string', 'min:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer'=>['nullable', 'string', 'exists:profiles,referral_code']
@@ -78,9 +78,10 @@ class RegisterController extends BaseController
       $user =
           User::create([
               'username' => $data['username'],
-              'phone' => $data['phone'],
+              'phone_number' => $data['phone_number'],
               'email' => $data['email'],
               'password' => $data['password'],
+              'is_on_line' => true,
               'referrer' => $data['referrer']??null
           ]);
       
@@ -99,41 +100,41 @@ class RegisterController extends BaseController
       
 
       //subscribe the user to free game plan
-      $wallet->transactions()->create([
-          'wallet_id' => $wallet->id,
-          'transaction_type' => 'CREDIT',
-          'amount' => 0.00,
-          'wallet_kind' => 'CREDITS',
-          'description' => 'SUBSCRIPTION TO FREE GAME PLAN',
-          'reference' => Str::random(10)
-      ]);
+      // $wallet->transactions()->create([
+      //     'wallet_id' => $wallet->id,
+      //     'transaction_type' => 'CREDIT',
+      //     'amount' => 0.00,
+      //     'wallet_kind' => 'CREDITS',
+      //     'description' => 'SUBSCRIPTION TO FREE GAME PLAN',
+      //     'reference' => Str::random(10)
+      // ]);
 
-      $user->plans()->attach(4, ['used' => 0, 'is_active' => true]);
+      // $user->plans()->attach(4, ['used' => 0, 'is_active' => true]);
       
-      //give the user a signup bonus by creating a credit transaction
-      if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
-        $wallet->transactions()
-          ->create([
-            'transaction_type' => 'CREDIT',
-            'amount' => config('trivia.bonus.signup.amount'),
-            'wallet_kind' => 'CREDITS',
-            'description' => 'SIGNUP BONUS',
-            'reference' => Str::random(10)
-        ]);
-      }
+      // //give the user a signup bonus by creating a credit transaction
+      // if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+      //   $wallet->transactions()
+      //     ->create([
+      //       'transaction_type' => 'CREDIT',
+      //       'amount' => config('trivia.bonus.signup.amount'),
+      //       'wallet_kind' => 'CREDITS',
+      //       'description' => 'SIGNUP BONUS',
+      //       'reference' => Str::random(10)
+      //   ]);
+      // }
 
-      if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.referral') && isset($user->referrer)){
+      // if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.referral') && isset($user->referrer)){
         
-        $referrer_id = Profile::where('referral_code', $user->referrer)->value('user_id');
-          WalletTransaction::create([
-            'wallet_id' => $referrer_id,
-            'transaction_type' => 'CREDIT',
-            'amount' =>  config('trivia.bonus.signup.referral_amount'),
-            'wallet_kind' => 'CREDITS',
-            'description' => 'REFERRAL BONUS FOR '. $user->username,
-            'reference' => Str::random(10)
-        ]);
-      }
+      //   $referrer_id = Profile::where('referral_code', $user->referrer)->value('user_id');
+      //     WalletTransaction::create([
+      //       'wallet_id' => $referrer_id,
+      //       'transaction_type' => 'CREDIT',
+      //       'amount' =>  config('trivia.bonus.signup.referral_amount'),
+      //       'wallet_kind' => 'CREDITS',
+      //       'description' => 'REFERRAL BONUS FOR '. $user->username,
+      //       'reference' => Str::random(10)
+      //   ]);
+      // }
             
         
         $user->wallet->refresh();
@@ -157,7 +158,6 @@ class RegisterController extends BaseController
               'access_token' => $token,
           ],
           'user' => $user->load('profile'),
-          'plans' => $user->activePlans()->get(),
           'wallet' => $user->wallet,
         ];
         return $this->sendResponse($result, 'User details');

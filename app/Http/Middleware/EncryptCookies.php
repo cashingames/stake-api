@@ -12,11 +12,6 @@ class EncryptCookies extends Middleware
      * @var array
      */
     protected $except = [
-        /**
-         * When using Xdebug to debug your application from a browser, a cookie called "XDEBUG_SESSION" is set.
-         * As this cookie was not set, and thus not encrypted, by the Laravel framework, an error will be thrown when the framework
-         * automatically detects and tries to decrypt the cookie.
-         */
-        'XDEBUG_SESSION' //This is to avoid XDEBUG from
+        //
     ];
 }
