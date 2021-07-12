@@ -99,43 +99,7 @@ class RegisterController extends BaseController
         ->create([]);
       
 
-      //subscribe the user to free game plan
-      // $wallet->transactions()->create([
-      //     'wallet_id' => $wallet->id,
-      //     'transaction_type' => 'CREDIT',
-      //     'amount' => 0.00,
-      //     'wallet_kind' => 'CREDITS',
-      //     'description' => 'SUBSCRIPTION TO FREE GAME PLAN',
-      //     'reference' => Str::random(10)
-      // ]);
 
-      // $user->plans()->attach(4, ['used' => 0, 'is_active' => true]);
-      
-      // //give the user a signup bonus by creating a credit transaction
-      // if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
-      //   $wallet->transactions()
-      //     ->create([
-      //       'transaction_type' => 'CREDIT',
-      //       'amount' => config('trivia.bonus.signup.amount'),
-      //       'wallet_kind' => 'CREDITS',
-      //       'description' => 'SIGNUP BONUS',
-      //       'reference' => Str::random(10)
-      //   ]);
-      // }
-
-      // if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.referral') && isset($user->referrer)){
-        
-      //   $referrer_id = Profile::where('referral_code', $user->referrer)->value('user_id');
-      //     WalletTransaction::create([
-      //       'wallet_id' => $referrer_id,
-      //       'transaction_type' => 'CREDIT',
-      //       'amount' =>  config('trivia.bonus.signup.referral_amount'),
-      //       'wallet_kind' => 'CREDITS',
-      //       'description' => 'REFERRAL BONUS FOR '. $user->username,
-      //       'reference' => Str::random(10)
-      //   ]);
-      // }
-            
         
         $user->wallet->refresh();
 

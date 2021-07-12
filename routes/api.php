@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 
 /*
@@ -19,3 +20,4 @@ use App\Http\Controllers\Auth\LoginController;
 
 Route::post('auth/login', [LoginController::class, 'login'])->middleware('api');
 Route::post('auth/register', [RegisterController::class, 'register'])->middleware('api');
+Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail'])->middleware('api');

@@ -36,18 +36,17 @@ class ForgotPasswordController extends BaseController
             return $this->sendError('Please enter your registered email address', 'Please enter your registered email address');
         }
 
-        $token = strtoupper(substr(md5(time()), 0, 7));
+        $token = mt_rand(10000,99999);
         Mail::send(new TokenGenerated($token, $user));
 
         // update user's password token and token expiry time
         $now = Carbon::now();
-        $expiry_time =  Carbon::now()->addMinutes(10);
         $exists = DB::select('select * from password_resets where email = ?', [$data['email']]);
 
         if ($exists) {
-            DB::update('update password_resets set token = ?, token_expiry = ?  where email = ?', [$token, $expiry_time, $data['email']]);
+            DB::update('update password_resets set token = ?, where email = ?', [$token, $data['email']]);
         } else {
-            DB::insert('insert into password_resets (email, token, created_at, token_expiry) values (?, ?, ?, ?)', [$data['email'], $token, $now, $expiry_time]);
+            DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?, ?)', [$data['email'], $token, $now]);
         }
 
         return $this->sendResponse($token, 'Email Sent');
