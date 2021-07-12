@@ -21,34 +21,24 @@ class ResetPasswordController extends BaseController
 
     // use ResetsPasswords;
 
-    public function reset(Request $request){
+    public function reset(Request $request, $email){
         //validate input:
         $data = $request->validate([
-            'email' => ['required', "string", "email"],
-            'password' => ['required', 'string'],                
+            'password' => ['required', 'string', 'min:8', 'confirmed'],                
             ]);
-            
-            
             
             if($data ){                   
 
-                $user = User::where('email', $data['email'])->first();
+                $user = User::where('email', $email)->first();
                     
-                    if (!$user){
-                        return $this->sendError("email is incorrect", "email is incorrect");
-                    }
+                if (!$user){
+                    return $this->sendError("email is incorrect", "email is incorrect");
+                }
                 $user->password = $data['password'];
-
-                $user->update(['password' => $data['password']]);
+                $user->save();
                 
-                $info = [
-                    'user' => $user,
-                    'token'=> auth()->tokenById($user->id)
-                ];
-                return $this->sendResponse($info, "Password reset successful.");
-
+                return $this->sendResponse($user, "Password reset successful.");
             }else{
-
                 return $this->sendError("password reset failed", "password reset failed");
             
             }

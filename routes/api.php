@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+
 
 
 /*
@@ -21,3 +23,5 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 Route::post('auth/login', [LoginController::class, 'login'])->middleware('api');
 Route::post('auth/register', [RegisterController::class, 'register'])->middleware('api');
 Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail'])->middleware('api');
+Route::post('auth/token/verify', [ForgotPasswordController::class,'verifyToken'])->middleware('api');
+Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset'])->middleware('api');

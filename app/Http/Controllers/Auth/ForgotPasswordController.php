@@ -44,9 +44,11 @@ class ForgotPasswordController extends BaseController
         $exists = DB::select('select * from password_resets where email = ?', [$data['email']]);
 
         if ($exists) {
-            DB::update('update password_resets set token = ?, where email = ?', [$token, $data['email']]);
+            DB::table('password_resets')
+            ->where('email', $data['email'])
+            ->update(['token' => $token]);
         } else {
-            DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?, ?)', [$data['email'], $token, $now]);
+            DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$data['email'], $token, $now]);
         }
 
         return $this->sendResponse($token, 'Email Sent');
@@ -56,20 +58,14 @@ class ForgotPasswordController extends BaseController
     public function verifyToken(Request $request)
     {
         $data = $request->validate([
-            'email' => ['required', 'string', 'email'],
             'token' => ['required', 'string']
         ]);
 
         if ($data) {
-            $user = DB::selectOne('select * from password_resets where email = ?', [$data['email']]);
+            $user = DB::selectOne('select * from password_resets where token = ?', [$data['token']]);
 
             if (!$user) {
                 return $this->sendError('Invalid verification code', 'Invalid verification code');
-            }
-
-            $now = Carbon::now();
-            if ($now->greaterThan($user->token_expiry)) {
-                return $this->sendError('Verification code has expired,  try again later', 'Verification code has expired,  try again later');
             }
 
             return $this->sendResponse("Verification successful", 'Verification successful');
