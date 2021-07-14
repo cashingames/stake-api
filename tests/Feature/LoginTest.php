@@ -46,7 +46,7 @@ class LoginTest extends TestCase
     }
 
     /** @test */
-    public function login_with_invalid_credentials()
+    public function a_user_cannot_login_with_invalid_credentials()
     {   
         
         $response = $this->postjson(self::AUTH_URL,[
