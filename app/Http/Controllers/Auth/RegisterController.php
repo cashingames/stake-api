@@ -75,31 +75,41 @@ class RegisterController extends BaseController
     {
 
       //create the user
-      $user =
-          User::create([
-              'username' => $data['username'],
-              'phone_number' => $data['phone_number'],
-              'email' => $data['email'],
-              'password' => $data['password'],
-              'is_on_line' => true,
-              'referrer' => $data['referrer']??null
-          ]);
+    $user =
+        User::create([
+            'username' => $data['username'],
+            'phone_number' => $data['phone_number'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'is_on_line' => true,
+            'referrer' => $data['referrer']??null
+        ]);
       
       //create the profile
-      $user
-          ->profile()
-          ->create([
-              'first_name' => $data['first_name'],
-              'last_name' => $data['last_name'],
-              'referral_code' =>uniqid($data['username']),
-          ]);
+    $user
+        ->profile()
+        ->create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'referral_code' =>uniqid($data['username']),
+        ]);
 
       //create the wallet
-      $wallet = $user->wallet()
+    $wallet = $user->wallet()
         ->create([]);
-      
 
+    //give user sign up bonus
 
+    if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+        $wallet->transactions()
+            ->create([
+            'transaction_type' => 'Fund Recieved',
+            'amount' => config('trivia.bonus.signup.amount'),
+            'wallet_kind' => 'CREDITS',
+            'description' => 'SIGNUP BONUS',
+            'reference' => Str::random(10)
+        ]);
+    }
         
         $user->wallet->refresh();
 

@@ -26,4 +26,27 @@ class Wallet extends Model
         return $this->hasMany(WalletTransaction::class);
     }
 
+    protected static function changeWalletBalance(WalletTransaction $model)
+    {
+        $wallet = $model->wallet;
+        if ($model->transaction_type == "Fund Recieved" && $model->wallet_kind == "CREDITS") {
+            $wallet->platform_account += $model->amount;
+        } else if ($model->transaction_type == "Fund Recieved" && $model->wallet_kind == "WINNINGS") {
+            $wallet->withdrawable_account += $model->amount;
+        } else if ($model->transaction_type == "Fund Withdrawal" && $model->wallet_kind == "CREDITS") { 
+            //Subtract amount from credits  
+            $wallet->platform_account -= $model->amount;
+        } else if ($model->transaction_type == "DEBIT" && $model->wallet_kind == "WINNINGS"){
+            //Subtract amount from winnings
+            $wallet->withdrawable_account -= $model->amount;
+        }
+
+        $wallet->balance = $wallet->platform_account + $wallet->withdrawable_account;
+        $model->balance = $wallet->balance;
+
+        $wallet->update();
+        $model->update();
+    }
+
+
 }
