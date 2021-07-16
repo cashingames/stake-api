@@ -80,7 +80,7 @@ class RegisterController extends BaseController
             'username' => $data['username'],
             'phone_number' => $data['phone_number'],
             'email' => $data['email'],
-            'password' => $data['password'],
+            'password' => bcrypt($data['password']),
             'is_on_line' => true,
             'referrer' => $data['referrer']??null
         ]);
