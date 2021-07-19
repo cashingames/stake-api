@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -25,3 +25,5 @@ Route::post('auth/register', [RegisterController::class, 'register'])->middlewar
 Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail'])->middleware('api');
 Route::post('auth/token/verify', [ForgotPasswordController::class,'verifyToken'])->middleware('api');
 Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset'])->middleware('api');
+
+Route::get('v2/user/me', [UserController::class, 'me'])->middleware('auth:api');
