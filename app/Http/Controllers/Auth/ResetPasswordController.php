@@ -34,7 +34,7 @@ class ResetPasswordController extends BaseController
                 if (!$user){
                     return $this->sendError("email is incorrect", "email is incorrect");
                 }
-                $user->password = $data['password'];
+                $user->password = bcrypt($data['password']);
                 $user->save();
                 
                 return $this->sendResponse($user, "Password reset successful.");
