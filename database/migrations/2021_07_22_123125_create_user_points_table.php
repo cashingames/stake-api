@@ -30,6 +30,6 @@ class CreateUserPointsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('points');
+        Schema::dropIfExists('user_points');
     }
 }
