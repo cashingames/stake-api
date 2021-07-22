@@ -66,5 +66,12 @@ class CategorySeeder extends Seeder
             ]
         );
 
+        DB::table('categories')->insert(
+            [
+                'name' => 'Generic',
+                'description' => 'General game categories',
+            ]
+        );
+
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class PointSeeder extends Seeder
+class BoostSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,70 +16,69 @@ class PointSeeder extends Seeder
     public function run()
     {
         //
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "5 value points",
-                'value' => 5,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
 
             ]
         );
 
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "50 value points",
-                'value' => 50,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
 
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "100 value points",
-                'value' => 100,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
 
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "150 value points",
-                'value' => 150,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
 
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "200 value points",
-                'value' => 200,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
 
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "250 value points",
-                'value' => 250,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
+
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "300 value points",
-                'value' => 300,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
+
             ]
         );
-        DB::table('points')->insert(
+        DB::table('boosts')->insert(
             [
-                'description' => "350 value points",
-                'value' => 350,
-            ]
-        );
-        DB::table('points')->insert(
-            [
-                'description' => "400 value points",
-                'value' => 400,
-            ]
-        );
-        DB::table('points')->insert(
-            [
-                'description' => "500 value points",
-                'value' => 500,
+                'name' => "",
+                'point_value' => 0,
+                'currency_value'=> 0
+
             ]
         );
 
