@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoriesTable extends Migration
+class CreateBoostsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,13 @@ class CreateCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('boosts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description');
-            $table->string('primary_color')->nullable();
-            $table->string('icon_name')->nullable();
-            $table->string('game_background_url')->nullable();
-            $table->bigInteger('category_id')->nullable();
+            $table->bigInteger('point_value');
+            $table->decimal('currency_value', 10,2);
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -33,6 +29,6 @@ class CreateCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('boosts');
     }
 }

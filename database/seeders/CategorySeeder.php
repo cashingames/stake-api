@@ -17,14 +17,12 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Movies',
                 'description' => 'Answer movie related questions',
-                'instruction' => 'Movies',
             ]
         );
         DB::table('categories')->insert(
             [
                 'name' => 'Nollywood',
                 'description' => 'Nigerian movie industry',
-                'instruction' => 'Answer nigerian movie questions',
                 'category_id' => 1,
             ]
         );
@@ -33,7 +31,6 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Hollywood',
                 'description' => 'Answer hollyood related questions',
-                'instruction' => 'For hollywood guys',
                 'category_id' => 1,
             ]
         );
@@ -42,7 +39,6 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Sports',
                 'description' => 'Sport Questions',
-                'instruction' => 'All ranges of sports',
             ]
         );
 
@@ -50,7 +46,6 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Football',
                 'description' => 'Football questions',
-                'instruction' => 'Football questions',
                 'category_id' => 4,
             ]
         );
@@ -60,7 +55,6 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Entertainment',
                 'description' => 'Answer hollyood related questions',
-                'instruction' => 'For hollywood guys',
             ]
         );
 
@@ -68,7 +62,6 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Music',
                 'description' => 'Answer hollyood related questions',
-                'instruction' => 'For hollywood guys',
                 'category_id' => 6,
             ]
         );

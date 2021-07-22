@@ -16,8 +16,9 @@ class CreateUserPointsTable extends Migration
         Schema::create('user_points', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('point_id')->constrained()->onDelete('cascade');
-            $table->bigInteger("points_count");
+            $table->foreignId('game_id')->constrained()->onDelete('cascade')->nullable();
+            $table->bigInteger("value");
+            $table->string('source');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateUserPointsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_points');
+        Schema::dropIfExists('points');
     }
 }
