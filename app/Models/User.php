@@ -62,6 +62,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class)->orderBy('created_at', 'desc');
     }
 
+    // public function mockTransactions(){
+    //     return $this->hasMany(WalletTransaction::class);
+    // }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

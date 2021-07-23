@@ -29,6 +29,14 @@ class WalletController extends BaseController
         return $this->sendResponse($data, 'Wallet transactions information');
     }
 
+    public function earnings()
+    {
+        $data = [
+            'earnings' => $this->user->transactions()->where('transaction_type', 'Fund Recieved')->orderBy('created_at', 'desc')->get()
+        ];
+        return $this->sendResponse($data, 'Earnings information');
+    }
+
     public function verifyTransaction(string $reference)
     {
         $client = new Client();
