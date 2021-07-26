@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\EnquiriesController;
 
 
 /*
@@ -34,3 +35,5 @@ Route::get('v2/wallet/me', [WalletController::class, 'me'])->middleware('auth:ap
 Route::get('v2/wallet/me/transactions', [WalletController::class, 'transactions'])->middleware('auth:api');
 Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
 Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"])->middleware('auth:api');
+
+Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback'])->middleware('api');

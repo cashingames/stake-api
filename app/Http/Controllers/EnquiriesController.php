@@ -15,7 +15,13 @@ class EnquiriesController extends BaseController
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
             'email' => ['required','email', 'string'],
-            'message' => ['required', 'string']
+            'message_body' => ['required', 'string']
         ]);
+
+       
+        Mail::send(new Feedback($data["first_name"], $data["last_name"], $data["email"], $data["message_body"]));
+
+        
+        return $this->sendResponse("Feedback Sent", 'Feedback Sent');
     }
 }
