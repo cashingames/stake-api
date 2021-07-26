@@ -36,4 +36,4 @@ Route::get('v2/wallet/me/transactions', [WalletController::class, 'transactions'
 Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
 Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"])->middleware('auth:api');
 
-Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback'])->middleware('api');
+Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback']);
