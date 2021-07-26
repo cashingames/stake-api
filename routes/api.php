@@ -33,3 +33,4 @@ Route::get('v2/user/me', [UserController::class, 'me'])->middleware('auth:api');
 Route::get('v2/wallet/me', [WalletController::class, 'me'])->middleware('auth:api');
 Route::get('v2/wallet/me/transactions', [WalletController::class, 'transactions'])->middleware('auth:api');
 Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
+Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"])->middleware('auth:api');
