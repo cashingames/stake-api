@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\Wallet;
 
-class UserSeeder extends Seeder
+class WalletSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,10 +15,8 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
-        User::factory()
+        Wallet::factory()
         ->count(5)
-        ->hasProfile(1)
-        ->hasWallet(1)
         ->hasTransactions(5)
         ->create();
     }
