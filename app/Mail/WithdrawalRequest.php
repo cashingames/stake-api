@@ -16,7 +16,6 @@ class WithdrawalRequest extends Mailable
      *
      * @return void
      */
-    private $user;
     public $amount;
     public $bankName;
     public $accountName;

@@ -84,6 +84,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Boost::class);
     }
 
+    public function withdrawals(){
+        return $this->hasMany(Withdrawal::class);
+    }
+
     
 
 }

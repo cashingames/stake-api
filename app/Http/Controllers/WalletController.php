@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\WalletTransaction;
+use App\Models\Withdrawal;
 use GuzzleHttp\Client;
 use stdClass;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WithdrawalRequest;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 
 class WalletController extends BaseController
@@ -60,12 +62,13 @@ class WalletController extends BaseController
         $wallet = $this->user->wallet;
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'CREDIT',
+            'transaction_type' => 'Fund Recieved',
             'amount' => ($result->data->amount / 100),
             'wallet_kind' => 'CREDITS',
             'description' => 'FUND WALLET FROM BANK',
             'reference' => $result->data->reference,
         ]);
+
         return $this->sendResponse(true, 'Payment was successful');
     }
 
@@ -100,22 +103,39 @@ class WalletController extends BaseController
         Mail::send(new WithdrawalRequest($data['bankName'],$data['accountName'],$data['accountNumber'],$data['amount']));
 
         $wallet = $this->user->wallet;
+       
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $amount,
+            'transaction_type' => 'Fund Withdrawal',
+            'amount' => $data['amount'],
             'wallet_kind' => 'WINNINGS',
-            'description' => 'WITHDRAW TO BANK',
+            'description' => 'Withdraw to bank',
             'reference' => Str::random(10),
+        ]);
+
+        $user = auth()->user(); 
+        
+        Withdrawal::create([
+            'user_id' => $user->id,
+            'bank_name' => $data['bankName'],
+            'amount' => $data['amount'],
+            'account_name' => $data['accountName'],
+            'account_number' => $data['accountNumber'],
+            'status' => 'REQUEST_RECIEVED'
+           
         ]);
         
         $wallet->refresh();
-        return $this->sendResponse($wallet, 'Withrawal Request sent.');
+        return $this->sendResponse('Withrawal Request sent.', 'Withrawal Request sent.');
 
     }
 
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
+    }
+
+    public function getWithdrawals(){
+        return $this->sendResponse(Withdrawal::latest()->get(),"withdrawals");
     }
 }

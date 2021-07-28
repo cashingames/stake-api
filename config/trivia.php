@@ -17,6 +17,6 @@ return [
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'set_claims_active' => env('SET_CLAIMS_ACTIVE', true),
-  'admin_withdrawal_request_email'=>env('ADMIN_WITHDRAWAL_REQUEST_EMAIL','hello@cashingames.com' ),
+  'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
   'can_play' => env('CAN_PLAY', true)
 ];

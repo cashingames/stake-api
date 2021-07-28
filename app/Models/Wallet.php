@@ -36,7 +36,7 @@ class Wallet extends Model
         } else if ($model->transaction_type == "Fund Withdrawal" && $model->wallet_kind == "CREDITS") { 
             //Subtract amount from credits  
             $wallet->platform_account -= $model->amount;
-        } else if ($model->transaction_type == "DEBIT" && $model->wallet_kind == "WINNINGS"){
+        } else if ($model->transaction_type == "Fund Withdrawal" && $model->wallet_kind == "WINNINGS"){
             //Subtract amount from winnings
             $wallet->withdrawable_account -= $model->amount;
         }
