@@ -94,8 +94,8 @@ class WalletController extends BaseController
     public function withdrawRequest(Request $request){
 
         $data = $request->validate([
-            'bankName' => ['required', 'string', 'max:20'],
-            'accountName' => ['required', 'string', 'max:20'],
+            'bankName' => ['required', 'string', 'max:100'],
+            'accountName' => ['required', 'string', 'max:100'],
             'accountNumber' => ['nullable', 'string', 'max:20'],
             'amount' => ['required', 'string', 'max:20'],
         ]);
