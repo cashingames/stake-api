@@ -75,7 +75,6 @@ class WalletTest extends TestCase
             "amount" => "1000"
         ]);
         
-        $response->dump();
         $response->assertStatus(200);
         $response->assertJson([
             'message' => 'Withrawal Request sent.',

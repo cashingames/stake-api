@@ -10,19 +10,6 @@ use App\Models\Profile;
 
 class ProfileController extends BaseController
 {
-    //
-    public function me()
-    {
-        return $this->sendResponse(auth()->user()->profile, "Current user profile");
-    }
-
-    public function checkEmail(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        ])->validate();
-    }
-
     public function editPersonalInformation(Request $request)
     {
 
@@ -98,8 +85,7 @@ class ProfileController extends BaseController
 
     public function addProfilePic(Request $request)
     {
-        // try{
-
+        
         $data  = $request->validate([
             'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
         ]);
@@ -120,10 +106,6 @@ class ProfileController extends BaseController
         }
 
         return $this->sendResponse($profile, "Profile Updated.");
-        // }
-        // catch(\Exception $e){
-        //     return $this->sendError("Profile Picture Not Saved", 'Profile Picture Not Saved');
-        // }
 
 
     }
