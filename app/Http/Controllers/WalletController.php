@@ -34,7 +34,10 @@ class WalletController extends BaseController
     public function earnings()
     {
         $data = [
-            'earnings' => $this->user->transactions()->where('transaction_type', 'Fund Recieved')->orderBy('created_at', 'desc')->get()
+            'earnings' => $this->user->transactions()
+            ->where('transaction_type', 'Fund Recieved')
+            ->where('wallet_kind', 'WINNINGS')
+            ->orderBy('created_at', 'desc')->get()
         ];
         return $this->sendResponse($data, 'Earnings information');
     }
