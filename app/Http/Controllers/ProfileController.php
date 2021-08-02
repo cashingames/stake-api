@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use URL;
 use App\Models\User;
 use App\Models\Profile;
 
@@ -102,10 +103,14 @@ class ProfileController extends BaseController
             $destinationPath = public_path('avatar');
             $profile->avatar = $name;
             $image->move($destinationPath, $name);
+           // echo $destinationPath;
+            $imagePath = URL::asset('avatar/'.$name);
+           
             $profile->save();
+               
         }
 
-        return $this->sendResponse($profile, "Profile Updated.");
+        return $this->sendResponse($imagePath, "Profile Updated.");
 
 
     }
