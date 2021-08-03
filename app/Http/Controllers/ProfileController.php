@@ -104,13 +104,12 @@ class ProfileController extends BaseController
             $profile->avatar = $name;
             $image->move($destinationPath, $name);
            // echo $destinationPath;
-            $imagePath = URL::asset('avatar/'.$name);
            
             $profile->save();
                
         }
 
-        return $this->sendResponse($imagePath, "Profile Updated.");
+        return $this->sendResponse($profile, "Profile Updated.");
 
 
     }
