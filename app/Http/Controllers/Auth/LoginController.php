@@ -58,6 +58,8 @@ class LoginController extends BaseController
             ],
             'user' => $user->load('profile'),
             'wallet' => $user->wallet,
+            'points' => $user->points,
+            'boosts' => $user->boosts
         ];
         return $this->sendResponse($result, 'User details');
     }
