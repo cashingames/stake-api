@@ -23,11 +23,11 @@ use App\Http\Controllers\EnquiriesController;
 |
 */
 
-Route::post('auth/login', [LoginController::class, 'login'])->middleware('api');
-Route::post('auth/register', [RegisterController::class, 'register'])->middleware('api');
-Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail'])->middleware('api');
-Route::post('auth/token/verify', [ForgotPasswordController::class,'verifyToken'])->middleware('api');
-Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset'])->middleware('api');
+Route::post('auth/login', [LoginController::class, 'login']);
+Route::post('auth/register', [RegisterController::class, 'register']);
+Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail']);
+Route::post('auth/token/verify', [ForgotPasswordController::class,'verifyToken']);
+Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset']);
 
 Route::get('v2/user/me', [UserController::class, 'me'])->middleware('auth:api');
 
