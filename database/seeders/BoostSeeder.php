@@ -18,70 +18,30 @@ class BoostSeeder extends Seeder
         //
         DB::table('boosts')->insert(
             [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
+                'name' => "Time Freeze",
+                'description' => "Freezes game for 3 seconds",
+                'point_value' => 100,
+                'currency_value'=> 49.3,
             ]
         );
 
         DB::table('boosts')->insert(
             [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
+                'name' => "Bombs",
+                'description' => "Removes one wrong and one right answer",
+                'point_value' => 100,
+                'currency_value'=> 115.0
             ]
         );
+
         DB::table('boosts')->insert(
             [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
+                'name' => "Skip",
+                'description' => "Skips a question",
+                'point_value' => 83.3333333,
+                'currency_value'=> 65.7333333
             ]
         );
-        DB::table('boosts')->insert(
-            [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
-            ]
-        );
-        DB::table('boosts')->insert(
-            [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
-            ]
-        );
-        DB::table('boosts')->insert(
-            [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
-            ]
-        );
-        DB::table('boosts')->insert(
-            [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
-            ]
-        );
-        DB::table('boosts')->insert(
-            [
-                'name' => "",
-                'point_value' => 0,
-                'currency_value'=> 0
-
-            ]
-        );
-
 
     }
 }

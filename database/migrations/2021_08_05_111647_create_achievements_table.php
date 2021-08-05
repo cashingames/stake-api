@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBoostsTable extends Migration
+class CreateAchievementsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateBoostsTable extends Migration
      */
     public function up()
     {
-        Schema::create('boosts', function (Blueprint $table) {
+        Schema::create('achievements', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->bigInteger('point_value');
-            $table->decimal('currency_value', 10,2);
+            $table->string('title');
+            $table->string('point_milestone');
+            $table->string('medal');
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateBoostsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('boosts');
+        Schema::dropIfExists('achievements');
     }
 }

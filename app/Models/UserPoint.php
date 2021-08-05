@@ -9,7 +9,7 @@ class UserPoint extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["source","value"];
+    protected $fillable = ["user_id","game_id","source","value"];
 
     public function user()
     {

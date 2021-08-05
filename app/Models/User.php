@@ -88,6 +88,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Withdrawal::class);
     }
 
-    
+    public function achievement(){
+        return $this->hasOne(Achievement::class);
+    }
 
 }

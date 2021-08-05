@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Boost extends Model
+class Achievement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'point_value', 'currency_value'];
+    protected $fillable = ['title', 'milestone', 'medal'];
 
     public function user()
     {
