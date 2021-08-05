@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\DB;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -100,18 +101,27 @@ class RegisterController extends BaseController
 
     //give user sign up bonus
 
-    if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
-        $wallet->transactions()
-            ->create([
-            'transaction_type' => 'Fund Recieved',
-            'amount' => config('trivia.bonus.signup.amount'),
-            'wallet_kind' => 'CREDITS',
-            'description' => 'SIGNUP BONUS',
-            'reference' => Str::random(10)
-        ]);
-    }
-        
-        $user->wallet->refresh();
+        if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+            $user->points()->create([
+                'user_id' => $user->id,
+                'value' => 100,
+                'source'=> 'Sign Up Bonus Points',
+            ]);
+
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => 1,
+                'boost_count'=> 3,
+                'used_count'=>0
+            ]);
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => 3,
+                'boost_count'=> 3,
+                'used_count'=>0
+            ]);
+
+        }
 
         return $user;
     }
@@ -128,11 +138,15 @@ class RegisterController extends BaseController
         $user =  auth()->user();
         $token = auth()->tokenById($user->id);
         $result = [
-          'token' => [
+            'token' => [
               'access_token' => $token,
-          ],
-          'user' => $user->load('profile'),
-          'wallet' => $user->wallet,
+            ],
+            'user' => $user->load([
+              'profile',
+              'wallet',
+              'points',
+              'boosts']),
+      
         ];
         return $this->sendResponse($result, 'User details');
     }

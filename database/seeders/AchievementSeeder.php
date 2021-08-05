@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use URL;
+use Illuminate\Support\Facades\DB;
 
 class AchievementSeeder extends Seeder
 {

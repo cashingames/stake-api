@@ -11,8 +11,4 @@ class Boost extends Model
 
     protected $fillable = ['name', 'description', 'point_value', 'currency_value'];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

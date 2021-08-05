@@ -20,7 +20,9 @@ class DatabaseSeeder extends Seeder
             //WalletTransactionSeeder::class,
             // WalletSeeder::class,
             // ProfileSeeder::class,
-            CategorySeeder::class
+            CategorySeeder::class,
+            BoostSeeder::class,
+            AchievementSeeder::class
         ]);
     }
 }

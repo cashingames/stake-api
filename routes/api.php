@@ -43,5 +43,7 @@ Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::cla
 Route::post('v2/wallet/me/withdrawal/request', [WalletController::class,'withdrawRequest'])->middleware('auth:api');
 
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
+Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware('auth:api');
+Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
 
 Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback']);
