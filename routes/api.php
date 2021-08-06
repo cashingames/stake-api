@@ -40,6 +40,7 @@ Route::get('v2/wallet/me', [WalletController::class, 'me'])->middleware('auth:ap
 Route::get('v2/wallet/me/transactions', [WalletController::class, 'transactions'])->middleware('auth:api');
 Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
 Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"])->middleware('auth:api');
+Route::get('v2/wallet/banks', [WalletController::class, 'getBanks'])->middleware('auth:api');
 Route::post('v2/wallet/me/withdrawal/request', [WalletController::class,'withdrawRequest'])->middleware('auth:api');
 
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
