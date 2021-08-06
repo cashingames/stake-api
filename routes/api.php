@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\EnquiriesController;
 
 
@@ -29,6 +30,8 @@ Route::post('auth/password/email', [ForgotPasswordController::class,'sendEmail']
 Route::post('auth/token/verify', [ForgotPasswordController::class,'verifyToken']);
 Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset']);
 
+Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback']);
+
 Route::get('v2/user/me', [UserController::class, 'me'])->middleware('auth:api');
 
 Route::post('v2/profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation'])->middleware('auth:api');
@@ -47,4 +50,4 @@ Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals
 Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware('auth:api');
 Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
 
-Route::post('v2/client/feedback', [EnquiriesController::class, 'feedback']);
+Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
