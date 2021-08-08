@@ -50,19 +50,10 @@ class CategorySeeder extends Seeder
             ]
         );
 
-
-        DB::table('categories')->insert(
-            [
-                'name' => 'Entertainment',
-                'description' => 'Answer hollyood related questions',
-            ]
-        );
-
         DB::table('categories')->insert(
             [
                 'name' => 'Music',
                 'description' => 'Answer hollyood related questions',
-                'category_id' => 6,
             ]
         );
 

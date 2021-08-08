@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\EnquiriesController;
+use App\Http\Controllers\CategoryController;
 
 
 /*
@@ -51,3 +52,4 @@ Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware
 Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
 
 Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
+Route::get('v2/game/categories', [CategoryController::class, 'get'])->middleware('auth:api');
