@@ -20,7 +20,8 @@ class QuestionFactory extends Factory
     return [
       'label' => $this->faker->sentence(5),
       'level' => $this->faker->randomElement(array('easy', 'medium', 'hard') ),
-      'category_id' => $this->faker->randomElement(array(2,3))
+      'game_type_id' => $this->faker->randomElement(array(1,2)),
+      'category_id' => $this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10,11))
     ];
   }
 

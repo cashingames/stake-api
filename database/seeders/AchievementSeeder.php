@@ -42,7 +42,7 @@ class AchievementSeeder extends Seeder
         DB::table('achievements')->insert(
             [
                 'title' => "Conqueror",
-                'point_milestone' => 50000,
+                'point_milestone' => 100000,
                 'medal'=> 'conqueror_medal.png',
             ]
         );

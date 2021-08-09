@@ -17,14 +17,18 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
            UserSeeder::class,
-            //WalletTransactionSeeder::class,
-            //WalletSeeder::class,
-            //ProfileSeeder::class,
-            CategorySeeder::class,
+            // WalletTransactionSeeder::class,
+            // WalletSeeder::class,
+            // ProfileSeeder::class,
+           CategorySeeder::class,
             ModeSeeder::class,
             GameTypeSeeder::class,
             BoostSeeder::class,
             AchievementSeeder::class
+
+            
         ]);
+
+        \App\Models\Question::factory(150)->create();
     }
 }

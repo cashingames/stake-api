@@ -53,7 +53,7 @@ class CategorySeeder extends Seeder
         DB::table('categories')->insert(
             [
                 'name' => 'Music',
-                'description' => 'Answer hollyood related questions',
+                'description' => 'Answer Music questions',
             ]
         );
 
@@ -61,6 +61,38 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Generic',
                 'description' => 'General game categories',
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Premier League Clubs',
+                'description' => 'Answer premier league related questions',
+                'category_id' => 5
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'La Liga Clubs',
+                'description' => 'Answer La liga questions',
+                'category_id' => 5
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'Naija Music',
+                'description' => 'Answer Naija music questions',
+                'category_id' => 6
+            ]
+        );
+
+        DB::table('categories')->insert(
+            [
+                'name' => 'The Rest of The World',
+                'description' => 'Answer world wide music questions',
+                'category_id' => 6
             ]
         );
 

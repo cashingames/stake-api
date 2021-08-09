@@ -14,6 +14,11 @@ return [
     'end_time' => env('TOURNAMENT_END_TIME', "00:00:00"),
     'categories' => [env('TOURNAMENT_CATEGORY1',''), env('TOURNAMENT_CATEGORY2', '')]
   ],
+  'product_launch'=>[
+    'is_launching'=>env('IS_LAUNCHING', false),
+    'categories'=> [env('LAUNCH_CATEGORY1',''), env('LAUNCH_CATEGORY2', '')],
+  ],
+  
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'set_claims_active' => env('SET_CLAIMS_ACTIVE', true),
