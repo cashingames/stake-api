@@ -22,7 +22,7 @@ class CreateUserQuizzesTable extends Migration
             $table->string('avatar')->nullable();
             $table->boolean('is_public')->default(false);
             $table->date('life_span')->nullable();
-            $table->string('quiz_code');
+            $table->string('quiz_code')->nullable();
             $table->timestamps();
         });
     }
