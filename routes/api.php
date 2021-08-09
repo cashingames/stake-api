@@ -50,6 +50,7 @@ Route::post('v2/wallet/me/withdrawal/request', [WalletController::class,'withdra
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
 Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware('auth:api');
 Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
+Route::get('v2/me/quizzes', [UserController::class, 'quizzes'])->middleware('auth:api');
 
 Route::get('v2/game/boosts',[GameController::class, 'boosts'])->middleware('auth:api');
 Route::get('v2/achievements',[GameController::class, 'achievements'])->middleware('auth:api');
@@ -59,3 +60,6 @@ Route::get('v2/game/types', [GameController::class, 'gameTypes'])->middleware('a
 Route::get('v2/game/categories', [CategoryController::class, 'get'])->middleware('auth:api');
 Route::get('v2/game/sub-categories/{id}', [CategoryController::class, 'subCategories'])->middleware('auth:api');
 Route::get('v2/game/all', [CategoryController::class, 'allGames'])->middleware('auth:api');
+
+Route::get('v2/friends/quizzes', [UserController::class, 'friendQuizzes'])->middleware('auth:api');
+Route::get('v2/me/friends', [UserController::class, 'friends'])->middleware('auth:api');

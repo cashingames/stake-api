@@ -11,5 +11,9 @@ class UserQuiz extends Model
 
     protected $fillable = ["user_id", "title", "quiz_code", "description","category_id","avatar","is_public", "life_span"];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 }

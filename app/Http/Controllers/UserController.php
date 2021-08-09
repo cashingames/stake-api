@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserQuiz;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends BaseController
@@ -46,5 +47,30 @@ class UserController extends BaseController
         ->get();
 
         return $this->sendResponse($userBoosts, "User Boosts");
+    }
+
+    public function quizzes(){
+        $user = auth()->user();
+        $quizzes = UserQuiz::where('user_id',$user->id)->get();
+
+        return $this->sendResponse($quizzes, "User Quizzes");
+    }
+
+    public function friends(){
+        $user = auth()->user();
+        $friends = User::where('referrer',$user->profile->referral_code)->get();
+
+        return $this->sendResponse($friends, "Friends");
+    }
+
+    public function friendQuizzes(){
+        $user = auth()->user();
+        $quizzes = [];
+        $friends = User::where('referrer',$user->profile->referral_code)->get();
+
+        foreach($friends as $friend){
+            $quizzes[]= UserQuiz::where('user_id',$friend->id)->get();
+        }
+        return $this->sendResponse($quizzes, "Friends Quizzes");
     }
 }

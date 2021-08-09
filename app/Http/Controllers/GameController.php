@@ -27,4 +27,5 @@ class GameController extends BaseController
     public function achievements(){
         return $this->sendResponse(Achievement::all(), "Achievements");
     }
+
 }
