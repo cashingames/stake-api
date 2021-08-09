@@ -52,4 +52,5 @@ Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware
 Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
 
 Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
+Route::get('v2/game/types', [GameController::class, 'gameTypes'])->middleware('auth:api');
 Route::get('v2/game/categories', [CategoryController::class, 'get'])->middleware('auth:api');
