@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Database\Seeders\DatabaseSeeder;
 use UserSeeder;
+use BoostSeeder;
 use App\Models\User;
 
 class RegisterTest extends TestCase
@@ -29,6 +30,7 @@ class RegisterTest extends TestCase
     protected function setUp(): void{
         parent::setUp();
         $this->seed(UserSeeder::class);
+        $this->seed(BoostSeeder::class);
         $this->user = User::first();
     
     }

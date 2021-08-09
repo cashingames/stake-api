@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         ->hasProfile(1)
         ->hasWallet(1)
         ->hasTransactions(5)
-        ->hasQuizzes(5)
+        // ->hasQuizzes(5)
         ->create();
     }
 }
