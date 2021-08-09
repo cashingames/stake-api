@@ -16,7 +16,7 @@ class CreateUserPointsTable extends Migration
         Schema::create('user_points', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('game_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('game_type_id')->nullable()->constrained('game_types')->onDelete('cascade');
             $table->bigInteger("value");
             $table->string('source');
             $table->timestamps();

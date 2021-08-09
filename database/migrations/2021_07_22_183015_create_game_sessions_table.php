@@ -16,7 +16,8 @@ class CreateGameSessionsTable extends Migration
         Schema::create('game_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mode_id')->constrained()->onDelete('cascade');
-            $table->foreignId('game_id')->constrained()->onDelete('cascade');
+            $table->foreignId('game_type_id')->constrained('game_types')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('challenge_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('opponent_id')->nullable()->constrained('users')->onDelete('cascade');

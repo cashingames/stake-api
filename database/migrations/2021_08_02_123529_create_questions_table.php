@@ -18,7 +18,8 @@ class CreateQuestionsTable extends Migration
             $table->string('label');
             $table->enum('level', ['easy', 'medium', 'hard'])->index();
             $table->foreignId('user_quiz_id')->nullable()->constrained('user_quizzes')->onDelete('cascade');
-            $table->unsignedBigInteger('game_id');
+            $table->foreignId('game_type_id')->constrained('game_types')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

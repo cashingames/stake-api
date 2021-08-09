@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             //ProfileSeeder::class,
             CategorySeeder::class,
             ModeSeeder::class,
+            GameTypeSeeder::class,
             BoostSeeder::class,
             AchievementSeeder::class
         ]);
