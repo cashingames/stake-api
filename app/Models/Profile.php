@@ -19,7 +19,8 @@ class Profile extends Model
         'account_name',
         'account_number',
         'bank_name',
-        'avatar'
+        'avatar',
+        'referrer'
     ];
 
     public function user(){

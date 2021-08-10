@@ -18,6 +18,7 @@ class CreateBoostsTable extends Migration
             $table->string('name');
             $table->string('description');
             $table->bigInteger('point_value');
+            $table->tinyInteger('pack_count');
             $table->decimal('currency_value', 10,2);
             $table->timestamps();
         });

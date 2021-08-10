@@ -26,6 +26,7 @@ class CreateProfilesTable extends Migration
             $table->string('bank_name')->nullable();
             $table->string('account_number')->nullable();
             $table->string('referral_code');
+            $table->string('referrer')->nullable();
             $table->timestamps();
         });
     }

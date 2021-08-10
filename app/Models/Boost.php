@@ -9,6 +9,6 @@ class Boost extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'point_value', 'currency_value'];
+    protected $fillable = ['name', 'description', 'point_value', 'currency_value', 'pack_count'];
 
 }
