@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WalletTransaction;
 use App\Models\Withdrawal;
+use App\Models\Boost;
 use GuzzleHttp\Client;
 use stdClass;
 use Illuminate\Support\Facades\Mail;
@@ -103,8 +104,8 @@ class WalletController extends BaseController
            return $this->sendResponse('Wrong boost selected', 'Wrong boost selected');
         }
 
-        $points = $this->user->points;
-
+        $points = $this->user->points->sum('value');
+        
         if($points >= $boost->point_value){
             
            $points -= $boost->point_value;
@@ -136,12 +137,12 @@ class WalletController extends BaseController
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
             'description' => 'BOUGHT BOOSTS',
-            'reference' => $result->data->reference,
+            'reference' => Str::random(10),
         ]);
         
         $this->user->boosts()->create([
             'user_id' => $this->user->id,
-            'boost_id' => $boost->Id,
+            'boost_id' => $boostId,
             'boost_count'=> $boost->pack_count,
             'used_count'=>0
         ]);
