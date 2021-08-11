@@ -28,10 +28,3 @@ class QuestionFactory extends Factory
 
 }
 
-// $factory->define(Question::class, function (Faker $faker) {
-//     return [
-//         'label'=>$faker->sentence(5),
-//         'level'=>$faker->randomElement(array('easy', 'medium', 'hard') ),
-//         'category_id'=>$faker->randomElement(array(2,3))
-//     ];
-// });

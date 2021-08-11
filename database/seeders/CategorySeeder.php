@@ -12,7 +12,9 @@ class CategorySeeder extends Seeder
      * @return void
      */
     public function run()
-    {
+    {   
+        //modifications will be done on this after review of categories and game flow is done
+        
         DB::table('categories')->insert(
             [
                 'name' => 'Movies',

@@ -49,4 +49,14 @@ class WalletTransaction extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getTransactionTypeAttribute($value){
+        if($value == "CREDIT")
+        {
+            return "Fund Recieved";
+        }else if ($value == "DEBIT")
+        {
+            return "Fund Withdrawal";
+        }
+    }
+
 }

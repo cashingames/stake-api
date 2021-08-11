@@ -31,16 +31,17 @@ class WalletController extends BaseController
         return $this->sendResponse($data, 'Wallet transactions information');
     }
 
-    // public function earnings()
-    // {
-    //     $data = [
-    //         'earnings' => $this->user->transactions()
-    //         ->where('transaction_type', 'Fund Recieved')
-    //         ->where('wallet_kind', 'WINNINGS')
-    //         ->orderBy('created_at', 'desc')->get()
-    //     ];
-    //     return $this->sendResponse($data, 'Earnings information');
-    // }
+    //this will be modified to appropriately return user earnings after a tournament
+    //since wallet has been modified, and tournament mode is yet to be developed, A user has no earnings yet
+    public function earnings()
+    {
+        $data = [
+            'earnings' => $this->user->transactions()
+            ->where('transaction_type', 'Fund Recieved')
+            ->orderBy('created_at', 'desc')->get()
+        ];
+        return $this->sendResponse($data, 'Earnings information');
+    }
 
     public function verifyTransaction(string $reference)
     {
@@ -65,7 +66,7 @@ class WalletController extends BaseController
         $wallet = $this->user->wallet;
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'Fund Recieved',
+            'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount / 100),
             'description' => 'FUND WALLET FROM BANK',
             'reference' => $result->data->reference,
@@ -93,6 +94,7 @@ class WalletController extends BaseController
 
     }
 
+    //when a user chooses to buy boost with points
     public function buyBoostsWithPoints($boostId){
 
         $boost = Boost::find($boostId);
@@ -119,6 +121,7 @@ class WalletController extends BaseController
         return $this->sendResponse(false, 'You do not have enough points');
     }
 
+    //when a user chooses to buy boost from wallet
     public function buyBoostsFromWallet($boostId){
         $boost = Boost::find($boostId);
         
@@ -130,7 +133,7 @@ class WalletController extends BaseController
 
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'Fund Withdrawal',
+            'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
             'description' => 'BOUGHT BOOSTS',
             'reference' => $result->data->reference,

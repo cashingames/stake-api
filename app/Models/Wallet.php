@@ -27,10 +27,10 @@ class Wallet extends Model
     protected static function changeWalletBalance(WalletTransaction $model)
     {
         $wallet = $model->wallet;
-        if ($model->transaction_type == "Fund Recieved" ) {
+        if ($model->transaction_type == "CREDIT" ) {
             $wallet->balance += $model->amount;
         } 
-        if ($model->transaction_type == "Fund Withdrawal" ) {  
+        if ($model->transaction_type == "DEBIT" ) {  
             $wallet->balance -= $model->amount;
         } 
         

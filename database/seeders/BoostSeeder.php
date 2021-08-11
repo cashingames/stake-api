@@ -15,7 +15,14 @@ class BoostSeeder extends Seeder
      */
     public function run()
     {
-        //
+        /* This was initially implemented to split the 
+            the boost unit to the least possible value ie 1
+            ** This was reversed based on the challenge that:
+            at the point of buying boosts, there was no way to ascertain the number of boosts
+            a user is buying, therefore
+            It made more sense going with the product design of buying boosts in packs
+        */
+        
         DB::table('boosts')->insert(
             [
                 'name' => "Time Freeze",
