@@ -31,12 +31,13 @@ class WalletController extends BaseController
         return $this->sendResponse($data, 'Wallet transactions information');
     }
 
+    //this will be modified to appropriately return user earnings after a tournament
+    //since wallet has been modified, and tournament mode is yet to be developed, A user has no earnings yet
     public function earnings()
     {
         $data = [
             'earnings' => $this->user->transactions()
             ->where('transaction_type', 'Fund Recieved')
-            ->where('wallet_kind', 'WINNINGS')
             ->orderBy('created_at', 'desc')->get()
         ];
         return $this->sendResponse($data, 'Earnings information');
@@ -65,9 +66,8 @@ class WalletController extends BaseController
         $wallet = $this->user->wallet;
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'Fund Recieved',
+            'transaction_type' => 'CREDIT',
             'amount' => ($result->data->amount / 100),
-            'wallet_kind' => 'CREDITS',
             'description' => 'FUND WALLET FROM BANK',
             'reference' => $result->data->reference,
         ]);
@@ -94,51 +94,106 @@ class WalletController extends BaseController
 
     }
 
-    public function withdrawRequest(Request $request){
+    //when a user chooses to buy boost with points
+    public function buyBoostsWithPoints($boostId){
 
-        $data = $request->validate([
-            'bankName' => ['required', 'string', 'max:100'],
-            'accountName' => ['required', 'string', 'max:100'],
-            'accountNumber' => ['nullable', 'string', 'max:20'],
-            'amount' => ['required', 'string', 'max:20'],
-        ]);
+        $boost = Boost::find($boostId);
+        
+        if ($boost==null){
+           return $this->sendResponse('Wrong boost selected', 'Wrong boost selected');
+        }
 
-        Mail::send(new WithdrawalRequest($data['bankName'],$data['accountName'],$data['accountNumber'],$data['amount']));
+        $points = $this->user->points;
+
+        if($points >= $boost->point_value){
+            
+           $points -= $boost->point_value;
+
+            $this->user->boosts()->create([
+                'user_id' => $this->user->id,
+                'boost_id' => $boost->Id,
+                'boost_count'=> $boost->pack_count,
+                'used_count'=>0
+            ]);
+
+        return $this->sendResponse(true, 'Boost Bought');
+        } 
+        return $this->sendResponse(false, 'You do not have enough points');
+    }
+
+    //when a user chooses to buy boost from wallet
+    public function buyBoostsFromWallet($boostId){
+        $boost = Boost::find($boostId);
+        
+        if ($boost==null){
+           return $this->sendResponse('Wrong boost selected', 'Wrong boost selected');
+        }
 
         $wallet = $this->user->wallet;
-       
+
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
-            'transaction_type' => 'Fund Withdrawal',
-            'amount' => $data['amount'],
-            'wallet_kind' => 'WINNINGS',
-            'description' => 'Withdraw to bank',
-            'reference' => Str::random(10),
-        ]);
-
-        $user = auth()->user(); 
-        
-        Withdrawal::create([
-            'user_id' => $user->id,
-            'bank_name' => $data['bankName'],
-            'amount' => $data['amount'],
-            'account_name' => $data['accountName'],
-            'account_number' => $data['accountNumber'],
-            'status' => 'REQUEST_RECIEVED'
-           
+            'transaction_type' => 'DEBIT',
+            'amount' => $boost->currency_value,
+            'description' => 'BOUGHT BOOSTS',
+            'reference' => $result->data->reference,
         ]);
         
-        $wallet->refresh();
-        return $this->sendResponse('Withrawal Request sent.', 'Withrawal Request sent.');
+        $this->user->boosts()->create([
+            'user_id' => $this->user->id,
+            'boost_id' => $boost->Id,
+            'boost_count'=> $boost->pack_count,
+            'used_count'=>0
+        ]);
 
+        return $this->sendResponse(true, 'Boost Bought');
     }
+
+    // public function withdrawRequest(Request $request){
+
+    //     $data = $request->validate([
+    //         'bankName' => ['required', 'string', 'max:100'],
+    //         'accountName' => ['required', 'string', 'max:100'],
+    //         'accountNumber' => ['nullable', 'string', 'max:20'],
+    //         'amount' => ['required', 'string', 'max:20'],
+    //     ]);
+
+    //     Mail::send(new WithdrawalRequest($data['bankName'],$data['accountName'],$data['accountNumber'],$data['amount']));
+
+    //     $wallet = $this->user->wallet;
+       
+    //     WalletTransaction::create([
+    //         'wallet_id' => $wallet->id,
+    //         'transaction_type' => 'Fund Withdrawal',
+    //         'amount' => $data['amount'],
+    //         'wallet_kind' => 'WINNINGS',
+    //         'description' => 'Withdraw to bank',
+    //         'reference' => Str::random(10),
+    //     ]);
+
+    //     $user = auth()->user(); 
+        
+    //     Withdrawal::create([
+    //         'user_id' => $user->id,
+    //         'bank_name' => $data['bankName'],
+    //         'amount' => $data['amount'],
+    //         'account_name' => $data['accountName'],
+    //         'account_number' => $data['accountNumber'],
+    //         'status' => 'REQUEST_RECIEVED'
+           
+    //     ]);
+        
+    //     $wallet->refresh();
+    //     return $this->sendResponse('Withrawal Request sent.', 'Withrawal Request sent.');
+
+    // }
 
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
 
-    public function getWithdrawals(){
-        return $this->sendResponse(Withdrawal::latest()->get(),"withdrawals");
-    }
+    // public function getWithdrawals(){
+    //     return $this->sendResponse(Withdrawal::latest()->get(),"withdrawals");
+    // }
 }

@@ -42,10 +42,12 @@ Route::get('v2/profile/me', [ProfileController::class,'me'])->middleware('auth:a
 
 Route::get('v2/wallet/me', [WalletController::class, 'me'])->middleware('auth:api');
 Route::get('v2/wallet/me/transactions', [WalletController::class, 'transactions'])->middleware('auth:api');
-Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
+//Route::get('v2/wallet/me/transactions/earnings', [WalletController::class, 'earnings'])->middleware('auth:api');
 Route::get('v2/wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"])->middleware('auth:api');
 Route::get('v2/wallet/banks', [WalletController::class, 'getBanks'])->middleware('auth:api');
-Route::post('v2/wallet/me/withdrawal/request', [WalletController::class,'withdrawRequest'])->middleware('auth:api');
+//Route::post('v2/wallet/me/withdrawal/request', [WalletController::class,'withdrawRequest'])->middleware('auth:api');
+Route::post('v2/points/buy-boosts/{boostId}',[WalletController::class, 'buyBoostsWithPoints'])->middleware('auth:api');
+Route::post('v2/wallet/buy-boosts/{boostId}',[WalletController::class, 'buyBoostsFromWallet'])->middleware('auth:api');
 
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
 Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware('auth:api');

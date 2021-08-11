@@ -20,7 +20,6 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->boolean('is_on_line')->default(false);
             $table->string('otp_token')->unique()->nullable();
-            $table->string('referrer')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');

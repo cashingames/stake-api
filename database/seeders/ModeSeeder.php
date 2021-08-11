@@ -14,7 +14,7 @@ class ModeSeeder extends Seeder
      */
     public function run()
     {
-        //
+        //According to earlier discussion when this was implemented, Tournament was not a mode this was why it was not included
 
         DB::table('modes')->insert(
             [

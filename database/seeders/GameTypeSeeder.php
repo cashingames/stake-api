@@ -14,7 +14,7 @@ class GameTypeSeeder extends Seeder
      */
     public function run()
     {
-        //
+        //This will also be reviewed if need be
 
         DB::table('game_types')->insert(
             [

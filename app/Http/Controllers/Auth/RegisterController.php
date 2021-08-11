@@ -83,7 +83,6 @@ class RegisterController extends BaseController
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
             'is_on_line' => true,
-            'referrer' => $data['referrer']??null
         ]);
       
       //create the profile
@@ -93,6 +92,7 @@ class RegisterController extends BaseController
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'referral_code' =>uniqid($data['username']),
+            'referrer' => $data['referrer']??null
         ]);
 
       //create the wallet

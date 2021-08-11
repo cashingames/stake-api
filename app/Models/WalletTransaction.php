@@ -24,7 +24,7 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance','wallet_kind'
+        'transaction_type', 'amount', 'description', 'reference', 'balance'
     ];
 
 
@@ -47,6 +47,16 @@ class WalletTransaction extends Model
     public function owner()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getTransactionTypeAttribute($value){
+        if($value == "CREDIT")
+        {
+            return "Fund Recieved";
+        }else if ($value == "DEBIT")
+        {
+            return "Fund Withdrawal";
+        }
     }
 
 }
