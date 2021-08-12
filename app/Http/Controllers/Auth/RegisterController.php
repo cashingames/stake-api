@@ -122,6 +122,15 @@ class RegisterController extends BaseController
             ]);
 
         }
+    //credit referrer with points
+    if(config('trivia.bonus.enabled') && 
+        config('trivia.bonus.signup.referral') && 
+        config('trivia.bonus.signup.referral_on_signup')&&
+        isset($data['referrer'])
+    ){
+        $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
+        $this->creditPoints($referrerId,50,"Points credited for signed up referral");
+    }
 
         return $user;
     }
@@ -144,8 +153,8 @@ class RegisterController extends BaseController
             'user' => $user->load([
               'profile',
               'wallet',
-              'points',
               'boosts']),
+            "points_count" => $user->points->sum("value")
       
         ];
         return $this->sendResponse($result, 'User details');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
+use App\Models\UserPoint;
 
 class BaseController extends Controller
 {
@@ -39,6 +40,16 @@ class BaseController extends Controller
         ];
 
         return response()->json($response, 400);
+    }
+
+    public function creditPoints($userId, $points, $description){
+
+        UserPoint::create([
+            'user_id' => $userId,
+            'value' => $points,
+            'source'=> $description,
+        ]);
+
     }
 
 }

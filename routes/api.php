@@ -50,8 +50,8 @@ Route::post('v2/points/buy-boosts/{boostId}',[WalletController::class, 'buyBoost
 Route::post('v2/wallet/buy-boosts/{boostId}',[WalletController::class, 'buyBoostsFromWallet'])->middleware('auth:api');
 
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
-Route::get('v2/me/points/{id}',[UserController::class, 'getPoints'])->middleware('auth:api');
-Route::get('v2/me/boosts/{id}',[UserController::class, 'getboosts'])->middleware('auth:api');
+Route::get('v2/me/points/{userId}',[UserController::class, 'getPoints'])->middleware('auth:api');
+Route::get('v2/me/boosts/{userId}',[UserController::class, 'getboosts'])->middleware('auth:api');
 Route::get('v2/me/quizzes', [UserController::class, 'quizzes'])->middleware('auth:api');
 
 Route::get('v2/game/boosts',[GameController::class, 'boosts'])->middleware('auth:api');

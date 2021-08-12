@@ -73,6 +73,8 @@ class WalletController extends BaseController
             'reference' => $result->data->reference,
         ]);
 
+        $this->creditPoints($this->user->id,100,"Points credited for funding wallet");
+
         return $this->sendResponse(true, 'Payment was successful');
     }
 

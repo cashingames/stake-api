@@ -17,16 +17,16 @@ class UserController extends BaseController
         $user = $this->user->load('profile');
         $result = [
             'user' => $user,
-            'wallet' => $user->wallet,
-            'points' => $user->points,
+            'wallet' => $user->wallet->load("transactions"),
+            'points' => $user->points->sum("value"),
             'boosts' => $user->boosts
         ];
         return $this->sendResponse($result, 'User details');
     }
 
-    public function getPoints($id)
+    public function getPoints($userId)
     {
-        $user = User::find($id);
+        $user = User::find($userId);
         if($user==null){
             return $this->sendResponse("User not found", "User not found");
         }
@@ -34,14 +34,14 @@ class UserController extends BaseController
         return $this->sendResponse($points, "User Points");
     }
 
-    public function getBoosts($id)
+    public function getBoosts($userId)
     {
-        $user = User::find($id);
+        $user = User::find($userId);
         if($user==null){
             return $this->sendResponse("User not found", "User not found");
         }
 
-       $userBoosts = DB::table('user_boosts')->where('user_id',$id)
+       $userBoosts = DB::table('user_boosts')->where('user_id',$userId)
         ->join('boosts', function ($join) {
             $join->on('boosts.id', '=', 'user_boosts.boost_id');
         })
