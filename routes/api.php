@@ -61,7 +61,7 @@ Route::get('v2/achievements',[GameController::class, 'achievements'])->middlewar
 Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
 Route::get('v2/game/types', [GameController::class, 'gameTypes'])->middleware('auth:api');
 Route::get('v2/game/categories/{gameTypeId}', [CategoryController::class, 'get'])->middleware('auth:api');
-Route::get('v2/game/sub-categories/{id}', [CategoryController::class, 'subCategories'])->middleware('auth:api');
+Route::get('v2/game/sub-categories/{catId}', [CategoryController::class, 'subCategories'])->middleware('auth:api');
 //Route::get('v2/game/all', [CategoryController::class, 'allGames'])->middleware('auth:api');
 
 Route::get('v2/friends/quizzes', [UserController::class, 'friendQuizzes'])->middleware('auth:api');

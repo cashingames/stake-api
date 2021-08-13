@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Question;
+use App\Models\GameType;
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
 {
     //
     public function get($gameTypeId){ 
+        $gameType = GameType::find($gameTypeId);
 
+        if($gameType==null){
+            return $this->sendResponse("Game type does not exist", "Game type does not exist");
+        }
         if( config('trivia.product_launch.is_launching')){
             $categories = [];
             $launchCategories = config('trivia.product_launch.categories');
@@ -40,8 +45,8 @@ class CategoryController extends BaseController
         return $this->sendResponse($cat, "All categories");
     }
 
-    public function subCategories($id){ 
-        $cat = Category::find($id);
+    public function subCategories($catId){ 
+        $cat = Category::find($catId);
         if ($cat==null){
             return $this->sendResponse("This Category does not exist", "This Category does not exist");
         }
