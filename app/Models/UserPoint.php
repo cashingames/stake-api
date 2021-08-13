@@ -9,7 +9,7 @@ class UserPoint extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["user_id","game_id","source","value"];
+    protected $fillable = ["user_id","game_id","description","value","point_flow_type", "point_aggregate"];
 
     public function user()
     {

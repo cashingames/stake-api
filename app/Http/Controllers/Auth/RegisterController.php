@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\UserPoint;
 use App\Models\Profile;
 use App\Models\Wallet;
 use App\Models\User;
@@ -102,10 +103,15 @@ class RegisterController extends BaseController
     //give user sign up bonus
 
         if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+
+            $user->points = 100;
+            $user->save();
+
             $user->points()->create([
                 'user_id' => $user->id,
                 'value' => 100,
-                'source'=> 'Sign Up Bonus Points',
+                'description'=> 'Sign Up Bonus Points',
+                'point_flow_type'=>'POINTS_ADDED',
             ]);
 
             $user->boosts()->create([
@@ -130,6 +136,10 @@ class RegisterController extends BaseController
     ){
         $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
         $this->creditPoints($referrerId,50,"Points credited for signed up referral");
+
+        $referrer = User::find($referrerId);
+        $referrer->points += 50;
+        $referrer->save();
     }
 
         return $user;
@@ -154,8 +164,6 @@ class RegisterController extends BaseController
               'profile',
               'wallet',
               'boosts']),
-            "points_count" => $user->points->sum("value")
-      
         ];
         return $this->sendResponse($result, 'User details');
     }

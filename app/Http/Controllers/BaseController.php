@@ -47,7 +47,8 @@ class BaseController extends Controller
         UserPoint::create([
             'user_id' => $userId,
             'value' => $points,
-            'source'=> $description,
+            'description'=> $description,
+            'point_flow_type'=>'POINTS_ADDED'
         ]);
 
     }

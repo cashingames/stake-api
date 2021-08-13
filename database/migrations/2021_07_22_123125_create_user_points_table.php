@@ -18,7 +18,8 @@ class CreateUserPointsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('game_type_id')->nullable()->constrained('game_types')->onDelete('cascade');
             $table->bigInteger("value");
-            $table->string('source');
+            $table->string('description');
+            $table->enum('point_flow_type', ['POINTS_ADDED', 'POINTS_SUBTRACTED']);
             $table->timestamps();
         });
     }

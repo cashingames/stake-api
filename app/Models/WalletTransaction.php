@@ -27,18 +27,6 @@ class WalletTransaction extends Model
         'wallet_id','transaction_type', 'amount', 'description', 'reference', 'balance'
     ];
 
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        //@TODO: This operation is expensive
-        WalletTransaction::created(function ($model) {
-            Wallet::changeWalletBalance($model);
-        });
-
-    }
-
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);

@@ -51,6 +51,7 @@ Route::post('v2/wallet/buy-boosts/{boostId}',[WalletController::class, 'buyBoost
 
 Route::get('v2/wallet/get/withdrawals', [WalletController::class,'getWithdrawals'])->middleware('auth:api');
 Route::get('v2/me/points/{userId}',[UserController::class, 'getPoints'])->middleware('auth:api');
+Route::get('v2/me/points/log/history/{userId}',[UserController::class, 'getPointsLog'])->middleware('auth:api');
 Route::get('v2/me/boosts/{userId}',[UserController::class, 'getboosts'])->middleware('auth:api');
 Route::get('v2/me/quizzes', [UserController::class, 'quizzes'])->middleware('auth:api');
 

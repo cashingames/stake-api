@@ -53,9 +53,9 @@ class BoostSeeder extends Seeder
         DB::table('boosts')->insert(
             [
                 'name' => "Time Freeze",
-                'description' => "Freezes game for 15 seconds",
-                'point_value' => 500,
-                'currency_value'=> 246.50,
+                'description' => "Freezes game for 3 seconds",
+                'point_value' => 100,
+                'currency_value'=> 49.3,
                 'pack_count' => 5
             ]
         );
@@ -64,8 +64,8 @@ class BoostSeeder extends Seeder
             [
                 'name' => "Bombs",
                 'description' => "Removes one wrong and one right answer",
-                'point_value' => 300,
-                'currency_value'=> 345.10,
+                'point_value' => 100,
+                'currency_value'=> 115.033333,
                 'pack_count' => 3
             ]
         );
@@ -74,8 +74,8 @@ class BoostSeeder extends Seeder
             [
                 'name' => "Skip",
                 'description' => "Skips a question",
-                'point_value' => 250,
-                'currency_value'=> 197.20,
+                'point_value' => 83.3333333,
+                'currency_value'=> 65.7333333,
                 'pack_count' => 3
             ]
         );

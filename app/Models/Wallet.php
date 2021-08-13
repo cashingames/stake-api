@@ -24,21 +24,4 @@ class Wallet extends Model
         return $this->hasMany(WalletTransaction::class);
     }
 
-    protected static function changeWalletBalance(WalletTransaction $model)
-    {
-        $wallet = $model->wallet;
-        if ($model->transaction_type == "CREDIT" ) {
-            $wallet->balance += $model->amount;
-        } 
-        if ($model->transaction_type == "DEBIT" ) {  
-            $wallet->balance -= $model->amount;
-        } 
-        
-        $model->balance = $wallet->balance;
-
-        $wallet->update();
-        $model->update();
-    }
-
-
 }

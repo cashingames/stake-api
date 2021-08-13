@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\BaseController;
+use App\Models\UserPoint;
 
 class LoginController extends BaseController
 {
@@ -58,8 +59,8 @@ class LoginController extends BaseController
             ],
             'user' => $user->load('profile'),
             'wallet' => $user->wallet,
-            'points' => $user->points,
-            'boosts' => $user->boosts
+            'boosts' => $user->boosts,
+           
         ];
         return $this->sendResponse($result, 'User details');
     }

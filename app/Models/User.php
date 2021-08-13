@@ -24,6 +24,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp_token',      
         'is_on_line',
+        'points'
     ];
 
     /**

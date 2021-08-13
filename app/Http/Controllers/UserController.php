@@ -18,7 +18,6 @@ class UserController extends BaseController
         $result = [
             'user' => $user,
             'wallet' => $user->wallet->load("transactions"),
-            'points' => $user->points->sum("value"),
             'boosts' => $user->boosts
         ];
         return $this->sendResponse($result, 'User details');
@@ -30,8 +29,18 @@ class UserController extends BaseController
         if($user==null){
             return $this->sendResponse("User not found", "User not found");
         }
-        $points = $user->points->sum('value');
+        $points = $user->points;
         return $this->sendResponse($points, "User Points");
+    }
+
+    public function getPointsLog($userId)
+    {
+        $user = User::find($userId);
+        if($user==null){
+            return $this->sendResponse("User not found", "User not found");
+        }
+        $pointsLog = $user->points()->latest()->get();
+        return $this->sendResponse($pointsLog, "User Points Log");
     }
 
     public function getBoosts($userId)
