@@ -45,13 +45,27 @@ class CategoryController extends BaseController
         return $this->sendResponse($cat, "All categories");
     }
 
-    public function subCategories($catId){ 
+    public function subCategories($catId, $gameTypeId){ 
         $cat = Category::find($catId);
-        if ($cat==null){
-            return $this->sendResponse("This Category does not exist", "This Category does not exist");
+        $gameType = GameType::find($gameTypeId);
+
+        if ($cat==null || $gameType==null ){
+            return $this->sendResponse("This Category or Gametype does not exist", "This Category or Gametype does not exist");
         }
-        $subCategories = Category::where('category_id' ,$cat->id)->has('questions', '>', 0)->get();
-        return $this->sendResponse($subCategories, "$cat->name"." Subcategories");
+        $subCategories = Category::where('category_id',$catId)->get();
+        $data = [];
+        $subCat = [];
+
+        foreach($subCategories as $sub){
+            $questions = Question::where('category_id',$sub->id)
+                    ->where('game_type_id',$gameTypeId)->first();
+            
+            $data[] = $questions->category->name;
+        }
+        foreach($data as $data){
+            $subCat[] = Category::where('name',$data)->first();
+        }
+        return $this->sendResponse($subCat, " Subcategories");
     }
 
 }
