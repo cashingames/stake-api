@@ -44,7 +44,8 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_on_line' => 'boolean'
+        'is_on_line' => 'boolean',
+        'points'=>'integer'
     ];
 
     public function profile()
