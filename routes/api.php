@@ -66,3 +66,5 @@ Route::get('v2/game/sub-categories/{catId}/{gameTypeId}', [CategoryController::c
 
 Route::get('v2/friends/quizzes', [UserController::class, 'friendQuizzes'])->middleware('auth:api');
 Route::get('v2/me/friends', [UserController::class, 'friends'])->middleware('auth:api');
+
+Route::post('v2/game/session/start/{subCatId}/{gameTypeId}/{modeId}',[GameController::class, 'start'])->middleware('auth:api');

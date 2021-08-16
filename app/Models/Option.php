@@ -15,7 +15,11 @@ class Option extends Model
    * @var array
    */
   protected $hidden = [
-      'is_correct','question_id ','title','created_at', 'updated_at'
+  'question_id ','created_at', 'updated_at'
+  ];
+
+  protected $casts = [
+    'is_correct' => 'boolean', 
   ];
 
   public function question(){

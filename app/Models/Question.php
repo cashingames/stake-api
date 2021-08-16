@@ -19,7 +19,7 @@ class Question extends Model
    * @var array
    */
   protected $hidden = [
-     'label','level', 'game_id', 'user_quiz_id','created_at', 'updated_at'
+    'game_id', 'user_quiz_id','created_at', 'updated_at'
   ];
 
   //

@@ -23,11 +23,12 @@ class DatabaseSeeder extends Seeder
             // ProfileSeeder::class,
             ModeSeeder::class,
             GameTypeSeeder::class,
-            AchievementSeeder::class
+            AchievementSeeder::class,
+            QuestionSeeder::class
 
             
         ]);
 
-        \App\Models\Question::factory(150)->create();
+        //\App\Models\Question::factory(150)->create();
     }
 }
