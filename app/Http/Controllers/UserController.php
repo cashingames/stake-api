@@ -19,6 +19,7 @@ class UserController extends BaseController
             'user' => $user,
             'wallet' => $user->wallet->load("transactions"),
             'boosts' => $user->boosts
+            
         ];
         return $this->sendResponse($result, 'User details');
     }
@@ -57,6 +58,18 @@ class UserController extends BaseController
         ->get();
 
         return $this->sendResponse($userBoosts, "User Boosts");
+    }
+    public function userAchievement()
+    {
+        $userId = $this->user->id;
+
+        $userAchievement = DB::table('user_achievements')->where('user_id',$userId)
+        ->join('achievements', function ($join) {
+            $join->on('achievements.id', '=', 'user_achievements.achievement_id');
+        })
+        ->get();
+
+        return $this->sendResponse($userAchievement, "User Achievement");
     }
 
     public function quizzes(){

@@ -11,6 +11,7 @@ use App\Models\GameSession;
 use App\Models\Achievement;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class GameController extends BaseController
 {
@@ -31,28 +32,45 @@ class GameController extends BaseController
     public function achievements(){
         return $this->sendResponse(Achievement::all(), "Achievements");
     }
+    
+    public function claimAchievement($achievementId){
+        $achievement = Achievement::find($achievementId);
+            if($achievement===null){
+                return $this->sendError('Invalid Achievement','Invalid Achievement');
+            }
+            $result= DB::table('user_achievements')->insert([
+                'user_id' => $this->user->id,
+                'achievement_id' => $achievement->id
+            ]);
+            return $this->sendResponse($result, 
+            'Achievement Claimed');
+    }
 
-    public function start($subCatId,$gameTypeId,$modeId){
-        $subCat = Category::find($subCatId);
-        $gameType = GameType::find($gameTypeId);
-        $mode = Mode::find($modeId);
+    public function startSingleGame(Request $request){
+        if(!($request->has('subCatId')) ||!($request->has('gameTypeId'))||!($request->has('modeId'))){
+            return $this->sendError('SubcategoryId, GametypeId and ModeId is required', 'SubcategoryId, GametypeId and ModeId is required');
+        }
+
+        $subCat = Category::find($request->subCatId);
+        $gameType = GameType::find($request->gameTypeId);
+        $mode = Mode::find($request->modeId);
        
         if(($subCat || $gameType || $mode) === null){
             return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
         }
 
-        $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameTypeId)->inRandomOrder()->take(5);
-        $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameTypeId)->inRandomOrder()->take(8);
-        $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameTypeId)->inRandomOrder()->take(7);
+        $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(5);
+        $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(8);
+        $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(7);
 
         $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
         $gameSession = new GameSession();
-
+       
         $gameSession->user_id = $this->user->id;
-        $gameSession->mode_id = $modeId;
-        $gameSession->game_type_id = $gameTypeId;
-        $gameSession->category_id = $subCatId;
+        $gameSession->mode_id = $mode->id;
+        $gameSession->game_type_id = $gameType->id;
+        $gameSession->category_id = $subCat->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
@@ -64,6 +82,65 @@ class GameController extends BaseController
             'game' =>$gameSession
           ];
         return $this->sendResponse($result, 'Game Started');
+    }
+
+    public function startChallenge(Request $request){
+        if($request->modeId == 2 && !($request->has('challengeId'))){
+            return $this->sendError('Challenge Mode requires the Challenge Id', 'Challenge Mode requires the Challenge Id');
+        }
+        if($request->modeId == 2 && !($request->has('opponentId'))){
+            return $this->sendError('Challenge Mode requires an Opponent', 'Challenge Mode requires an Opponent');
+        }
+
+        if($request->has('challengeId') && $request->has('opponentId')){
+            $challenge = DB::table('challenges')->where('id', $request->challengeId)
+            ->where('is_accepted',true)->first();
+            
+            if($challenge === null){
+                return $this->sendError('Opponent is yet to accept the challenge', 
+                'Opponent is yet to accept the challenge.
+                You will be notified when your challenge request is accepted');
+            }
+            $opponent = User::find($request->opponentId); 
+
+            if(($opponent === null )){
+                return $this->sendError('Invalid Opponent', 
+                'Invalid Opponent');
+            }
+            $subCat = Category::find($request->subCatId);
+            $gameType = GameType::find($request->gameTypeId);
+            $mode = Mode::find($request->modeId);
+
+            if(($subCat || $gameType || $mode) === null){
+                return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
+            }
+    
+            $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(5);
+            $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(8);
+            $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(7);
+    
+            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
+    
+            $gameSession = new GameSession();
+           
+            $gameSession->user_id = $this->user->id;
+            $gameSession->mode_id = $mode->id;
+            $gameSession->game_type_id = $gameType->id;
+            $gameSession->category_id = $subCat->id;
+            $gameSession->opponent_id = $opponent->id;
+            $gameSession->session_token = Str::random(40);
+            $gameSession->start_time = Carbon::now();
+            $gameSession->end_time = Carbon::now()->addMinutes(1);
+            $gameSession->state = 'ONGOING';
+            $gameSession->save();
+
+            $result = [
+                'questions' => $questions,
+                'game' =>$gameSession
+              ];
+            return $this->sendResponse($result, 'Game Started');
+        }
+        return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
 
 }

@@ -17,6 +17,8 @@ class CreateChallengesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('opponent_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('game_type_id')->constrained('game_types')->onDelete('cascade');
             $table->boolean('is_accepted')->nullable();
             $table->timestamps();
         });
