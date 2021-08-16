@@ -101,7 +101,7 @@ class ProfileController extends BaseController
             $image = $request->file('avatar');
             $name = $this->user->id.".".$image->guessExtension();
             $destinationPath = public_path('avatar');
-            $profile->avatar = $name;
+            $profile->avatar ='avatar/'.$name;
             $image->move($destinationPath, $name);
            // echo $destinationPath;
            
