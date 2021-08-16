@@ -12,11 +12,11 @@ class Boost extends Model
     protected $fillable = ['name', 'description', 'point_value', 'currency_value', 'pack_count'];
 
     public function getPointValueAttribute($value){
-       return round(($value * $this->pack_count),2);
+       return round(($value * $this->pack_count),1);
     }
 
     public function getCurrencyValueAttribute($value){
-        return round(($value * $this->pack_count),2);
+        return round(($value * $this->pack_count),1);
      }
 
 }
