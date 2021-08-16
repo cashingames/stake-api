@@ -19,7 +19,7 @@ class AchievementSeeder extends Seeder
             [
                 'title' => "Sage",
                 'point_milestone' => 2000,
-                'medal'=>'sage_medal.png',
+                'medal'=>'medals/sage_medal.png',
             ],
         
         );
@@ -27,7 +27,7 @@ class AchievementSeeder extends Seeder
             [
                 'title' => "Regal",
                 'point_milestone' => 5000,
-                'medal'=> 'regal_medal.png',
+                'medal'=> 'medals/regal_medal.png',
             ]
         );
 
@@ -35,7 +35,7 @@ class AchievementSeeder extends Seeder
             [
                 'title' => "Knight",
                 'point_milestone' => 10000,
-                'medal'=> 'knight_medal.png',
+                'medal'=> 'medals/knight_medal.png',
             ]
         );
 
@@ -43,7 +43,7 @@ class AchievementSeeder extends Seeder
             [
                 'title' => "Conqueror",
                 'point_milestone' => 100000,
-                'medal'=> 'conqueror_medal.png',
+                'medal'=> 'medals/conqueror_medal.png',
             ]
         );
     }
