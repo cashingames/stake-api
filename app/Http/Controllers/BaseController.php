@@ -44,6 +44,7 @@ class BaseController extends Controller
 
     public function creditPoints($userId, $points, $description){
 
+        //create point traffic log
         UserPoint::create([
             'user_id' => $userId,
             'value' => $points,
@@ -51,6 +52,12 @@ class BaseController extends Controller
             'point_flow_type'=>'POINTS_ADDED'
         ]);
 
+        //find benefactor
+        $user = User::find($userId) ;
+
+        //add points
+        $user->points += $points;
+        $user->save();
     }
 
 }

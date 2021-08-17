@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\Challenge;
 
-class UserSeeder extends Seeder
+class ChallengeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,13 +15,8 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
-        User::factory()
+        Challenge::factory()
         ->count(5)
-        ->hasProfile(1)
-        ->hasWallet(1)
-        ->hasTransactions(5)
-        // ->hasQuizzes(5)
-       // ->hasChallenges(5)
         ->create();
     }
 }

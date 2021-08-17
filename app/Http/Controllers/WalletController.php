@@ -123,6 +123,7 @@ class WalletController extends BaseController
                 'point_flow_type'=>'POINTS_SUBTRACTED',
             ]);
             
+            //credit user with bought boost
             $this->user->boosts()->create([
                 'user_id' => $this->user->id,
                 'boost_id' => $boostId,
@@ -171,45 +172,7 @@ class WalletController extends BaseController
         return $this->sendResponse(false, 'You do not have enough money in your wallet.');
     }
 
-    // public function withdrawRequest(Request $request){
-
-    //     $data = $request->validate([
-    //         'bankName' => ['required', 'string', 'max:100'],
-    //         'accountName' => ['required', 'string', 'max:100'],
-    //         'accountNumber' => ['nullable', 'string', 'max:20'],
-    //         'amount' => ['required', 'string', 'max:20'],
-    //     ]);
-
-    //     Mail::send(new WithdrawalRequest($data['bankName'],$data['accountName'],$data['accountNumber'],$data['amount']));
-
-    //     $wallet = $this->user->wallet;
-       
-    //     WalletTransaction::create([
-    //         'wallet_id' => $wallet->id,
-    //         'transaction_type' => 'Fund Withdrawal',
-    //         'amount' => $data['amount'],
-    //         'wallet_kind' => 'WINNINGS',
-    //         'description' => 'Withdraw to bank',
-    //         'reference' => Str::random(10),
-    //     ]);
-
-    //     $user = auth()->user(); 
-        
-    //     Withdrawal::create([
-    //         'user_id' => $user->id,
-    //         'bank_name' => $data['bankName'],
-    //         'amount' => $data['amount'],
-    //         'account_name' => $data['accountName'],
-    //         'account_number' => $data['accountNumber'],
-    //         'status' => 'REQUEST_RECIEVED'
-           
-    //     ]);
-        
-    //     $wallet->refresh();
-    //     return $this->sendResponse('Withrawal Request sent.', 'Withrawal Request sent.');
-
-    // }
-
+    
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');

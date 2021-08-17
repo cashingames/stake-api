@@ -127,6 +127,7 @@ class GameController extends BaseController
             $gameSession->mode_id = $mode->id;
             $gameSession->game_type_id = $gameType->id;
             $gameSession->category_id = $subCat->id;
+            $gameSession->challenge_id = $request->challengeId;
             $gameSession->opponent_id = $opponent->id;
             $gameSession->session_token = Str::random(40);
             $gameSession->start_time = Carbon::now();
@@ -142,5 +143,34 @@ class GameController extends BaseController
         }
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
+    
+    public function end(Request $request){
+        $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
 
+        if ($gameSession === null){
+            return $this->sendError('Game Session does not exist', 'Game Session does not exist');
+        }
+       //credit points to user
+        $this->creditPoints($this->user->id,$request->userPointsGained,"Points gained from correct game answers");
+        
+        //if game is challange mode
+        if($gameSession->mode_id===2){
+            //credit opponent with points
+            $this->creditPoints($gameSession->opponent_id,$request->opponentPointsGained,"Points gained from correct game answers");
+
+            //save opponent details
+            $gameSession->opponent_points_gained = $request->opponentPointsGained;
+            $gameSession->opponent_wrong_count = $request->opponentWrongCount;
+            $gameSession->opponent_correct_count = $request->opponentCorrectCount;
+        }
+
+        $gameSession->state = "COMPLETED";
+        $gameSession->user_points_gained = $request->userPointsGained;   
+        $gameSession->user_wrong_count= $request->userWrongCount;
+        $gameSession->user_correct_count= $request->userCorrectCount;
+     
+        $gameSession->save();
+
+        return $this->sendResponse($gameSession, 'Game Ended');
+    }
 }

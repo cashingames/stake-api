@@ -137,9 +137,6 @@ class RegisterController extends BaseController
         $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
         $this->creditPoints($referrerId,50,"Points credited for signed up referral");
 
-        $referrer = User::find($referrerId);
-        $referrer->points += 50;
-        $referrer->save();
     }
 
         return $user;
