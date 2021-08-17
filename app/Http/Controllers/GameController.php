@@ -7,6 +7,8 @@ use App\Models\Mode;
 use App\Models\GameType;
 use App\Models\Boost;
 use App\Models\Category;
+use App\Models\Challenge;
+use App\Models\User;
 use App\Models\GameSession;
 use App\Models\Achievement;
 use Illuminate\Support\Str;
@@ -93,8 +95,7 @@ class GameController extends BaseController
         }
 
         if($request->has('challengeId') && $request->has('opponentId')){
-            $challenge = DB::table('challenges')->where('id', $request->challengeId)
-            ->where('is_accepted',true)->first();
+            $challenge = Challenge::find($request->challengeId);
             
             if($challenge === null){
                 return $this->sendError('Opponent is yet to accept the challenge', 
@@ -144,31 +145,69 @@ class GameController extends BaseController
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
     
-    public function end(Request $request){
+    public function endSingleGame(Request $request){
+
+        $request->validate([
+            'sessionToken' => ['required', 'string'],
+            'userPointsGained' => ['required', 'string'],
+            'userWrongCount'=> ['required', 'string'],
+            'userCorrectCount' => ['required', 'string'],
+        ]);
         $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
 
         if ($gameSession === null){
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
+
        //credit points to user
         $this->creditPoints($this->user->id,$request->userPointsGained,"Points gained from correct game answers");
-        
-        //if game is challange mode
-        if($gameSession->mode_id===2){
-            //credit opponent with points
-            $this->creditPoints($gameSession->opponent_id,$request->opponentPointsGained,"Points gained from correct game answers");
-
-            //save opponent details
-            $gameSession->opponent_points_gained = $request->opponentPointsGained;
-            $gameSession->opponent_wrong_count = $request->opponentWrongCount;
-            $gameSession->opponent_correct_count = $request->opponentCorrectCount;
-        }
 
         $gameSession->state = "COMPLETED";
         $gameSession->user_points_gained = $request->userPointsGained;   
         $gameSession->user_wrong_count= $request->userWrongCount;
         $gameSession->user_correct_count= $request->userCorrectCount;
      
+        $gameSession->save();
+
+        return $this->sendResponse($gameSession, 'Game Ended');
+    }
+
+    public function endChallengeGame(Request $request){
+        $request->validate([
+            'sessionToken' => ['required', 'string'],
+            'opponentId' => ['required', 'string'],
+            'userPointsGained' => ['required', 'string'],
+            'userWrongCount'=> ['required', 'string'],
+            'userCorrectCount' => ['required', 'string'],
+            'opponentPointsGained' =>['required','string'],
+            'opponentWrongCount' => ['required', 'string',],
+            'opponentCorrectCount' => ['required', 'string'],
+        ]);
+
+        $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
+
+        if ($gameSession === null){
+            return $this->sendError('Game Session does not exist', 'Game Session does not exist');
+        }
+        //credit user with points
+        $isChallenge = Mode::where("id",$gameSession->mode_id)->first();
+
+        if(($isChallenge->name) !=="Challenge"){
+            return $this->sendError('This Game was not played in Challenge mode', 'This Game was not played in Challenge mode');
+        }
+            
+        $this->creditPoints($this->user->id,$request->userPointsGained,"Points gained from correct game answers");
+        //credit opponent with points
+        $this->creditPoints($request->opponentId,$request->opponentPointsGained,"Points gained from correct game answers");
+
+        //save  details
+        $gameSession->state = "COMPLETED";
+        $gameSession->user_points_gained = $request->userPointsGained;   
+        $gameSession->user_wrong_count= $request->userWrongCount;
+        $gameSession->user_correct_count= $request->userCorrectCount;
+        $gameSession->opponent_points_gained = $request->opponentPointsGained;
+        $gameSession->opponent_wrong_count = $request->opponentWrongCount;
+        $gameSession->opponent_correct_count = $request->opponentCorrectCount;
         $gameSession->save();
 
         return $this->sendResponse($gameSession, 'Game Ended');

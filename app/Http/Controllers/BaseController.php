@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\UserPoint;
+use App\Models\User;
 
 class BaseController extends Controller
 {

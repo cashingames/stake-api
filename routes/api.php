@@ -57,6 +57,8 @@ Route::get('v2/me/quizzes', [UserController::class, 'quizzes'])->middleware('aut
 
 Route::get('v2/game/boosts',[GameController::class, 'boosts'])->middleware('auth:api');
 Route::get('v2/achievements',[GameController::class, 'achievements'])->middleware('auth:api');
+Route::post('v2/claim/achievement/{achievementId}', [GameController::class, 'claimAchievement'])->middleware('auth:api');
+Route::post('v2/me/achievement', [UserController::class, 'userAchievement'])->middleware('auth:api');
 
 Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
 Route::get('v2/game/types', [GameController::class, 'gameTypes'])->middleware('auth:api');
@@ -69,5 +71,5 @@ Route::get('v2/me/friends', [UserController::class, 'friends'])->middleware('aut
 
 Route::post('v2/game/start/single-player',[GameController::class, 'startSingleGame'])->middleware('auth:api');
 Route::post('v2/game/start/challenge',[GameController::class, 'startChallenge'])->middleware('auth:api');
-Route::post('v2/claim/achievement/{achievementId}', [GameController::class, 'claimAchievement'])->middleware('auth:api');
-Route::post('v2/me/achievement', [UserController::class, 'userAchievement'])->middleware('auth:api');
+Route::post('v2/game/end/single-player',[GameController::class, 'endSingleGame'])->middleware('auth:api');
+Route::post('v2/game/end/challenge',[GameController::class, 'endChallengeGame'])->middleware('auth:api');
