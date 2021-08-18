@@ -45,7 +45,7 @@ class GameController extends BaseController
                 'user_id' => $this->user->id,
                 'achievement_id' => $achievement->id
             ]);
-            return $this->sendResponse($result, 
+            return $this->sendResponse($achievement, 
             'Achievement Claimed');
     }
 
