@@ -212,4 +212,8 @@ class GameController extends BaseController
 
         return $this->sendResponse($gameSession, 'Game Ended');
     }
+
+    public function consumeBoost($boostId){
+        $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $boostId)->first();
+    }
 }

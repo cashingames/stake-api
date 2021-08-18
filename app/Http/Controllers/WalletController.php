@@ -111,27 +111,32 @@ class WalletController extends BaseController
 
         $points = $this->user->points;
         
-        if($points >= ($boost->point_value * $boost->pack_count)){
+        if($points >= ($boost->point_value)){
             //subtract points from user
-            $this->user->update(['points'=>$points - ($boost->point_value * $boost->pack_count)]);
+            $this->user->update(['points'=>$points - $boost->point_value ]);
            
             //log point traffic
             $this->user->points()->create([
                 'user_id' => $this->user->id,
-                'value' => $boost->point_value * $boost->pack_count,
+                'value' => $boost->point_value ,
                 'description'=> 'Points used for buying boosts',
                 'point_flow_type'=>'POINTS_SUBTRACTED',
             ]);
             
             //credit user with bought boost
-            $this->user->boosts()->create([
-                'user_id' => $this->user->id,
-                'boost_id' => $boostId,
-                'boost_count'=> $boost->pack_count,
-                'used_count'=>0
-            ]);
-
-
+                //if user already has boost, add to boost else create new boost for user
+            $userBoost = $this->user->boosts()->where('boost_id',$boostId)->first();
+            if($userBoost === null){
+                $this->user->boosts()->create([
+                    'user_id' => $this->user->id,
+                    'boost_id' => $boostId,
+                    'boost_count'=> $boost->pack_count,
+                    'used_count'=>0
+                ]);
+            }
+            else {
+                $userBoost->update(['boost_count'=>$userBoost->boost_count+$boost->pack_count]);
+            }
 
         return $this->sendResponse(true, 'Boost Bought');
         } 
@@ -147,26 +152,33 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
-        if($wallet->balance >=($boost->currency_value * $boost->pack_count)){
+        if($wallet->balance >=($boost->currency_value )){
 
             WalletTransaction::create([
                 'wallet_id' => $wallet->id,
                 'transaction_type' => 'DEBIT',
-                'amount' => $boost->currency_value * $boost->pack_count,
+                'amount' => $boost->currency_value ,
                 'description' => 'BOUGHT BOOSTS FROM WALLET',
                 'reference' => Str::random(10),
             ]);
             
-            $wallet->balance -= $boost->currency_value * $boost->pack_count; 
+            $wallet->balance -= $boost->currency_value ; 
             $wallet->save();
 
-            $this->user->boosts()->create([
-                'user_id' => $this->user->id,
-                'boost_id' => $boostId,
-                'boost_count'=> $boost->pack_count,
-                'used_count'=>0
-            ]);
+            $userBoost = $this->user->boosts()->where('boost_id',$boostId)->first();
 
+            if($userBoost === null){
+                $this->user->boosts()->create([
+                    'user_id' => $this->user->id,
+                    'boost_id' => $boostId,
+                    'boost_count'=> $boost->pack_count,
+                    'used_count'=>0
+                ]);
+            }
+            else {
+                $userBoost->update(['boost_count'=>$userBoost->boost_count+$boost->pack_count]);
+            }
+            
             return $this->sendResponse(true, 'Boost Bought');
         }
         return $this->sendResponse(false, 'You do not have enough money in your wallet.');
