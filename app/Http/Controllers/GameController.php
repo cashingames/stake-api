@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Mode;
 use App\Models\GameType;
 use App\Models\Boost;
+use App\Models\UserBoost;
 use App\Models\Category;
 use App\Models\Challenge;
 use App\Models\User;
@@ -215,5 +216,22 @@ class GameController extends BaseController
 
     public function consumeBoost($boostId){
         $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $boostId)->first();
+        if($userBoost === null){
+            return $this->sendError('You are not subscribed to this boost', 'You are not subscribed to this boost');
+        }
+
+        if($userBoost->boost_count <= 0){
+            //User has finished boost , reset used count
+            $userBoost->used_count = 0;
+            $userBoost->save();
+            return $this->sendResponse('You have used up this boost', 'You have used up this boost');
+        }
+
+        $userBoost->update([
+            'used_count'=>$userBoost->used_count + 1,
+            'boost_count'=>$userBoost->boost_count - 1
+        ]);
+
+        return $this->sendResponse($userBoost, 'Boost consumed');
     }
 }

@@ -73,3 +73,4 @@ Route::post('v2/game/start/single-player',[GameController::class, 'startSingleGa
 Route::post('v2/game/start/challenge',[GameController::class, 'startChallenge'])->middleware('auth:api');
 Route::post('v2/game/end/single-player',[GameController::class, 'endSingleGame'])->middleware('auth:api');
 Route::post('v2/game/end/challenge',[GameController::class, 'endChallengeGame'])->middleware('auth:api');
+Route::post('v2/game/boost/consume/{boostId}',[GameController::class, 'consumeBoost'])->middleware('auth:api');
