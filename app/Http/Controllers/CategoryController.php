@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\GameType;
+use App\Models\GameSession;
+
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
@@ -68,4 +70,25 @@ class CategoryController extends BaseController
         return $this->sendResponse($subCat, " Subcategories");
     }
 
+    public function timesPlayed($catId){
+        $category = Category::find($catId);
+        if($category === null){
+            return $this->sendError("Invalid Category", " Invalid Category");
+        }
+
+        $hasSubCategory = Category::where('category_id',$category->id)->get();
+       
+        if(count($hasSubCategory)==0){
+            $count = GameSession::where('category_id',$category->id)->count();
+
+            return $this->sendResponse($count, " times played");
+        }
+         
+        $subPlayedCount = [];
+        foreach($hasSubCategory as $sub){
+            $count = GameSession::where('category_id',$sub->id)->count();
+            $subPlayedCount[]=$count;
+        }
+        return $this->sendResponse(array_sum($subPlayedCount), " times played");
+    }
 }
