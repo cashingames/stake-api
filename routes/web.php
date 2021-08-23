@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('emails.users.challengeInvite', ['opponent' => 'Finn',"user"=>'Zubby', "year"=>2444]);
 });

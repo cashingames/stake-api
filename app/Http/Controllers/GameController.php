@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Mode;
-use App\Models\GameType;
-use App\Models\Boost;
-use App\Models\UserBoost;
-use App\Models\Category;
-use App\Models\Challenge;
 use App\Models\User;
-use App\Models\GameSession;
+use App\Models\Boost;
+use App\Models\Category;
+use App\Models\GameType;
+use App\Models\Challenge;
+use App\Models\UserBoost;
 use App\Models\Achievement;
+use App\Models\GameSession;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Mail\ChallengeInvite;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class GameController extends BaseController
 {
@@ -40,6 +42,10 @@ class GameController extends BaseController
         $achievement = Achievement::find($achievementId);
             if($achievement===null){
                 return $this->sendError('Invalid Achievement','Invalid Achievement');
+            }
+
+            if($this->user->points < $achievement->point_milestone){
+                return $this->sendError('You do not have enough points to claim this achievement','You do not have enough points to claim this achievement');
             }
             $result= DB::table('user_achievements')->insert([
                 'user_id' => $this->user->id,
@@ -233,5 +239,35 @@ class GameController extends BaseController
         ]);
 
         return $this->sendResponse($userBoost, 'Boost consumed');
+    }
+
+    public function sendChallengeInvite(Request $request){
+        $request->validate([
+            'opponentEmail' => ['required', 'email'],
+            'categoryId' =>['required'],
+            'gameTypeId'=>['required'],
+        ]);
+
+        $opponent= User::where('email', $request->opponentEmail)->first();
+
+        if($opponent === null){
+            return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');
+        }
+
+        $challenge = Challenge::create([
+            'user_id' => $this->user->id,
+            'opponent_id' => $opponent->id,
+            'category_id' => $request->categoryId,
+            'game_type_id' => $request->gameTypeId,
+            'is_accepted' => false,
+        ]);
+
+        Mail::send(new ChallengeInvite($opponent, $challenge->id));
+        return $this->sendResponse($challenge, 'Challenge Invite Sent! You will be notified when your opponent responds.');
+
+    }
+
+    public function acceptChallenge(){
+        echo("Accepted");
     }
 }
