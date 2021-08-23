@@ -47,12 +47,26 @@ class GameController extends BaseController
             if($this->user->points < $achievement->point_milestone){
                 return $this->sendError('You do not have enough points to claim this achievement','You do not have enough points to claim this achievement');
             }
-            $result= DB::table('user_achievements')->insert([
+
+            $isClaimed = DB::table('user_achievements')
+                ->where('achievement_id',$achievement->id)
+                ->where('user_id', $this->user->id)->first();
+            
+            if($isClaimed === null){
+
+                $result= DB::table('user_achievements')->insert([
                 'user_id' => $this->user->id,
                 'achievement_id' => $achievement->id
-            ]);
-            return $this->sendResponse($achievement, 
-            'Achievement Claimed');
+                ]);
+                
+                return $this->sendResponse($achievement, 
+                'Achievement Claimed');
+                
+            }
+            else{
+                return $this->sendError('You have already claimed this achievement',
+                'You have already claimed this achievement');
+            }
     }
 
     public function startSingleGame(Request $request){
