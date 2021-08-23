@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
+use Carbon\Carbon;
 
 class ChallengeInvite extends Mailable
 {
@@ -38,7 +39,7 @@ class ChallengeInvite extends Mailable
             ->subject('Cashingames Invitation! : Play a Challenge Game!')
             ->view('emails.users.challengeInvite')
             ->with([
-                'opponent' => $this->opponent->username,
+                'opponent' => $this->opponent->email,
                 'user' => auth()->user()->username,
                 'year' => Carbon::now()->year,
                 'challengeId'=>$this->challengeId

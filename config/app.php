@@ -56,6 +56,7 @@ return [
 
     'asset_url' => env('ASSET_URL', null),
     "admin_email" => env("ADMIN_MAIL_ADDRESS", "hello@cashingames.com"),
+    "web_app_url"=> env('WEB_APP_URL', "www.cashingames.com"),
 
     /*
     |--------------------------------------------------------------------------

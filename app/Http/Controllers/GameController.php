@@ -273,7 +273,7 @@ class GameController extends BaseController
             'opponent_id' => $opponent->id,
             'category_id' => $request->categoryId,
             'game_type_id' => $request->gameTypeId,
-            'is_accepted' => false,
+            'status' => 'PENDING',
         ]);
 
         Mail::send(new ChallengeInvite($opponent, $challenge->id));
@@ -281,7 +281,31 @@ class GameController extends BaseController
 
     }
 
-    public function acceptChallenge(){
-        echo("Accepted");
+    public function acceptChallenge($challengeId){
+        
+        $challenge = Challenge::find($challengeId);
+        
+        if($challenge === null){
+           return $this->sendError('No challenge found', 'No Challenge found');
+        } 
+        
+        $challenge->update(["status"=>'ACCEPTED']);
+        
+        return redirect()->away(config("app.web_app_url"));
+
+    }
+
+    public function declineChallenge($challengeId){
+        
+        $challenge = Challenge::find($challengeId);
+        
+        if($challenge === null){
+           return $this->sendError('No challenge found', 'No Challenge found');
+        } 
+        
+        $challenge->update(["status"=> "DECLINED"]);
+        
+        return $this->sendResponse("Challenge Declined", 'Challenge Declined');
+
     }
 }
