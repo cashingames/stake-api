@@ -76,5 +76,5 @@ Route::post('v2/game/end/challenge',[GameController::class, 'endChallengeGame'])
 Route::post('v2/game/boost/consume/{boostId}',[GameController::class, 'consumeBoost'])->middleware('auth:api');
 
 Route::post('v2/game/challenge/invite',[GameController::class, 'sendChallengeInvite'])->middleware('auth:api');
-Route::get('v2/game/challenge/accept/{challengeId}',[GameController::class, 'acceptChallenge']);
-Route::get('v2/game/challenge/decline/{challengeId}',[GameController::class, 'declineChallenge']);
+Route::post('v2/game/challenge/accept/{challengeId}',[GameController::class, 'acceptChallenge']);
+Route::post('v2/game/challenge/decline/{challengeId}',[GameController::class, 'declineChallenge']);
