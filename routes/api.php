@@ -62,15 +62,24 @@ Route::prefix('v2')->group(function () {
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
         Route::post('me/achievement', [UserController::class, 'userAchievement']);
 
+<<<<<<< HEAD
         Route::get('game/modes', [GameController::class, 'modes']);
         Route::get('game/types', [GameController::class, 'gameTypes']);
         Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'get']);
         Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
         //Route::get('game/all', [CategoryController::class, 'allGames']);
+=======
+Route::get('v2/game/modes', [GameController::class, 'modes'])->middleware('auth:api');
+Route::get('v2/game/types', [GameController::class, 'gameTypes'])->middleware('auth:api');
+Route::get('v2/game/categories/{gameTypeId}', [CategoryController::class, 'get'])->middleware('auth:api');
+Route::get('v2/game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories'])->middleware('auth:api');
+Route::get('v2/category/times-played/{catId}', [CategoryController::class, 'timesPlayed'])->middleware('auth:api');
+>>>>>>> 791ca740d01f351e611a0d7b404be0a8fb447abc
 
         Route::get('friends/quizzes', [UserController::class, 'friendQuizzes']);
         Route::get('me/friends', [UserController::class, 'friends']);
 
+<<<<<<< HEAD
         Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
         Route::post('game/start/challenge', [GameController::class, 'startChallenge']);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
@@ -78,3 +87,14 @@ Route::prefix('v2')->group(function () {
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
     });
 });
+=======
+Route::post('v2/game/start/single-player',[GameController::class, 'startSingleGame'])->middleware('auth:api');
+Route::post('v2/game/start/challenge',[GameController::class, 'startChallenge'])->middleware('auth:api');
+Route::post('v2/game/end/single-player',[GameController::class, 'endSingleGame'])->middleware('auth:api');
+Route::post('v2/game/end/challenge',[GameController::class, 'endChallengeGame'])->middleware('auth:api');
+Route::post('v2/game/boost/consume/{boostId}',[GameController::class, 'consumeBoost'])->middleware('auth:api');
+
+Route::post('v2/game/challenge/invite',[GameController::class, 'sendChallengeInvite'])->middleware('auth:api');
+Route::post('v2/game/challenge/accept/{challengeId}',[GameController::class, 'acceptChallenge']);
+Route::post('v2/game/challenge/decline/{challengeId}',[GameController::class, 'declineChallenge']);
+>>>>>>> 791ca740d01f351e611a0d7b404be0a8fb447abc

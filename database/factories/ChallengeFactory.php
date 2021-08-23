@@ -29,7 +29,7 @@ class ChallengeFactory extends Factory
             'opponent_id' => $this->faker->randomElement(array(1,2,3,4,5) ),
             'category_id' =>$this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10,11) ),
             'game_type_id' =>$this->faker->randomElement(array(1,2) ),
-            'is_accepted' => $this->faker->randomElement(array(true, false) ),
+            'status' => $this->faker->randomElement(array("ACCEPTED", "PENDING", "DECLINED") ),
         ];
     }
 }

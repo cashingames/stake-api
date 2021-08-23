@@ -52,8 +52,8 @@ class BoostSeeder extends Seeder
         
         DB::table('boosts')->insert(
             [
-                'name' => "Time Freeze",
-                'description' => "Freezes game for 3 seconds",
+                'name' => "Time Freeze ",
+                'description' => "Freezes game time For 15 Seconds",
                 'point_value' => 100,
                 'currency_value'=> 49.3,
                 'pack_count' => 5

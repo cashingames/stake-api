@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Mode;
-use App\Models\GameType;
-use App\Models\Boost;
-use App\Models\UserBoost;
-use App\Models\Category;
-use App\Models\Challenge;
 use App\Models\User;
-use App\Models\GameSession;
+use App\Models\Boost;
+use App\Models\Category;
+use App\Models\GameType;
+use App\Models\Challenge;
+use App\Models\UserBoost;
 use App\Models\Achievement;
+use App\Models\GameSession;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Mail\ChallengeInvite;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class GameController extends BaseController
 {
@@ -41,12 +43,30 @@ class GameController extends BaseController
             if($achievement===null){
                 return $this->sendError('Invalid Achievement','Invalid Achievement');
             }
-            $result= DB::table('user_achievements')->insert([
+
+            if($this->user->points < $achievement->point_milestone){
+                return $this->sendError('You do not have enough points to claim this achievement','You do not have enough points to claim this achievement');
+            }
+
+            $isClaimed = DB::table('user_achievements')
+                ->where('achievement_id',$achievement->id)
+                ->where('user_id', $this->user->id)->first();
+            
+            if($isClaimed === null){
+
+                $result= DB::table('user_achievements')->insert([
                 'user_id' => $this->user->id,
                 'achievement_id' => $achievement->id
-            ]);
-            return $this->sendResponse($result, 
-            'Achievement Claimed');
+                ]);
+                
+                return $this->sendResponse($achievement, 
+                'Achievement Claimed');
+                
+            }
+            else{
+                return $this->sendError('You have already claimed this achievement',
+                'You have already claimed this achievement');
+            }
     }
 
     public function startSingleGame(Request $request){
@@ -233,5 +253,59 @@ class GameController extends BaseController
         ]);
 
         return $this->sendResponse($userBoost, 'Boost consumed');
+    }
+
+    public function sendChallengeInvite(Request $request){
+        $request->validate([
+            'opponentEmail' => ['required', 'email'],
+            'categoryId' =>['required'],
+            'gameTypeId'=>['required'],
+        ]);
+
+        $opponent= User::where('email', $request->opponentEmail)->first();
+
+        if($opponent === null){
+            return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');
+        }
+
+        $challenge = Challenge::create([
+            'user_id' => $this->user->id,
+            'opponent_id' => $opponent->id,
+            'category_id' => $request->categoryId,
+            'game_type_id' => $request->gameTypeId,
+            'status' => 'PENDING',
+        ]);
+
+        Mail::send(new ChallengeInvite($opponent, $challenge->id));
+        return $this->sendResponse($challenge, 'Challenge Invite Sent! You will be notified when your opponent responds.');
+
+    }
+
+    public function acceptChallenge($challengeId){
+        
+        $challenge = Challenge::find($challengeId);
+        
+        if($challenge === null){
+           return $this->sendError('No challenge found', 'No Challenge found');
+        } 
+        
+        $challenge->update(["status"=>'ACCEPTED']);
+        
+        return redirect()->away(config("app.web_app_url"));
+
+    }
+
+    public function declineChallenge($challengeId){
+        
+        $challenge = Challenge::find($challengeId);
+        
+        if($challenge === null){
+           return $this->sendError('No challenge found', 'No Challenge found');
+        } 
+        
+        $challenge->update(["status"=> "DECLINED"]);
+        
+        return $this->sendResponse("Challenge Declined", 'Challenge Declined');
+
     }
 }

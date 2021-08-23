@@ -49,6 +49,8 @@ class CategorySeeder extends Seeder
                 'name' => 'Football',
                 'description' => 'Football questions',
                 'category_id' => 4,
+                'icon_name'=> 'icons/soccer_ball.png',
+                'primary_color'=> '#EF8318'
             ]
         );
 
@@ -56,6 +58,8 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Music',
                 'description' => 'Answer Music questions',
+                'icon_name'=> 'icons/music_note.png',
+                'primary_color' => '#9C3DB8'
             ]
         );
 
