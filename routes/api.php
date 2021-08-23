@@ -67,6 +67,7 @@ Route::prefix('v2')->group(function () {
         Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'get']);
         Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
         //Route::get('game/all', [CategoryController::class, 'allGames']);
+        Route::get('category/times-played/{catId}', [CategoryController::class, 'timesPlayed']);
 
         Route::get('friends/quizzes', [UserController::class, 'friendQuizzes']);
         Route::get('me/friends', [UserController::class, 'friends']);
@@ -76,5 +77,9 @@ Route::prefix('v2')->group(function () {
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
         Route::post('game/end/challenge', [GameController::class, 'endChallengeGame']);
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
+
+        Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
+        Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
+        Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
     });
 });
