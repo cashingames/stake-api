@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Lunaweb\RecaptchaV3\Facades\RecaptchaV3;
 use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\DB;
 use App\Models\WalletTransaction;
@@ -50,7 +49,7 @@ class RegisterController extends BaseController
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -62,7 +61,7 @@ class RegisterController extends BaseController
             'phone_number' => ['nullable', 'string', 'min:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer'=>['nullable', 'string', 'exists:profiles,referral_code']
+            'referrer' => ['nullable', 'string', 'exists:profiles,referral_code']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -70,39 +69,39 @@ class RegisterController extends BaseController
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \App\User
      */
     protected function create(array $data)
     {
 
-      //create the user
-    $user =
-        User::create([
-            'username' => $data['username'],
-            'phone_number' => $data['phone_number'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'is_on_line' => true,
-        ]);
-      
-      //create the profile
-    $user
-        ->profile()
-        ->create([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'referral_code' =>uniqid($data['username']),
-            'referrer' => $data['referrer']??null
-        ]);
+        //create the user
+        $user =
+            User::create([
+                'username' => $data['username'],
+                'phone_number' => $data['phone_number'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
+                'is_on_line' => true,
+            ]);
 
-      //create the wallet
-    $wallet = $user->wallet()
-        ->create([]);
+        //create the profile
+        $user
+            ->profile()
+            ->create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'referral_code' => uniqid($data['username']),
+                'referrer' => $data['referrer'] ?? null
+            ]);
 
-    //give user sign up bonus
+        //create the wallet
+        $wallet = $user->wallet()
+            ->create([]);
 
-        if(config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')){
+        //give user sign up bonus
+
+        if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
             $user->points = 100;
             $user->save();
@@ -110,34 +109,34 @@ class RegisterController extends BaseController
             $user->points()->create([
                 'user_id' => $user->id,
                 'value' => 100,
-                'description'=> 'Sign Up Bonus Points',
-                'point_flow_type'=>'POINTS_ADDED',
+                'description' => 'Sign Up Bonus Points',
+                'point_flow_type' => 'POINTS_ADDED',
             ]);
 
             $user->boosts()->create([
                 'user_id' => $user->id,
                 'boost_id' => 1,
-                'boost_count'=> 3,
-                'used_count'=>0
+                'boost_count' => 3,
+                'used_count' => 0
             ]);
             $user->boosts()->create([
                 'user_id' => $user->id,
                 'boost_id' => 3,
-                'boost_count'=> 3,
-                'used_count'=>0
+                'boost_count' => 3,
+                'used_count' => 0
             ]);
 
         }
-    //credit referrer with points
-    if(config('trivia.bonus.enabled') && 
-        config('trivia.bonus.signup.referral') && 
-        config('trivia.bonus.signup.referral_on_signup')&&
-        isset($data['referrer'])
-    ){
-        $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
-        $this->creditPoints($referrerId,50,"Points credited for signed up referral");
+        //credit referrer with points
+        if (config('trivia.bonus.enabled') &&
+            config('trivia.bonus.signup.referral') &&
+            config('trivia.bonus.signup.referral_on_signup') &&
+            isset($data['referrer'])
+        ) {
+            $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
+            $this->creditPoints($referrerId, 50, "Points credited for signed up referral");
 
-    }
+        }
 
         return $user;
     }
@@ -145,22 +144,22 @@ class RegisterController extends BaseController
     /**
      * The user has been registered.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
+     * @param \Illuminate\Http\Request $request
+     * @param mixed $user
      * @return mixed
      */
     protected function registered(Request $request, $user)
     {
-        $user =  auth()->user();
+        $user = auth()->user();
         $token = auth()->tokenById($user->id);
         $result = [
             'token' => [
-              'access_token' => $token,
+                'access_token' => $token,
             ],
             'user' => $user->load([
-              'profile',
-              'wallet',
-              'boosts']),
+                'profile',
+                'wallet',
+                'boosts']),
         ];
         return $this->sendResponse($result, 'User details');
     }

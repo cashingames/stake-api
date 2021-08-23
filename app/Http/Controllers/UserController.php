@@ -14,14 +14,18 @@ class UserController extends BaseController
 
     public function me()
     {
-        $user = $this->user->load('profile');
-        $result = [
-            'user' => $user,
-            'wallet' => $user->wallet->load("transactions"),
-            'boosts' => $user->boosts
-            
-        ];
-        return $this->sendResponse($result, 'User details');
+        try {
+            $user = $this->user->load('profile');
+            $result = [
+                'user' => $user,
+                'wallet' => $user->wallet->load("transactions"),
+                'boosts' => $user->boosts
+            ];
+            return $this->sendResponse($result, 'User details');
+        } catch(\Exception $e){
+            error_log($e->getLine().', '.$e->getMessage());
+            return $this->sendError([], $e->getMessage());
+        }
     }
 
     public function getPoints($userId)
