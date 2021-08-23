@@ -6,11 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +49,26 @@ class User extends Authenticatable implements JWTSubject
         'points'=>'integer'
     ];
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     public function profile()
     {
         return $this->hasOne(Profile::class);
@@ -61,20 +82,6 @@ class User extends Authenticatable implements JWTSubject
     public function transactions()
     {
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class)->orderBy('created_at', 'desc');
-    }
-
-    // public function mockTransactions(){
-    //     return $this->hasMany(WalletTransaction::class);
-    // }
-
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
     }
     
     public function points(){
@@ -96,5 +103,4 @@ class User extends Authenticatable implements JWTSubject
     public function challenges(){
         return $this->hasMany(Challenge::class);
     }
-
 }
