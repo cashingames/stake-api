@@ -25,7 +25,7 @@ class GameTypeSeeder extends Seeder
 
         DB::table('game_types')->insert(
             [
-                'name' => "Select One Option",
+                'name' => "Multi Choice",
                 'description' => "Select one correct answer from other options",
             ]
         );
