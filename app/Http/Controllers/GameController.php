@@ -56,7 +56,9 @@ class GameController extends BaseController
 
                 $result= DB::table('user_achievements')->insert([
                 'user_id' => $this->user->id,
-                'achievement_id' => $achievement->id
+                'achievement_id' => $achievement->id,
+                'created_at'=> Carbon::now(),
+                'updated_at'=> Carbon::now()
                 ]);
                 
                 return $this->sendResponse($achievement, 

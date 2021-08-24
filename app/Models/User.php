@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -49,6 +50,9 @@ class User extends Authenticatable implements JWTSubject
         'points'=>'integer'
     ];
 
+    protected $appends = [
+        'achievement'
+    ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -102,5 +106,19 @@ class User extends Authenticatable implements JWTSubject
 
     public function challenges(){
         return $this->hasMany(Challenge::class);
+    }
+
+    public function getAchievementAttribute()
+    {   
+        $latestAchievement = DB::table('user_achievements')
+        ->where('user_id', $this->id)->latest()->first();
+        
+        if( $latestAchievement === null){
+            return " ";
+        }
+        $achievementName = Achievement::where('id',$latestAchievement->achievement_id)->first();
+        
+        return($achievementName->title);
+        
     }
 }
