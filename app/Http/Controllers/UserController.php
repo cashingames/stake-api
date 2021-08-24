@@ -123,4 +123,11 @@ class UserController extends BaseController
         }
         return $this->sendResponse($quizzes, "Friends Quizzes");
     }
+
+    public function setOffline(){
+        $user = $this->user;
+
+        $user->update(['is_on_line'=>false]);
+        return $this->sendResponse($user, "User is set offline");
+    }
 }
