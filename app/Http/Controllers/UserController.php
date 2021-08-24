@@ -87,7 +87,30 @@ class UserController extends BaseController
         $user = auth()->user();
         $friends = Profile::where('referrer',$user->profile->referral_code)->get();
 
-        return $this->sendResponse($friends, "Friends");
+        if($friends === null){
+            return $this->sendError("You have not friends yet", "You have not friends yet");
+        }
+
+        $onlineFriends = [];
+        $offlineFriends = [];
+        
+        foreach($friends as $friend){
+            $isOnline = User::where('id', $friend->user_id)->where('is_on_line', true)->first();
+            
+            if($isOnline != null){
+                $onlineFriends[]= $isOnline->profile;
+            }
+            $isOffline = User::where('id', $friend->user_id)->where('is_on_line', false)->first();
+            if($isOffline != null){
+                $offlineFriends[]= $isOffline->profile;
+            }
+            
+        }
+        $result = [
+            'online'=>$onlineFriends,
+            'offline' =>$offlineFriends
+        ];
+        return $this->sendResponse($result, "Friends");
     }
 
     public function friendQuizzes(){

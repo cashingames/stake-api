@@ -112,13 +112,13 @@ class User extends Authenticatable implements JWTSubject
     {   
         $latestAchievement = DB::table('user_achievements')
         ->where('user_id', $this->id)->latest()->first();
-        
+
         if( $latestAchievement === null){
             return " ";
         }
-        $achievementName = Achievement::where('id',$latestAchievement->achievement_id)->first();
+        $achievement = Achievement::where('id',$latestAchievement->achievement_id)->first();
         
-        return($achievementName->title);
+        return($achievement->title);
         
     }
 }
