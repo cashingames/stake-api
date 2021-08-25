@@ -30,6 +30,8 @@ Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset']);
+Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
+Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
 
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [EnquiriesController::class, 'feedback']);
@@ -80,7 +82,6 @@ Route::prefix('v2')->group(function () {
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
-        Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
-        Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
+      
     });
 });
