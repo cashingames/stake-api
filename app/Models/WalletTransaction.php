@@ -40,7 +40,7 @@ class WalletTransaction extends Model
     public function getTransactionTypeAttribute($value){
         if($value == "CREDIT")
         {
-            return "Fund Recieved";
+            return "Fund Received";
         }else if ($value == "DEBIT")
         {
             return "Fund Withdrawal";
