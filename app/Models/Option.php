@@ -25,4 +25,12 @@ class Option extends Model
   public function question(){
       return $this->belongsTo(Question::class);
   }
+
+  public function getIsCorrectAttribute($value){
+    return base64_encode($value);
+  }
+  public function getTitleAttribute($value){
+    return base64_encode($value);
+  }
+ 
 }

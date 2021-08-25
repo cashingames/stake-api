@@ -35,5 +35,10 @@ class Question extends Model
       return $this->hasMany(Game::class);
   }
 
-
+  public function getLabelAttribute($value){
+    return base64_encode($value);
+  }
+  public function getLevelAttribute($value){
+    return base64_encode($value);
+  }
 }
