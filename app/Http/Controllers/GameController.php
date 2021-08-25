@@ -293,7 +293,7 @@ class GameController extends BaseController
         
         $challenge->update(["status"=>'ACCEPTED']);
         
-        return redirect()->away(config("app.web_app_url"));
+        return $this->sendResponse("Challenge Accepted", 'Challenge Accepted');
 
     }
 
