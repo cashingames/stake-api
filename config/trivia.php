@@ -21,10 +21,11 @@ return [
     'is_launching'=>env('IS_LAUNCHING', false),
     'categories'=> [env('LAUNCH_CATEGORY1',''), env('LAUNCH_CATEGORY2', '')],
   ],
-  
+  'game'=>[
+    'questions_count'=>env('GAME_QUESTIONS_COUNT',10),
+  ],
+
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
-  'set_claims_active' => env('SET_CLAIMS_ACTIVE', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
-  'can_play' => env('CAN_PLAY', true)
 ];
