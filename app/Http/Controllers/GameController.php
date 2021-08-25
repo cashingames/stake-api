@@ -293,7 +293,7 @@ class GameController extends BaseController
         
         $challenge->update(["status"=>'ACCEPTED']);
         
-        return $this->sendResponse("Challenge Accepted", 'Challenge Accepted');
+        return $this->sendResponse($challenge, 'Challenge Accepted');
 
     }
 
