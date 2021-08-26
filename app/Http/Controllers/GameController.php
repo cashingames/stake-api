@@ -292,8 +292,14 @@ class GameController extends BaseController
         } 
         
         $challenge->update(["status"=>'ACCEPTED']);
+
+        $opponent = User::where("id", $challenge->user_id)->first();
         
-        return $this->sendResponse($challenge, 'Challenge Accepted');
+        $result = [
+            "challenge"=> $challenge,
+            "opponent"=>$opponent
+        ];
+        return $this->sendResponse($result, 'Challenge Accepted');
 
     }
 
