@@ -138,7 +138,7 @@ class WalletController extends BaseController
                 $userBoost->update(['boost_count'=>$userBoost->boost_count+$boost->pack_count]);
             }
 
-        return $this->sendResponse(true, 'Boost Bought');
+        return $this->sendResponse($points, 'Boost Bought');
         } 
         return $this->sendResponse(false, 'You do not have enough points');
     }
@@ -179,7 +179,7 @@ class WalletController extends BaseController
                 $userBoost->update(['boost_count'=>$userBoost->boost_count+$boost->pack_count]);
             }
             
-            return $this->sendResponse(true, 'Boost Bought');
+            return $this->sendResponse($wallet->balance, 'Boost Bought');
         }
         return $this->sendResponse(false, 'You do not have enough money in your wallet.');
     }
