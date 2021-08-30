@@ -246,7 +246,7 @@ class GameController extends BaseController
             //User has finished boost , reset used count
             $userBoost->used_count = 0;
             $userBoost->save();
-            return $this->sendError('You have used up this boost', 'You have used up this boost');
+            return $this->sendResponse('You have used up this boost', 'You have used up this boost');
         }
 
         $userBoost->update([
