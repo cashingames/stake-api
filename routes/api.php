@@ -57,7 +57,7 @@ Route::prefix('v2')->group(function () {
         Route::get('wallet/get/withdrawals', [WalletController::class, 'getWithdrawals']);
         Route::get('me/points/{userId}', [UserController::class, 'getPoints']);
         Route::get('me/points/log/history/{userId}', [UserController::class, 'getPointsLog']);
-        Route::get('me/boosts/{userId}', [UserController::class, 'getboosts']);
+        Route::get('me/boosts', [UserController::class, 'getboosts']);
         Route::get('me/quizzes', [UserController::class, 'quizzes']);
 
         Route::get('game/boosts', [GameController::class, 'boosts']);

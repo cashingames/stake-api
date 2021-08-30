@@ -48,14 +48,9 @@ class UserController extends BaseController
         return $this->sendResponse($pointsLog, "User Points Log");
     }
 
-    public function getBoosts($userId)
+    public function getBoosts()
     {
-        $user = User::find($userId);
-        if($user==null){
-            return $this->sendResponse("User not found", "User not found");
-        }
-
-       $userBoosts = DB::table('user_boosts')->where('user_id',$userId)
+       $userBoosts = DB::table('user_boosts')->where('user_id',$this->user->id)
         ->join('boosts', function ($join) {
             $join->on('boosts.id', '=', 'user_boosts.boost_id');
         })
@@ -63,6 +58,7 @@ class UserController extends BaseController
 
         return $this->sendResponse($userBoosts, "User Boosts");
     }
+    
     public function userAchievement()
     {
         $userId = $this->user->id;
