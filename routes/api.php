@@ -55,8 +55,8 @@ Route::prefix('v2')->group(function () {
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
 
         Route::get('wallet/get/withdrawals', [WalletController::class, 'getWithdrawals']);
-        Route::get('me/points/{userId}', [UserController::class, 'getPoints']);
-        Route::get('me/points/log/history/{userId}', [UserController::class, 'getPointsLog']);
+        Route::get('me/points', [UserController::class, 'getPoints']);
+        Route::get('me/points/log/history', [UserController::class, 'getPointsLog']);
         Route::get('me/boosts', [UserController::class, 'getboosts']);
         Route::get('me/quizzes', [UserController::class, 'quizzes']);
 

@@ -28,23 +28,14 @@ class UserController extends BaseController
         }
     }
 
-    public function getPoints($userId)
+    public function getPoints()
     {
-        $user = User::find($userId);
-        if($user==null){
-            return $this->sendResponse("User not found", "User not found");
-        }
-        $points = $user->points;
-        return $this->sendResponse($points, "User Points");
+        return $this->sendResponse($this->user->points, "User Points");
     }
 
-    public function getPointsLog($userId)
+    public function getPointsLog()
     {
-        $user = User::find($userId);
-        if($user==null){
-            return $this->sendResponse("User not found", "User not found");
-        }
-        $pointsLog = $user->points()->latest()->get();
+        $pointsLog = $this->user->points()->latest()->get();
         return $this->sendResponse($pointsLog, "User Points Log");
     }
 
@@ -58,7 +49,7 @@ class UserController extends BaseController
 
         return $this->sendResponse($userBoosts, "User Boosts");
     }
-    
+
     public function userAchievement()
     {
         $userId = $this->user->id;
