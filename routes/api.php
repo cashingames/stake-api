@@ -12,6 +12,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\EnquiriesController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LeadersController;
 
 
 /*
@@ -82,6 +83,6 @@ Route::prefix('v2')->group(function () {
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
-      
+        Route::get('leaders/global',[LeadersController::class,'globalLeaders']);
     });
 });
