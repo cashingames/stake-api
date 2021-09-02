@@ -23,7 +23,7 @@ class CategoryController extends BaseController
             $launchCategories = config('trivia.product_launch.categories');
             foreach ($launchCategories as $category){
                 
-                $cat =Category::where('name',$category)->has('questions', '>', 0)->first();
+                $cat =Category::where('name',$category)->first();
                 
                 if($cat !== null){
                     $categories[] = $cat;
@@ -39,7 +39,10 @@ class CategoryController extends BaseController
                 $questions = Question::where('category_id',$category->id)
                         ->where('game_type_id',$gameTypeId)->first();
                 
-                $data[] = $questions->category->name;
+                if($questions!==null){
+                    $data[] = $questions->category->name;
+                }
+                
             }
             foreach($data as $data){
                 $cat[] = Category::where('name',$data)->first();
@@ -54,15 +57,17 @@ class CategoryController extends BaseController
         if ($cat==null || $gameType==null ){
             return $this->sendResponse("This Category or Gametype does not exist", "This Category or Gametype does not exist");
         }
-        $subCategories = Category::where('category_id',$catId)->get();
+        $subCategories = Category::where('category_id',$catId)->has('questions', '>', 0)->get();
         $data = [];
         $subCat = [];
 
         foreach($subCategories as $sub){
             $questions = Question::where('category_id',$sub->id)
                     ->where('game_type_id',$gameTypeId)->first();
-            
-            $data[] = $questions->category->name;
+            if($questions !==null){
+                $data[] = $questions->category->name;
+            }
+           
         }
         foreach($data as $data){
             $subCat[] = Category::where('name',$data)->first();

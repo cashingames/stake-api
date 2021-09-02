@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             // WalletSeeder::class,
             // ProfileSeeder::class,
             AchievementSeeder::class,
-            QuestionSeeder::class
+           // QuestionSeeder::class
 
             
         ]);
