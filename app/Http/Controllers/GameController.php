@@ -28,7 +28,12 @@ class GameController extends BaseController
     }
 
     public function gameTypes(){
-        return $this->sendResponse(GameType::all(), "Game Types");
+        $types = GameType::all();
+        
+        //sort based on availbility
+        $sorted = $types->sortByDesc('is_available');
+        
+        return $this->sendResponse($sorted->values()->all(), "Game Types");
     }
 
     public function boosts(){
