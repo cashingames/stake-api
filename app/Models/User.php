@@ -51,7 +51,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $appends = [
-        'achievement'
+        'achievement','rank'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -123,6 +123,26 @@ class User extends Authenticatable implements JWTSubject
         $achievement = Achievement::where('id',$latestAchievement->achievement_id)->first();
         
         return($achievement->title);
+        
+    }
+
+    public function getRankAttribute()
+    {   
+        $results = User::orderBy('points', 'desc')->get();
+        
+        $userIndex = -1;
+
+        if (count($results) > 0){
+            $userIndex = $results->search(function($user) {
+                return $user->id == $this->id;
+            });
+        }
+
+        if ($userIndex === false || $userIndex === -1){
+            return 786;
+        }
+
+        return $userIndex + 1;
         
     }
 }
