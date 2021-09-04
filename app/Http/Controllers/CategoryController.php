@@ -6,36 +6,54 @@ use App\Models\Category;
 use App\Models\Question;
 use App\Models\GameType;
 use App\Models\GameSession;
-
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
 {
     //
-    public function get($gameTypeId){ 
-        $gameType = GameType::find($gameTypeId);
+    private $categories = [];
 
-        if($gameType==null){
-            return $this->sendResponse("Game type does not exist", "Game type does not exist");
-        }
+    private function getLaunchCategories(){
         if( config('trivia.product_launch.is_launching')){
-            $categories = [];
             $launchCategories = config('trivia.product_launch.categories');
             foreach ($launchCategories as $category){
                 
                 $cat =Category::where('name',$category)->first();
                 
                 if($cat !== null){
-                    $categories[] = $cat;
+                    $this->categories[] = $cat;
                 }
             }
-            return $this->sendResponse($categories, "All categories");
+            return true;
+        }
+        return false;
+    }
+
+    public function get(){
+        $launchCategories = $this->getLaunchCategories();
+        if ($launchCategories){
+            return $this->sendResponse($this->categories, "All categories");
+        }
+       
+        return $this->sendResponse(Category::all(), "All categories");
+    }
+
+    public function getGameTypeCategories($gameTypeId){ 
+        $gameType = GameType::find($gameTypeId);
+
+        if($gameType==null){
+            return $this->sendResponse("Game type does not exist", "Game type does not exist");
+        }
+        
+        $launchCategories = $this->getLaunchCategories();
+        if ($launchCategories){
+            return $this->sendResponse($this->categories, "All categories");
         }
 
-        $categories = Category::all();
+        $allCategories = Category::all();
         $data = [];
         $cat=[];
-            foreach($categories as $category){
+            foreach($allCategories as $category){
                 $questions = Question::where('category_id',$category->id)
                         ->where('game_type_id',$gameTypeId)->first();
                 
@@ -96,4 +114,5 @@ class CategoryController extends BaseController
         }
         return $this->sendResponse(array_sum($subPlayedCount), " times played");
     }
+
 }

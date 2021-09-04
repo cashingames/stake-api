@@ -108,6 +108,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Challenge::class);
     }
 
+    public function categoryRanking(){
+        return $this->hasOne(CategoryRanking::class);
+    }
+
     public function getAchievementAttribute()
     {   
         $latestAchievement = DB::table('user_achievements')

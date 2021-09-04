@@ -68,7 +68,8 @@ Route::prefix('v2')->group(function () {
 
         Route::get('game/modes', [GameController::class, 'modes']);
         Route::get('game/types', [GameController::class, 'gameTypes']);
-        Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'get']);
+        Route::get('game/categories', [CategoryController::class, 'get']);
+        Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'getGameTypeCategories']);
         Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
         //Route::get('game/all', [CategoryController::class, 'allGames']);
         Route::get('category/times-played/{catId}', [CategoryController::class, 'timesPlayed']);
@@ -84,5 +85,6 @@ Route::prefix('v2')->group(function () {
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
         Route::get('leaders/global',[LeadersController::class,'globalLeaders']);
+        Route::get('leaders/category/{catId}',[LeadersController::class,'categoryRankings']);
     });
 });

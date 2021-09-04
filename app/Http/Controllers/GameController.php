@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\GameType;
 use App\Models\Challenge;
 use App\Models\UserBoost;
+use App\Models\CategoryRanking;
 use App\Models\Achievement;
 use App\Models\GameSession;
 use Illuminate\Support\Str;
@@ -168,6 +169,40 @@ class GameController extends BaseController
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
     
+    private function updateRanking($userId,$catId,$points){
+        //category rankings
+        //get category id of played subcategory
+        $isCategory = Category::where('id',$catId )->select('category_id')->first();
+        //if played category is not a subcategory
+        if($isCategory===null){ 
+            $ranking = CategoryRanking::where('user_id',$userId)->where('category_id',$catId)->first();
+
+            if($ranking === null){
+                CategoryRanking::create([
+                    'user_id' => $userId,
+                    'category_id' =>$catId,
+                    'points_gained'=>$points
+                ]);
+                return;
+            } 
+            $ranking->update(['points_gained'=>$ranking->points_gained + $points]);
+            return;
+        }
+
+        $ranking = CategoryRanking::where('user_id',$userId)->where('category_id',$isCategory->category_id)->first();
+
+        if($ranking === null){
+            CategoryRanking::create([
+                'user_id' => $userId,
+                'category_id' =>$isCategory->category_id,
+                'points_gained'=>$points
+            ]);
+            return;
+        } 
+        $ranking->update(['points_gained'=>$ranking->points_gained + $points]);
+
+    }
+
     public function endSingleGame(Request $request){
 
         $request->validate([
@@ -191,9 +226,12 @@ class GameController extends BaseController
         $gameSession->user_correct_count= $request->userCorrectCount;
      
         $gameSession->save();
+        
+        $this->updateRanking($this->user->id,$gameSession->category_id,$gameSession->user_points_gained);
 
         return $this->sendResponse($gameSession, 'Game Ended');
     }
+
 
     public function endChallengeGame(Request $request){
         $request->validate([
@@ -232,6 +270,12 @@ class GameController extends BaseController
         $gameSession->opponent_wrong_count = $request->opponentWrongCount;
         $gameSession->opponent_correct_count = $request->opponentCorrectCount;
         $gameSession->save();
+        
+        //update category rankings for user
+        $this->updateRanking($this->user->id,$gameSession->category_id,$gameSession->user_points_gained);
+
+        //update category rankings for opponent
+        $this->updateRanking($gameSession->opponent_id,$gameSession->category_id,$gameSession->opponent_points_gained);
 
         return $this->sendResponse($gameSession, 'Game Ended');
     }
