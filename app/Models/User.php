@@ -51,7 +51,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $appends = [
-        'achievement','rank'
+        'achievement','rank', 'played_games_count'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -143,6 +143,15 @@ class User extends Authenticatable implements JWTSubject
         }
 
         return $userIndex + 1;
+        
+    }
+
+    public function getPlayedGamesCountAttribute()
+    {   
+        $playedAsUser = GameSession::where('user_id',$this->id)->count();
+        $playedAsOpponent = GameSession::where('opponent_id',$this->id)->count();
+      
+        return $playedAsUser + $playedAsOpponent;
         
     }
 }
