@@ -102,15 +102,18 @@ class CategoryController extends BaseController
         $hasSubCategory = Category::where('category_id',$category->id)->get();
        
         if(count($hasSubCategory)==0){
-            $count = GameSession::where('category_id',$category->id)->count();
+            $countAsUser = GameSession::where('category_id',$category->id)->where('user_id',$this->user->id)->count();
+            $countAsOpponent = GameSession::where('category_id',$category->id)->where('opponent_id',$this->user->id)->count();
 
-            return $this->sendResponse($count, " times played");
+            return $this->sendResponse($countAsUser + $countAsOpponent, " times played");
         }
          
         $subPlayedCount = [];
         foreach($hasSubCategory as $sub){
-            $count = GameSession::where('category_id',$sub->id)->count();
-            $subPlayedCount[]=$count;
+            $countAsUser = GameSession::where('category_id',$sub->id)->where('user_id',$this->user->id)->count();
+            $countAsOpponent = GameSession::where('category_id',$sub->id)->where('opponent_id',$this->user->id)->count();
+            
+            $subPlayedCount[] = $countAsUser + $countAsOpponent;
         }
         return $this->sendResponse(array_sum($subPlayedCount), " times played");
     }
