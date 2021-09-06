@@ -36,6 +36,13 @@ class GameController extends BaseController
         return $this->sendResponse($sorted->values()->all(), "Game Types");
     }
 
+    public function shuffleGameTypes(){
+        $types = GameType::inRandomOrder()
+        ->limit(3) 
+        ->get();
+        return $this->sendResponse($types, "Random Game Types");
+    }
+
     public function boosts(){
         return $this->sendResponse(Boost::all(), "Game Boosts");
     }

@@ -68,6 +68,7 @@ Route::prefix('v2')->group(function () {
 
         Route::get('game/modes', [GameController::class, 'modes']);
         Route::get('game/types', [GameController::class, 'gameTypes']);
+        Route::get('game/types/random', [GameController::class, 'shuffleGameTypes']);
         Route::get('game/categories', [CategoryController::class, 'get']);
         Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'getGameTypeCategories']);
         Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
