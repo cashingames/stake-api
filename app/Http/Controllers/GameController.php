@@ -372,4 +372,14 @@ class GameController extends BaseController
         return $this->sendResponse("Challenge Declined", 'Challenge Declined');
 
     }
+
+    public function recentlyPlayed(){
+        $recentGames = [];
+        $games = GameSession::where('user_id', $this->user->id)->latest()->limit(3)->get();
+        foreach($games as $g){
+            $category = Category::where('id',$g->category_id)->first();
+            $recentGames[]=$category;
+        }
+        return $this->sendResponse($recentGames, 'Recent Games');
+    }
 }

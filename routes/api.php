@@ -87,5 +87,6 @@ Route::prefix('v2')->group(function () {
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
         Route::get('leaders/global',[LeadersController::class,'globalLeaders']);
         Route::get('leaders/category/{catId}',[LeadersController::class,'categoryRankings']);
+        Route::get('user/games/recently-played',[GameController::class,'recentlyPlayed']);
     });
 });
