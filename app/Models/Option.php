@@ -20,6 +20,7 @@ class Option extends Model
 
   protected $casts = [
     'is_correct' => 'boolean', 
+    'title'=>'string'
   ];
 
   public function question(){
@@ -30,7 +31,7 @@ class Option extends Model
     return base64_encode($value);
   }
   public function getTitleAttribute($value){
-    return base64_encode($value);
+    return base64_encode(str_replace('"', '', $value));
   }
  
 }
