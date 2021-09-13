@@ -74,7 +74,9 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Premier League Clubs',
                 'description' => 'Answer premier league related questions',
-                'category_id' => 5
+                'category_id' => 5,
+                'icon_name'=> 'icons/premier_league.png',
+                'primary_color'=> '#EF8318'
             ]
         );
 
@@ -82,7 +84,9 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'La Liga Clubs',
                 'description' => 'Answer La liga questions',
-                'category_id' => 5
+                'category_id' => 5,
+                'icon_name'=> 'icons/la_liga.jpg',
+                'primary_color'=> '#EF8318'
             ]
         );
 
@@ -90,7 +94,9 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Naija Music',
                 'description' => 'Answer Naija music questions',
-                'category_id' => 6
+                'category_id' => 6,
+                'icon_name'=> 'icons/naija_music.jpg',
+                'primary_color' => '#9C3DB8'
             ]
         );
 
@@ -98,7 +104,9 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'The Rest of The World',
                 'description' => 'Answer world wide music questions',
-                'category_id' => 6
+                'category_id' => 6,
+                'icon_name'=> 'icons/world_music.jpg',
+                'primary_color' => '#9C3DB8'
             ]
         );
 
