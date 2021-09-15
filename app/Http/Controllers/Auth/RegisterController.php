@@ -91,7 +91,7 @@ class RegisterController extends BaseController
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
-                'referral_code' => uniqid($data['username']),
+                'referral_code' =>$data['username']."_".mt_rand(1111,9999),
                 'referrer' => $data['referrer'] ?? null
             ]);
 

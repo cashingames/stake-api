@@ -53,6 +53,8 @@ class LoginController extends BaseController
     protected function respondWithToken($token)
     {
         $user =  auth()->user();
+        $user->update(["is_on_line"=>true]);
+        
         $result = [
             'token' => [
                 'access_token' => $token,

@@ -12,6 +12,7 @@ use App\Models\UserBoost;
 use App\Models\CategoryRanking;
 use App\Models\Achievement;
 use App\Models\GameSession;
+use App\Models\Question;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\ChallengeInvite;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Mail;
 class GameController extends BaseController
 {
     //
+    private $gameId;
 
     public function modes(){
         return $this->sendResponse(Mode::all(), "Game Modes");
@@ -132,7 +134,7 @@ class GameController extends BaseController
 
         if($request->has('challengeId') && $request->has('opponentId')){
             $challenge = Challenge::find($request->challengeId);
-            
+
             if($challenge === null){
                 return $this->sendError('Opponent is yet to accept the challenge', 
                 'Opponent is yet to accept the challenge.
@@ -151,31 +153,54 @@ class GameController extends BaseController
             if(($subCat || $gameType || $mode) === null){
                 return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
             }
-    
-            $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
-            $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
-            $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
-    
-            $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
-    
-            $gameSession = new GameSession();
            
-            $gameSession->user_id = $this->user->id;
-            $gameSession->mode_id = $mode->id;
-            $gameSession->game_type_id = $gameType->id;
-            $gameSession->category_id = $subCat->id;
-            $gameSession->challenge_id = $request->challengeId;
-            $gameSession->opponent_id = $opponent->id;
-            $gameSession->session_token = Str::random(40);
-            $gameSession->start_time = Carbon::now();
-            $gameSession->end_time = Carbon::now()->addMinutes(1);
-            $gameSession->state = 'ONGOING';
-            $gameSession->save();
+            $isSelected = Question::where('challenge_id',$challenge->id)->get();
+            $gameSessionToken =Str::random(40);
 
+            if(count($isSelected)==0){
+                $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
+                $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
+                $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
+
+                $selectedQuestions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
+
+                //tag questions to challenge
+                foreach($selectedQuestions as $q){
+                    Question::where('id',$q->id)->update([
+                        'challenge_id' => $challenge->id,
+                    ]);
+                }
+                
+                $gameSession = new GameSession();
+
+                $gameSession->user_id = $this->user->id;
+                $gameSession->mode_id = $mode->id;
+                $gameSession->game_type_id = $gameType->id;
+                $gameSession->category_id = $subCat->id;
+                $gameSession->challenge_id = $request->challengeId;
+                $gameSession->opponent_id = $opponent->id;
+                $gameSession->session_token = Str::random(40);
+                $gameSession->start_time = Carbon::now();
+                $gameSession->end_time = Carbon::now()->addMinutes(1);
+                $gameSession->state = 'ONGOING';
+                $gameSession->save();
+
+                $challenge->game_session_id = $gameSession->id;
+                $challenge->save();
+
+                $result = [
+                    'questions' => $selectedQuestions,
+                    'game' =>$gameSession
+                ];
+               return $this->sendResponse($result, 'Game Started');
+            }
+            
+            $gameSession = GameSession::where('id',$challenge->game_session_id)->first();
             $result = [
-                'questions' => $questions,
+                'questions' => $isSelected,
                 'game' =>$gameSession
-              ];
+            ];
+
             return $this->sendResponse($result, 'Game Started');
         }
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
@@ -289,6 +314,9 @@ class GameController extends BaseController
         //update category rankings for opponent
         $this->updateRanking($gameSession->opponent_id,$gameSession->category_id,$gameSession->opponent_points_gained);
 
+        //untag question to challenge
+        Question::where('challenge_id', $gameSession->challenge_id)->update(['challenge_id' => null]);
+
         return $this->sendResponse($gameSession, 'Game Ended');
     }
 
@@ -382,4 +410,5 @@ class GameController extends BaseController
         }
         return $this->sendResponse($recentGames, 'Recent Games');
     }
+
 }
