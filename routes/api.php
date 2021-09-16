@@ -91,7 +91,7 @@ Route::prefix('v2')->group(function () {
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
-         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
+        Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
 
     });
 });

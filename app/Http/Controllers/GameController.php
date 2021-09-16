@@ -379,6 +379,7 @@ class GameController extends BaseController
         $challenge->update(["status"=>'ACCEPTED']);
 
         $opponent = User::where("id", $challenge->user_id)->first();
+        $me = User::where("id", $challenge->opponent_id)->first();
         
         $result = [
             "challenge"=> $challenge,
@@ -389,7 +390,7 @@ class GameController extends BaseController
         Notification::create([
             'user_id' => $challenge->user_id,
             'title'=>'CHALLENGE ACCEPTED',
-            'message'=> $this->user->username.' has accepted your challenge. Start game here:'.config("app.web_app_url").'/duel/profile',
+            'message'=> $me->username.' has accepted your challenge. Start game here: '.config("app.web_app_url").'/duel/profile',
         ]);
         return $this->sendResponse($result, 'Challenge Accepted');
 
@@ -404,12 +405,14 @@ class GameController extends BaseController
         } 
         
         $challenge->update(["status"=> "DECLINED"]);
+        
+        $me = User::where("id", $challenge->opponent_id)->first();
 
         //notify challenger of declined challenge
         Notification::create([
             'user_id' => $challenge->user_id,
             'title'=>'CHALLENGE DECLINED',
-            'message'=>'Your challenge invite to '.$this->user->username.' was declined.'
+            'message'=>'Your challenge invite to '.$me->username.' was declined.'
         ]);
         
         return $this->sendResponse("Challenge Declined", 'Challenge Declined');
