@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\GameController;
-use App\Http\Controllers\EnquiriesController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LeadersController;
 
@@ -35,8 +35,8 @@ Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acce
 Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
 
 Route::prefix('v2')->group(function () {
-    Route::post('client/feedback', [EnquiriesController::class, 'feedback']);
-
+    Route::post('client/feedback', [MessagesController::class, 'feedback']);
+    
     Route::middleware('auth:api')->group(function () {
         Route::get('user/me', [UserController::class, 'me']);
         Route::post('user/me/set-offline', [UserController::class, 'setOffline']);
@@ -88,5 +88,10 @@ Route::prefix('v2')->group(function () {
         Route::get('leaders/global',[LeadersController::class,'globalLeaders']);
         Route::get('leaders/category/{catId}',[LeadersController::class,'categoryRankings']);
         Route::get('user/games/recently-played',[GameController::class,'recentlyPlayed']);
+
+        Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
+        Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
+         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
+
     });
 });

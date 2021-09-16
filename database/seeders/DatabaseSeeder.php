@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ModeSeeder::class,
             UserSeeder::class,
             ChallengeSeeder::class,
+            NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,
             // ProfileSeeder::class,
