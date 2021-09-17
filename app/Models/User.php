@@ -92,6 +92,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserPoint::class);
     }
 
+    public function onlineTimelines(){
+        return $this->hasMany(OnlineTimeline::class);
+    }
+
     public function boosts(){
         return $this->hasMany(UserBoost::class);
     }

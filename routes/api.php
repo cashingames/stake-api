@@ -39,7 +39,7 @@ Route::prefix('v2')->group(function () {
     
     Route::middleware('auth:api')->group(function () {
         Route::get('user/me', [UserController::class, 'me']);
-        Route::post('user/me/set-offline', [UserController::class, 'setOffline']);
+        Route::post('me/set/online', [UserController::class, 'setOnline']);
 
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);

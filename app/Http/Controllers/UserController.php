@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\UserQuiz;
+use App\Models\OnlineTimeline;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class UserController extends BaseController
 {
@@ -75,24 +77,25 @@ class UserController extends BaseController
         $friends = Profile::where('referrer',$user->profile->referral_code)->get();
 
         if($friends === null){
-            return $this->sendError("You have not friends yet", "You have not friends yet");
+            return $this->sendError("You have no friends yet", "You have no friends yet");
         }
 
-        $onlineFriends = [];
-        $offlineFriends = [];
+        $isOnline = OnlineTimeline::where('referrer',$user->profile->referral_code)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
         
-        foreach($friends as $friend){
-            $isOnline = User::where('id', $friend->user_id)->where('is_on_line', true)->first();
-            
-            if($isOnline != null){
-                $onlineFriends[]= $isOnline->profile;
-            }
-            $isOffline = User::where('id', $friend->user_id)->where('is_on_line', false)->first();
-            if($isOffline != null){
-                $offlineFriends[]= $isOffline->profile;
-            }
-            
+        $onlineFriends = [];
+        foreach($isOnline as $friend){
+            $details = $friend->user->load('profile');
+            $onlineFriends[] = $details;   
         }
+
+        $isOffline = OnlineTimeline::where('referrer',$user->profile->referral_code)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
+
+        $offlineFriends = [];
+        foreach($isOffline as $friend){
+            $details = $friend->user->load('profile');
+            $offlineFriends[] = $details;   
+        }
+        
         $result = [
             'online'=>$onlineFriends,
             'offline' =>$offlineFriends
@@ -111,10 +114,11 @@ class UserController extends BaseController
         return $this->sendResponse($quizzes, "Friends Quizzes");
     }
 
-    public function setOffline(){
-        $user = $this->user;
-
-        $user->update(['is_on_line'=>false]);
-        return $this->sendResponse($user, "User is set offline");
+    public function setOnline(){
+        OnlineTimeline::create([
+            'user_id' => $this->user->id,
+            'referrer' => $this->user->profile->referrer
+        ]);
+        return $this->sendResponse('Online status updated', "Online status updated");
     }
 }
