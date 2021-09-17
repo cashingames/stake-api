@@ -21,6 +21,7 @@ class GameTypeSeeder extends Seeder
             [
                 'name' => "True or False",
                 'description' => "Select from two options whether true or false",
+                'icon'=> 'icons/true_or_false_icon.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -30,6 +31,7 @@ class GameTypeSeeder extends Seeder
             [
                 'name' => "Multi Choice",
                 'description' => "Select one correct answer from other options",
+                'icon'=> 'icons/multi_choice_icon.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
