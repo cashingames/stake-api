@@ -19,9 +19,11 @@ class UserController extends BaseController
         try {
             $user = $this->user->load('profile');
             $result = [
-                'user' => $user,
-                'wallet' => $user->wallet->load("transactions"),
-                'boosts' => $user->boosts
+                'user' => $user->load([
+                    'profile',
+                    'wallet',
+                    'transactions',
+                    'boosts']),
             ];
             return $this->sendResponse($result, 'User details');
         } catch(\Exception $e){
