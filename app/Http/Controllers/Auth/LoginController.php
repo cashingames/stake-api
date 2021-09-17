@@ -62,6 +62,7 @@ class LoginController extends BaseController
             'user' => $user->load([
                 'profile',
                 'wallet',
+                'transactions',
                 'boosts']),
            
         ];
