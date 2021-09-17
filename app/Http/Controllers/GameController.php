@@ -156,7 +156,6 @@ class GameController extends BaseController
             }
            
             $isSelected = Question::where('challenge_id',$challenge->id)->get();
-            $gameSessionToken =Str::random(40);
 
             if(count($isSelected)==0){
                 $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count')/3);
@@ -314,9 +313,6 @@ class GameController extends BaseController
 
         //update category rankings for opponent
         $this->updateRanking($gameSession->opponent_id,$gameSession->category_id,$gameSession->opponent_points_gained);
-
-        //untag question to challenge
-        Question::where('challenge_id', $gameSession->challenge_id)->update(['challenge_id' => null]);
 
         return $this->sendResponse($gameSession, 'Game Ended');
     }
