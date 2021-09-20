@@ -28,6 +28,7 @@ use App\Http\Controllers\LeadersController;
 
 Route::post('auth/login', [LoginController::class, 'login']);
 Route::post('auth/register', [RegisterController::class, 'register']);
+Route::get('auth/username/verify/{username}', [RegisterController::class, 'verifyUsername']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset']);

@@ -43,7 +43,7 @@ class RegisterController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['register']]);
+        $this->middleware('auth:api', ['except' => ['register','verifyUsername']]);
     }
 
     /**
@@ -163,5 +163,13 @@ class RegisterController extends BaseController
                 'boosts']),
         ];
         return $this->sendResponse($result, 'User details');
+    }
+
+    public function verifyUsername($username){
+        $exists = User::where('username', $username)->first();
+        if ($exists === null){
+            return $this->sendResponse(true, 'Username is available');
+        }
+        return $this->sendResponse(false, 'Username is not available');
     }
 }
