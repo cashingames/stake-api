@@ -26,7 +26,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp_token',      
         'is_on_line',
-        'points'
+        'points',
+        'user_index_status'
     ];
 
     /**
@@ -157,5 +158,14 @@ class User extends Authenticatable implements JWTSubject
       
         return $playedAsUser + $playedAsOpponent;
         
+    }
+    public function getUserIndexStatusAttribute($value)
+    {   
+        if($value =='CLIMBED'){
+            return true;
+        }
+        if($value =='DROPPED'){
+            return false;
+        }
     }
 }

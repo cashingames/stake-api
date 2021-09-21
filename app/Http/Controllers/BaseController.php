@@ -58,7 +58,29 @@ class BaseController extends Controller
 
         //add points
         $user->points += $points;
-        $user->save();
+        $user->user_index_status = 'CLIMBED';
+        $user->save();  
+
+    }
+
+    public function subtractPoints($userId, $points, $description){
+
+        //create point traffic log
+        UserPoint::create([
+            'user_id' => $userId,
+            'value' => $points,
+            'description'=> $description,
+            'point_flow_type'=>'POINTS_SUBTRACTED'
+        ]);
+
+        //find benefactor
+        $user = User::find($userId) ;
+
+        //subtract points
+        $user->points -= $points;
+        $user->user_index_status = 'DROPPED';
+        $user->save();  
+
     }
 
 }

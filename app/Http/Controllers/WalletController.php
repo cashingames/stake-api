@@ -114,6 +114,7 @@ class WalletController extends BaseController
         if($points >= ($boost->point_value)){
             //subtract points from user
             $this->user->update(['points'=>$points - $boost->point_value ]);
+            $this->user->update(['user_index_status'=>'DROPPED']);
            
             //log point traffic
             $this->user->points()->create([
