@@ -119,7 +119,7 @@ class WalletController extends BaseController
             $this->user->points()->create([
                 'user_id' => $this->user->id,
                 'value' => $boost->point_value ,
-                'description'=> 'Points used for buying boosts',
+                'description'=> 'Points used for buying '.$boost->name.' boosts',
                 'point_flow_type'=>'POINTS_SUBTRACTED',
             ]);
             
@@ -158,7 +158,7 @@ class WalletController extends BaseController
                 'wallet_id' => $wallet->id,
                 'transaction_type' => 'DEBIT',
                 'amount' => $boost->currency_value ,
-                'description' => 'BOUGHT BOOSTS FROM WALLET',
+                'description' => 'BOUGHT '.strtoupper($boost->name).' BOOSTS FROM WALLET',
                 'reference' => Str::random(10),
             ]);
             
