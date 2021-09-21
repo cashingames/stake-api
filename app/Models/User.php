@@ -167,5 +167,6 @@ class User extends Authenticatable implements JWTSubject
         if($value =='DROPPED'){
             return false;
         }
+        return true;
     }
 }
