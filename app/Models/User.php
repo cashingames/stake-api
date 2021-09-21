@@ -48,11 +48,12 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_on_line' => 'boolean',
-        'points'=>'integer'
+        'points'=>'integer',
     ];
 
     protected $appends = [
-        'achievement','rank', 'played_games_count'
+        'achievement','rank', 'played_games_count', 
+        'challenges_played','win_rate','sports_points','music_points'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -168,5 +169,41 @@ class User extends Authenticatable implements JWTSubject
             return false;
         }
         return true;
+    }
+
+    public function getChallengesPlayedAttribute()
+    {   
+        $playedAsUser = Challenge::where('user_id',$this->id)->count();
+        $playedAsOpponent = Challenge::where('opponent_id',$this->id)->count();
+      
+        return $playedAsUser + $playedAsOpponent;
+    }
+
+    public function getWinRateAttribute()
+    {   
+        $singleGameWins = GameSession::where('mode_id',1)->where('user_id',$this->id)->where('user_won',true)->count();
+
+        $challengeGameWinsAsUser= GameSession::where('mode_id',2)->where('user_id',$this->id)->where('user_won',true)->count();
+
+        $challengeGameWinsAsOpponent= GameSession::where('mode_id',2)->where('opponent_id',$this->id)->where('opponent_won',true)->count();
+        return (($singleGameWins+$challengeGameWinsAsUser+$challengeGameWinsAsOpponent)/100);
+    }
+
+    public function getMusicPointsAttribute()
+    {   
+       $sum = CategoryRanking::where('user_id', $this->id)
+                ->where('category_id',6)
+                ->sum('points_gained');
+      
+        return $sum;
+    }
+
+    public function getSportsPointsAttribute()
+    {   
+       $sum = CategoryRanking::where('user_id', $this->id)
+                ->where('category_id',5)
+                ->sum('points_gained');
+      
+        return $sum;
     }
 }

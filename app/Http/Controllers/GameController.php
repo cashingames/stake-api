@@ -261,6 +261,9 @@ class GameController extends BaseController
         $gameSession->user_points_gained = $request->userPointsGained;   
         $gameSession->user_wrong_count= $request->userWrongCount;
         $gameSession->user_correct_count= $request->userCorrectCount;
+        if($request->userCorrectCount > $request->userWrongCount){
+            $gameSession->user_won= true;
+        }
      
         $gameSession->save();
         
@@ -306,7 +309,15 @@ class GameController extends BaseController
         $gameSession->opponent_points_gained = $request->opponentPointsGained;
         $gameSession->opponent_wrong_count = $request->opponentWrongCount;
         $gameSession->opponent_correct_count = $request->opponentCorrectCount;
+
+        if($request->userPointsGained > $request->opponentPointsGained){
+            $gameSession->user_won= true;
+        }
+        if($request->opponentPointsGained > $request->userPointsGained){
+            $gameSession->opponent_won= true;
+        }
         $gameSession->save();
+        
         
         //update category rankings for user
         $this->updateRanking($this->user->id,$gameSession->category_id,$gameSession->user_points_gained);
