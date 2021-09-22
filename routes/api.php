@@ -45,7 +45,8 @@ Route::prefix('v2')->group(function () {
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);
-        Route::get('profile/me', [ProfileController::class, 'me']);
+        Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
+        Route::get('profile/me', [UserController::class, 'me']);
 
         Route::get('wallet/me', [WalletController::class, 'me']);
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);

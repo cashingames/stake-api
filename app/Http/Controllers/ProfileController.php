@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use URL;
 use App\Models\User;
 use App\Models\Profile;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends BaseController
 {
@@ -110,7 +111,25 @@ class ProfileController extends BaseController
         }
 
         return $this->sendResponse($profile, "Profile Updated.");
-
-
     }
+
+    public function changePassword(Request $request){
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:8'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+            ]);
+
+            if( $data['password'] === $data['new_password']){
+               return $this->sendError("The new password must be different from the old password.", "The new password must be different from the old password.");
+            }
+    
+            if (Hash::check($data['password'], $this->user->password)){
+                $this->user->update(['password' => bcrypt($data['new_password'])]);
+                return $this->sendResponse("Password Changed!.", "Password Changed!.");
+            }    
+            return $this->sendError("Old password inputed does not match existing password.","Old password inputed does not match existing password.");
+        }
+
+        
+   
 }
