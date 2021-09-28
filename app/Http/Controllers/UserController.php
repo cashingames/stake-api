@@ -76,20 +76,21 @@ class UserController extends BaseController
 
     public function friends(){
 
-        $isOnline = OnlineTimeline::where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
-        
+        $users = User::get();
         $onlineFriends = [];
-        foreach($isOnline as $friend){
-            $details = $friend->user->load('profile');
-            $onlineFriends[] = $details;   
-        }
-
-        $isOffline = OnlineTimeline::where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
-
         $offlineFriends = [];
-        foreach($isOffline as $friend){
-            $details = $friend->user->load('profile');
-            $offlineFriends[] = $details;   
+
+        foreach($users as $friend){
+            $isOnline = OnlineTimeline::where('user_id', $friend->id)
+            ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
+            if($isOnline !== null){
+                $onlineFriends[] = $isOnline->user->load('profile');
+            }
+            $isOffline = OnlineTimeline::where('user_id', $friend->id)
+            ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
+            if($isOffline !== null){
+                $offlineFriends[] = $isOffline->user->load('profile');
+            }
         }
         
         $result = [
@@ -97,6 +98,7 @@ class UserController extends BaseController
             'offline' =>array_unique($offlineFriends)
         ];
         return $this->sendResponse($result, "Friends");
+
     }
 
     public function friendQuizzes(){
