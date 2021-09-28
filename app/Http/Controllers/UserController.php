@@ -94,10 +94,10 @@ class UserController extends BaseController
         }
         
         $result = [
-            'online'=>array_diff($onlineFriends,$offlineFriends),
+            'online'=>$onlineFriends,
             'offline' =>array_diff($offlineFriends,$onlineFriends)
         ];
-        return $this->sendResponse(array_unique($result), "Friends");
+        return $this->sendResponse($result, "Friends");
 
     }
 
