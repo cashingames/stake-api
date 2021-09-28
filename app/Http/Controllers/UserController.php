@@ -75,14 +75,8 @@ class UserController extends BaseController
     }
 
     public function friends(){
-        $user = auth()->user();
-        $friends = Profile::where('referrer',$user->profile->referral_code)->get();
 
-        if($friends === null){
-            return $this->sendError("You have no friends yet", "You have no friends yet");
-        }
-
-        $isOnline = OnlineTimeline::where('referrer',$user->profile->referral_code)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
+        $isOnline = OnlineTimeline::where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
         
         $onlineFriends = [];
         foreach($isOnline as $friend){
@@ -90,7 +84,7 @@ class UserController extends BaseController
             $onlineFriends[] = $details;   
         }
 
-        $isOffline = OnlineTimeline::where('referrer',$user->profile->referral_code)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
+        $isOffline = OnlineTimeline::where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
 
         $offlineFriends = [];
         foreach($isOffline as $friend){
