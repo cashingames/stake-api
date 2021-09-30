@@ -102,14 +102,7 @@ class UserController extends BaseController
     }
 
     public function friendQuizzes(){
-        $user = auth()->user();
-        $quizzes = [];
-        $friends = Profile::where('referrer',$user->profile->referral_code)->get();
-
-        foreach($friends as $friend){
-            $quizzes[]= UserQuiz::where('user_id',$friend->id)->get();
-        }
-        return $this->sendResponse($quizzes, "Friends Quizzes");
+        return $this->sendResponse(UserQuiz::all(), "Friends Quizzes");
     }
 
     public function setOnline(){
