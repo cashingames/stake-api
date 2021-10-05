@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\UserQuiz;
@@ -17,17 +16,17 @@ class UserController extends BaseController
     public function me()
     {
         try {
-            $user = $this->user->load('profile');
             $result = [
                 'user' => $user->load([
                     'profile',
                     'wallet',
                     'transactions',
-                    'boosts']),
+                    'boosts'
+                ]),
             ];
             return $this->sendResponse($result, 'User details');
-        } catch(\Exception $e){
-            error_log($e->getLine().', '.$e->getMessage());
+        } catch (\Exception $e) {
+            error_log($e->getLine() . ', ' . $e->getMessage());
             return $this->sendError([], $e->getMessage());
         }
     }
@@ -45,11 +44,11 @@ class UserController extends BaseController
 
     public function getBoosts()
     {
-       $userBoosts = DB::table('user_boosts')->where('user_id',$this->user->id)
-        ->join('boosts', function ($join) {
-            $join->on('boosts.id', '=', 'user_boosts.boost_id');
-        })
-        ->get();
+        $userBoosts = DB::table('user_boosts')->where('user_id', $this->user->id)
+            ->join('boosts', function ($join) {
+                $join->on('boosts.id', '=', 'user_boosts.boost_id');
+            })
+            ->get();
 
         return $this->sendResponse($userBoosts, "User Boosts");
     }
@@ -58,54 +57,64 @@ class UserController extends BaseController
     {
         $userId = $this->user->id;
 
-        $userAchievement = DB::table('user_achievements')->where('user_id',$userId)
-        ->join('achievements', function ($join) {
-            $join->on('achievements.id', '=', 'user_achievements.achievement_id');
-        })
-        ->get();
+        $userAchievement = DB::table('user_achievements')->where('user_id', $userId)
+            ->join('achievements', function ($join) {
+                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
+            })
+            ->get();
 
         return $this->sendResponse($userAchievement, "User Achievement");
     }
 
-    public function quizzes(){
+    public function quizzes()
+    {
         $user = auth()->user();
-        $quizzes = UserQuiz::where('user_id',$user->id)->get();
+        $quizzes = UserQuiz::where('user_id', $user->id)->get();
 
         return $this->sendResponse($quizzes, "User Quizzes");
     }
 
-    public function friends(){
+    public function friends()
+    {
 
         $users = User::get();
         $onlineFriends = [];
         $offlineFriends = [];
 
-        foreach($users as $friend){
+        foreach ($users as $friend) {
             $isOnline = OnlineTimeline::where('user_id', $friend->id)
-            ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if($isOnline !== null){
+                ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
+            if ($isOnline !== null) {
                 $onlineFriends[] = $isOnline->user->load('profile');
             }
             $isOffline = OnlineTimeline::where('user_id', $friend->id)
-            ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if($isOffline !== null){
+                ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
+            if ($isOffline !== null) {
                 $offlineFriends[] = $isOffline->user->load('profile');
             }
         }
-        
+
         $result = [
-            'online'=>$onlineFriends,
-            'offline' =>array_diff($offlineFriends,$onlineFriends)
+            'online' => $onlineFriends,
+            'offline' => array_diff($offlineFriends, $onlineFriends)
         ];
         return $this->sendResponse($result, "Friends");
-
     }
 
-    public function friendQuizzes(){
-        return $this->sendResponse(UserQuiz::all(), "Friends Quizzes");
+    public function friendQuizzes()
+    {
+        $user = auth()->user();
+        $quizzes = [];
+        $friends = Profile::where('referrer', $user->profile->referral_code)->get();
+
+        foreach ($friends as $friend) {
+            $quizzes[] = UserQuiz::where('user_id', $friend->id)->get();
+        }
+        return $this->sendResponse($quizzes, "Friends Quizzes");
     }
 
-    public function setOnline(){
+    public function setOnline()
+    {
         OnlineTimeline::create([
             'user_id' => $this->user->id,
             'referrer' => $this->user->profile->referrer

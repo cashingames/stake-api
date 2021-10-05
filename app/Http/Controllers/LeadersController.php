@@ -31,7 +31,11 @@ class LeadersController extends BaseController
      */
     public function global()
     {
-        $leaders = User::select('points', 'user_index_status')->orderBy('points', 'desc')->with('profile:first_name,last_name,avatar')->limit(25)->get();
+        $leaders = User::orderBy('points', 'desc')
+            ->select('id', 'points', 'user_index_status')
+            ->with('profile:id,user_id,first_name,last_name,avatar')
+            ->limit(25)->get();
+
         return $this->sendResponse($leaders, "Global Leaders");
     }
 
