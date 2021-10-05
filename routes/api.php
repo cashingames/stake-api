@@ -37,7 +37,7 @@ Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'dec
 
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
-    
+
     Route::middleware('auth:api')->group(function () {
         Route::get('user/me', [UserController::class, 'me']);
         Route::post('me/set/online', [UserController::class, 'setOnline']);
@@ -87,13 +87,12 @@ Route::prefix('v2')->group(function () {
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
-        Route::get('leaders/global',[LeadersController::class,'globalLeaders']);
-        Route::get('leaders/category/{catId}',[LeadersController::class,'categoryRankings']);
-        Route::get('user/games/recently-played',[GameController::class,'recentlyPlayed']);
+        Route::get('leaders/global', [LeadersController::class, 'global']);
+        Route::get('leaders/category/{catId}', [LeadersController::class, 'categoryRankings']);
+        Route::get('user/games/recently-played', [GameController::class, 'recentlyPlayed']);
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
-
     });
 });
