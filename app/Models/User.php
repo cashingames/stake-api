@@ -120,6 +120,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Challenge::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(User::class, 'category_rankings')->withPivot('points_gained', 'user_id');
+    }
+
     public function categoryRanking()
     {
         return $this->hasOne(CategoryRanking::class);

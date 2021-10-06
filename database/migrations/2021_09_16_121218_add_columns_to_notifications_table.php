@@ -30,10 +30,7 @@ class AddColumnsToNotificationsTable extends Migration
     public function down()
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->dropColumn('user_id');
-            $table->dropColumn('title');
-            $table->dropColumn('message');
-            $table->dropColumn('is_read');
+            $table->dropColumn(['user_id', 'title', 'message', 'is_read']);
         });
     }
 }

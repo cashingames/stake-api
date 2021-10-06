@@ -17,7 +17,7 @@ class UserController extends BaseController
     {
         try {
             $result = [
-                'user' => $user->load([
+                'user' => $this->user->load([
                     'profile',
                     'wallet',
                     'transactions',

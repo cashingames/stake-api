@@ -15,14 +15,15 @@ class CategoryRanking extends Model
         'user_profile'
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
     public function getUserProfileAttribute()
-    {   
+    {
         $user = User::where('id', $this->user_id)->first();
-        
+
         return $user->load('profile');
     }
 }

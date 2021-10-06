@@ -29,8 +29,7 @@ class AddUserWonColumnToGameSessionsTable extends Migration
     {
         Schema::table('game_sessions', function (Blueprint $table) {
             //
-            $table->dropColumn('user_won');
-            $table->dropColumn('opponent_won');
+            $table->dropColumn(['user_won', 'opponent_won']);
         });
     }
 }

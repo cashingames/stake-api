@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\CategoryRanking;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class LeadersController extends BaseController
 {
@@ -31,9 +34,10 @@ class LeadersController extends BaseController
      */
     public function global()
     {
-        $leaders = User::orderBy('points', 'desc')
-            ->select('id', 'points', 'user_index_status')
-            ->with('profile:id,user_id,first_name,last_name,avatar')
+        $leaders = DB::table('users')
+            ->orderBy('points', 'desc')
+            ->join('profiles', 'users.id', '=', 'profiles.user_id')
+            ->select('users.points', 'users.user_index_status', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
             ->limit(25)->get();
 
         return $this->sendResponse($leaders, "Global Leaders");
@@ -54,6 +58,17 @@ class LeadersController extends BaseController
      */
     public function categories()
     {
+        $response = [];
+        Category::has('users')->get()->each(function ($item) use (&$response) {
+            $board = $item->users()->orderBy('points_gained', 'desc')
+                ->join('users', 'users.id', '=', 'user_id')
+                ->join('profiles', 'users.id', '=', 'profiles.user_id')
+                ->select('points_gained as points', 'users.user_index_status', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
+                ->limit(25)
+                ->get();
+            $response[$item->name] = $board;
+        });
+        return $this->sendResponse($response, 'Categories leaderboard');
     }
 
     /**

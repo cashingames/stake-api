@@ -29,8 +29,7 @@ class AddPrimaryColorsToGameTypesTable extends Migration
     {
         Schema::table('game_types', function (Blueprint $table) {
             //
-            $table->dropColumn('primary_color_1');
-            $table->dropColumn('primary_color_2');
+            $table->dropColumn(['primary_color_1', 'primary_color_2']);
         });
     }
 }

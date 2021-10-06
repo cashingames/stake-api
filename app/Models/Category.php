@@ -10,14 +10,19 @@ class Category extends Model
   use HasFactory;
 
   protected $fillable = ['name', 'description'];
-  
-  public function questions(){
+
+  public function questions()
+  {
     return $this->hasMany(Question::class);
   }
 
-  public function gameTypes(){
+  public function gameTypes()
+  {
     return $this->hasMany(GameType::class);
   }
-  
 
+  public function users()
+  {
+    return $this->belongsToMany(Category::class, 'category_rankings')->withPivot('points_gained', 'user_id');
+  }
 }
