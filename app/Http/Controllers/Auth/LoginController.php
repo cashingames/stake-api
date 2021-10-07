@@ -26,7 +26,7 @@ class LoginController extends BaseController
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Invalid email and password'], 400);
         }
 
@@ -53,19 +53,7 @@ class LoginController extends BaseController
     protected function respondWithToken($token)
     {
         $user =  auth()->user();
-        $user->update(["is_on_line"=>true]);
-        
-        $result = [
-            'token' => [
-                'access_token' => $token,
-            ],
-            'user' => $user->load([
-                'profile',
-                'wallet',
-                'transactions',
-                'boosts']),
-           
-        ];
-        return $this->sendResponse($result, 'User details');
+        $user->update(["is_on_line" => true]);
+        return $this->sendResponse($token, 'Token');
     }
 }
