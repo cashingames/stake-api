@@ -43,7 +43,7 @@ class RegisterController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['register','verifyUsername']]);
+        $this->middleware('auth:api', ['except' => ['register', 'verifyUsername']]);
     }
 
     /**
@@ -58,7 +58,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phone_number' => ['nullable', 'string', 'min:11', 'max:11','unique:users'],
+            'phone_number' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:profiles,referral_code']
@@ -91,7 +91,7 @@ class RegisterController extends BaseController
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
-                'referral_code' =>$data['username']."_".mt_rand(1111,9999),
+                'referral_code' => $data['username'] . "_" . mt_rand(1111, 9999),
                 'referrer' => $data['referrer'] ?? null
             ]);
 
@@ -125,17 +125,16 @@ class RegisterController extends BaseController
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
-
         }
         //credit referrer with points
-        if (config('trivia.bonus.enabled') &&
+        if (
+            config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
             $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
             $this->creditPoints($referrerId, 50, "Points credited for signed up referral");
-
         }
 
         return $user;
@@ -150,24 +149,14 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        $user = auth()->user();
         $token = auth()->tokenById($user->id);
-        $result = [
-            'token' => [
-                'access_token' => $token,
-            ],
-            'user' => $user->load([
-                'profile',
-                'wallet',
-                'transactions',
-                'boosts']),
-        ];
-        return $this->sendResponse($result, 'User details');
+        return $this->sendResponse($token, 'Registration token');
     }
 
-    public function verifyUsername($username){
+    public function verifyUsername($username)
+    {
         $exists = User::where('username', $username)->first();
-        if ($exists === null){
+        if ($exists === null) {
             return $this->sendResponse(true, 'Username is available');
         }
         return $this->sendResponse(false, 'Username is not available');
