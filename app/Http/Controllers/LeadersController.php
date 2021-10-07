@@ -59,7 +59,7 @@ class LeadersController extends BaseController
     public function categories()
     {
         $response = [];
-        Category::has('users')->get()->each(function ($item) use (&$response) {
+        Category::whereNull('category_id')->has('users')->get()->each(function ($item) use (&$response) {
             $board = $item->users()->orderBy('points_gained', 'desc')
                 ->join('users', 'users.id', '=', 'user_id')
                 ->join('profiles', 'users.id', '=', 'profiles.user_id')
