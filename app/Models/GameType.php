@@ -9,24 +9,24 @@ class GameType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','description', 'instruction','category_id'];
+    protected $fillable = ['name', 'description', 'instruction', 'category_id'];
 
     protected $appends = [
         'is_available'
-     ];
+    ];
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function getisAvailableAttribute()
-    {   
-        $hasQuestions = Question::where('game_type_id',$this->id)->first();
-        
-        if($hasQuestions === null){
+    public function getIsAvailableAttribute()
+    {
+        $hasQuestions = Question::where('game_type_id', $this->id)->first();
+
+        if ($hasQuestions === null) {
             return false;
         }
         return true;
-
     }
 }

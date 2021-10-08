@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GameType;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\UserQuiz;
 use App\Models\OnlineTimeline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use stdClass;
 
 class UserController extends BaseController
 {
@@ -29,6 +31,31 @@ class UserController extends BaseController
             error_log($e->getLine() . ', ' . $e->getMessage());
             return $this->sendError([], $e->getMessage());
         }
+    }
+
+    public function profile()
+    {
+        $result = new stdClass;
+        $result->username = $this->user->username;
+        $result->email = $this->user->email;
+        $result->lastName = $this->user->profile->last_name;
+        $result->firstName = $this->user->profile->first_name;
+        $result->fullName = $this->user->profile->first_name . " " . $this->user->profile->last_name;
+        $result->avatar = $this->user->profile->avatar;
+        $result->points = $this->user->points;
+        $result->globalRank = $this->user->rank;
+        $result->gamesCount = $this->user->played_games_count;
+        $result->walletBalance = $this->user->wallet->balance;
+        $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
+            return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
+        });
+        $result->gameTypes = GameType::inRandomOrder()->select('name', 'description', 'icon', 'primary_color_2 as bgColor')
+            ->get()->map(function ($item) {
+                $item->isEnabled = $item->is_available;
+                return $item;
+            });
+
+        return $this->sendResponse($result, 'User details');
     }
 
     public function getPoints()

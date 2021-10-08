@@ -35,6 +35,12 @@ Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'res
 Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
 Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
 
+Route::middleware('auth:api')->prefix('v3')->group(
+    function () {
+        Route::get('user/profile', [UserController::class, 'profile']);
+    }
+);
+
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
 
