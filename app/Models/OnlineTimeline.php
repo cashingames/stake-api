@@ -11,7 +11,19 @@ class OnlineTimeline extends Model
 
     protected $fillable = ['referrer','user_id'];
 
+    protected $appends = [
+        'is_currently_online'
+    ];
+
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function getIsCurrentlyOnlineAttribute()
+    {
+        if($this->updated_at >Carbon::now()->subMinutes(5)->toDateTimeString()){
+            return true;
+        }
+        return false;
     }
 }
