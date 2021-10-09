@@ -111,12 +111,12 @@ class UserController extends BaseController
         foreach ($users as $friend) {
             $isOnline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOnline !== null && $isOnline->user_id !== $this->user->id) {
+            if ($isOnline !== null ) {
                 $onlineFriends[] = $isOnline->user->load('profile');
             }
             $isOffline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOffline !== null && $isOffline->user_id !== $this->user->id) {
+            if ($isOffline !== null ) {
                 $offlineFriends[] = $isOffline->user->load('profile');
             }
         }
