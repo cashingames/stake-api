@@ -122,19 +122,28 @@ class UserController extends BaseController
         foreach ($users as $friend) {
             $isOnline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOnline !== null) {
+            if ($isOnline !== null ) {
                 $onlineFriends[] = $isOnline->user->load('profile');
             }
             $isOffline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOffline !== null) {
+            if ($isOffline !== null ) {
                 $offlineFriends[] = $isOffline->user->load('profile');
             }
         }
-
+        
+        //remove duplicates from offline records,
+      
+        $offlineCollect = collect($offlineFriends);
+        $uniqueOffline = $offlineCollect->unique();
+        $allUniqueValues = $uniqueOffline->values()->all() ;
+        
+        // compare and remove same records from offline and online records
+        $diff = collect($allUniqueValues)->diff(collect($onlineFriends));
+        
         $result = [
             'online' => $onlineFriends,
-            'offline' => $offlineFriends
+            'offline' => $diff->values()->all()
         ];
         return $this->sendResponse($result, "Friends");
     }
