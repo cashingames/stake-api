@@ -55,6 +55,17 @@ class UserController extends BaseController
                 return $item;
             });
 
+        // $result->gamePerformance = 
+        /**
+         * 1.fetch userscore last weeks
+         * 2.fetch userscore last two weeks
+         * 
+         * if( 1 > 2) then increase, % increase = (1-2)%. gamePermance = Your result was up X% last week. You can try harder this week.
+         * else if( 2 > 1) then decrease % decrease = (2-1)% gamePermance = Oops, your result was X% down last week. You can try harder this week.
+         * 
+         * return 
+         */
+
         return $this->sendResponse($result, 'User details');
     }
 
