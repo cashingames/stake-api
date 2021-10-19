@@ -74,7 +74,7 @@ class UserController extends BaseController
             });
         $result->transactions = $this->user->transactions()
             ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
-            ->orderBy('transactionDate', 'desc  ')
+            ->orderBy('transactionDate', 'desc')
             ->get();
         $result->earnings = $this->user->transactions()
             ->where('transaction_type', 'Fund Recieved')
