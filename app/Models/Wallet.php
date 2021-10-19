@@ -10,9 +10,10 @@ class Wallet extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
+        'user_id',
         'balance'
     ];
+
 
     public function owner()
     {
@@ -23,5 +24,4 @@ class Wallet extends Model
     {
         return $this->hasMany(WalletTransaction::class);
     }
-
 }

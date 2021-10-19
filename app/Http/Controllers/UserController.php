@@ -41,11 +41,29 @@ class UserController extends BaseController
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;
         $result->fullName = $this->user->profile->first_name . " " . $this->user->profile->last_name;
+        $result->phoneNumber = $this->user->phone_number;
+        $result->bankName = $this->user->profile->bank_name;
+        $result->accountName = $this->user->profile->account_name;
+        $result->accountNumber = $this->user->profile->account_number;
+        $result->dateOfBirth = $this->user->profile->date_of_birth;
+        $result->gender = $this->user->profile->gender;
         $result->avatar = $this->user->profile->avatar;
+        $result->referralCode = $this->user->profile->referral_code;
         $result->points = $this->user->points;
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
         $result->walletBalance = $this->user->wallet->balance;
+        $result->badge = $this->user->achievement;
+        $result->winRate = $this->user->win_rate;
+        $result->totalChallenges = $this->user->challenges_played;
+        $result->boosts = DB::table('user_boosts')->where('user_id', $this->user->id)
+            ->join('boosts', function ($join) {
+                $join->on('boosts.id', '=', 'user_boosts.boost_id');
+            })->select('boosts.id', 'name')->get();
+        $result->achievements = DB::table('user_achievements')->where('user_id', $this->user->id)
+            ->join('achievements', function ($join) {
+                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
+            })->select('achievements.id', 'title', 'medal as logoUrl')->get();
         $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
             return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
         });
@@ -54,6 +72,13 @@ class UserController extends BaseController
                 $item->isEnabled = $item->is_available;
                 return $item;
             });
+        $result->transactions = $this->user->transactions()
+            ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('transactionDate', 'desc  ')
+            ->get();
+        $result->earnings = $this->user->transactions()
+            ->where('transaction_type', 'Fund Recieved')
+            ->orderBy('created_at', 'desc')->get();
 
         // $result->gamePerformance = 
         /**
@@ -122,25 +147,25 @@ class UserController extends BaseController
         foreach ($users as $friend) {
             $isOnline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOnline !== null ) {
+            if ($isOnline !== null) {
                 $onlineFriends[] = $isOnline->user->load('profile');
             }
             $isOffline = OnlineTimeline::where('user_id', $friend->id)
                 ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOffline !== null ) {
+            if ($isOffline !== null) {
                 $offlineFriends[] = $isOffline->user->load('profile');
             }
         }
-        
+
         //remove duplicates from offline records,
-      
+
         $offlineCollect = collect($offlineFriends);
         $uniqueOffline = $offlineCollect->unique();
-        $allUniqueValues = $uniqueOffline->values()->all() ;
-        
+        $allUniqueValues = $uniqueOffline->values()->all();
+
         // compare and remove same records from offline and online records
         $diff = collect($allUniqueValues)->diff(collect($onlineFriends));
-        
+
         $result = [
             'online' => $onlineFriends,
             'offline' => $diff->values()->all()

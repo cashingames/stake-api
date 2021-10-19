@@ -53,7 +53,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate', 'sports_points', 'music_points'
+        'challenges_played', 'win_rate'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -87,7 +87,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function transactions()
     {
-        return $this->hasManyThrough(WalletTransaction::class, Wallet::class)->orderBy('created_at', 'desc');
+        return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
     public function points()
@@ -203,21 +203,21 @@ class User extends Authenticatable implements JWTSubject
         return (($singleGameWins + $challengeGameWinsAsUser + $challengeGameWinsAsOpponent) / 100);
     }
 
-    public function getMusicPointsAttribute()
-    {
-        $sum = CategoryRanking::where('user_id', $this->id)
-            ->where('category_id', 6)
-            ->sum('points_gained');
+    // public function getMusicPointsAttribute()
+    // {
+    //     $sum = CategoryRanking::where('user_id', $this->id)
+    //         ->where('category_id', 6)
+    //         ->sum('points_gained');
 
-        return $sum;
-    }
+    //     return $sum;
+    // }
 
-    public function getSportsPointsAttribute()
-    {
-        $sum = CategoryRanking::where('user_id', $this->id)
-            ->where('category_id', 5)
-            ->sum('points_gained');
+    // public function getSportsPointsAttribute()
+    // {
+    //     $sum = CategoryRanking::where('user_id', $this->id)
+    //         ->where('category_id', 5)
+    //         ->sum('points_gained');
 
-        return $sum;
-    }
+    //     return $sum;
+    // }
 }

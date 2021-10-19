@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WalletTransaction extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
     /**
      * The attributes that should be cast.
@@ -24,7 +24,12 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id','transaction_type', 'amount', 'description', 'reference', 'balance'
+        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance'
+    ];
+
+
+    protected $hidden = [
+        'laravel_through_key'
     ];
 
     public function wallet()
@@ -37,14 +42,12 @@ class WalletTransaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getTransactionTypeAttribute($value){
-        if($value == "CREDIT")
-        {
+    public function getTransactionTypeAttribute($value)
+    {
+        if ($value == "CREDIT") {
             return "Fund Received";
-        }else if ($value == "DEBIT")
-        {
+        } else if ($value == "DEBIT") {
             return "Fund Withdrawal";
         }
     }
-
 }

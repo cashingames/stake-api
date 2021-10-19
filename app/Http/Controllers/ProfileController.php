@@ -18,46 +18,36 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'username' => ['required', 'string', 'max:20'],
-            'phoneNumber'=> ['nullable', 'string', 'max:11'],
-            'email' => ['required', 'email'],
-            'password' =>['nullable','string'],
+            'phoneNumber' => ['nullable', 'string', 'max:11'],
+            'password' => ['nullable', 'string'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-
-        $user = auth()->user();
-        $profile = $user->profile;
-
-        if ($profile == null) {
-            return $this->sendError(['Profile not found'], "Unable to update profile");
+        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
+            $this->user->phone_number = $data['phoneNumber'];
+        }
+        if (isset($data['password']) &&  !is_null($data['password'])) {
+            $this->user->password = bcrypt($data['password']);
         }
 
-        $user->username = $data['username'];
-        
-        if(isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])){
-            $user->phone_number = $data['phoneNumber'];
-        }
-        if(isset($data['password']) &&  !is_null($data['password'])){
-            $user->password = bcrypt($data['password']);
-        }
-       
+        $profile = $this->user->profile;
+
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
 
-        if(isset($data['gender']) &&  !is_null($data['gender'])){
+        if (isset($data['gender']) &&  !is_null($data['gender'])) {
             $profile->gender =  $data['gender'];
         }
 
-        if(isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])){
-            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString() ;
+        if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
+            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
 
-        $user->save();
+        $this->user->save();
         $profile->save();
 
-        return $this->sendResponse($user, "Profile Updated.");
+        return $this->sendResponse($this->user, "Profile Updated.");
     }
 
     public function editBank(Request $request)
@@ -87,7 +77,7 @@ class ProfileController extends BaseController
 
     public function addProfilePic(Request $request)
     {
-        
+
         $data  = $request->validate([
             'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
         ]);
@@ -100,36 +90,33 @@ class ProfileController extends BaseController
 
         if ($request->hasFile('avatar')) {
             $image = $request->file('avatar');
-            $name = $this->user->id.".".$image->guessExtension();
+            $name = $this->user->id . "." . $image->guessExtension();
             $destinationPath = public_path('avatar');
-            $profile->avatar ='avatar/'.$name;
+            $profile->avatar = 'avatar/' . $name;
             $image->move($destinationPath, $name);
-           // echo $destinationPath;
-           
+            // echo $destinationPath;
+
             $profile->save();
-               
         }
 
         return $this->sendResponse($profile, "Profile Updated.");
     }
 
-    public function changePassword(Request $request){
+    public function changePassword(Request $request)
+    {
         $data = $request->validate([
             'password' => ['required', 'string', 'min:8'],
             'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-            ]);
+        ]);
 
-            if( $data['password'] === $data['new_password']){
-               return $this->sendError("The new password must be different from the old password.", "The new password must be different from the old password.");
-            }
-    
-            if (Hash::check($data['password'], $this->user->password)){
-                $this->user->update(['password' => bcrypt($data['new_password'])]);
-                return $this->sendResponse("Password Changed!.", "Password Changed!.");
-            }    
-            return $this->sendError("Old password inputed does not match existing password.","Old password inputed does not match existing password.");
+        if ($data['password'] === $data['new_password']) {
+            return $this->sendError("The new password must be different from the old password.", "The new password must be different from the old password.");
         }
 
-        
-   
+        if (Hash::check($data['password'], $this->user->password)) {
+            $this->user->update(['password' => bcrypt($data['new_password'])]);
+            return $this->sendResponse("Password Changed!.", "Password Changed!.");
+        }
+        return $this->sendError("Old password inputed does not match existing password.", "Old password inputed does not match existing password.");
+    }
 }
