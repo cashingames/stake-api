@@ -37,7 +37,7 @@ class GameController extends BaseController
         $result->boosts = Boost::all();
         $result->gameModes = Mode::select('id', 'name')->get();
         $result->gameTypes = GameType::inRandomOrder()
-            ->select('name', 'description', 'icon', 'primary_color_2 as bgColor')
+            ->select('id', 'name', 'description', 'icon', 'primary_color_2 as bgColor')
             ->get()->map(function ($item) {
                 $item->isEnabled = $item->is_available;
                 return $item;
@@ -119,21 +119,21 @@ class GameController extends BaseController
 
     public function startSingleGame(Request $request)
     {
-        if (!($request->has('subCatId')) || !($request->has('gameTypeId')) || !($request->has('modeId'))) {
+        if (!$request->has('category') || !$request->has('gameType')) {
             return $this->sendError('SubcategoryId, GametypeId and ModeId is required', 'SubcategoryId, GametypeId and ModeId is required');
         }
 
-        $subCat = Category::find($request->subCatId);
-        $gameType = GameType::find($request->gameTypeId);
-        $mode = Mode::find($request->modeId);
+        $category = Category::find($request->subCatId);
+        $type = GameType::find($request->gameTypeId);
+        $mode = Mode::where('name', 'Exhibition')->single();
 
-        if (($subCat || $gameType || $mode) === null) {
+        if (($category || $type || $mode) === null) {
             return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
         }
 
-        $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-        $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-        $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
+        $easyQuestions = $category->questions()->where('level', 'easy')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
+        $mediumQuestions =  $category->questions()->where('level', 'medium')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
+        $hardQuestions = $category->questions()->where('level', 'hard')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
 
         $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
@@ -141,8 +141,8 @@ class GameController extends BaseController
 
         $gameSession->user_id = $this->user->id;
         $gameSession->mode_id = $mode->id;
-        $gameSession->game_type_id = $gameType->id;
-        $gameSession->category_id = $subCat->id;
+        $gameSession->game_type_id = $type->id;
+        $gameSession->category_id = $category->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
