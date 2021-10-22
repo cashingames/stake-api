@@ -16,21 +16,19 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CategorySeeder::class,
-            BoostSeeder::class,
             GameTypeSeeder::class,
             ModeSeeder::class,
+            AchievementSeeder::class,
+            BoostSeeder::class,
             UserSeeder::class,
-            ChallengeSeeder::class,
-            NotificationSeeder::class,
+            // ChallengeSeeder::class,
+            // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,
             // ProfileSeeder::class,
-            AchievementSeeder::class,
-           // QuestionSeeder::class
+            // QuestionSeeder::class
 
-            
+
         ]);
-
-        //\App\Models\Question::factory(150)->create();
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GameType;
-use App\Models\Profile;
 use App\Models\User;
+use App\Models\Profile;
+use App\Models\GameType;
 use App\Models\UserQuiz;
 use App\Models\OnlineTimeline;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use stdClass;
 
 class UserController extends BaseController
@@ -67,11 +67,6 @@ class UserController extends BaseController
         $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
             return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
         });
-        $result->gameTypes = GameType::inRandomOrder()->select('name', 'description', 'icon', 'primary_color_2 as bgColor')
-            ->get()->map(function ($item) {
-                $item->isEnabled = $item->is_available;
-                return $item;
-            });
         $result->transactions = $this->user->transactions()
             ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('transactionDate', 'desc')

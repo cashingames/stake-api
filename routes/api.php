@@ -41,6 +41,14 @@ Route::middleware('auth:api')->prefix('v3')->group(
     }
 );
 
+Route::middleware('api')->prefix('v3')->group(
+    function () {
+        Route::get('game/common', [GameController::class, 'getCommonData']);
+    }
+);
+
+
+
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
 
