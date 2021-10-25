@@ -53,6 +53,11 @@ class GameController extends BaseController
             where c.category_id = 0
             "
         );
+
+        $result->gameTypes = $result->gameTypes->map(function ($type) use ($result) {
+            $type->categories = $result->categories;
+            return $type;
+        });
         $result->subcategories = DB::select("select c.id, c.name, c.category_id as categoryId from categories c where c.category_id != 0");
 
         //get no of subcategories
@@ -119,17 +124,9 @@ class GameController extends BaseController
 
     public function startSingleGame(Request $request)
     {
-        if (!$request->has('category') || !$request->has('gameType')) {
-            return $this->sendError('SubcategoryId, GametypeId and ModeId is required', 'SubcategoryId, GametypeId and ModeId is required');
-        }
-
-        $category = Category::find($request->subCatId);
-        $type = GameType::find($request->gameTypeId);
-        $mode = Mode::where('name', 'Exhibition')->single();
-
-        if (($category || $type || $mode) === null) {
-            return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
-        }
+        $category = Category::find($request->category);
+        $type = GameType::find($request->type);
+        $mode = Mode::where('name', 'Exhibition')->first();
 
         $easyQuestions = $category->questions()->where('level', 'easy')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
         $mediumQuestions =  $category->questions()->where('level', 'medium')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
@@ -138,7 +135,6 @@ class GameController extends BaseController
         $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
         $gameSession = new GameSession();
-
         $gameSession->user_id = $this->user->id;
         $gameSession->mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
@@ -146,13 +142,19 @@ class GameController extends BaseController
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
-        $gameSession->state = 'ONGOING';
-        $gameSession->save();
+        $gameSession->state = "ONGOING";
+        // $gameSession->save();
+
+        $gameInfo = new stdClass;
+        $gameInfo->token = $gameSession->session_token;
+        $gameInfo->startTime = $gameSession->start_time;
+        $gameInfo->endTime = $gameSession->end_time;
 
         $result = [
             'questions' => $questions,
-            'game' => $gameSession
+            'game' => $gameInfo
         ];
+
         return $this->sendResponse($result, 'Game Started');
     }
 
@@ -374,9 +376,6 @@ class GameController extends BaseController
         }
 
         if ($userBoost->boost_count <= 0) {
-            //User has finished boost , reset used count
-            $userBoost->used_count = 0;
-            $userBoost->save();
             return $this->sendError('You have used up this boost', 'You have used up this boost');
         }
 
@@ -463,16 +462,5 @@ class GameController extends BaseController
         ]);
 
         return $this->sendResponse("Challenge Declined", 'Challenge Declined');
-    }
-
-    public function recentlyPlayed()
-    {
-        $recentGames = [];
-        $games = GameSession::where('user_id', $this->user->id)->latest()->limit(3)->get();
-        foreach ($games as $g) {
-            $category = Category::where('id', $g->category_id)->first();
-            $recentGames[] = $category;
-        }
-        return $this->sendResponse($recentGames, 'Recent Games');
     }
 }

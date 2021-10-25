@@ -59,7 +59,7 @@ class UserController extends BaseController
         $result->boosts = DB::table('user_boosts')->where('user_id', $this->user->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'name')->get();
+            })->select('boosts.id', 'name', 'user_boosts.boost_count as count')->where('user_boosts.boost_count', '>', 0)->get();
         $result->achievements = DB::table('user_achievements')->where('user_id', $this->user->id)
             ->join('achievements', function ($join) {
                 $join->on('achievements.id', '=', 'user_achievements.achievement_id');

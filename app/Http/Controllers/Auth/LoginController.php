@@ -27,7 +27,7 @@ class LoginController extends BaseController
         $credentials = request(['email', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid email and password'], 400);
+            return response()->json(['error' => 'Invalid email or password'], 400);
         }
 
         return $this->respondWithToken($token);

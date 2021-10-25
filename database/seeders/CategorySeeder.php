@@ -16,31 +16,35 @@ class CategorySeeder extends Seeder
     {
         //modifications will be done on this after review of categories and game flow is done
 
-        DB::table('categories')->insert(
-            [
-                'name' => 'Movies',
-                'category_id' => 0,
-                'icon_name' => 'icons/world_music.jpg',
-                'description' => 'Answer movie related questions',
-                'primary_color' => '#EF8318'
-            ]
-        );
+        // DB::table('categories')->insert(
+        //     [
+        //         'name' => 'Movies',
+        //         'category_id' => 0,
+        //         'icon_name' => 'icons/world_music.jpg',
+        //         'description' => 'Answer movie related questions',
+        //         'primary_color' => '#EF8318'
+        //     ]
+        // );
 
-        DB::table('categories')->insert(
-            [
-                'name' => 'Nollywood',
-                'description' => 'Nigerian movie industry',
-                'category_id' => 1,
-            ]
-        );
+        // DB::table('categories')->insert(
+        //     [
+        //         'name' => 'Nollywood',
+        //         'description' => 'Nigerian movie industry',
+        //         'category_id' => 1,
+        //         'icon_name' => 'icons/world_music.jpg',
+        //         'primary_color' => '#EF8318'
+        //     ]
+        // );
 
-        DB::table('categories')->insert(
-            [
-                'name' => 'Hollywood',
-                'description' => 'Answer hollyood related questions',
-                'category_id' => 1,
-            ]
-        );
+        // DB::table('categories')->insert(
+        //     [
+        //         'name' => 'Hollywood',
+        //         'description' => 'Answer hollyood related questions',
+        //         'category_id' => 1,
+        //         'icon_name' => 'icons/world_music.jpg',
+        //         'primary_color' => '#EF8318'
+        //     ]
+        // );
 
 
         DB::table('categories')->insert(
@@ -59,6 +63,8 @@ class CategorySeeder extends Seeder
                 'name' => 'Premier League Clubs',
                 'description' => 'Answer premier league related questions',
                 'category_id' => 101,
+                'icon_name' => 'icons/premier_league.png',
+                'primary_color' => '#EF8318'
             ]
         );
 
@@ -68,7 +74,7 @@ class CategorySeeder extends Seeder
                 'category_id' => 0,
                 'name' => 'Music',
                 'description' => 'Answer Music questions',
-                'icon_name' => 'icons/music_note.png',
+                'icon_name' => 'icons/music_note.jpg',
                 'primary_color' => '#9C3DB8'
             ],
         );
@@ -78,6 +84,8 @@ class CategorySeeder extends Seeder
                 'name' => 'Naija Music',
                 'description' => 'Answer Naija music questions',
                 'category_id' => 501,
+                'icon_name' => 'icons/naija_music.jpg',
+                'primary_color' => '#EF8318'
             ],
         );
 
@@ -86,6 +94,8 @@ class CategorySeeder extends Seeder
                 'name' => 'The Rest of The World',
                 'description' => 'Answer world wide music questions',
                 'category_id' => 501,
+                'icon_name' => 'icons/world_music.jpg',
+                'primary_color' => '#EF8318'
             ]
         );
     }
