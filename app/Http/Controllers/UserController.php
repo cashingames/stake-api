@@ -134,47 +134,30 @@ class UserController extends BaseController
 
     public function friends()
     {
-        $onlineFriends = [];
-        $offlineFriends = [];
+        $onlineUsers = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function($user){
 
-        $isOnline = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
-      
-        if(count($isOnline) >0){
-            foreach($isOnline as $friend){
-            
-                $data = new stdClass;
-                $data->id = $friend->user_id;
-                $data->username = $friend->user->username;
-                $data->email = $friend->user->email;
-                $data->lastName = $friend->user->profile->last_name;
-                $data->firstName = $friend->user->profile->first_name;
-                $data->avatar = $friend->user->profile->avatar;
-                
-                $onlineFriends[] = $data;
-            }
-        }
+            $data = new stdClass;
+            $data->id = $user->user_id;
+            $data->fullName = $user->user->profile->first_name . ' '.$user->user->profile->last_name;
+            $data->username = $user->user->username;
+            $data->avatar = $user->user->profile->avatar;
+            return $data;
+        });
 
-        $isOffline = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
-        
-        if(count($isOffline) >0){
-            foreach($isOffline as $friend){
-            
-                $data = new stdClass;
-                $data->id = $friend->user_id;
-                $data->username = $friend->user->username;
-                $data->email = $friend->user->email;
-                $data->lastName = $friend->user->profile->last_name;
-                $data->firstName = $friend->user->profile->first_name;
-                $data->avatar = $friend->user->profile->avatar;
-                
-                $offlineFriends[] = $data;
-            }
-            
-        }
+        $offlineUsers = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function($user){
+
+            $data = new stdClass;
+            $data->id = $user->user_id;
+            $data->fullName = $user->user->profile->first_name . ' '.$user->user->profile->last_name;
+            $data->username = $user->user->username;
+            $data->avatar = $user->user->profile->avatar;
+            return $data;
+        });
+
 
         $result = [
-            'online' => $onlineFriends,
-            'offline' => $offlineFriends
+            'online' => $onlineUsers,
+            'offline' => $offlineUsers
         ];
         return $this->sendResponse($result, "Friends");
     }
