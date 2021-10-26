@@ -9,7 +9,7 @@ class OnlineTimeline extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['referrer','user_id'];
+    protected $fillable = ['referrer','user_id', 'updated_at'];
 
     public function user(){
         return $this->belongsTo(User::class);

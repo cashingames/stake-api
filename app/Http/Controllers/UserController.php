@@ -134,36 +134,47 @@ class UserController extends BaseController
 
     public function friends()
     {
-
-        $users = User::get();
         $onlineFriends = [];
         $offlineFriends = [];
 
-        foreach ($users as $friend) {
-            $isOnline = OnlineTimeline::where('user_id', $friend->id)
-                ->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOnline !== null) {
-                $onlineFriends[] = $isOnline->user->load('profile');
-            }
-            $isOffline = OnlineTimeline::where('user_id', $friend->id)
-                ->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->first();
-            if ($isOffline !== null) {
-                $offlineFriends[] = $isOffline->user->load('profile');
+        $isOnline = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
+      
+        if(count($isOnline) >0){
+            foreach($isOnline as $friend){
+            
+                $data = new stdClass;
+                $data->id = $friend->user_id;
+                $data->username = $friend->user->username;
+                $data->email = $friend->user->email;
+                $data->lastName = $friend->user->profile->last_name;
+                $data->firstName = $friend->user->profile->first_name;
+                $data->avatar = $friend->user->profile->avatar;
+                
+                $onlineFriends[] = $data;
             }
         }
 
-        //remove duplicates from offline records,
-
-        $offlineCollect = collect($offlineFriends);
-        $uniqueOffline = $offlineCollect->unique();
-        $allUniqueValues = $uniqueOffline->values()->all();
-
-        // compare and remove same records from offline and online records
-        $diff = collect($allUniqueValues)->diff(collect($onlineFriends));
+        $isOffline = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
+        
+        if(count($isOffline) >0){
+            foreach($isOffline as $friend){
+            
+                $data = new stdClass;
+                $data->id = $friend->user_id;
+                $data->username = $friend->user->username;
+                $data->email = $friend->user->email;
+                $data->lastName = $friend->user->profile->last_name;
+                $data->firstName = $friend->user->profile->first_name;
+                $data->avatar = $friend->user->profile->avatar;
+                
+                $offlineFriends[] = $data;
+            }
+            
+        }
 
         $result = [
             'online' => $onlineFriends,
-            'offline' => $diff->values()->all()
+            'offline' => $offlineFriends
         ];
         return $this->sendResponse($result, "Friends");
     }
@@ -181,7 +192,14 @@ class UserController extends BaseController
     }
 
     public function setOnline()
-    {
+    {   
+        $lastLoggedRecord = OnlineTimeline::where('user_id', $this->user->id)->first();
+
+        if($lastLoggedRecord !== null){
+            $lastLoggedRecord->update(['updated_at'=> Carbon::now()]);
+            return $this->sendResponse('Online status updated', "Online status updated");
+        }
+
         OnlineTimeline::create([
             'user_id' => $this->user->id,
             'referrer' => $this->user->profile->referrer
