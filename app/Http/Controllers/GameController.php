@@ -143,7 +143,7 @@ class GameController extends BaseController
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
-        // $gameSession->save();
+        $gameSession->save();
 
         $gameInfo = new stdClass;
         $gameInfo->token = $gameSession->session_token;
