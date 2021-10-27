@@ -49,13 +49,13 @@ class BoostSeeder extends Seeder
             a user is buying, therefore
             It made more sense going with the product design of buying boosts in packs
         */
-        
+
         DB::table('boosts')->insert(
             [
-                'name' => "Time Freeze ",
+                'name' => "Time Freeze",
                 'description' => "Freezes game time For 15 Seconds",
                 'point_value' => 100,
-                'currency_value'=> 49.3,
+                'currency_value' => 49.3,
                 'pack_count' => 5
             ]
         );
@@ -65,7 +65,7 @@ class BoostSeeder extends Seeder
                 'name' => "Bombs",
                 'description' => "Removes one wrong and one right answer",
                 'point_value' => 100,
-                'currency_value'=> 115.033333,
+                'currency_value' => 115.033333,
                 'pack_count' => 3
             ]
         );
@@ -75,10 +75,9 @@ class BoostSeeder extends Seeder
                 'name' => "Skip",
                 'description' => "Skips a question",
                 'point_value' => 83.3333333,
-                'currency_value'=> 65.7333333,
+                'currency_value' => 65.7333333,
                 'pack_count' => 3
             ]
         );
-
     }
 }
