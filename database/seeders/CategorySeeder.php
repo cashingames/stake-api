@@ -74,7 +74,7 @@ class CategorySeeder extends Seeder
                 'category_id' => 0,
                 'name' => 'Music',
                 'description' => 'Answer Music questions',
-                'icon_name' => 'icons/music_note.jpg',
+                'icon_name' => 'icons/music_note.png',
                 'primary_color' => '#9C3DB8'
             ],
         );
