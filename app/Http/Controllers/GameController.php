@@ -36,7 +36,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->gameModes = Mode::select('id', 'name')->get();
+        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->take(1)->get();
         $result->gameTypes = GameType::inRandomOrder()
             ->select('id', 'name', 'display_name as displayName', 'description', 'icon', 'primary_color_2 as bgColor')
             ->get();
@@ -52,7 +52,7 @@ class GameController extends BaseController
             "
         );
 
-        $result->gameTypes = $result->gameTypes->map(function ($type) use ($result) {
+        $result->gameTypes->map(function ($type) use ($result) {
             $type->categories = $result->categories;
             return $type;
         });
@@ -124,7 +124,7 @@ class GameController extends BaseController
     {
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
-        $mode = Mode::where('name', 'Exhibition')->first();
+        $mode = Mode::where('name', 'EXHIBITION')->first();
 
         $easyQuestions = $category->questions()->where('level', 'easy')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
         $mediumQuestions =  $category->questions()->where('level', 'medium')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);

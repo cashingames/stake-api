@@ -18,17 +18,18 @@ class ModeSeeder extends Seeder
 
         DB::table('modes')->insert(
             [
-                'name' => "Exhibition",
+                'name' => "EXHIBITION",
+                'display_name' => "Exhibition",
                 'description' => "Play Single",
             ]
         );
 
         DB::table('modes')->insert(
             [
-                'name' => "Challenge",
+                'name' => "CHALLENGE",
+                'display_name' => "Challenge",
                 'description' => "Challenge a friend to a duel",
             ]
         );
-        
     }
 }
