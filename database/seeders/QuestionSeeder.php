@@ -12,8 +12,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuestionSeeder extends Seeder
 {
-    private $categoryName = 'Music';
-    private $gameType = 'Multi Choice';
+    private $categoryName = 'Premier League Clubs';
+    private $gameType = 'TRUE_FALSE';
 
     /**
      * Run the database seeds.
@@ -22,43 +22,35 @@ class QuestionSeeder extends Seeder
      */
     public function run()
     {
-        //
-        // if ( env('APP_ENV') == 'local' ) {
+        // if (env('APP_ENV') == 'testing' ||  env('APP_ENV') == 'local') {
         //     Question::factory()
-        //     ->hasOptions(4)
-        //     ->count(500)
-        //     ->create();
-        // }
+        //         ->hasOptions(4)
+        //         ->count(50)
+        //         ->create();
+        // } else {
+        $inputFileName = base_path('questions' . '.xlsx');
+        $reader = IOFactory::createReader('Xlsx');
+        $reader->setReadDataOnly(TRUE);
+        $spreadsheet = $reader->load($inputFileName);
 
-        if (env('APP_ENV') == 'testing' ||  env('APP_ENV') == 'local') {
-            Question::factory()
-                ->hasOptions(4)
-                ->count(50)
-                ->create();
-        } else {
-            $inputFileName = base_path($this->categoryName . '.xlsx');
-            $reader = IOFactory::createReader('Xlsx');
-            $reader->setReadDataOnly(TRUE);
-            $spreadsheet = $reader->load($inputFileName);
+        foreach ($spreadsheet->getAllSheets() as $currentSheet) {
 
-            foreach ($spreadsheet->getAllSheets() as $currentSheet) {
-
-                $this->readWorkSheet($currentSheet);
-            }
+            $this->readWorkSheet($currentSheet);
         }
+        // }
     }
 
     private function readWorkSheet(Worksheet $workSheet)
     {
 
         $category = Category::where('name', $this->categoryName)->first();
-        $gameType = GameType::where('name', $this->gameType)->first();
+        $type = GameType::where('name', $this->gameType)->first();
 
         if ($category == null) {
             echo "Category cannot be found \n";
             return;
         }
-        if ($gameType == null) {
+        if ($type == null) {
             echo "Game Type does not exist \n";
             return;
         }
@@ -78,7 +70,7 @@ class QuestionSeeder extends Seeder
                 continue;
             }
 
-            $answer = trim($workSheet->getCellByColumnAndRow(7, $i)->getValue());
+            $answer = trim($workSheet->getCellByColumnAndRow(3, $i)->getValue());
             if ($answer == '' || ctype_space($answer)) {
                 echo "Row " . $i . " answer is empty \n";
                 continue;
@@ -87,13 +79,13 @@ class QuestionSeeder extends Seeder
             $question = new Question;
             $question->level = strtolower($level);
             $question->label = $label;
-            $question->game_type_id = $gameType->id;
+            $question->game_type_id = $type->id;
             $question->category_id = $category->id;
 
             $options = [];
             $hasCorrectAnswer = false;
 
-            for ($j = 3; $j <= 6; $j++) {
+            for ($j = 4; $j <= 7; $j++) {
                 $optionLabel = trim($workSheet->getCellByColumnAndRow($j, $i)->getValue());
 
                 if (ctype_space($optionLabel) || $optionLabel == '') {
@@ -111,7 +103,6 @@ class QuestionSeeder extends Seeder
                 $option->is_correct = $isCorrect;
 
                 if ($option)
-
                     array_push($options, $option);
             }
 

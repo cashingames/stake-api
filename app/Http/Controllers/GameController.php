@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Mail\ChallengeInvite;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use stdClass;
 
@@ -37,11 +38,8 @@ class GameController extends BaseController
         $result->boosts = Boost::all();
         $result->gameModes = Mode::select('id', 'name')->get();
         $result->gameTypes = GameType::inRandomOrder()
-            ->select('id', 'name', 'description', 'icon', 'primary_color_2 as bgColor')
-            ->get()->map(function ($item) {
-                $item->isEnabled = $item->is_available;
-                return $item;
-            });
+            ->select('id', 'name', 'display_name as displayName', 'description', 'icon', 'primary_color_2 as bgColor')
+            ->get();
         $result->categories = DB::select(
             "select c.id, c.name, c.description, c.icon_name as icon, primary_color as bgColor,
                 (select count(g.id) 
@@ -244,71 +242,48 @@ class GameController extends BaseController
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
 
-    private function updateRanking($userId, $catId, $points)
-    {
-        //category rankings
-        //get category id of played subcategory
-        $isCategory = Category::where('id', $catId)->select('category_id')->first();
-        //if played category is not a subcategory
-        if ($isCategory === null) {
-            $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $catId)->first();
-
-            if ($ranking === null) {
-                CategoryRanking::create([
-                    'user_id' => $userId,
-                    'category_id' => $catId,
-                    'points_gained' => $points
-                ]);
-                return;
-            }
-            $ranking->update(['points_gained' => $ranking->points_gained + $points]);
-            return;
-        }
-
-        $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $isCategory->category_id)->first();
-
-        if ($ranking === null) {
-            CategoryRanking::create([
-                'user_id' => $userId,
-                'category_id' => $isCategory->category_id,
-                'points_gained' => $points
-            ]);
-            return;
-        }
-        $ranking->update(['points_gained' => $ranking->points_gained + $points]);
-    }
 
     public function endSingleGame(Request $request)
     {
 
-        $request->validate([
-            'sessionToken' => ['required', 'string'],
-            'userPointsGained' => ['required', 'string'],
-            'userWrongCount' => ['required', 'string'],
-            'userCorrectCount' => ['required', 'string'],
-        ]);
-        $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
+        // $request = json_decode($this->getSampleEndData());
 
-        if ($gameSession === null) {
+        //get the session information
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
+        if (!$game) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
 
-        //credit points to user
-        $this->creditPoints($this->user->id, $request->userPointsGained, "Points gained from correct game answers");
+        $game->end_time = Carbon::now()->subSeconds(1);
+        $game->state = 'COMPLETED';
 
-        $gameSession->state = "COMPLETED";
-        $gameSession->user_points_gained = $request->userPointsGained;
-        $gameSession->user_wrong_count = $request->userWrongCount;
-        $gameSession->user_correct_count = $request->userCorrectCount;
-        if ($request->userCorrectCount > $request->userWrongCount) {
-            $gameSession->user_won = true;
+
+
+        $questions = Question::whereIn('id', array_column($request->chosenOptions, 'question_id'))->get();
+        foreach ($request->chosenOptions as $a) {
+
+            $isCorect = $questions->find($a['question_id'])
+                ->options()
+                ->where('id', $a['id'])
+                ->where('is_correct', true)
+                ->first();
+
+            if ($isCorect) {
+                $game->user_correct_count += 1;
+            } else {
+                $game->user_wrong_count += 1;
+            }
         }
 
-        $gameSession->save();
+        $game->user_won = $game->user_correct_count > $game->user_wrong_count;
+        $game->user_points_gained = $game->user_correct_count * 5; //@TODO to be revised
 
-        $this->updateRanking($this->user->id, $gameSession->category_id, $gameSession->user_points_gained);
+        $game->save();
 
-        return $this->sendResponse($gameSession, 'Game Ended');
+        $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from correct game answers");
+        $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+
+        return $this->sendResponse($game, 'Game Ended');
     }
 
 
@@ -462,5 +437,70 @@ class GameController extends BaseController
         ]);
 
         return $this->sendResponse("Challenge Declined", 'Challenge Declined');
+    }
+
+
+    private function updateRanking($userId, $catId, $points)
+    {
+        //category rankings
+        //get category id of played subcategory
+        $isCategory = Category::where('id', $catId)->select('category_id')->first();
+        //if played category is not a subcategory
+        if ($isCategory === null) {
+            $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $catId)->first();
+
+            if ($ranking === null) {
+                CategoryRanking::create([
+                    'user_id' => $userId,
+                    'category_id' => $catId,
+                    'points_gained' => $points
+                ]);
+                return;
+            }
+            $ranking->update(['points_gained' => $ranking->points_gained + $points]);
+            return;
+        }
+
+        $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $isCategory->category_id)->first();
+
+        if ($ranking === null) {
+            CategoryRanking::create([
+                'user_id' => $userId,
+                'category_id' => $isCategory->category_id,
+                'points_gained' => $points
+            ]);
+            return;
+        }
+        $ranking->update(['points_gained' => $ranking->points_gained + $points]);
+    }
+
+    private function getSampleEndData()
+    {
+        return '{
+   "started":true,
+   "ended":false,
+   "token":"1MGuGBwrzjnOVWGIYwvUpK8faHPPtFdriDPHXHQZ",
+   "startTime":"2021-10-27T05:29:38.236304Z",
+   "endTime":"2021-10-27T05:30:38.236366Z",
+   "chosenOptions":[
+      {
+         "id":57,
+         "question_id":"15",
+         "title":"YXQ=",
+         "is_correct":"MA==",
+         "isSelected":true
+      }
+   ],
+   "consumedBoosts":[
+      {
+         "boostId":"4",
+         "questionId":15
+      },
+      {
+         "boostId":"4",
+         "questionId":15
+      }
+   ]
+}';
     }
 }

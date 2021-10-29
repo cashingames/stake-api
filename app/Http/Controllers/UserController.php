@@ -9,6 +9,7 @@ use App\Models\UserQuiz;
 use App\Models\OnlineTimeline;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class UserController extends BaseController
@@ -35,6 +36,9 @@ class UserController extends BaseController
 
     public function profile()
     {
+
+        Log::info('Showing the user profile for user: ');
+
         $result = new stdClass;
         $result->username = $this->user->username;
         $result->email = $this->user->email;
@@ -134,21 +138,21 @@ class UserController extends BaseController
 
     public function friends()
     {
-        $onlineUsers = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function($user){
+        $onlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
 
             $data = new stdClass;
             $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' '.$user->user->profile->last_name;
+            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
             $data->username = $user->user->username;
             $data->avatar = $user->user->profile->avatar;
             return $data;
         });
 
-        $offlineUsers = OnlineTimeline::where('user_id','!=',$this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function($user){
+        $offlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
 
             $data = new stdClass;
             $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' '.$user->user->profile->last_name;
+            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
             $data->username = $user->user->username;
             $data->avatar = $user->user->profile->avatar;
             return $data;
@@ -175,11 +179,11 @@ class UserController extends BaseController
     }
 
     public function setOnline()
-    {   
+    {
         $lastLoggedRecord = OnlineTimeline::where('user_id', $this->user->id)->first();
 
-        if($lastLoggedRecord !== null){
-            $lastLoggedRecord->update(['updated_at'=> Carbon::now()]);
+        if ($lastLoggedRecord !== null) {
+            $lastLoggedRecord->update(['updated_at' => Carbon::now()]);
             return $this->sendResponse('Online status updated', "Online status updated");
         }
 
