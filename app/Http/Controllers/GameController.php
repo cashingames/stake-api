@@ -33,6 +33,7 @@ class GameController extends BaseController
 
     public function getCommonData()
     {
+        $u = $this->user;
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
@@ -46,7 +47,7 @@ class GameController extends BaseController
                     from game_sessions g 
                     where g.category_id IN 
                         (select id from categories 
-                            where categories.category_id = c.id)) as played 
+                            where categories.category_id = c.id) and g.user_id = '" . $this->user->id . "' ) as played 
             from categories c  
             where c.category_id = 0
             "
