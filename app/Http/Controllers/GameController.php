@@ -57,14 +57,7 @@ class GameController extends BaseController
             $type->categories = $result->categories;
             return $type;
         });
-        $result->subcategories = DB::select("
-            select c.id, c.name, c.category_id as categoryId 
-            from categories c
-            join questions q on q.category_id = c.id
-            where c.category_id != 0
-            GROUP BY c.category_id
-            having COUNT(q.id) > 30
-        ");
+        $result->subcategories = DB::select("select c.id, c.name, c.category_id as categoryId from categories c where c.category_id != 0");
 
         //get no of subcategories
         // (select count(id) 
