@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -203,21 +204,20 @@ class User extends Authenticatable implements JWTSubject
         return (($singleGameWins + $challengeGameWinsAsUser + $challengeGameWinsAsOpponent) / 100);
     }
 
-    // public function getMusicPointsAttribute()
-    // {
-    //     $sum = CategoryRanking::where('user_id', $this->id)
-    //         ->where('category_id', 6)
-    //         ->sum('points_gained');
+    public function friends()
+    {
 
-    //     return $sum;
-    // }
+        $friends = User::where('id','!=', $this->id)->get()->map(function ($friend) {
+            $data = new stdClass;
+            $data->id = $friend->id;
+            $data->fullName = $friend->profile->full_name;
+            $data->username = $friend->username;
+            $data->avatar = $friend->profile->avatar;
+            return $data;
+        });
 
-    // public function getSportsPointsAttribute()
-    // {
-    //     $sum = CategoryRanking::where('user_id', $this->id)
-    //         ->where('category_id', 5)
-    //         ->sum('points_gained');
+        return $friends;
+       
+    }
 
-    //     return $sum;
-    // }
 }

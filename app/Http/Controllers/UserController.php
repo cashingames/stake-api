@@ -44,7 +44,7 @@ class UserController extends BaseController
         $result->email = $this->user->email;
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;
-        $result->fullName = $this->user->profile->first_name . " " . $this->user->profile->last_name;
+        $result->fullName = $this->user->profile->full_name;
         $result->phoneNumber = $this->user->phone_number;
         $result->bankName = $this->user->profile->bank_name;
         $result->accountName = $this->user->profile->account_name;
@@ -78,6 +78,7 @@ class UserController extends BaseController
         $result->earnings = $this->user->transactions()
             ->where('transaction_type', 'Fund Recieved')
             ->orderBy('created_at', 'desc')->get();
+        $result->friends = $this->user->friends();
 
         // $result->gamePerformance = 
         /**

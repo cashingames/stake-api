@@ -23,8 +23,17 @@ class Profile extends Model
         'referrer'
     ];
 
+    protected $appends = [
+       'full_name'
+    ];
+
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . " " . $this->last_name;
     }
 
 }
