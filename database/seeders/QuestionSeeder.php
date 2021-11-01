@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuestionSeeder extends Seeder
 {
-    private $categoryName = 'Premier League Clubs';
+    private $categoryName = 'La Liga';
     private $gameType = 'TRUE_FALSE';
 
     /**
@@ -28,7 +28,7 @@ class QuestionSeeder extends Seeder
         //         ->count(50)
         //         ->create();
         // } else {
-        $inputFileName = base_path('questions' . '.xlsx');
+        $inputFileName = base_path('La Liga' . '.xlsx');
         $reader = IOFactory::createReader('Xlsx');
         $reader->setReadDataOnly(TRUE);
         $spreadsheet = $reader->load($inputFileName);
