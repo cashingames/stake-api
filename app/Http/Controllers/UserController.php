@@ -25,7 +25,7 @@ class UserController extends BaseController
         $result->email = $this->user->email;
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;
-        $result->fullName = $this->user->profile->first_name . " " . $this->user->profile->last_name;
+        $result->fullName = $this->user->profile->full_name;
         $result->phoneNumber = $this->user->phone_number;
         $result->bankName = $this->user->profile->bank_name;
         $result->accountName = $this->user->profile->account_name;
@@ -61,6 +61,7 @@ class UserController extends BaseController
         $result->earnings = $this->user->transactions()
             ->where('transaction_type', 'Fund Recieved')
             ->orderBy('created_at', 'desc')->get();
+        $result->friends = $this->user->friends();
 
         // $result->gamePerformance = 
         /**
@@ -121,32 +122,17 @@ class UserController extends BaseController
 
     public function friends()
     {
-        $onlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
 
+        $friends = User::where('id','!=', $this->user->id)->get()->map(function ($user) {
             $data = new stdClass;
-            $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
-            $data->username = $user->user->username;
-            $data->avatar = $user->user->profile->avatar;
+            $data->id = $user->id;
+            $data->fullName = $user->profile->first_name . ' ' . $user->profile->last_name;
+            $data->username = $user->username;
+            $data->avatar = $user->profile->avatar;
             return $data;
         });
 
-        $offlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
-
-            $data = new stdClass;
-            $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
-            $data->username = $user->user->username;
-            $data->avatar = $user->user->profile->avatar;
-            return $data;
-        });
-
-
-        $result = [
-            'online' => $onlineUsers,
-            'offline' => $offlineUsers
-        ];
-        return $this->sendResponse($result, "Friends");
+        return $this->sendResponse($friends, "Friends");
     }
 
     public function friendQuizzes()

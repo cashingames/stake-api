@@ -32,13 +32,9 @@ class GameController extends BaseController
         $result->achievements = Achievement::all();
         $result->boosts = Boost::where('id', 1)->get();
         $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->take(1)->get();
-
-
         $gameTypes = GameType::inRandomOrder()->get();
 
         $categories = Category::all();
-
-        // $subcategories = collect(DB::select("select c.id, c.name, c.category_id as categoryId from categories c where c.category_id != 0"));
 
         $gameInfo = DB::select("
                         SELECT 
@@ -395,12 +391,12 @@ class GameController extends BaseController
     public function sendChallengeInvite(Request $request)
     {
         $request->validate([
-            'opponentEmail' => ['required', 'email'],
+            'opponentId' => ['required'],
             'categoryId' => ['required'],
             'gameTypeId' => ['required'],
         ]);
 
-        $opponent = User::where('email', $request->opponentEmail)->first();
+        $opponent = User::find($request->opponentId);
 
         if ($opponent === null) {
             return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');
