@@ -26,63 +26,86 @@ use stdClass;
 class GameController extends BaseController
 {
 
-    public function modes()
-    {
-        return $this->sendResponse(Mode::all(), "Game Modes");
-    }
-
     public function getCommonData()
     {
-        $u = $this->user;
         $result = new stdClass;
         $result->achievements = Achievement::all();
-        $result->boosts = Boost::all();
-        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->get();
-        $result->gameTypes = GameType::inRandomOrder()
-            ->select('id', 'name', 'display_name as displayName', 'description', 'icon', 'primary_color_2 as bgColor')
-            ->get();
-        $result->categories = DB::select(
-            "select c.id, c.name, c.description, c.icon_name as icon, primary_color as bgColor,
-                (select count(g.id) 
-                    from game_sessions g 
-                    where g.category_id IN 
-                        (select id from categories 
-                            where categories.category_id = c.id) and g.user_id = '" . $this->user->id . "' ) as played 
-            from categories c  
-            where c.category_id = 0
-            "
-        );
+        $result->boosts = Boost::where('id', 1)->get();
+        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->take(1)->get();
+        $gameTypes = GameType::inRandomOrder()->get();
 
-        $result->gameTypes->map(function ($type) use ($result) {
-            $type->categories = $result->categories;
-            return $type;
-        });
-        $result->subcategories = DB::select("select c.id, c.name, c.category_id as categoryId from categories c where c.category_id != 0");
+        $categories = Category::all();
 
-        //get no of subcategories
-        // (select count(id) 
-        //     from categories 
-        //     where category_id=c.id) as subcategories, 
+        $gameInfo = DB::select("
+                        SELECT 
+                            gt.name game_type_name, gt.id game_type_id, 
+                            c.category_id category_id,
+                                (select name from categories where categories.id = c.category_id) category_name,
+                            c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+                            (select count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
+                        FROM questions q
+                        JOIN categories c ON c.id = q.category_id
+                        JOIN game_types gt ON gt.id = q.game_type_id
+                        GROUP by q.category_id, q.game_type_id
+                    ");
+
+        $gameInfo = collect($gameInfo);
+        $toReturnTypes = [];
+        foreach ($gameTypes as $type) {
+            $uniqueCategories = $gameInfo->where('game_type_id', $type->id)->unique('category_id');
+            $categoryIds = $uniqueCategories->values()->pluck('category_id');
+
+            $_categories = $categories->filter(function ($x) use ($categoryIds) {
+                return $categoryIds->contains($x->id);
+            });
+
+            $toReturnCategories = [];
+            foreach ($_categories as $category) {
+
+
+
+                $uSubs = $gameInfo->where('game_type_id', $type->id)->where('category_id', $category->id)->unique('subcategory_id');
+                $_subcategories = $categories->filter(function ($x) use ($uSubs) {
+                    return $uSubs->firstWhere('subcategory_id', $x->id) !== null;
+                });
+
+                $toReturnSubcategories = [];
+                foreach ($_subcategories as $subcategory) {
+                    $s = new stdClass;
+                    $s->id = $subcategory->id;
+                    $s->categoryId = $subcategory->category_id;
+                    $s->name = $subcategory->name;
+                    $toReturnSubcategories[] = $s;
+                }
+
+                $c = new stdClass;
+                $c->id = $category->id;
+                $c->name = $category->name;
+                $c->description = $category->description;
+                $c->icon = $category->icon_name;
+                $c->bgColor = $category->primary_color;
+                $c->played = $gameInfo->where('game_type_id', $type->id)->where('category_id', $category->id)->sum('played');
+                $c->subcategories = $toReturnSubcategories;
+                $toReturnCategories[] = $c;
+            }
+
+            $_type = new stdClass;
+            $_type->id = $type->id;
+            $_type->name = $type->name;
+            $_type->displayName = $type->display_name;
+            $_type->description = $type->description;
+            $_type->icon = $type->icon;
+            $_type->bgColor = $type->primary_color_2;
+
+            $_type->categories = $toReturnCategories;
+
+
+            $toReturnTypes[] = $_type;
+        }
+
+        $result->gameTypes = $toReturnTypes;
 
         return $this->sendResponse($result, "");
-    }
-
-    public function gameTypes()
-    {
-        $types = GameType::all();
-
-        //sort based on availbility
-        $sorted = $types->sortByDesc('is_available');
-
-        return $this->sendResponse($sorted->values()->all(), "Game Types");
-    }
-
-    public function shuffleGameTypes()
-    {
-        $types = GameType::inRandomOrder()
-            ->limit(3)
-            ->get();
-        return $this->sendResponse($types, "Random Game Types");
     }
 
     public function claimAchievement($achievementId)
@@ -125,13 +148,8 @@ class GameController extends BaseController
     {
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
-        $mode = Mode::where('name', 'EXHIBITION')->first();
-
-        $easyQuestions = $category->questions()->where('level', 'easy')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-        $mediumQuestions =  $category->questions()->where('level', 'medium')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-        $hardQuestions = $category->questions()->where('level', 'hard')->where('game_type_id', $type->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-
-        $questions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
+        $mode = Mode::find($request->mode);
+        $questions = $category->questions()->take(10)->get()->shuffle();
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -258,8 +276,6 @@ class GameController extends BaseController
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->state = 'COMPLETED';
 
-
-
         $questions = Question::whereIn('id', array_column($request->chosenOptions, 'question_id'))->get();
         foreach ($request->chosenOptions as $a) {
 
@@ -283,6 +299,15 @@ class GameController extends BaseController
 
         $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from correct game answers");
         $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+
+        foreach ($request->consumedBoosts as $row) {
+            $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
+
+            $userBoost->update([
+                'used_count' => $userBoost->used_count + 1,
+                'boost_count' => $userBoost->boost_count - 1
+            ]);
+        }
 
         return $this->sendResponse($game, 'Game Ended');
     }

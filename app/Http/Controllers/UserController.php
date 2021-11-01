@@ -14,25 +14,6 @@ use stdClass;
 
 class UserController extends BaseController
 {
-    //
-
-    public function me()
-    {
-        try {
-            $result = [
-                'user' => $this->user->load([
-                    'profile',
-                    'wallet',
-                    'transactions',
-                    'boosts'
-                ]),
-            ];
-            return $this->sendResponse($result, 'User details');
-        } catch (\Exception $e) {
-            error_log($e->getLine() . ', ' . $e->getMessage());
-            return $this->sendError([], $e->getMessage());
-        }
-    }
 
     public function profile()
     {
@@ -60,10 +41,12 @@ class UserController extends BaseController
         $result->badge = $this->user->achievement;
         $result->winRate = $this->user->win_rate;
         $result->totalChallenges = $this->user->challenges_played;
-        $result->boosts = DB::table('user_boosts')->where('user_id', $this->user->id)
+        $result->boosts = DB::table('user_boosts')
+            ->where('user_id', $this->user->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'name', 'user_boosts.boost_count as count')->where('user_boosts.boost_count', '>', 0)->get();
+            })->select('boosts.id', 'name', 'user_boosts.boost_count as count')
+            ->where('user_boosts.boost_count', '>', 0)->get();
         $result->achievements = DB::table('user_achievements')->where('user_id', $this->user->id)
             ->join('achievements', function ($join) {
                 $join->on('achievements.id', '=', 'user_achievements.achievement_id');
