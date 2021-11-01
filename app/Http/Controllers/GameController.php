@@ -30,8 +30,8 @@ class GameController extends BaseController
     {
         $result = new stdClass;
         $result->achievements = Achievement::all();
-        $result->boosts = Boost::where('id', 1)->get();
-        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->take(1)->get();
+        $result->boosts = Boost::all();
+        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->get();
         $gameTypes = GameType::inRandomOrder()->get();
 
         $categories = Category::all();

@@ -207,7 +207,7 @@ class User extends Authenticatable implements JWTSubject
     public function friends()
     {
 
-        $friends = User::where('id','!=', $this->id)->get()->map(function ($friend) {
+        return User::where('id', '!=', $this->id)->get()->map(function ($friend) {
             $data = new stdClass;
             $data->id = $friend->id;
             $data->fullName = $friend->profile->full_name;
@@ -215,9 +215,5 @@ class User extends Authenticatable implements JWTSubject
             $data->avatar = $friend->profile->avatar;
             return $data;
         });
-
-        return $friends;
-       
     }
-
 }
