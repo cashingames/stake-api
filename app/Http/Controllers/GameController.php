@@ -37,7 +37,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->take(1)->get();
+        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->get();
         $result->gameTypes = GameType::inRandomOrder()
             ->select('id', 'name', 'display_name as displayName', 'description', 'icon', 'primary_color_2 as bgColor')
             ->get();
@@ -366,12 +366,12 @@ class GameController extends BaseController
     public function sendChallengeInvite(Request $request)
     {
         $request->validate([
-            'opponentEmail' => ['required', 'email'],
+            'opponentId' => ['required'],
             'categoryId' => ['required'],
             'gameTypeId' => ['required'],
         ]);
 
-        $opponent = User::where('email', $request->opponentEmail)->first();
+        $opponent = User::find($request->opponentId);
 
         if ($opponent === null) {
             return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');

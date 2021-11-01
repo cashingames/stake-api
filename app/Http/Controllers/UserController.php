@@ -138,32 +138,17 @@ class UserController extends BaseController
 
     public function friends()
     {
-        $onlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
 
+        $friends = User::where('id','!=', $this->user->id)->get()->map(function ($user) {
             $data = new stdClass;
-            $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
-            $data->username = $user->user->username;
-            $data->avatar = $user->user->profile->avatar;
+            $data->id = $user->id;
+            $data->fullName = $user->profile->first_name . ' ' . $user->profile->last_name;
+            $data->username = $user->username;
+            $data->avatar = $user->profile->avatar;
             return $data;
         });
 
-        $offlineUsers = OnlineTimeline::where('user_id', '!=', $this->user->id)->where('updated_at', '<', Carbon::now()->subMinutes(5)->toDateTimeString())->get()->map(function ($user) {
-
-            $data = new stdClass;
-            $data->id = $user->user_id;
-            $data->fullName = $user->user->profile->first_name . ' ' . $user->user->profile->last_name;
-            $data->username = $user->user->username;
-            $data->avatar = $user->user->profile->avatar;
-            return $data;
-        });
-
-
-        $result = [
-            'online' => $onlineUsers,
-            'offline' => $offlineUsers
-        ];
-        return $this->sendResponse($result, "Friends");
+        return $this->sendResponse($friends, "Friends");
     }
 
     public function friendQuizzes()
