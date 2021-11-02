@@ -149,7 +149,7 @@ class GameController extends BaseController
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = Mode::find($request->mode);
-        $questions = $category->questions()->take(10)->get()->shuffle();
+        $questions = $category->questions()->take(20)->get()->shuffle();
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
