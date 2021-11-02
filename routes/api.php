@@ -104,8 +104,7 @@ Route::prefix('v2')->group(function () {
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
         Route::get('leaders/global', [LeadersController::class, 'global']);
         Route::get('leaders/categories', [LeadersController::class, 'categories']);
-        Route::get('leaders/category/{catId}', [LeadersController::class, 'categoryRankings']);
-        Route::get('user/games/recently-played', [GameController::class, 'recentlyPlayed']);
+
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
