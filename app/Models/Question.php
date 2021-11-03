@@ -22,6 +22,7 @@ class Question extends Model
     'game_id', 'user_quiz_id','created_at', 'updated_at'
   ];
 
+  protected $fillable =['created_by'];
   //
   public function options(){
       return $this->hasMany(Option::class)->inRandomOrder();
