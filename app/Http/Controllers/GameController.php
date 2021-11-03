@@ -132,14 +132,21 @@ class GameController extends BaseController
         } 
        
         Achievement::orderBy('point_milestone','ASC')->get()->map(function ($a) {
-            if($a->point_milestone <= $this->user->points){
-                DB::table('user_achievements')->insert([
-                    'user_id' => $this->user->id,
-                    'achievement_id' => $a->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-            }
+            
+            $checkIsClaimed = DB::table('user_achievements')
+                ->where('achievement_id',$a->id)
+                ->where('user_id', $this->user->id)->first();
+           
+            if($checkIsClaimed === null){
+                if($a->point_milestone <= $this->user->points){
+                    DB::table('user_achievements')->insert([
+                        'user_id' => $this->user->id,
+                        'achievement_id' => $a->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]);
+                }
+            }  
         });
         
         return $this->sendResponse(
