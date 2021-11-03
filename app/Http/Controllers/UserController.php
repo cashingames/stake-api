@@ -51,9 +51,15 @@ class UserController extends BaseController
             ->join('achievements', function ($join) {
                 $join->on('achievements.id', '=', 'user_achievements.achievement_id');
             })->select('achievements.id', 'title', 'medal as logoUrl')->get();
-        $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
-            return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
-        });
+        // $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
+        //     return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
+        // });
+        $result->recentGames = $this->user->gameSessions()->latest()
+            ->select('category_id')
+            ->groupBy('category_id')->limit(3)->get()
+            ->map(function ($x) {
+                return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
+            });
         $result->transactions = $this->user->transactions()
             ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('transactionDate', 'desc')
@@ -62,6 +68,7 @@ class UserController extends BaseController
             ->where('transaction_type', 'Fund Recieved')
             ->orderBy('created_at', 'desc')->get();
         $result->friends = $this->user->friends();
+        $result->pointsTransaction = $this->user->points()->latest()->get();
 
         // $result->gamePerformance = 
         /**
@@ -77,40 +84,6 @@ class UserController extends BaseController
         return $this->sendResponse($result, 'User details');
     }
 
-    public function getPoints()
-    {
-        return $this->sendResponse($this->user->points, "User Points");
-    }
-
-    public function getPointsLog()
-    {
-        $pointsLog = $this->user->points()->latest()->get();
-        return $this->sendResponse($pointsLog, "User Points Log");
-    }
-
-    public function getBoosts()
-    {
-        $userBoosts = DB::table('user_boosts')->where('user_id', $this->user->id)
-            ->join('boosts', function ($join) {
-                $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })
-            ->get();
-
-        return $this->sendResponse($userBoosts, "User Boosts");
-    }
-
-    public function userAchievement()
-    {
-        $userId = $this->user->id;
-
-        $userAchievement = DB::table('user_achievements')->where('user_id', $userId)
-            ->join('achievements', function ($join) {
-                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
-            })
-            ->get();
-
-        return $this->sendResponse($userAchievement, "User Achievement");
-    }
 
     public function quizzes()
     {
@@ -120,20 +93,7 @@ class UserController extends BaseController
         return $this->sendResponse($quizzes, "User Quizzes");
     }
 
-    public function friends()
-    {
 
-        $friends = User::where('id','!=', $this->user->id)->get()->map(function ($user) {
-            $data = new stdClass;
-            $data->id = $user->id;
-            $data->fullName = $user->profile->first_name . ' ' . $user->profile->last_name;
-            $data->username = $user->username;
-            $data->avatar = $user->profile->avatar;
-            return $data;
-        });
-
-        return $this->sendResponse($friends, "Friends");
-    }
 
     public function friendQuizzes()
     {

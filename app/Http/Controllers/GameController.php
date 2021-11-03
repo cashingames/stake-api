@@ -74,6 +74,7 @@ class GameController extends BaseController
                     $s->id = $subcategory->id;
                     $s->categoryId = $subcategory->category_id;
                     $s->name = $subcategory->name;
+                    $s->icon = $subcategory->icon_name;
                     $toReturnSubcategories[] = $s;
                 }
 
