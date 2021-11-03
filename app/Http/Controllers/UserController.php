@@ -41,32 +41,11 @@ class UserController extends BaseController
         $result->badge = $this->user->achievement;
         $result->winRate = $this->user->win_rate;
         $result->totalChallenges = $this->user->challenges_played;
-        $result->boosts = DB::table('user_boosts')
-            ->where('user_id', $this->user->id)
-            ->join('boosts', function ($join) {
-                $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'name', 'user_boosts.boost_count as count')
-            ->where('user_boosts.boost_count', '>', 0)->get();
-        $result->achievements = DB::table('user_achievements')->where('user_id', $this->user->id)
-            ->join('achievements', function ($join) {
-                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
-            })->select('achievements.id', 'title', 'medal as logoUrl')->get();
-        // $result->recentGames = $this->user->gameSessions()->latest()->limit(3)->get()->map(function ($x) {
-        //     return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
-        // });
-        $result->recentGames = $this->user->gameSessions()->latest()
-            ->select('category_id')
-            ->groupBy('category_id')->limit(3)->get()
-            ->map(function ($x) {
-                return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
-            });
-        $result->transactions = $this->user->transactions()
-            ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
-            ->orderBy('transactionDate', 'desc')
-            ->get();
-        $result->earnings = $this->user->transactions()
-            ->where('transaction_type', 'Fund Recieved')
-            ->orderBy('created_at', 'desc')->get();
+        $result->boosts = $this->user->userBoosts();
+        $result->achievements = $this->user->userAchievements();
+        $result->recentGames = $this->user->recentGames();
+        $result->transactions = $this->user->userTransactions();
+        $result->earnings = $this->user->earnings();
         $result->friends = $this->user->friends();
         $result->pointsTransaction = $this->user->points()->latest()->get();
 

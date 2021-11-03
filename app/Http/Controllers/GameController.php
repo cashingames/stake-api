@@ -123,25 +123,29 @@ class GameController extends BaseController
             ->where('achievement_id', $achievement->id)
             ->where('user_id', $this->user->id)->first();
 
-        if ($isClaimed === null) {
+        if ($isClaimed !== null) {
 
-            $result = DB::table('user_achievements')->insert([
-                'user_id' => $this->user->id,
-                'achievement_id' => $achievement->id,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-
-            return $this->sendResponse(
-                $achievement,
-                'Achievement Claimed'
-            );
-        } else {
             return $this->sendError(
                 'You have already claimed this achievement',
                 'You have already claimed this achievement'
-            );
-        }
+            ); 
+        } 
+       
+        Achievement::orderBy('point_milestone','ASC')->get()->map(function ($a) {
+            if($a->point_milestone <= $this->user->points){
+                DB::table('user_achievements')->insert([
+                    'user_id' => $this->user->id,
+                    'achievement_id' => $a->id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+        });
+        
+        return $this->sendResponse(
+            $achievement,
+            'Achievement Claimed'
+        );
     }
 
     public function startSingleGame(Request $request)

@@ -106,9 +106,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserBoost::class);
     }
 
-    public function achievement()
+    public function achievements()
     {
-        return $this->hasOne(Achievement::class);
+        return $this->hasMany(Achievement::class);
     }
 
     public function quizzes()
@@ -215,5 +215,51 @@ class User extends Authenticatable implements JWTSubject
             $data->avatar = $friend->profile->avatar;
             return $data;
         });
+    }
+
+    public function earnings()
+    {
+        return $this->transactions()
+            ->where('transaction_type', 'Fund Recieved')
+            ->orderBy('created_at', 'desc')->get();
+        
+    }
+
+    public function userTransactions()
+    {
+        return $this->transactions()
+            ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('transactionDate', 'desc')
+            ->get();
+       
+    }
+
+    public function recentGames()
+    {
+        return $this->gameSessions()->latest()
+            ->select('category_id')
+            ->groupBy('category_id')->limit(3)->get()
+            ->map(function ($x) {
+                return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
+            });
+        
+    }
+
+    public function userAchievements()
+    {
+        return DB::table('user_achievements')->where('user_id', $this->id)
+            ->join('achievements', function ($join) {
+                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
+            })->select('achievements.id', 'title', 'medal as logoUrl')->get();
+    }
+
+    public function userBoosts()
+    {
+        return DB::table('user_boosts')
+            ->where('user_id', $this->id)
+            ->join('boosts', function ($join) {
+                $join->on('boosts.id', '=', 'user_boosts.boost_id');
+            })->select('boosts.id', 'name', 'user_boosts.boost_count as count')
+            ->where('user_boosts.boost_count', '>', 0)->get();
     }
 }
