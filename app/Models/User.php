@@ -217,12 +217,12 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
-    public function earnings()
+    public function pointTransactions()
     {
-        return $this->transactions()
-            ->where('transaction_type', 'Fund Recieved')
-            ->orderBy('created_at', 'desc')->get();
-        
+        return $this->points()
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
     }
 
     public function userTransactions()
@@ -230,8 +230,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->transactions()
             ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('transactionDate', 'desc')
+            ->limit(10)
             ->get();
-       
     }
 
     public function recentGames()
@@ -242,7 +242,6 @@ class User extends Authenticatable implements JWTSubject
             ->map(function ($x) {
                 return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
             });
-        
     }
 
     public function userAchievements()

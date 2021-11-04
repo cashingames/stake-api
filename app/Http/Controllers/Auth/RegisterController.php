@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Http\Controllers\BaseController;
+use App\Models\Boost;
 use Illuminate\Support\Facades\DB;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
@@ -116,13 +117,13 @@ class RegisterController extends BaseController
 
             $user->boosts()->create([
                 'user_id' => $user->id,
-                'boost_id' => 1,
+                'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
             $user->boosts()->create([
                 'user_id' => $user->id,
-                'boost_id' => 3,
+                'boost_id' => Boost::where('name', 'Skip')->first()->id,
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
@@ -135,7 +136,7 @@ class RegisterController extends BaseController
             isset($data['referrer'])
         ) {
             $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
-            $this->creditPoints($referrerId, 50, "Points credited for signed up referral");
+            $this->creditPoints($referrerId, 50, "Referral bonus");
         }
 
         return $user;

@@ -66,18 +66,21 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
+
+        //#paystack returns in kobo hence divide by 100 for naira
+        $value = ($result->data->amount / 100);
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
-            'amount' => ($result->data->amount / 100),
+            'amount' => $value,
             'description' => 'FUND WALLET FROM BANK',
             'reference' => $result->data->reference,
         ]);
 
-        $wallet->balance += $result->data->amount / 100;
+        $wallet->balance += $value;
         $wallet->save();
 
-        $this->creditPoints($this->user->id, 100, "Points credited for funding wallet");
+        $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
 
         return $this->sendResponse(true, 'Payment was successful');
     }

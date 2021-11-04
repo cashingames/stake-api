@@ -128,17 +128,17 @@ class GameController extends BaseController
             return $this->sendError(
                 'You have already claimed this achievement',
                 'You have already claimed this achievement'
-            ); 
-        } 
-       
-        Achievement::orderBy('point_milestone','ASC')->get()->map(function ($a) {
-            
+            );
+        }
+
+        Achievement::orderBy('point_milestone', 'ASC')->get()->map(function ($a) {
+
             $checkIsClaimed = DB::table('user_achievements')
-                ->where('achievement_id',$a->id)
+                ->where('achievement_id', $a->id)
                 ->where('user_id', $this->user->id)->first();
-           
-            if($checkIsClaimed === null){
-                if($a->point_milestone <= $this->user->points){
+
+            if ($checkIsClaimed === null) {
+                if ($a->point_milestone <= $this->user->points) {
                     DB::table('user_achievements')->insert([
                         'user_id' => $this->user->id,
                         'achievement_id' => $a->id,
@@ -146,9 +146,9 @@ class GameController extends BaseController
                         'updated_at' => Carbon::now()
                     ]);
                 }
-            }  
+            }
         });
-        
+
         return $this->sendResponse(
             $achievement,
             'Achievement Claimed'
@@ -308,8 +308,9 @@ class GameController extends BaseController
 
         $game->save();
 
-        $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from correct game answers");
+        $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from game played");
         $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+
 
         foreach ($request->consumedBoosts as $row) {
             $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
@@ -318,6 +319,11 @@ class GameController extends BaseController
                 'used_count' => $userBoost->used_count + 1,
                 'boost_count' => $userBoost->boost_count - 1
             ]);
+        }
+
+        //find if this is the first time this user is playing this subcategory
+        if (GameSession::where('category_id')->first() == null) {
+            $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
         }
 
         return $this->sendResponse($game, 'Game Ended');
