@@ -303,13 +303,16 @@ class GameController extends BaseController
             }
         }
 
+
         $game->user_won = $game->user_correct_count > $game->user_wrong_count;
         $game->user_points_gained = $game->user_correct_count * 5; //@TODO to be revised
 
         $game->save();
 
-        $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from game played");
-        $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+        if ($game->user_points_gained > 0) {
+            $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from game played");
+            $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+        }
 
 
         foreach ($request->consumedBoosts as $row) {
