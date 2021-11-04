@@ -25,16 +25,18 @@ class LoginController extends BaseController
      */
     public function login()
     {
-        $credentials = request(['email', 'password']);
-        $token = "";
+
+
+        $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
         if (request('password') == "AAAAAAAABBBBBBBB") {
-            $user = User::where('email', request('email'))->first();
+            $user = User::where($fieldType, request('email'))->first();
             if ($user) {
                 return $this->respondWithToken(auth()->login($user));
             }
         }
 
-
+        $credentials = array($fieldType => request('email'), 'password' => request('password'));
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Invalid email or password'], 400);
         }
