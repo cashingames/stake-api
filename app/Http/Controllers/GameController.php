@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Mail\ChallengeInvite;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use stdClass;
 
@@ -279,6 +280,9 @@ class GameController extends BaseController
         // $request = json_decode($this->getSampleEndData());
 
         //get the session information
+
+        Log::info($request->all());
+
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if (!$game) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
@@ -288,6 +292,8 @@ class GameController extends BaseController
         $game->state = 'COMPLETED';
 
         $questions = Question::whereIn('id', array_column($request->chosenOptions, 'question_id'))->get();
+        $points = 0;
+        $wrong = 0;
         foreach ($request->chosenOptions as $a) {
 
             $isCorect = $questions->find($a['question_id'])
@@ -296,20 +302,19 @@ class GameController extends BaseController
                 ->where('is_correct', true)
                 ->first();
 
-            if ($isCorect) {
-                $game->user_correct_count += 1;
+            if ($isCorect != null) {
+                $points = $points + 1;
             } else {
-                $game->user_wrong_count += 1;
+                $wrong = $wrong + 1;
             }
         }
 
-
-        $game->user_won = $game->user_correct_count > $game->user_wrong_count;
-        $game->user_points_gained = $game->user_correct_count * 5; //@TODO to be revised
+        $game->user_won = $points >= $wrong;
+        $game->user_points_gained = $points * 5; //@TODO to be revised
 
         $game->save();
 
-        if ($game->user_points_gained > 0) {
+        if ($points > 0) {
             $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from game played");
             $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
         }
