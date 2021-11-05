@@ -80,7 +80,7 @@ class WalletController extends BaseController
         $wallet->balance += $value;
         $wallet->save();
 
-        $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
+        // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
 
         return $this->sendResponse(true, 'Payment was successful');
     }

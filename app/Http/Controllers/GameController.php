@@ -325,9 +325,9 @@ class GameController extends BaseController
         }
 
         //find if this is the first time this user is playing this subcategory
-        if (GameSession::where('category_id')->first() == null) {
-            $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
-        }
+        // if (GameSession::where('category_id')->first() == null) {
+        //     $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
+        // }
 
         return $this->sendResponse($game, 'Game Ended');
     }
