@@ -19,7 +19,7 @@ class Question extends Model
    * @var array
    */
   protected $hidden = [
-    'game_id', 'user_quiz_id', 'created_at', 'updated_at'
+    'game_id', 'created_at', 'updated_at'
   ];
 
   protected $fillable = ['created_by'];
