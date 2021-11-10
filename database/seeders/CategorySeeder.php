@@ -103,7 +103,7 @@ class CategorySeeder extends Seeder
                 'name' => 'Country',
                 'description' => 'Answer country related sports questions.',
                 'category_id' => 101,
-                'icon' => 'icons/soccer_ball.jpg',
+                'icon' => 'icons/soccer_ball.png',
                 'background_color' => 'rgb(251, 198, 2)'
             ]
         );

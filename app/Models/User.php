@@ -232,7 +232,7 @@ class User extends Authenticatable implements JWTSubject
             ->select('category_id')
             ->groupBy('category_id')->limit(3)->get()
             ->map(function ($x) {
-                return $x->category()->select('id', 'name', 'description', 'primary_color as bgColor', 'icon_name as icon')->first();
+                return $x->category()->select('id', 'name', 'description', 'background_color as bgColor', 'icon as icon')->first();
             });
     }
 
