@@ -17,11 +17,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategorySeeder::class,
             GameTypeSeeder::class,
-            ModeSeeder::class,
+            GameModeSeeder::class,
             AchievementSeeder::class,
             BoostSeeder::class,
             UserSeeder::class,
-            // ChallengeSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,

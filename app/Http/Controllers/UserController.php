@@ -34,7 +34,7 @@ class UserController extends BaseController
         $result->gender = $this->user->profile->gender;
         $result->avatar = $this->user->profile->avatar;
         $result->referralCode = $this->user->profile->referral_code;
-        $result->points = $this->user->points;
+        $result->points = $this->user->points();
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
         $result->walletBalance = $this->user->wallet->balance;
@@ -46,7 +46,7 @@ class UserController extends BaseController
         $result->recentGames = $this->user->recentGames();
         $result->transactions = $this->user->userTransactions();
         $result->friends = $this->user->friends();
-        $result->pointsTransaction = $this->user->pointTransactions();
+        $result->pointsTransaction = $this->user->getUserPointTransactions();
 
         // $result->gamePerformance = 
         /**

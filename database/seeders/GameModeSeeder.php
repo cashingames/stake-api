@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class ModeSeeder extends Seeder
+class GameModeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class ModeSeeder extends Seeder
     {
         //According to earlier discussion when this was implemented, Tournament was not a mode this was why it was not included
 
-        DB::table('modes')->insert(
+        DB::table('game_modes')->insert(
             [
                 'name' => "EXHIBITION",
                 'display_name' => "Exhibition",
@@ -24,7 +24,7 @@ class ModeSeeder extends Seeder
             ]
         );
 
-        DB::table('modes')->insert(
+        DB::table('game_modes')->insert(
             [
                 'name' => "CHALLENGE",
                 'display_name' => "Challenge",

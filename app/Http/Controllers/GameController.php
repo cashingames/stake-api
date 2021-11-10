@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mode;
+use App\Models\GameMode;
 use App\Models\User;
 use App\Models\Boost;
 use App\Models\Category;
@@ -31,7 +31,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->gameModes = Mode::select('id', 'name', 'display_name as displayName')->get();
+        $result->gameModes = GameMode::select('id', 'name', 'display_name as displayName')->get();
         $gameTypes = GameType::inRandomOrder()->get();
 
         $categories = Category::all();
@@ -75,7 +75,7 @@ class GameController extends BaseController
                     $s->id = $subcategory->id;
                     $s->categoryId = $subcategory->category_id;
                     $s->name = $subcategory->name;
-                    $s->icon = $subcategory->icon_name;
+                    $s->icon = $subcategory->icon;
                     $toReturnSubcategories[] = $s;
                 }
 
@@ -83,8 +83,8 @@ class GameController extends BaseController
                 $c->id = $category->id;
                 $c->name = $category->name;
                 $c->description = $category->description;
-                $c->icon = $category->icon_name;
-                $c->bgColor = $category->primary_color;
+                $c->icon = $category->icon;
+                $c->bgColor = $category->background_color;
                 $c->played = $gameInfo->where('game_type_id', $type->id)->where('category_id', $category->id)->sum('played');
                 $c->subcategories = $toReturnSubcategories;
                 $toReturnCategories[] = $c;
@@ -96,7 +96,7 @@ class GameController extends BaseController
             $_type->displayName = $type->display_name;
             $_type->description = $type->description;
             $_type->icon = $type->icon;
-            $_type->bgColor = $type->primary_color_2;
+            $_type->bgColor = $type->background_color_2;
 
             $_type->categories = $toReturnCategories;
 
@@ -160,12 +160,12 @@ class GameController extends BaseController
     {
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
-        $mode = Mode::find($request->mode);
+        $mode = GameMode::find($request->mode);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
-        $gameSession->mode_id = $mode->id;
+        $gameSession->game_mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
         $gameSession->category_id = $category->id;
         $gameSession->session_token = Str::random(40);
@@ -309,14 +309,13 @@ class GameController extends BaseController
             }
         }
 
-        $game->user_won = $points >= $wrong;
-        $game->user_points_gained = $points * 5; //@TODO to be revised
+        $game->wrong_count = $wrong;
+        $game->points_gained = $points * 5; //@TODO to be revised
 
         $game->save();
 
         if ($points > 0) {
-            $this->creditPoints($this->user->id, $game->user_points_gained, "Points gained from game played");
-            $this->updateRanking($this->user->id, $game->category_id, $game->user_points_gained);
+            $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
 
 
@@ -383,13 +382,6 @@ class GameController extends BaseController
             $gameSession->opponent_won = true;
         }
         $gameSession->save();
-
-
-        //update category rankings for user
-        $this->updateRanking($this->user->id, $gameSession->category_id, $gameSession->user_points_gained);
-
-        //update category rankings for opponent
-        $this->updateRanking($gameSession->opponent_id, $gameSession->category_id, $gameSession->opponent_points_gained);
 
         return $this->sendResponse($gameSession, 'Game Ended');
     }
@@ -488,41 +480,6 @@ class GameController extends BaseController
         ]);
 
         return $this->sendResponse("Challenge Declined", 'Challenge Declined');
-    }
-
-
-    private function updateRanking($userId, $catId, $points)
-    {
-        //category rankings
-        //get category id of played subcategory
-        $isCategory = Category::where('id', $catId)->select('category_id')->first();
-        //if played category is not a subcategory
-        if ($isCategory === null) {
-            $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $catId)->first();
-
-            if ($ranking === null) {
-                CategoryRanking::create([
-                    'user_id' => $userId,
-                    'category_id' => $catId,
-                    'points_gained' => $points
-                ]);
-                return;
-            }
-            $ranking->update(['points_gained' => $ranking->points_gained + $points]);
-            return;
-        }
-
-        $ranking = CategoryRanking::where('user_id', $userId)->where('category_id', $isCategory->category_id)->first();
-
-        if ($ranking === null) {
-            CategoryRanking::create([
-                'user_id' => $userId,
-                'category_id' => $isCategory->category_id,
-                'points_gained' => $points
-            ]);
-            return;
-        }
-        $ranking->update(['points_gained' => $ranking->points_gained + $points]);
     }
 
     private function getSampleEndData()

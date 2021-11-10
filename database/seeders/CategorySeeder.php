@@ -52,9 +52,9 @@ class CategorySeeder extends Seeder
                 'id' => 101,
                 'category_id' => 0,
                 'name' => 'Football',
-                'icon_name' => 'icons/soccer_ball.png',
+                'icon' => 'icons/soccer_ball.png',
                 'description' => 'Football Questions',
-                'primary_color' => '#9C3DB8'
+                'background_color' => '#9C3DB8'
             ]
         );
 
@@ -63,8 +63,8 @@ class CategorySeeder extends Seeder
                 'name' => 'Premier League Clubs',
                 'description' => 'Answer premier league related questions',
                 'category_id' => 101,
-                'icon_name' => 'icons/premier_league.png',
-                'primary_color' => '#EF8318'
+                'icon' => 'icons/premier_league.png',
+                'background_color' => '#EF8318'
             ]
         );
 
@@ -74,8 +74,8 @@ class CategorySeeder extends Seeder
                 'category_id' => 0,
                 'name' => 'Music',
                 'description' => 'Answer Music questions',
-                'icon_name' => 'icons/music_note.png',
-                'primary_color' => '#9C3DB8'
+                'icon' => 'icons/music_note.png',
+                'background_color' => '#9C3DB8'
             ],
         );
 
@@ -84,18 +84,27 @@ class CategorySeeder extends Seeder
                 'name' => 'Naija Music',
                 'description' => 'Answer Naija music questions',
                 'category_id' => 501,
-                'icon_name' => 'icons/naija_music.jpg',
-                'primary_color' => '#EF8318'
+                'icon' => 'icons/naija_music.jpg',
+                'background_color' => '#EF8318'
             ],
         );
 
         DB::table('categories')->insert(
             [
-                'name' => 'The Rest of The World',
+                'name' => 'Global Music',
                 'description' => 'Answer world wide music questions',
                 'category_id' => 501,
-                'icon_name' => 'icons/world_music.jpg',
-                'primary_color' => '#EF8318'
+                'icon' => 'icons/world_music.jpg',
+                'background_color' => '#EF8318'
+            ]
+        );
+        DB::table('categories')->insert(
+            [
+                'name' => 'Country',
+                'description' => 'Answer country related sports questions.',
+                'category_id' => 101,
+                'icon' => 'icons/soccer_ball.jpg',
+                'background_color' => 'rgb(251, 198, 2)'
             ]
         );
     }

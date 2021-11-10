@@ -15,13 +15,13 @@ class AlterSelectedColumnsFromTables extends Migration
     {   
         //Category Table
         Schema::table('categories', function (Blueprint $table) {
-            $table->renameColumn('primary_color', 'font_colour');
+            $table->renameColumn('primary_color', 'font_color');
         });
         Schema::table('categories', function (Blueprint $table) {
             $table->renameColumn('icon_name', 'icon');
         });
         Schema::table('categories', function (Blueprint $table) {
-            $table->renameColumn('game_background_url', 'background_colour');
+            $table->renameColumn('game_background_url', 'background_color');
         });
 
         //Game Session Questions Table
@@ -66,6 +66,9 @@ class AlterSelectedColumnsFromTables extends Migration
         //Online Timelines
         Schema::dropIfExists('online_timelines');
 
+        //Category Rankings
+        Schema::dropIfExists('category_rankings');
+
         //User Points
         Schema::table('user_points', function (Blueprint $table) {
             $table->dropColumn('game_type_id');
@@ -90,13 +93,13 @@ class AlterSelectedColumnsFromTables extends Migration
     {   
         //Category Table
         Schema::table('categories', function (Blueprint $table) {
-            $table->renameColumn('font_colour', 'primary_color');
+            $table->renameColumn('font_color', 'primary_color');
         });
         Schema::table('categories', function (Blueprint $table) {
             $table->renameColumn('icon', 'icon_name');
         });
         Schema::table('categories', function (Blueprint $table) {
-            $table->renameColumn('background_colour', 'game_background_url');
+            $table->renameColumn('background_color', 'game_background_url');
         });
 
         //Game Session Questions Table

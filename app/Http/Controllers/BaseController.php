@@ -53,14 +53,6 @@ class BaseController extends Controller
             'point_flow_type'=>'POINTS_ADDED'
         ]);
 
-        //find benefactor
-        $user = User::find($userId) ;
-
-        //add points
-        $user->points += $points;
-        $user->user_index_status = 'CLIMBED';
-        $user->save();  
-
     }
 
     public function subtractPoints($userId, $points, $description){
@@ -72,14 +64,6 @@ class BaseController extends Controller
             'description'=> $description,
             'point_flow_type'=>'POINTS_SUBTRACTED'
         ]);
-
-        //find benefactor
-        $user = User::find($userId) ;
-
-        //subtract points
-        $user->points -= $points;
-        $user->user_index_status = 'DROPPED';
-        $user->save();  
 
     }
 

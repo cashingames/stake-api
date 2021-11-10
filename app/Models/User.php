@@ -26,9 +26,7 @@ class User extends Authenticatable implements JWTSubject
         'phone_number',
         'password',
         'otp_token',
-        'is_on_line',
-        'points',
-        'user_index_status'
+        'is_on_line'
     ];
 
     /**
@@ -49,7 +47,6 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_on_line' => 'boolean',
-        'points' => 'integer',
     ];
 
     protected $appends = [
@@ -91,11 +88,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function points()
-    {
-        return $this->hasMany(UserPoint::class);
-    }
-
     public function onlineTimelines()
     {
         return $this->hasMany(OnlineTimeline::class);
@@ -116,14 +108,20 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(User::class, 'category_rankings')->withPivot('points_gained', 'user_id');
     }
 
-    public function categoryRanking()
-    {
-        return $this->hasOne(CategoryRanking::class);
-    }
+    // public function categoryRanking()
+    // {
+    //     return $this->hasOne(CategoryRanking::class);
+    // }
 
     public function gameSessions()
     {
         return $this->hasMany(GameSession::class);
+    }
+
+    public function points(){
+        return UserPoint::where('user_id', $this->id)
+        ->where('point_flow_type','POINTS_ADDED')
+        ->sum('value');
     }
 
     public function getAchievementAttribute()
@@ -139,15 +137,22 @@ class User extends Authenticatable implements JWTSubject
         return ($achievement->title);
     }
 
+
     public function getRankAttribute()
     {
-        $results = User::orderBy('points', 'desc')->get();
-
+         $results = DB::select(
+            "select SUM(value) as score, user_id from user_points WHERE 
+            point_flow_type = 'POINTS_ADDED'
+            group by user_id
+            order by score desc
+            limit 100"
+        );
+    
         $userIndex = -1;
-
+        
         if (count($results) > 0) {
-            $userIndex = $results->search(function ($user) {
-                return $user->id == $this->id;
+            $userIndex = collect($results)->search(function ($user) {
+                return $user->user_id == $this->id;
             });
         }
 
@@ -160,38 +165,29 @@ class User extends Authenticatable implements JWTSubject
 
     public function getPlayedGamesCountAttribute()
     {
-        $playedAsUser = GameSession::where('user_id', $this->id)->count();
-        $playedAsOpponent = GameSession::where('opponent_id', $this->id)->count();
+        return GameSession::where('user_id', $this->id)->count();
+    }
 
-        return $playedAsUser + $playedAsOpponent;
-    }
-    public function getUserIndexStatusAttribute($value)
-    {
-        if ($value == 'CLIMBED') {
-            return true;
-        }
-        if ($value == 'DROPPED') {
-            return false;
-        }
-        return true;
-    }
+    // public function getUserIndexStatusAttribute($value)
+    // {
+    //     if ($value == 'CLIMBED') {
+    //         return true;
+    //     }
+    //     if ($value == 'DROPPED') {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     public function getChallengesPlayedAttribute()
     {
-        $playedAsUser = Challenge::where('user_id', $this->id)->count();
-        $playedAsOpponent = Challenge::where('opponent_id', $this->id)->count();
-
-        return $playedAsUser + $playedAsOpponent;
+        return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
     }
 
     public function getWinRateAttribute()
     {
-        $singleGameWins = GameSession::where('mode_id', 1)->where('user_id', $this->id)->where('user_won', true)->count();
-
-        $challengeGameWinsAsUser = GameSession::where('mode_id', 2)->where('user_id', $this->id)->where('user_won', true)->count();
-
-        $challengeGameWinsAsOpponent = GameSession::where('mode_id', 2)->where('opponent_id', $this->id)->where('opponent_won', true)->count();
-        return (($singleGameWins + $challengeGameWinsAsUser + $challengeGameWinsAsOpponent) / 100);
+        $gameWins = GameSession::where('correct_count','>=', 5)->count();
+        return ($gameWins / 100);
     }
 
     public function friends()
@@ -207,9 +203,15 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
+    
     public function pointTransactions()
     {
-        return $this->points()
+        return $this->hasMany(UserPoint::class);
+    }
+
+    public function getUserPointTransactions()
+    {
+        return $this->pointTransactions()
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

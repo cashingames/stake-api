@@ -13,11 +13,18 @@ class LeadersController extends BaseController
      */
     public function global()
     {
-        $leaders = DB::table('users')
-            ->orderBy('points', 'desc')
-            ->join('profiles', 'users.id', '=', 'profiles.user_id')
-            ->select('users.points', 'users.user_index_status', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
-            ->limit(25)->get();
+        $leaders = DB::select(
+            'SELECT g.*, p.avatar, p.first_name , p.last_name
+            FROM (
+                SELECT SUM(points_gained) AS points, user_id FROM game_sessions
+                INNER JOIN users ON users.id = game_sessions.user_id
+                GROUP BY user_id
+                ORDER BY points DESC
+                LIMIT 25
+            ) g
+            INNER JOIN profiles p ON g.user_id = p.user_id
+            ORDER BY g.points DESC'
+        );  
 
         return $this->sendResponse($leaders, "Global Leaders");
     }
@@ -31,9 +38,9 @@ class LeadersController extends BaseController
         $response = [];
         Category::where('category_id', 0)->has('users')->get()->each(function ($item) use (&$response) {
             $board = $item->users()->orderBy('points_gained', 'desc')
-                ->join('users', 'users.id', '=', 'category_rankings.user_id')
+                ->join('users', 'users.id', '=', 'game_sessions.user_id')
                 ->join('profiles', 'users.id', '=', 'profiles.user_id')
-                ->select('points_gained as points', 'users.user_index_status', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
+                ->select('points_gained as points', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
                 ->limit(25)
                 ->get();
             $response[$item->name] = $board;

@@ -23,6 +23,6 @@ class Category extends Model
 
   public function users()
   {
-    return $this->belongsToMany(Category::class, 'category_rankings')->withPivot('points_gained', 'user_id');
+    return $this->belongsToMany(Category::class, 'game_sessions')->withPivot('points_gained', 'user_id');
   }
 }
