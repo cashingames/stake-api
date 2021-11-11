@@ -176,6 +176,7 @@ class User extends Authenticatable implements JWTSubject
             $lastGamePlayed = GameSession::where('user_id', $this->id)->latest()->first();
             
             if($lastGamePlayed->created_at <= Carbon::now()->subDay()){
+                //subscribe user to free plan
                 $this->userPlan->update(['plan_id' => 1, 'is_active' => true]);
                 return true;
             }
