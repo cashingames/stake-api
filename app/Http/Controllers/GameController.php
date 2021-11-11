@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GameMode;
 use App\Models\User;
 use App\Models\Boost;
+use App\Models\Plan;
 use App\Models\Category;
 use App\Models\GameType;
 use App\Models\Challenge;
@@ -31,6 +32,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
+        $result->plans = Plan::all();
         $result->gameModes = GameMode::select('id', 'name', 'display_name as displayName')->get();
         $gameTypes = GameType::inRandomOrder()->get();
 

@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Facades\DB;
 use stdClass;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -88,9 +89,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function onlineTimelines()
+    public function userPlan()
     {
-        return $this->hasMany(OnlineTimeline::class);
+        return $this->hasOne(UserPlan::class);
     }
 
     public function boosts()
@@ -112,11 +113,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(User::class, 'game_sessions')->withPivot('points_gained', 'user_id');
     }
-
-    // public function categoryRanking()
-    // {
-    //     return $this->hasOne(CategoryRanking::class);
-    // }
 
     public function gameSessions()
     {
@@ -173,16 +169,27 @@ class User extends Authenticatable implements JWTSubject
         return GameSession::where('user_id', $this->id)->count();
     }
 
-    // public function getUserIndexStatusAttribute($value)
-    // {
-    //     if ($value == 'CLIMBED') {
-    //         return true;
-    //     }
-    //     if ($value == 'DROPPED') {
-    //         return false;
-    //     }
-    //     return true;
-    // }
+    public function hasActivePlan()
+    {
+        $isPlanActive = $this->userPlan->is_active;
+        if(!$isPlanActive){
+            $lastGamePlayed = GameSession::where('user_id', $this->id)->latest()->first();
+            
+            if($lastGamePlayed->created_at <= Carbon::now()->subDay()){
+                $this->userPlan->update(['plan_id' => 1, 'is_active' => true]);
+                return true;
+            }
+            return false;
+        }
+        $recentGamesCount = $this->gameSessions->where('created_at', '>=', Carbon::now()->subDay())->count();
+        $plan = Plan::where('id',$this->userPlan->plan_id)->first();
+        
+        if($recentGamesCount >= $plan->game_count){
+            $this->userPlan->update(['is_active' => false]);
+            return false;
+        }
+        return true;     
+    }
 
     public function getChallengesPlayedAttribute()
     {

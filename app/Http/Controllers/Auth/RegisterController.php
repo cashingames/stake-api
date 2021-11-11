@@ -94,26 +94,24 @@ class RegisterController extends BaseController
                 'last_name' => $data['last_name'],
                 'referral_code' => $data['username'] . "_" . mt_rand(1111, 9999),
                 'referrer' => $data['referrer'] ?? null,
-                'points' => 0
             ]);
 
         //create the wallet
         $user->wallet()
             ->create([]);
 
+        //subscribe user to free plan
+        DB::table('user_plans')->insert([
+            'user_id' => $user->id,
+            'plan_id' => 1,
+            'is_active'=> true
+        ]);
+        
         //give user sign up bonus
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $user->points = 100;
-            $user->save();
-
-            $user->points()->create([
-                'user_id' => $user->id,
-                'value' => 100,
-                'description' => 'Sign Up Bonus Points',
-                'point_flow_type' => 'POINTS_ADDED',
-            ]);
+            $this->creditPoints($user->id, 100, "Sign up bonus points");
 
             $user->boosts()->create([
                 'user_id' => $user->id,

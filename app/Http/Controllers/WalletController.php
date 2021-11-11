@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WalletTransaction;
-use App\Models\Withdrawal;
+use App\Models\Plan;
 use App\Models\Boost;
 use GuzzleHttp\Client;
 use stdClass;
@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WithdrawalRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class WalletController extends BaseController
@@ -195,7 +196,60 @@ class WalletController extends BaseController
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
 
-    // public function getWithdrawals(){
-    //     return $this->sendResponse(Withdrawal::latest()->get(),"withdrawals");
-    // }
+    public function subscribeToPlan($planId){
+        $plan = Plan::find($planId);
+        
+        if($plan === null){
+            return $this->sendError('Plan does not exist', 'Plan does not exist');
+        }
+
+        if($plan->price > $this->user->wallet->balance){
+            return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
+        }
+
+        $checkPlanSubscription= DB::table('user_plans')->where('user_id',$this->user->id)->first();
+       
+        if($checkPlanSubscription === null){
+            $this->user->wallet->balance -= $plan->price;
+    
+            WalletTransaction::create([
+                'wallet_id' => $this->user->wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $plan->price,
+                'description' => 'SUBSCRIBED TO ' . strtoupper($plan->name) ,
+                'reference' => Str::random(10),
+            ]);
+    
+            $this->user->wallet->save();
+    
+            DB::table('user_plans')->insert([
+                'user_id' => $this->user->id,
+                'plan_id' => $plan->id,
+                'is_active'=> true
+            ]);
+            
+            return $this->sendResponse('You have successfully subscribed to '.$plan->name,
+             'You have successfully subscribed to '.$plan->name);   
+        }
+        
+        if( !$checkPlanSubscription->is_active ){
+            $this->user->wallet->balance -= $plan->price;
+
+            WalletTransaction::create([
+                'wallet_id' => $this->user->wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $plan->price,
+                'description' => 'SUBSCRIBED TO ' . strtoupper($plan->name) ,
+                'reference' => Str::random(10),
+            ]);
+    
+            $this->user->wallet->save();
+            
+            $this->user->userPlan->update(['plan_id' => $plan->id, 'is_active' => true]);
+
+            return $this->sendResponse('You have successfully subscribed to '.$plan->name,
+            'You have successfully subscribed to '.$plan->name);   
+        }
+        return $this->sendError('You already have an active plan', 'You already have an active plan');
+    }
 }
