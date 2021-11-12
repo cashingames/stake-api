@@ -142,15 +142,32 @@ class StoreTest extends TestCase
         $response->assertStatus(200);
     }
 
-    // public function test_boost_cannot_be_bought_if_point_is_less_than_boost_point_value()
-    // {   
-    //     $this->seed(BoostSeeder::class);
+    public function test_boost_can_be_bought_with_points()
+    {   
+        UserPoint::create([
+            'user_id' => $this->user->id,
+            'value' => 2000,
+            'description'=> 'test points added',
+            'point_flow_type'=>'POINTS_ADDED'
+        ]);
 
-    //     $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
-    //     $response->assertJsonFragment(['message' => 'You do not have enough points']);
+        $this->seed(BoostSeeder::class);
 
-    //     $response->assertStatus(400);
-    // }
+        $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
+        
+        // $response->dump();
+        $response->assertStatus(200);
+    }
+
+    public function test_boost_cannot_be_bought_if_point_is_less_than_boost_point_value()
+    {   
+        $this->seed(BoostSeeder::class);
+
+        $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
+        $response->assertJsonFragment(['message' => 'You do not have enough points']);
+
+        $response->assertStatus(400);
+    }
 
     public function test_boost_cannot_be_bought_if_wallet_balance_is_less_than_boost_currency_value()
     {   

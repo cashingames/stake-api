@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WalletTransaction;
 use App\Models\Plan;
+use App\Models\UserPoint;
 use App\Models\Boost;
 use GuzzleHttp\Client;
 use stdClass;
@@ -106,48 +107,44 @@ class WalletController extends BaseController
     }
 
     //when a user chooses to buy boost with points
-    // public function buyBoostsWithPoints($boostId)
-    // {
+    public function buyBoostsWithPoints($boostId)
+    {
 
-    //     $boost = Boost::find($boostId);
+        $boost = Boost::find($boostId);
 
-    //     if ($boost == null) {
-    //         return $this->sendError([], 'Wrong boost selected');
-    //     }
+        if ($boost == null) {
+            return $this->sendError([], 'Wrong boost selected');
+        }
 
-    //     $points = $this->user->points;
-    //     if ($points < ($boost->point_value)) {
-    //         return $this->sendError(false, 'You do not have enough points');
-    //     }
+        $points = $this->user->points();
+        if ($points < ($boost->point_value)) {
+            return $this->sendError(false, 'You do not have enough points');
+        }
 
-    //     //subtract points from user
-    //     $this->user->update(['points' => $points - $boost->point_value]);
-    //     $this->user->update(['user_index_status' => 'DROPPED']);
+        //log point traffic
+        UserPoint::create([
+            'user_id' => $this->user->id,
+            'value' => $boost->point_value,
+            'description' => 'Points used for buying ' . $boost->name . ' boosts',
+            'point_flow_type' => 'POINTS_SUBTRACTED',
+        ]);
 
-    //     //log point traffic
-    //     $this->user->points()->create([
-    //         'user_id' => $this->user->id,
-    //         'value' => $boost->point_value,
-    //         'description' => 'Points used for buying ' . $boost->name . ' boosts',
-    //         'point_flow_type' => 'POINTS_SUBTRACTED',
-    //     ]);
+        //credit user with bought boost
+        //if user already has boost, add to boost else create new boost for user
+        $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
+        if ($userBoost === null) {
+            $this->user->boosts()->create([
+                'user_id' => $this->user->id,
+                'boost_id' => $boostId,
+                'boost_count' => $boost->pack_count,
+                'used_count' => 0
+            ]);
+        } else {
+            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
+        }
 
-    //     //credit user with bought boost
-    //     //if user already has boost, add to boost else create new boost for user
-    //     $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
-    //     if ($userBoost === null) {
-    //         $this->user->boosts()->create([
-    //             'user_id' => $this->user->id,
-    //             'boost_id' => $boostId,
-    //             'boost_count' => $boost->pack_count,
-    //             'used_count' => 0
-    //         ]);
-    //     } else {
-    //         $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
-    //     }
-
-    //     return $this->sendResponse($points - $boost->point_value, 'Boost Bought');
-    // }
+        return $this->sendResponse($points - $boost->point_value, 'Boost Bought');
+    }
 
     //when a user chooses to buy boost from wallet
     public function buyBoostsFromWallet($boostId)
