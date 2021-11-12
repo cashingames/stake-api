@@ -119,9 +119,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function points()
     {
-        return UserPoint::where('user_id', $this->id)
+        $pointsAdded = UserPoint::where('user_id', $this->id)
             ->where('point_flow_type', 'POINTS_ADDED')
             ->sum('value');
+        $pointsSubtracted = UserPoint::where('user_id', $this->id)
+            ->where('point_flow_type', 'POINTS_SUBTRACTED')
+            ->sum('value');
+        return $pointsAdded -  $pointsSubtracted;
     }
 
     public function getAchievementAttribute()
