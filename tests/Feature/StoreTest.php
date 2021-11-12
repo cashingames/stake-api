@@ -12,6 +12,7 @@ use UserSeeder;
 use App\Models\Achievement;
 use App\Models\Boost;
 use App\Models\User;
+use App\Models\UserPoint;
 
 class StoreTest extends TestCase
 {   
@@ -64,7 +65,12 @@ class StoreTest extends TestCase
     public function test_achievement_can_be_claimed()
     {   
         $this->seed(AchievementSeeder::class);
-        $this->user->update(['points'=> 200000]);
+        UserPoint::create([
+            'user_id' => $this->user->id,
+            'value' => 200000,
+            'description'=> 'test points added',
+            'point_flow_type'=>'POINTS_ADDED'
+        ]);
 
         $response = $this->post(self::CLAIM_ACHIEVEMENT_URL.Achievement::inRandomOrder()->first()->id);
         $response->assertJsonFragment(['message' => 'Achievement Claimed']);
@@ -84,7 +90,13 @@ class StoreTest extends TestCase
 
     public function test_achievement_cannot_be_claimed_more_than_once()
     {   
-        $this->user->update(['points'=> 200000]);
+         UserPoint::create([
+            'user_id' => $this->user->id,
+            'value' => 2000,
+            'description'=> 'test points added',
+            'point_flow_type'=>'POINTS_ADDED'
+        ]);
+
         $this->seed(AchievementSeeder::class);
         $achievement = Achievement::first();
         $this->post(self::CLAIM_ACHIEVEMENT_URL.$achievement->id);
@@ -113,21 +125,10 @@ class StoreTest extends TestCase
     {   
         $this->seed(BoostSeeder::class);
 
-        $response = $this->post(self::BUY_BOOST_POINTS_URL.'50');
+        $response = $this->post(self::BUY_BOOST_WALLET_URL.'50');
         $response->assertJsonFragment(['message' => 'Wrong boost selected']);
 
         $response->assertStatus(400);
-    }
-
-    public function test_boosts_can_be_bought_with_points()
-    {   
-        $this->seed(BoostSeeder::class);
-        $this->user->update(['points'=> 1000]);
-
-        $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
-        $response->assertJsonFragment(['message' => 'Boost Bought']);
-
-        $response->assertStatus(200);
     }
 
     public function test_boosts_can_be_bought_from_wallet()
@@ -141,15 +142,15 @@ class StoreTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_boost_cannot_be_bought_if_point_is_less_than_boost_point_value()
-    {   
-        $this->seed(BoostSeeder::class);
+    // public function test_boost_cannot_be_bought_if_point_is_less_than_boost_point_value()
+    // {   
+    //     $this->seed(BoostSeeder::class);
 
-        $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
-        $response->assertJsonFragment(['message' => 'You do not have enough points']);
+    //     $response = $this->post(self::BUY_BOOST_POINTS_URL.Boost::inRandomOrder()->first()->id);
+    //     $response->assertJsonFragment(['message' => 'You do not have enough points']);
 
-        $response->assertStatus(400);
-    }
+    //     $response->assertStatus(400);
+    // }
 
     public function test_boost_cannot_be_bought_if_wallet_balance_is_less_than_boost_currency_value()
     {   

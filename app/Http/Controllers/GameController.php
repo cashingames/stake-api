@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Boost;
 use App\Models\Plan;
 use App\Models\Category;
+use App\Models\UserPoint;
 use App\Models\GameType;
 use App\Models\Challenge;
 use App\Models\UserBoost;
@@ -117,8 +118,9 @@ class GameController extends BaseController
         if ($achievement === null) {
             return $this->sendError('Invalid Achievement', 'Invalid Achievement');
         }
-
-        if ($this->user->points < $achievement->point_milestone) {
+        $userPoints = $this->user->points();
+        
+        if ($userPoints < $achievement->point_milestone) {
             return $this->sendError('You do not have enough points to claim this achievement', 'You do not have enough points to claim this achievement');
         }
 
@@ -141,7 +143,8 @@ class GameController extends BaseController
                 ->where('user_id', $this->user->id)->first();
 
             if ($checkIsClaimed === null) {
-                if ($a->point_milestone <= $this->user->points) {
+                $userPoints = $this->user->points();
+                if ($a->point_milestone <= $userPoints) {
                     DB::table('user_achievements')->insert([
                         'user_id' => $this->user->id,
                         'achievement_id' => $a->id,
