@@ -16,6 +16,11 @@ class Category extends Model
     return $this->hasMany(Question::class);
   }
 
+  public function gameSessions()
+  {
+    return $this->hasMany(GameSession::class);
+  }
+
   public function gameTypes()
   {
     return $this->hasMany(GameType::class);

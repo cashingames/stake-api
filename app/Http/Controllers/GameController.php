@@ -32,7 +32,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->plans = Plan::all();
+        // $result->plans = Plan::all();
         $result->gameModes = GameMode::select('id', 'name', 'display_name as displayName')->get();
         $gameTypes = GameType::inRandomOrder()->get();
 
@@ -295,7 +295,7 @@ class GameController extends BaseController
 
         $questions = Question::whereIn('id', array_column($request->chosenOptions, 'question_id'))->get();
         $points = 0;
-        $wrong = 0;
+        $wrongs = 0;
         foreach ($request->chosenOptions as $a) {
 
             $isCorect = $questions->find($a['question_id'])
@@ -307,11 +307,11 @@ class GameController extends BaseController
             if ($isCorect != null) {
                 $points = $points + 1;
             } else {
-                $wrong = $wrong + 1;
+                $wrongs = $wrongs + 1;
             }
         }
 
-        $game->wrong_count = $wrong;
+        $game->wrong_count = $wrongs;
         $game->points_gained = $points * 5; //@TODO to be revised
 
         $game->save();
@@ -354,13 +354,13 @@ class GameController extends BaseController
 
         $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
 
-        if ($gameSession === null) {
+        if ($gameSession == null) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
         //credit user with points
         $isChallenge = Mode::where("id", $gameSession->mode_id)->first();
 
-        if (($isChallenge->name) !== "Challenge") {
+        if (($isChallenge->name) != "Challenge") {
             return $this->sendError('This Game was not played in Challenge mode', 'This Game was not played in Challenge mode');
         }
 

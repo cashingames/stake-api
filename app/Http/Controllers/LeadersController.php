@@ -14,7 +14,7 @@ class LeadersController extends BaseController
     public function global()
     {
         $leaders = DB::select(
-            'SELECT g.*, p.avatar, p.first_name , p.last_name
+            'SELECT g.points, p.avatar, p.first_name , p.last_name
             FROM (
                 SELECT SUM(points_gained) AS points, user_id FROM game_sessions
                 INNER JOIN users ON users.id = game_sessions.user_id
@@ -24,7 +24,8 @@ class LeadersController extends BaseController
             ) g
             INNER JOIN profiles p ON g.user_id = p.user_id
             ORDER BY g.points DESC'
-        );  
+
+        );
 
         return $this->sendResponse($leaders, "Global Leaders");
     }
@@ -36,15 +37,24 @@ class LeadersController extends BaseController
     public function categories()
     {
         $response = [];
-        Category::where('category_id', 0)->has('users')->get()->each(function ($item) use (&$response) {
-            $board = $item->users()->orderBy('points_gained', 'desc')
-                ->join('users', 'users.id', '=', 'game_sessions.user_id')
-                ->join('profiles', 'users.id', '=', 'profiles.user_id')
-                ->select('points_gained as points', 'profiles.first_name', 'profiles.last_name', 'profiles.avatar')
-                ->limit(25)
-                ->get();
-            $response[$item->name] = $board;
-        });
+        $leaders = DB::select(
+            'select p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name
+            from 
+            (select sum(points_gained) points, gs.user_id, c.category_id
+                from game_sessions gs
+                inner join categories c on c.id = gs.category_id
+                inner join users u on u.id = gs.user_id
+                group by c.category_id, gs.user_id
+                order by points desc 
+                limit 25
+            ) r
+            join profiles p on p.user_id = r.user_id
+            join categories c on c.id = r.category_id
+            order by r.points desc'
+        );
+        foreach ($leaders as $leader) {
+            $response[$leader->category_name][] = $leader;
+        }
         return $this->sendResponse($response, 'Categories leaderboard');
     }
 }
