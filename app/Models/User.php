@@ -174,11 +174,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function hasActivePlan()
     {   
-
         $isPlanActive = $this->userPlan->is_active;
         if (!$isPlanActive) {
             $lastGamePlayed = GameSession::where('user_id', $this->id)->latest()->first();
 
+            if($lastGamePlayed === null){
+                return true;
+            }
             if ($lastGamePlayed->created_at <= Carbon::now()->subDay()) {
                 //subscribe user to free plan
                 $this->userPlan->update(['plan_id' => 1, 'is_active' => true]);
