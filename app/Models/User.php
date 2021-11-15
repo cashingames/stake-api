@@ -50,7 +50,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate'
+        'challenges_played', 'win_rate', 'active_plan'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -193,6 +193,15 @@ class User extends Authenticatable implements JWTSubject
             return false;
         }
         return true;
+    }
+
+    public function getActivePlanAttribute()
+    {
+        $activePlan = $this->userPlan->first();
+
+        $plan = Plan::where('id', $activePlan->plan_id)->first();
+
+        return $plan->name;
     }
 
     public function getChallengesPlayedAttribute()

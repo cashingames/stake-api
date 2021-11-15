@@ -48,6 +48,7 @@ class UserController extends BaseController
         $result->friends = $this->user->friends();
         $result->pointsTransaction = $this->user->getUserPointTransactions();
         $result->hasActivePlan = $this->user->hasActivePlan();
+        $result->activePlan = $this->user->active_plan;
 
         // $result->gamePerformance = 
         /**
@@ -101,4 +102,6 @@ class UserController extends BaseController
         ]);
         return $this->sendResponse('Online status updated', "Online status updated");
     }
+
+
 }
