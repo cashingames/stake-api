@@ -8,6 +8,7 @@ use Tests\TestCase;
 
 use App\Models\User;
 use UserSeeder;
+use PlanSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -28,6 +29,7 @@ class ResetPasswordTest extends TestCase
     protected function setUp(): void{
         parent::setUp();
         $this->seed(UserSeeder::class);
+        $this->seed(PlanSeeder::class);
         $this->user = User::first();  
         $this->now = Carbon::now();
         $this->token = mt_rand(10000,99999);

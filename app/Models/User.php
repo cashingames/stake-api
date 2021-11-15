@@ -173,7 +173,8 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function hasActivePlan()
-    {
+    {   
+
         $isPlanActive = $this->userPlan->is_active;
         if (!$isPlanActive) {
             $lastGamePlayed = GameSession::where('user_id', $this->id)->latest()->first();
@@ -196,10 +197,18 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function getActivePlanAttribute()
-    {
-        $activePlan = $this->userPlan->first();
+    {   
+        //for already signed up users before plan was introduced subscribe to free plan
+        $subscribedPlan = UserPlan::where('user_id', $this->id)->first();
+        if($subscribedPlan === null){
+            DB::table('user_plans')->insert([
+                'user_id' => $this->id,
+                'plan_id' => 1,
+                'is_active'=> true
+            ]);
+        }
 
-        $plan = Plan::where('id', $activePlan->plan_id)->first();
+        $plan = Plan::where('id', $subscribedPlan->plan_id)->first();
 
         return $plan->name;
     }

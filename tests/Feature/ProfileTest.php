@@ -8,10 +8,12 @@ use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use UserSeeder;
+use PlanSeeder;
 use App\Models\User;
 
 class ProfileTest extends TestCase
-{
+{   
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -24,6 +26,7 @@ class ProfileTest extends TestCase
         parent::setUp();
         
         $this->seed(UserSeeder::class);
+        $this->seed(PlanSeeder::class);
         $this->user = User::first(); 
 
         $this->actingAs($this->user);
