@@ -18,8 +18,8 @@ class PlanSeeder extends Seeder
         
         DB::table('plans')->insert(
             [
-                'name' => 'Free Plan',
-                'description' => 'Play a maximun of 10 games',
+                'name' => 'Free',
+                'description' => 'Play a maximun of 10 games a day',
                 'price' => 0.00,
                 'game_count' => 10,
                 'background_color'=> '#FAC502'
@@ -28,8 +28,8 @@ class PlanSeeder extends Seeder
 
         DB::table('plans')->insert(
             [
-                'name' => 'Double O Plan',
-                'description' => 'Play a maximum of 15 games',
+                'name' => 'Double O',
+                'description' => 'Play a maximum of 15 games a day',
                 'price' => 500.00,
                 'game_count' => 15,
                 'background_color'=>'#A35EBB'
@@ -38,8 +38,8 @@ class PlanSeeder extends Seeder
 
         DB::table('plans')->insert(
             [
-                'name' => 'Dicey Multiples Plan',
-                'description' => 'Play a maximum of 20 games',
+                'name' => 'Dicey Multiples',
+                'description' => 'Play a maximum of 20 games a day',
                 'price' => 800.00,
                 'game_count' => 20,
                 'background_color'=> '#2D9CDB'
@@ -49,8 +49,8 @@ class PlanSeeder extends Seeder
 
         DB::table('plans')->insert(
             [
-                'name' => 'The Ultimate Plan',
-                'description' => 'Play a maximum of 25 games',
+                'name' => 'The Ultimate',
+                'description' => 'Play a maximum of 25 games a day',
                 'price' => 1000.00,
                 'game_count' => 25,
                 'background_color'=>'#EF2F55'

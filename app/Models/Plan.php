@@ -11,6 +11,10 @@ class Plan extends Model
 
     protected $fillable = ['name' ,'description','price','game_count', 'background_color'];
 
+    protected $casts = [
+        'price' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
