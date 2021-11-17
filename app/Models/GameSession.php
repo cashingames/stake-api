@@ -8,15 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class GameSession extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ['plan_id'];
+
 
     public function mode()
     {
-        return $this->belongsTo(Mode::class);
+        return $this->belongsTo(GameMode::class);
     }
 
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
     }
 
     public function user()

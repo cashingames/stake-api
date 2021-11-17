@@ -225,8 +225,8 @@ class WalletController extends BaseController
                 'is_active'=> true
             ]);
             
-            return $this->sendResponse('You have successfully subscribed to '.$plan->name,
-             'You have successfully subscribed to '.$plan->name);   
+            return $this->sendResponse('You have successfully subscribed to '.$plan->name .' plan',
+             'You have successfully subscribed to '.$plan->name .' plan');   
         }
         
         if( !$checkPlanSubscription->is_active ){
@@ -236,7 +236,7 @@ class WalletController extends BaseController
                 'wallet_id' => $this->user->wallet->id,
                 'transaction_type' => 'DEBIT',
                 'amount' => $plan->price,
-                'description' => 'SUBSCRIBED TO ' . strtoupper($plan->name) ,
+                'description' => 'SUBSCRIBED TO ' . strtoupper($plan->name) .' PLAN',
                 'reference' => Str::random(10),
             ]);
     
@@ -244,8 +244,8 @@ class WalletController extends BaseController
             
             $this->user->userPlan->update(['plan_id' => $plan->id, 'is_active' => true]);
 
-            return $this->sendResponse('You have successfully subscribed to '.$plan->name,
-            'You have successfully subscribed to '.$plan->name);   
+            return $this->sendResponse('You have successfully subscribed to '.$plan->name.' plan',
+            'You have successfully subscribed to '.$plan->name .' plan');   
         }
         return $this->sendError('You already have an active plan', 'You already have an active plan');
     }

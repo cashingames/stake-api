@@ -209,7 +209,7 @@ class User extends Authenticatable implements JWTSubject
 
         $plan = Plan::where('id', $subscribedPlan->plan_id)->first();
 
-        return $plan->name;
+        return $plan;
     }
 
     public function getChallengesPlayedAttribute()

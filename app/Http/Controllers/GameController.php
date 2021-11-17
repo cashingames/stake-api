@@ -162,10 +162,11 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {
+    {   
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
+        $plan = Plan::find($request->plan);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
 
         $gameSession = new GameSession();
@@ -173,6 +174,7 @@ class GameController extends BaseController
         $gameSession->game_mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
         $gameSession->category_id = $category->id;
+        $gameSession->plan_id = $plan->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);

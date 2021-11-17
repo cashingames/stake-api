@@ -32,6 +32,7 @@ class ResetPasswordTest extends TestCase
         $this->seed(PlanSeeder::class);
         $this->user = User::first();  
         $this->now = Carbon::now();
+        $this->actingAs($this->user);
         $this->token = mt_rand(10000,99999);
  
     }
