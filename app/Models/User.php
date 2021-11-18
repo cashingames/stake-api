@@ -261,6 +261,14 @@ class User extends Authenticatable implements JWTSubject
 
     }
 
+    public function hasPaidPlan(){
+        $paid_plan = UserPlan::where('user_id', $this->id)->where('is_active',true)->where('plan_id','>',1)->first();
+        if($paid_plan !== null){
+            return true;
+        }
+        return false;
+    }
+
     public function getChallengesPlayedAttribute()
     {
         return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();

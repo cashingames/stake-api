@@ -49,6 +49,7 @@ class UserController extends BaseController
         $result->pointsTransaction = $this->user->getUserPointTransactions();
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->user->active_plan;
+        $result->hasPaidActivePlan = $this->user->hasPaidPlan();
 
         // $result->gamePerformance = 
         /**

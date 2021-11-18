@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WalletTransaction;
 use App\Models\Plan;
 use App\Models\UserPoint;
+use App\Models\UserPlan;
 use App\Models\Boost;
 use GuzzleHttp\Client;
 use stdClass;
@@ -13,6 +14,7 @@ use App\Mail\WithdrawalRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 
 class WalletController extends BaseController
@@ -204,13 +206,16 @@ class WalletController extends BaseController
             return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
         }
 
-        $this->user->userPlan->where('is_active',true)->get()->map(function ($plan){
-            $p = Plan::where('id',$plan->id)->first();
+        $userPlans = UserPlan::where('user_id', $this->user->id)->where('is_active',true)->get();
+        
+        foreach($userPlans as $u_p){
+            $p = Plan::where('id',$u_p->plan_id)->first();
+            
             if($p->is_free === false){
                 return $this->sendError('You already have an active paid plan.', 'You already have an active paid plan.');
             }
-        });
-
+        }
+        
         $this->user->wallet->balance -= $plan->price;
     
         WalletTransaction::create([

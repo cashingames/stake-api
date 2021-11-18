@@ -10,10 +10,11 @@ class Plan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name' ,'description','price','game_count', 'background_color'];
+    protected $fillable = ['name' ,'description','price','game_count', 'background_color', 'is_free'];
 
     protected $casts = [
         'price' => 'integer',
+        'is_free' => 'boolean'
     ];
 
     protected $appends = [
