@@ -8,6 +8,7 @@ use App\Models\Boost;
 use App\Models\Plan;
 use App\Models\Category;
 use App\Models\UserPoint;
+use App\Models\UserPlan;
 use App\Models\GameType;
 use App\Models\Challenge;
 use App\Models\UserBoost;
