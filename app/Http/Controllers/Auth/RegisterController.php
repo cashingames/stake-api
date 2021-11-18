@@ -104,7 +104,8 @@ class RegisterController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $user->id,
             'plan_id' => 1,
-            'is_active'=> true
+            'is_active'=> true,
+            'used_count'=> 0
         ]);
         
         //give user sign up bonus

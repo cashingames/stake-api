@@ -191,6 +191,13 @@ class GameController extends BaseController
             'game' => $gameInfo
         ];
 
+        //update used plan count.
+        $getUserPlan = UserPlan::where('user_id',$this->user->id)
+        ->where('plan_id',$plan->id)
+        ->where('is_active', true)->first();
+
+        $getUserPlan->update(['used_count'=> $getUserPlan->used_count + 1]);
+
         return $this->sendResponse($result, 'Game Started');
     }
 

@@ -25,6 +25,11 @@ class Plan extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function userPlans()
+    {
+        return $this->hasMany(UserPlan::class);
+    }
+
     public function gameSessions(){
         return $this->hasMany(GameSession::class);
     }
@@ -32,13 +37,13 @@ class Plan extends Model
     public function getRemainingGamesAttribute()
     {   
         $user = auth()->user();
-        $recentGamesCount = GameSession::where('user_id', $user->id)->where('plan_id',$this->id)->
-        where('created_at', '>=', Carbon::now()->subDay())->count();
-
-        if($recentGamesCount === null){
-            return $this->game_count;
+        $active_game_count = $this->userPlans->where('user_id', $user->id)->where('plan_id',$this->id)->where('is_active', true)->first();
+        
+        if($active_game_count !== null){
+            return ($this->game_count - $active_game_count->used_count);
         }
-        return $this->game_count - $recentGamesCount;
+       return $this->game_count;
+       
     }
 
 }

@@ -89,7 +89,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function userPlan()
     {
-        return $this->hasOne(UserPlan::class);
+        return $this->hasMany(UserPlan::class);
     }
 
     public function boosts()
@@ -104,7 +104,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function plan()
     {
-        return $this->hasOne(Plan::class);
+        return $this->hasMany(Plan::class);
     }
 
     public function categories()
@@ -173,43 +173,92 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function hasActivePlan()
-    {   
-        $isPlanActive = $this->userPlan->is_active;
-        if (!$isPlanActive) {
-            $lastGamePlayed = GameSession::where('user_id', $this->id)->latest()->first();
-
-            if ($lastGamePlayed === null || $lastGamePlayed->created_at <= Carbon::now()->subDay()) {
-                //subscribe user to free plan
-                $this->userPlan->update(['plan_id' => 1, 'is_active' => true]);
+    {            
+        //Check if it's a new day
+        if(Carbon::now()->isAfter(Carbon::today()->startOfDay())){
+            //get free plan
+            $freePlan = $this->userPlan->where('plan_id', 1)->where('is_active', true)->first();
+            if($freePlan===null){
+                //check if user has any other active plan
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                if($otherActivePlan === null){
+                    return false;
+                }
+                if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
+                    //deactivate plan
+                    $otherActivePlan->update(['is_active'=>false]);
+                    return false;
+                }
                 return true;
             }
-            return false;
-        }
-        $recentGamesCount = $this->gameSessions->where('created_at', '>=', Carbon::now()->subDay())->count();
-        $plan = Plan::where('id', $this->userPlan->plan_id)->first();
+           //check if it's that of previous day
+            if($freePlan->updated_at->between(Carbon::yesterday(),Carbon::today()->startOfDay())){
+                //deactivate free plan
+                $freePlan->update(['is_active'=>false]);
+                //insert new free plan for the day
+                UserPlan::create([
+                    'plan_id' => 1,
+                    'user_id' => $this->id,
+                    'used_count' => 0,
+                    'is_active' => true,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+                //check if user has any other active plan
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                if($otherActivePlan === null){
+                    return true;
+                }
+                if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
+                    //deactivate plan
+                    $otherActivePlan->update(['is_active'=>false]);
+                    return true;
+                }
+                return true;
+            }  
+            //check the number of game counts for the free
+            if($freePlan->used_count >= Plan::find(1)->game_count){
+                //deactivate free plan
+                $freePlan->update(['is_active'=>false]);
 
-        if ($recentGamesCount >= $plan->game_count) {
-            $this->userPlan->update(['is_active' => false]);
-            return false;
+                //check other plan count
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                if($otherActivePlan === null){
+                    return false;
+                }
+                if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
+                    //deactivate plan
+                    $otherActivePlan->update(['is_active'=>false]);
+                    return false;
+                }
+                return true;
+            }
+            return true;
         }
-        return true;
+    
+        return false;
     }
 
     public function getActivePlanAttribute()
     {   
-        //for already signed up users before plan was introduced subscribe to free plan
-        $subscribedPlan = UserPlan::where('user_id', $this->id)->first();
-        if($subscribedPlan === null){
-            DB::table('user_plans')->insert([
-                'user_id' => $this->id,
-                'plan_id' => 1,
-                'is_active'=> true
-            ]);
+        $subscribedPlan = UserPlan::where('user_id', $this->id)->where('is_active', true)->get();
+        if(count($subscribedPlan) === 0){
+          return [];
         }
+        return $subscribedPlan->map(function ($u_plan) {
+            $plan = Plan::where('id', $u_plan->plan_id)->first();
+            $data = new stdClass;
+            $data->id = $plan->id;
+            $data->name = $plan->name;
+            $data->description = $plan->description;
+            $data->price = $plan->price;
+            $data->game_count = $plan->game_count;
+            $data->background_color = $plan->background_color;
+            $data->is_free = $plan->is_free;
+            $data->remaining_games = $plan->remaining_games;
+            return $data;
+        });
 
-        $plan = Plan::where('id', $subscribedPlan->plan_id)->first();
-
-        return $plan;
     }
 
     public function getChallengesPlayedAttribute()
