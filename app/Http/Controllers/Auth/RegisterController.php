@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Http\Controllers\BaseController;
 use App\Models\Boost;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
@@ -105,7 +106,9 @@ class RegisterController extends BaseController
             'user_id' => $user->id,
             'plan_id' => 1,
             'is_active'=> true,
-            'used_count'=> 0
+            'used_count'=> 0,
+            'created_at'=>Carbon::now(),
+            'updated_at'=>Carbon::now()
         ]);
         
         //give user sign up bonus
