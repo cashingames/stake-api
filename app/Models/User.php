@@ -179,15 +179,24 @@ class User extends Authenticatable implements JWTSubject
             //get free plan
             $freePlan = $this->userPlan->where('plan_id', 1)->where('is_active', true)->first();
             if($freePlan===null){
+                //give free plan
+                UserPlan::create([
+                    'plan_id' => 1,
+                    'user_id' => $this->id,
+                    'used_count' => 0,
+                    'is_active' => true,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
                 //check if user has any other active plan
                 $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                 if($otherActivePlan === null){
-                    return false;
+                    return true;
                 }
                 if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
                     //deactivate plan
                     $otherActivePlan->update(['is_active'=>false]);
-                    return false;
+                    return true;
                 }
                 return true;
             }
