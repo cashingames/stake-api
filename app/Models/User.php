@@ -176,31 +176,49 @@ class User extends Authenticatable implements JWTSubject
     {            
         //Check if it's a new day
         if(Carbon::now()->isAfter(Carbon::today()->startOfDay())){
-            //get free plan
+            //get active free plan
             $freePlan = $this->userPlan->where('plan_id', 1)->where('is_active', true)->first();
-            if($freePlan===null){
-                //give free plan
-                UserPlan::create([
-                    'plan_id' => 1,
-                    'user_id' => $this->id,
-                    'used_count' => 0,
-                    'is_active' => true,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-                //check if user has any other active plan
+            if($freePlan === null){
+                //check last given free plan
+                $lastFreePlan = UserPlan::where('user_id', $this->id)->where('plan_id', 1)->latest()->first();
+                //check if it's yesterday's own
+                if($lastFreePlan->updated_at->between(Carbon::yesterday(),Carbon::today()->startOfDay())){
+                //give free plan for today
+                    UserPlan::create([
+                        'plan_id' => 1,
+                        'user_id' => $this->id,
+                        'used_count' => 0,
+                        'is_active' => true,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]);
+                    //check if user has any other active plan
+                    $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                    if($otherActivePlan === null){
+                        return true;
+                    }
+                    if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
+                        //deactivate plan
+                        $otherActivePlan->update(['is_active'=>false]);
+                        return true;
+                    }
+                    //user has existing paid plan so,
+                    return true;
+                }
+                //if not yesterday's own, check other plans
                 $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                 if($otherActivePlan === null){
-                    return true;
+                    return false;
                 }
                 if($otherActivePlan->used_count >= Plan::find($otherActivePlan->plan_id)->game_count){
                     //deactivate plan
                     $otherActivePlan->update(['is_active'=>false]);
-                    return true;
+                    return false;
                 }
                 return true;
             }
            //check if it's that of previous day
+          
             if($freePlan->updated_at->between(Carbon::yesterday(),Carbon::today()->startOfDay())){
                 //deactivate free plan
                 $freePlan->update(['is_active'=>false]);
@@ -225,7 +243,7 @@ class User extends Authenticatable implements JWTSubject
                 }
                 return true;
             }  
-            //check the number of game counts for the free
+            //if not that of previous day, check the number of game counts for the active free
             if($freePlan->used_count >= Plan::find(1)->game_count){
                 //deactivate free plan
                 $freePlan->update(['is_active'=>false]);
@@ -244,7 +262,6 @@ class User extends Authenticatable implements JWTSubject
             }
             return true;
         }
-    
         return false;
     }
 
