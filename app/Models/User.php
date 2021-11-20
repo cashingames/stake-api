@@ -267,23 +267,42 @@ class User extends Authenticatable implements JWTSubject
 
     public function getActivePlanAttribute()
     {   
-        $subscribedPlan = UserPlan::where('user_id', $this->id)->where('is_active', true)->get();
+        $subscribedPlan = UserPlan::where('user_id', $this->id)
+                                    ->where('is_active', true)
+                                    ->get();
         if(count($subscribedPlan) === 0){
           return [];
         }
-        return $subscribedPlan->map(function ($u_plan) {
+        
+        $subscribedPlans = [];
+        $purchasedPlan =  new stdClass;
+        $purchasedPlan->name = "Purchased Games";
+        $purchasedPlan->background_color = "rgb(250, 197, 2)";
+        $purchasedPlan->is_free = false;
+
+        $sumOfPurchasedPlanGames = 0;
+
+         $subscribedPlan->each(function ($u_plan) {
             $plan = Plan::where('id', $u_plan->plan_id)->first();
             $data = new stdClass;
-            $data->id = $plan->id;
-            $data->name = $plan->name;
-            $data->description = $plan->description;
-            $data->price = $plan->price;
-            $data->game_count = $plan->game_count;
-            $data->background_color = $plan->background_color;
-            $data->is_free = $plan->is_free;
-            $data->remaining_games = $plan->remaining_games;
-            return $data;
-        });
+
+            if($plan->is_free == "1"){
+                $data->name = "Bonus Games";
+                $data->description = $plan->remaining_games. " games remaining" ;
+                $data->background_color = $plan->background_color;
+                $data->is_free = $plan->is_free;
+                $subscribedPlans[] = $data;
+            }else{
+                $sumOfPurchasedPlanGames += $plan->remaining_games;
+            }
+
+        }); 
+        
+        $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
+        $subscribedPlans[] = $purchasedPlan;
+
+
+       return $subscribedPlans;
 
     }
 
