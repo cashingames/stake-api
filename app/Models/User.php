@@ -286,7 +286,7 @@ class User extends Authenticatable implements JWTSubject
             $plan = Plan::where('id', $u_plan->plan_id)->first();
             $data = new stdClass;
 
-            if($plan->is_free == "1"){
+            if($plan->is_free){
                 $data->name = "Bonus Games";
                 $data->description = $plan->remaining_games. " games remaining" ;
                 $data->background_color = $plan->background_color;
@@ -303,7 +303,8 @@ class User extends Authenticatable implements JWTSubject
 
 
        return $subscribedPlans;
-
+    
+    // return [];
     }
 
     public function hasPaidPlan(){
