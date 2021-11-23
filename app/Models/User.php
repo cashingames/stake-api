@@ -279,7 +279,9 @@ class User extends Authenticatable implements JWTSubject
         $purchasedPlan->name = "Purchased Games";
         $purchasedPlan->background_color = "rgb(250, 197, 2)";
         $purchasedPlan->is_free = false;
+        $purchasedPlan->id = 0;
 
+        $purchasedPlanId = 0;
         $sumOfPurchasedPlanGames = 0;
 
         foreach($subscribedPlan as $u_plan){
@@ -292,14 +294,17 @@ class User extends Authenticatable implements JWTSubject
                 $data->description = $plan->remaining_games. " games remaining" ;
                 $data->background_color = $plan->background_color;
                 $data->is_free = $plan->is_free;
+                $data->id = $plan->id;
                 $subscribedPlans[] = $data;
             }else{
                 $sumOfPurchasedPlanGames = $plan->remaining_games;
+                $purchasedPlanId = $plan->id;
             }
 
         }; 
         
         $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
+        $purchasedPlan->id = $purchasedPlanId;
         $subscribedPlans[] = $purchasedPlan;
 
         return $subscribedPlans;
