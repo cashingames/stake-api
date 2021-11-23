@@ -56,6 +56,7 @@ class ResetPasswordTest extends TestCase
             "password_confirmation" => "password111"
         ]);
 
+        $response->dump();
         $response->assertStatus(200);
     }
 

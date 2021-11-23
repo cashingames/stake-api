@@ -282,7 +282,7 @@ class User extends Authenticatable implements JWTSubject
 
         $sumOfPurchasedPlanGames = 0;
 
-         $subscribedPlan->each(function ($u_plan) {
+        $subscribedPlan->each(function ($u_plan) {
             $plan = Plan::where('id', $u_plan->plan_id)->first();
             $data = new stdClass;
 
@@ -293,7 +293,7 @@ class User extends Authenticatable implements JWTSubject
                 $data->is_free = $plan->is_free;
                 $subscribedPlans[] = $data;
             }else{
-                $sumOfPurchasedPlanGames += $plan->remaining_games;
+                $sumOfPurchasedPlanGames = $plan->remaining_games;
             }
 
         }); 
@@ -304,7 +304,6 @@ class User extends Authenticatable implements JWTSubject
 
        return $subscribedPlans;
     
-    // return [];
     }
 
     public function hasPaidPlan(){
