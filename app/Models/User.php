@@ -279,7 +279,6 @@ class User extends Authenticatable implements JWTSubject
         $purchasedPlan->name = "Purchased Games";
         $purchasedPlan->background_color = "rgb(250, 197, 2)";
         $purchasedPlan->is_free = false;
-        $purchasedPlan->id = 0;
 
         $purchasedPlanId = 0;
         $sumOfPurchasedPlanGames = 0;
@@ -295,9 +294,11 @@ class User extends Authenticatable implements JWTSubject
                 $data->background_color = $plan->background_color;
                 $data->is_free = $plan->is_free;
                 $data->id = $plan->id;
-                $subscribedPlans[] = $data;
+                if ( $plan->remaining_games > 0){
+                    $subscribedPlans[] = $data;
+                }
             }else{
-                $sumOfPurchasedPlanGames = $plan->remaining_games;
+                $sumOfPurchasedPlanGames += $plan->remaining_games;
                 $purchasedPlanId = $plan->id;
             }
 
@@ -305,10 +306,11 @@ class User extends Authenticatable implements JWTSubject
         
         $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
         $purchasedPlan->id = $purchasedPlanId;
-        $subscribedPlans[] = $purchasedPlan;
-
+        
+        if ( $sumOfPurchasedPlanGames > 0){
+            $subscribedPlans[] = $purchasedPlan;
+        }
         return $subscribedPlans;
-    
     }
 
     public function hasPaidPlan(){
