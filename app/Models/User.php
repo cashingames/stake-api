@@ -87,7 +87,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function userPlans()
+    public function userPlan()
     {
         return $this->hasMany(UserPlan::class);
     }
@@ -177,7 +177,7 @@ class User extends Authenticatable implements JWTSubject
         //Check if it's a new day
         if(Carbon::now()->isAfter(Carbon::today()->startOfDay())){
             //get active free plan
-            $freePlan = $this->userPlans->where('plan_id', 1)->where('is_active', true)->first();
+            $freePlan = $this->userPlan->where('plan_id', 1)->where('is_active', true)->first();
             if($freePlan === null){
                 //check last given free plan
                 $lastFreePlan = UserPlan::where('user_id', $this->id)->where('plan_id', 1)->latest()->first();
@@ -193,7 +193,7 @@ class User extends Authenticatable implements JWTSubject
                         'updated_at' => Carbon::now()
                     ]);
                     //check if user has any other active plan
-                    $otherActivePlan = $this->userPlans->where('is_active', true)->first();
+                    $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                     if($otherActivePlan === null){
                         return true;
                     }
@@ -206,7 +206,7 @@ class User extends Authenticatable implements JWTSubject
                     return true;
                 }
                 //if not yesterday's own, check other plans
-                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return false;
                 }
@@ -232,7 +232,7 @@ class User extends Authenticatable implements JWTSubject
                     'updated_at' => Carbon::now()
                 ]);
                 //check if user has any other active plan
-                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return true;
                 }
@@ -249,7 +249,7 @@ class User extends Authenticatable implements JWTSubject
                 $freePlan->update(['is_active'=>false]);
 
                 //check other plan count
-                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return false;
                 }
