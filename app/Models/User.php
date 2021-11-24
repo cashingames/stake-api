@@ -50,7 +50,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate', 'active_plan'
+        'challenges_played', 'win_rate', 'active_plans'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -87,7 +87,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function userPlan()
+    public function userPlans()
     {
         return $this->hasMany(UserPlan::class);
     }
@@ -177,7 +177,7 @@ class User extends Authenticatable implements JWTSubject
         //Check if it's a new day
         if(Carbon::now()->isAfter(Carbon::today()->startOfDay())){
             //get active free plan
-            $freePlan = $this->userPlan->where('plan_id', 1)->where('is_active', true)->first();
+            $freePlan = $this->userPlans->where('plan_id', 1)->where('is_active', true)->first();
             if($freePlan === null){
                 //check last given free plan
                 $lastFreePlan = UserPlan::where('user_id', $this->id)->where('plan_id', 1)->latest()->first();
@@ -193,7 +193,7 @@ class User extends Authenticatable implements JWTSubject
                         'updated_at' => Carbon::now()
                     ]);
                     //check if user has any other active plan
-                    $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                    $otherActivePlan = $this->userPlans->where('is_active', true)->first();
                     if($otherActivePlan === null){
                         return true;
                     }
@@ -206,7 +206,7 @@ class User extends Authenticatable implements JWTSubject
                     return true;
                 }
                 //if not yesterday's own, check other plans
-                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return false;
                 }
@@ -232,7 +232,7 @@ class User extends Authenticatable implements JWTSubject
                     'updated_at' => Carbon::now()
                 ]);
                 //check if user has any other active plan
-                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return true;
                 }
@@ -249,7 +249,7 @@ class User extends Authenticatable implements JWTSubject
                 $freePlan->update(['is_active'=>false]);
 
                 //check other plan count
-                $otherActivePlan = $this->userPlan->where('is_active', true)->first();
+                $otherActivePlan = $this->userPlans->where('is_active', true)->first();
                 if($otherActivePlan === null){
                     return false;
                 }
@@ -265,7 +265,7 @@ class User extends Authenticatable implements JWTSubject
         return false;
     }
 
-    public function getActivePlanAttribute()
+    public function getActivePlansAttribute()
     {   
         $subscribedPlan = UserPlan::where('user_id', $this->id)
                                     ->where('is_active', true)
@@ -280,11 +280,10 @@ class User extends Authenticatable implements JWTSubject
         $purchasedPlan->background_color = "rgb(250, 197, 2)";
         $purchasedPlan->is_free = false;
 
-        $purchasedPlanId = 0;
         $sumOfPurchasedPlanGames = 0;
 
-        foreach($subscribedPlan as $u_plan){
-            $plan = Plan::where('id', $u_plan->plan_id)->first();
+        foreach($subscribedPlan as $activePlan){
+            $plan = Plan::where('id', $activePlan->plan_id)->first();
             $data = new stdClass;
 
             if($plan->is_free){
@@ -293,19 +292,17 @@ class User extends Authenticatable implements JWTSubject
                 $data->description = $plan->remaining_games. " games remaining" ;
                 $data->background_color = $plan->background_color;
                 $data->is_free = $plan->is_free;
-                $data->id = $plan->id;
+
                 if ( $plan->remaining_games > 0){
                     $subscribedPlans[] = $data;
                 }
             }else{
                 $sumOfPurchasedPlanGames += $plan->remaining_games;
-                $purchasedPlanId = $plan->id;
             }
 
         }; 
         
         $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
-        $purchasedPlan->id = $purchasedPlanId;
         
         if ( $sumOfPurchasedPlanGames > 0){
             $subscribedPlans[] = $purchasedPlan;

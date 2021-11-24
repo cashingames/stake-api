@@ -167,15 +167,26 @@ class GameController extends BaseController
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
-        $plan = Plan::find($request->plan);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
+        
+        $planId = 0;
+
+        $freePlan = UserPlan::where('user_id',$this->user->id)
+                    ->where('plan_id',1)->where('is_active',true)->first();
+        
+        if($freePlan !== null ){
+            $planId = $freePlan->plan_id;
+        }else{
+            $activePlan = UserPlan::where('user_id',$this->user->id)->where('plan_id','>',1)->where('is_active',true)->first();  
+            $planId = $activePlan->plan_id;
+        }
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
         $gameSession->category_id = $category->id;
-        $gameSession->plan_id = $plan->id;
+        $gameSession->plan_id = $planId;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
@@ -192,12 +203,10 @@ class GameController extends BaseController
             'game' => $gameInfo
         ];
 
-        //update used plan count.
-        $getUserPlan = UserPlan::where('user_id',$this->user->id)
-        ->where('plan_id',$plan->id)
-        ->where('is_active', true)->first();
+        $playedPlan = UserPlan::where('user_id',$this->user->id)->where('plan_id',$planId)
+        ->where('is_active',true)->first();
 
-        $getUserPlan->update(['used_count'=> $getUserPlan->used_count + 1]);
+        $playedPlan->update(['used_count'=> $playedPlan->used_count + 1]);
 
         return $this->sendResponse($result, 'Game Started');
     }
