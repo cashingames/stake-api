@@ -17,10 +17,6 @@ class Plan extends Model
         'is_free' => 'boolean'
     ];
 
-    protected $appends = [
-        'remaining_games'
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -35,16 +31,6 @@ class Plan extends Model
         return $this->hasMany(GameSession::class);
     }
    
-    public function getRemainingGamesAttribute()
-    {   
-        $user = auth()->user();
-        $active_game_count = $this->userPlans->where('user_id', $user->id)->where('plan_id',$this->id)->where('is_active', true)->first();
-        
-        if($active_game_count !== null){
-            return ($this->game_count - $active_game_count->used_count);
-        }
-       return $this->game_count;
-       
-    }
+    
 
 }

@@ -285,19 +285,19 @@ class User extends Authenticatable implements JWTSubject
         foreach($subscribedPlan as $activePlan){
             $plan = Plan::where('id', $activePlan->plan_id)->first();
             $data = new stdClass;
-
+            $remainingGames = $plan->game_count - $activePlan->used_count;
             if($plan->is_free){
                
                 $data->name = "Bonus Games";
-                $data->description = $plan->remaining_games. " games remaining" ;
+                $data->description = $remainingGames. " games remaining" ;
                 $data->background_color = $plan->background_color;
                 $data->is_free = $plan->is_free;
 
-                if ( $plan->remaining_games > 0){
+                if ( $remainingGames > 0){
                     $subscribedPlans[] = $data;
                 }
             }else{
-                $sumOfPurchasedPlanGames += $plan->remaining_games;
+                $sumOfPurchasedPlanGames += $remainingGames;
             }
 
         }; 

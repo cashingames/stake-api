@@ -206,23 +206,13 @@ class WalletController extends BaseController
             return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
         }
 
-        $userPlans = UserPlan::where('user_id', $this->user->id)->where('is_active',true)->get();
-        
-        foreach($userPlans as $u_p){
-            $p = Plan::where('id',$u_p->plan_id)->first();
-            
-            if($p->is_free === false){
-                return $this->sendError('You already have an active paid plan.', 'You already have an active paid plan.');
-            }
-        }
-        
         $this->user->wallet->balance -= $plan->price;
     
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
-            'description' => 'SUBSCRIBED TO ' . strtoupper($plan->name) ,
+            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES' ,
             'reference' => Str::random(10),
         ]);
 
@@ -237,8 +227,8 @@ class WalletController extends BaseController
             'updated_at' => Carbon::now()
         ]);
 
-        return $this->sendResponse('You have successfully subscribed to '.$plan->name .' plan',
-             'You have successfully subscribed to '.$plan->name .' plan');   
+        return $this->sendResponse('You have successfully bought '.$plan->game_count .' games',
+        'You have successfully bought '.$plan->game_count .' games');   
        
     }
 }
