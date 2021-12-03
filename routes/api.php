@@ -27,6 +27,7 @@ use App\Http\Controllers\LeadersController;
 */
 
 Route::post('auth/login', [LoginController::class, 'login']);
+Route::post('auth/google/login', [LoginController::class, 'loginWithGoogle']);
 Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/username/verify/{username}', [RegisterController::class, 'verifyUsername']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
