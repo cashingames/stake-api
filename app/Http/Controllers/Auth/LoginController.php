@@ -1,14 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use App\Models\UserPoint;
 use App\Models\Profile;
 use App\Models\Wallet;
 use App\Models\Boost;
 use App\Models\WalletTransaction;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends BaseController
 {
@@ -19,7 +21,7 @@ class LoginController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'loginWithGoogle']]);
     }
 
     /**
@@ -74,18 +76,17 @@ class LoginController extends BaseController
 
     public function loginWithGoogle(Request $request){
         $data = $request->validate([
-            'email' => ['required','unique', 'email'],
+            'email' => ['required', 'email'],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'avatar' => ['required', 'string', 'max:14'],
         ]);
         
         $returningUser = User::where('email', $data['email'])->first();
-
-        if($returningUser === null){
+        
+        if($returningUser == null){
            
             $user = User::create([
-                'username' => $data['username'] . "_" . mt_rand(1111, 9999),
+                'username' => $data['first_name'] . "_" . mt_rand(1111, 9999),
                 'email' => $data['email'],
                 'password' => bcrypt($data['email']),
                 'is_on_line' => true,
@@ -97,7 +98,7 @@ class LoginController extends BaseController
                 ->create([
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
-                    'referral_code' => $data['username'] . "_" . mt_rand(1111, 9999),
+                    'referral_code' => $user->username . "_" . mt_rand(1111, 9999),
                     'referrer' => $data['referrer'] ?? null,
                 ]);
 
@@ -145,16 +146,14 @@ class LoginController extends BaseController
                     $this->creditPoints($referrerId, 50, "Referral bonus");
             }
 
-            $credentials = array($data['email'], $data['email']);
-            $token = auth()->attempt($credentials);
+            $token = auth()->tokenById($user->id);
             
-            return $this->respondWithToken($token);
+            return $this->sendResponse($token, 'Token');
     
         }
 
-        $credentials = array($data['email'], $data['email']);
-        $token = auth()->attempt($credentials);
+        $token = auth()->tokenById($returningUser->id);
            
-        return $this->respondWithToken($token);
+        return $this->sendResponse($token, 'Token');
     }
 }
