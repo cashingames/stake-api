@@ -22,19 +22,21 @@ class ResetPasswordController extends BaseController
 
     // use ResetsPasswords;
 
-    public function reset(Request $request, $email, $code){
+    public function reset(Request $request){
        
         $data = $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],                
+                'password' => ['required', 'string', 'min:8', 'confirmed'], 
+                'email' => ['email', 'required'] ,
+                'code' => ['string','required']              
             ]);
             
-        $validRecord = DB::table('password_resets')->where('email', $email)->where('token', $code)->first();
+        $validRecord = DB::table('password_resets')->where('email', $data['email'])->where('token', $data['code'])->first();
                 
         if ($validRecord == null){
             return $this->sendError("email or token is incorrect", "email or token is incorrect");
         }
 
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $data['email'])->first();
             
         $user->password = bcrypt($data['password']);
         $user->save();
