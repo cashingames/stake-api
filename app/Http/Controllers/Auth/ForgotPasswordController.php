@@ -51,7 +51,7 @@ class ForgotPasswordController extends BaseController
             DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$data['email'], $token, $now]);
         }
 
-        return $this->sendResponse($token, 'Email Sent');
+        return $this->sendResponse(true, 'Email Sent');
     }
 
 

@@ -51,12 +51,15 @@ class ResetPasswordTest extends TestCase
 
     public function test_a_user_can_reset_password(){
 
-        $response = $this->postjson(self::RESET_PASSWORD_URL.$this->user->email, [
+        DB::table('password_resets')->insert(['email' =>$this->user->email, 'token' => 8989]);
+        
+        $resetDetails = DB::table('password_resets')->where('email', $this->user->email)->where('token', 8989)->first();
+        
+        $response = $this->postjson(self::RESET_PASSWORD_URL.$this->user->email.'/'.$resetDetails->token, [
             "password" => "password111",
             "password_confirmation" => "password111"
         ]);
 
-        $response->dump();
         $response->assertStatus(200);
     }
 

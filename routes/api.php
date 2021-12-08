@@ -32,7 +32,7 @@ Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/username/verify/{username}', [RegisterController::class, 'verifyUsername']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
-Route::post('auth/password/reset/{email}', [ResetPasswordController::class, 'reset']);
+Route::post('auth/password/reset/{email}/{code}', [ResetPasswordController::class, 'reset']);
 Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
 Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
 
