@@ -36,7 +36,6 @@ class ResetPasswordController extends BaseController
                 }
                 $user->password = bcrypt($data['password']);
                 $user->save();
-                auth()->attempt(['email','password']);
                 
                 return $this->sendResponse($user, "Password reset successful.");
             }else{
