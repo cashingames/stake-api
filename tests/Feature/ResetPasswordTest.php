@@ -24,7 +24,7 @@ class ResetPasswordTest extends TestCase
 
     protected $user, $token, $now;
     const VALIDATE_URL = '/api/auth/token/verify';
-    const RESET_PASSWORD_URL = '/api/auth/password/reset/';
+    const RESET_PASSWORD_URL = '/api/auth/password/reset';
 
     protected function setUp(): void{
         parent::setUp();
@@ -51,7 +51,13 @@ class ResetPasswordTest extends TestCase
 
     public function test_a_user_can_reset_password(){
 
-        $response = $this->postjson(self::RESET_PASSWORD_URL.$this->user->email, [
+        DB::table('password_resets')->insert(['email' =>$this->user->email, 'token' => 8989]);
+        
+        $resetDetails = DB::table('password_resets')->where('email', $this->user->email)->where('token', 8989)->first();
+        
+        $response = $this->postjson(self::RESET_PASSWORD_URL, [
+            "email" => $this->user->email,
+            "code" => "8989",
             "password" => "password111",
             "password_confirmation" => "password111"
         ]);
