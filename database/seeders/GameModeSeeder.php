@@ -21,6 +21,8 @@ class GameModeSeeder extends Seeder
                 'name' => "EXHIBITION",
                 'display_name' => "Exhibition",
                 'description' => "Play Single",
+                'icon' => 'icons/exhibition_icon.png',
+                'background_color' => '#E2F5EA'
             ]
         );
 
@@ -29,6 +31,8 @@ class GameModeSeeder extends Seeder
                 'name' => "CHALLENGE",
                 'display_name' => "Challenge",
                 'description' => "Challenge a friend to a duel",
+                'icon' => 'icons/challenge_icon.png',
+                'background_color' => '#FAEEFF'
             ]
         );
     }
