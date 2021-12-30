@@ -389,7 +389,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_id', $this->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id','boosts.icon','name', 'user_boosts.boost_count as count')
+            })->select('boosts.id','boosts.icon','boosts.description','name', 'user_boosts.boost_count as count')
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
 }
