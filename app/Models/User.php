@@ -277,7 +277,7 @@ class User extends Authenticatable implements JWTSubject
         $subscribedPlans = [];
         $purchasedPlan =  new stdClass;
         $purchasedPlan->name = "Purchased Games";
-        $purchasedPlan->background_color = "rgb(250, 197, 2)";
+        $purchasedPlan->background_color = "#D9E0FF";
         $purchasedPlan->is_free = false;
 
         $sumOfPurchasedPlanGames = 0;
