@@ -34,7 +34,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->plans = Plan::where('is_free',false)->get();
+        $result->plans = Plan::all();
         $result->gameModes = GameMode::select('id', 'name','description','icon','background_color as bgColor','display_name as displayName')->get();
         $gameTypes = GameType::inRandomOrder()->get();
 
