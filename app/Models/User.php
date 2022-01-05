@@ -290,7 +290,7 @@ class User extends Authenticatable implements JWTSubject
                
                 $data->name = "Bonus Games";
                 $data->description = $remainingGames. " games remaining" ;
-                $data->background_color = $plan->background_color;
+                $data->background_color = "#FFFFFF";
                 $data->is_free = $plan->is_free;
 
                 if ( $remainingGames > 0){
