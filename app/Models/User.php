@@ -289,6 +289,7 @@ class User extends Authenticatable implements JWTSubject
             if($plan->is_free){
                
                 $data->name = "Bonus Games";
+                $data->game_count = $remainingGames ;
                 $data->description = $remainingGames. " games remaining" ;
                 $data->background_color = "#FFFFFF";
                 $data->is_free = $plan->is_free;
@@ -302,8 +303,9 @@ class User extends Authenticatable implements JWTSubject
 
         }; 
         
+        $purchasedPlan->game_count = $sumOfPurchasedPlanGames;
         $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
-        
+       
         if ( $sumOfPurchasedPlanGames > 0){
             $subscribedPlans[] = $purchasedPlan;
         }
