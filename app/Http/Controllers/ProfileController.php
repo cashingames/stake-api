@@ -78,13 +78,13 @@ class ProfileController extends BaseController
     public function addProfilePic(Request $request)
     {
 
-        $data  = $request->validate([
-            'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
-        ]);
+        // $data  = $request->validate([
+        //     'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+        // ]);
 
-        if (!$data) {
-            return $this->sendError("The file must be an image", "The file must be an image");
-        }
+        // if (!$data) {
+        //     return $this->sendError("The file must be an image", "The file must be an image");
+        // }
 
         $profile = $this->user->profile;
 
@@ -101,6 +101,7 @@ class ProfileController extends BaseController
 
         return $this->sendResponse($profile, "Profile Updated.");
     }
+
 
     public function changePassword(Request $request)
     {
