@@ -94,7 +94,7 @@ class CategorySeeder extends Seeder
                 'name' => 'Global Music',
                 'description' => 'Answer world wide music questions',
                 'category_id' => 501,
-                'icon' => 'icons/world_music.jpg',
+                'icon' => 'icons/world_music.png',
                 'background_color' => '#EF8318'
             ]
         );
