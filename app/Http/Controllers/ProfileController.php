@@ -90,7 +90,7 @@ class ProfileController extends BaseController
 
         if ($request->hasFile('avatar')) {
             $image = $request->file('avatar');
-            $name = $this->user->id . "." . $image->guessExtension();
+            $name = uniqid().$this->user->username . "." . $image->guessExtension();
             $destinationPath = public_path('avatar');
             $profile->avatar = 'avatar/' . $name;
             $image->move($destinationPath, $name);
