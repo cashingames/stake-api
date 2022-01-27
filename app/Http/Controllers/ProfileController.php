@@ -97,9 +97,11 @@ class ProfileController extends BaseController
             // echo $destinationPath;
 
             $profile->save();
+
+            return $this->sendResponse($profile, "Profile Updated.");
         }
 
-        return $this->sendResponse($profile, "Profile Updated.");
+        return $this->sendResponse("No file found for upload", "No file found for upload");
     }
 
 
