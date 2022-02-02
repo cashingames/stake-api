@@ -219,7 +219,7 @@ class User extends Authenticatable implements JWTSubject
             }
            //check if it's that of previous day
           
-            if($freePlan->updated_at->between(Carbon::yesterday(),Carbon::today()->startOfDay())){
+            if($freePlan->updated_at <= Carbon::today()->startOfDay()){
                 //deactivate free plan
                 $freePlan->update(['is_active'=>false]);
                 //insert new free plan for the day
