@@ -64,7 +64,7 @@ class BoostSeeder extends Seeder
         DB::table('boosts')->insert(
             [
                 'name' => "Bomb",
-                'description' => "Removes one wrong and one right answer",
+                'description' => "Takes out two options",
                 'point_value' => 100,
                 'currency_value' => 115.033333,
                 'pack_count' => 3,
