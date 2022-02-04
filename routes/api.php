@@ -53,6 +53,7 @@ Route::middleware('api')->prefix('v3')->group(
 
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
+    Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
 
     Route::middleware('auth:api')->group(function () {
         Route::get('user/me', [UserController::class, 'me']);
