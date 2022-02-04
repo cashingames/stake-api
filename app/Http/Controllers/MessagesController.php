@@ -26,6 +26,13 @@ class MessagesController extends BaseController
         return $this->sendResponse("Feedback Sent", 'Feedback Sent');
     }
 
+    public function fetchFaqAndAnswers(){
+
+        $faqs = json_decode(file_get_contents(storage_path() . "/faq.json"), true);
+
+        return $this->sendResponse($faqs, 'data fetched');
+    }
+
     public function fetchNotifications(){
        
         $user = $this->user;
