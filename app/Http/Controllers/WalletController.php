@@ -77,7 +77,7 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => $value,
-            'description' => 'FUND WALLET FROM BANK',
+            'description' => 'Fund Wallet',
             'reference' => $result->data->reference,
         ]);
 
@@ -166,7 +166,7 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
-            'description' => 'BOUGHT ' . strtoupper($boost->name) . ' BOOSTS FROM WALLET',
+            'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
             'reference' => Str::random(10),
         ]);
 
