@@ -44,12 +44,13 @@ class GameController extends BaseController
                         SELECT 
                             gt.name game_type_name, gt.id game_type_id, 
                             c.category_id category_id,
-                                (select name from categories where categories.id = c.category_id) category_name,
+                                (SELECT name from categories WHERE categories.id = c.category_id) category_name,
                             c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
-                            (select count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
+                            (SELECT count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
                         FROM questions q
                         JOIN categories c ON c.id = q.category_id
-                        JOIN game_types gt ON gt.id = q.game_type_id
+                        JOIN game_types gt ON gt.id = q.game_type_id 
+                        WHERE q.deleted_at IS NULL
                         GROUP by q.category_id, q.game_type_id
                     ");
 
