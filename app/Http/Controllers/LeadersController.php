@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class LeadersController extends BaseController
 {
@@ -18,13 +19,14 @@ class LeadersController extends BaseController
             FROM (
                 SELECT SUM(points_gained) AS points, user_id FROM game_sessions gs
                 INNER JOIN users ON users.id = gs.user_id
-                WHERE DATE(gs.created_at) = { now()->toDateString() + }
+                WHERE DATE(gs.created_at) = ?
                 GROUP BY user_id
                 ORDER BY points DESC
                 LIMIT 25
             ) g
             INNER JOIN profiles p ON g.user_id = p.user_id
-            ORDER BY g.points DESC'
+            ORDER BY g.points DESC',
+            [now()->toDateString()]
         );
 
         return $this->sendResponse($leaders, "Global Leaders");
@@ -38,20 +40,21 @@ class LeadersController extends BaseController
     {
         $response = [];
         $leaders = DB::select(
-            'select p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name
-            from 
-            (select sum(points_gained) points, gs.user_id, c.category_id
-                from game_sessions gs
-                inner join categories c on c.id = gs.category_id
-                inner join users u on u.id = gs.user_id
-                WHERE DATE(gs.created_at) = { now()->toDateString() + }
+            'SELECT p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name
+            FROM 
+            (SELECT sum(points_gained) points, gs.user_id, c.category_id
+                FROM game_sessions gs
+                INNER JOIN categories c on c.id = gs.category_id
+                INNER JOIN users u on u.id = gs.user_id
+                WHERE DATE(gs.created_at) = ?
                 group by c.category_id, gs.user_id
                 order by points desc 
                 limit 25
             ) r
             join profiles p on p.user_id = r.user_id
             join categories c on c.id = r.category_id
-            order by r.points desc'
+            order by r.points desc',
+            [now()->toDateString()]
         );
         foreach ($leaders as $leader) {
             $response[$leader->category_name][] = $leader;
