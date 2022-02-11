@@ -15,9 +15,9 @@ class LeadersController extends BaseController
     public function global()
     {
         $leaders = DB::select(
-            'SELECT g.points, p.avatar, p.first_name , p.last_name
+            'SELECT g.points, p.avatar, p.first_name , p.last_name, g.username
             FROM (
-                SELECT SUM(points_gained) AS points, user_id FROM game_sessions gs
+                SELECT SUM(points_gained) AS points, user_id, username FROM game_sessions gs
                 INNER JOIN users ON users.id = gs.user_id
                 WHERE DATE(gs.created_at) = ?
                 GROUP BY user_id
@@ -40,9 +40,9 @@ class LeadersController extends BaseController
     {
         $response = [];
         $leaders = DB::select(
-            'SELECT p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name
+            'SELECT p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name, r.username
             FROM 
-            (SELECT sum(points_gained) points, gs.user_id, c.category_id
+            (SELECT sum(points_gained) points, gs.user_id, c.category_id, u.username
                 FROM game_sessions gs
                 INNER JOIN categories c on c.id = gs.category_id
                 INNER JOIN users u on u.id = gs.user_id
