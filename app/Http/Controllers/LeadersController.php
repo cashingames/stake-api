@@ -16,7 +16,7 @@ class LeadersController extends BaseController
         $leaders = DB::select(
             'SELECT g.points, p.avatar, p.first_name , p.last_name
             FROM (
-                SELECT SUM(points_gained) AS points, user_id FROM game_sessions
+                SELECT SUM(points_gained) AS points, user_id FROM game_sessions gs
                 INNER JOIN users ON users.id = game_sessions.user_id
                 WHERE DATE(gs.created_at) = CURDATE()
                 GROUP BY user_id
