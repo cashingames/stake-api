@@ -16,6 +16,11 @@ class GameType extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
+
     // public function IsEnabled()
     // {
     //     $hasQuestions = Question::where('game_type_id', $this->id)->first();

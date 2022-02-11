@@ -34,24 +34,24 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->plans = Plan::where('is_free',false)->get();
-        $result->gameModes = GameMode::select('id', 'name','description','icon','background_color as bgColor','display_name as displayName')->get();
-        $gameTypes = GameType::inRandomOrder()->get();
+        $result->plans = Plan::where('is_free', false)->get();
+        $result->gameModes = GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get();
+        $gameTypes = GameType::has('qustions')->inRandomOrder()->get();
 
         $categories = Category::all();
 
         $gameInfo = DB::select("
                         SELECT 
                             gt.name game_type_name, gt.id game_type_id, 
-                            c.category_id category_id,
-                                (SELECT name from categories WHERE categories.id = c.category_id) category_name,
-                            c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+                            c.category_id category_id, c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+                            (SELECT name from categories WHERE categories.id = c.category_id) category_name,
                             (SELECT count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
                         FROM questions q
                         JOIN categories c ON c.id = q.category_id
                         JOIN game_types gt ON gt.id = q.game_type_id 
                         WHERE q.deleted_at IS NULL
                         GROUP by q.category_id, q.game_type_id
+                        HAVING count(q.id) > 0
                     ");
 
         $gameInfo = collect($gameInfo);
@@ -121,7 +121,7 @@ class GameController extends BaseController
             return $this->sendError('Invalid Achievement', 'Invalid Achievement');
         }
         $userPoints = $this->user->points();
-        
+
         if ($userPoints < $achievement->point_milestone) {
             return $this->sendError('You do not have enough points to claim this achievement', 'You do not have enough points to claim this achievement');
         }
@@ -164,21 +164,21 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {   
+    {
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
-        
+
         $planId = 0;
 
-        $freePlan = UserPlan::where('user_id',$this->user->id)
-                    ->where('plan_id',1)->where('is_active',true)->first();
-        
-        if($freePlan !== null ){
+        $freePlan = UserPlan::where('user_id', $this->user->id)
+            ->where('plan_id', 1)->where('is_active', true)->first();
+
+        if ($freePlan !== null) {
             $planId = $freePlan->plan_id;
-        }else{
-            $activePlan = UserPlan::where('user_id',$this->user->id)->where('plan_id','>',1)->where('is_active',true)->first();  
+        } else {
+            $activePlan = UserPlan::where('user_id', $this->user->id)->where('plan_id', '>', 1)->where('is_active', true)->first();
             $planId = $activePlan->plan_id;
         }
 
@@ -204,10 +204,10 @@ class GameController extends BaseController
             'game' => $gameInfo
         ];
 
-        $playedPlan = UserPlan::where('user_id',$this->user->id)->where('plan_id',$planId)
-        ->where('is_active',true)->first();
+        $playedPlan = UserPlan::where('user_id', $this->user->id)->where('plan_id', $planId)
+            ->where('is_active', true)->first();
 
-        $playedPlan->update(['used_count'=> $playedPlan->used_count + 1]);
+        $playedPlan->update(['used_count' => $playedPlan->used_count + 1]);
 
         return $this->sendResponse($result, 'Game Started');
     }
