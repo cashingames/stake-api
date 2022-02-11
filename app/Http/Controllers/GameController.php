@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GameMode;
 use App\Models\User;
+use App\Models\Profile;
 use App\Models\Boost;
 use App\Models\Plan;
 use App\Models\Category;
@@ -163,6 +164,29 @@ class GameController extends BaseController
         );
     }
 
+    private function giftReferrerOnFirstGame(){
+        if($this->user->gameSessions->count() != 1){
+          return;
+        } 
+    
+        if( config('trivia.bonus.enabled') &&
+            config('trivia.bonus.signup.referral') &&
+            config('trivia.bonus.signup.referral_on_first_game') &&
+            isset($this->user->profile->referrer)
+        ){
+            $referrerId = Profile::where('referral_code', $this->user->profile->referrer)->value('user_id');
+            
+            DB::table('user_plans')->insert([
+                'user_id' => $referrerId,
+                'plan_id' => 1,
+                'is_active'=> true,
+                'used_count'=> 8,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+        }
+    }
+
     public function startSingleGame(Request $request)
     {
         $category = Category::find($request->category);
@@ -208,6 +232,8 @@ class GameController extends BaseController
             ->where('is_active', true)->first();
 
         $playedPlan->update(['used_count' => $playedPlan->used_count + 1]);
+
+        $this->giftReferrerOnFirstGame();
 
         return $this->sendResponse($result, 'Game Started');
     }
