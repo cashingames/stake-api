@@ -36,7 +36,7 @@ class GameController extends BaseController
         $result->boosts = Boost::all();
         $result->plans = Plan::where('is_free', false)->get();
         $result->gameModes = GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get();
-        $gameTypes = GameType::has('qustions')->inRandomOrder()->get();
+        $gameTypes = GameType::has('questions')->inRandomOrder()->get();
 
         $categories = Category::all();
 
