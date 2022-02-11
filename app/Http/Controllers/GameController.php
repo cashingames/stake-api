@@ -178,7 +178,7 @@ class GameController extends BaseController
             
             DB::table('user_plans')->insert([
                 'user_id' => $referrerId,
-                'plan_id' => 1,
+                'plan_id' => 5,
                 'is_active'=> true,
                 'used_count'=> 8,
                 'created_at' => Carbon::now(),

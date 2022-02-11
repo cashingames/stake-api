@@ -18,7 +18,7 @@ class PlanSeeder extends Seeder
         
         DB::table('plans')->insert(
             [
-                'name' => 'Free',
+                'name' => 'Daily Bonus',
                 'description' => 'Play 10 times',
                 'price' => 0.00,
                 'game_count' => 10,
@@ -59,6 +59,18 @@ class PlanSeeder extends Seeder
                 'is_free'=>false
             ]
         );
+
+        DB::table('plans')->insert(
+            [
+                'name' => 'Earned Bonus',
+                'description' => 'Play 10 times',
+                'price' => 0.00,
+                'game_count' => 10,
+                'background_color'=> '#FAC502',
+                'is_free'=>true
+            ]
+        );
+
 
     }
 }
