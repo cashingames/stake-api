@@ -18,7 +18,7 @@ class LeadersController extends BaseController
             FROM (
                 SELECT SUM(points_gained) AS points, user_id FROM game_sessions gs
                 INNER JOIN users ON users.id = gs.user_id
-                WHERE DATE(gs.created_at) = CURDATE()
+                WHERE DATE(gs.created_at) = { now()->toDateString() + }
                 GROUP BY user_id
                 ORDER BY points DESC
                 LIMIT 25
@@ -44,7 +44,7 @@ class LeadersController extends BaseController
                 from game_sessions gs
                 inner join categories c on c.id = gs.category_id
                 inner join users u on u.id = gs.user_id
-                WHERE DATE(gs.created_at) = CURDATE()
+                WHERE DATE(gs.created_at) = { now()->toDateString() + }
                 group by c.category_id, gs.user_id
                 order by points desc 
                 limit 25
