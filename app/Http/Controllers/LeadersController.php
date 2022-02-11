@@ -17,7 +17,7 @@ class LeadersController extends BaseController
             'SELECT g.points, p.avatar, p.first_name , p.last_name
             FROM (
                 SELECT SUM(points_gained) AS points, user_id FROM game_sessions gs
-                INNER JOIN users ON users.id = game_sessions.user_id
+                INNER JOIN users ON users.id = gs.user_id
                 WHERE DATE(gs.created_at) = CURDATE()
                 GROUP BY user_id
                 ORDER BY points DESC
@@ -25,7 +25,6 @@ class LeadersController extends BaseController
             ) g
             INNER JOIN profiles p ON g.user_id = p.user_id
             ORDER BY g.points DESC'
-
         );
 
         return $this->sendResponse($leaders, "Global Leaders");
