@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         ->hasProfile(1)
         ->hasWallet(1)
         ->hasTransactions(5)
-        ->hasUserPlan(1)
+        // ->hasUserPlan(1)
         ->create();
     }
 }

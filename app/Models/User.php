@@ -182,7 +182,7 @@ class User extends Authenticatable implements JWTSubject
                 //check last given free plan
                 $lastFreePlan = UserPlan::where('user_id', $this->id)->where('plan_id', 1)->latest()->first();
                 //check if it's not today's own
-                if($lastFreePlan->updated_at <= Carbon::today()->startOfDay()){
+                if($lastFreePlan->updated_at < Carbon::today()->startOfDay()){
                 //give free plan for today
                     UserPlan::create([
                         'plan_id' => 1,
