@@ -104,26 +104,27 @@ class User extends Authenticatable implements JWTSubject
 
     public function plans()
     {
-        return $this->belongsToMany(Plan::class, 'user_plans')->withPivot('plan_count', 'is_active','expire_at');
+        return $this
+        ->belongsToMany(Plan::class, 'user_plans')
+        ->withPivot('id', 'plan_count', 'is_active', 'expire_at', 'used_count');
     }
 
-    public function currentPlans()
+    public function scopeActivePlans()
     {
 
         //a plan is active if 
         // - isactive is true and
-        // - games_count * plan_count< used_count and 
+        // - games_count * plan_count> used_count and 
         // - expiry is greater than the current datetime or expiry is null
         return $this
-        ->belongsToMany(Plan::class, 'user_plans')
-        ->withPivot('plan_count', 'is_active', 'expire_at', 'used_count')
-        ->wherePivot('is_active', true)
-        ->whereRaw('game_count * user_plans.plan_count < user_plans.used_count ')
-        ->wherePivot('expire_at', '>', now())
-        ->orWherePivot('expire_at', NULL);
+            ->plans()
+            ->wherePivot('is_active', true)
+            ->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
+            ->wherePivot('expire_at', '>', now())
+            ->orWherePivot('expire_at', NULL);
     }
 
-    public function randomFreePlan()
+    public function getNextFreePlan()
     {
         //returns the first active free plan that will expire next
 
@@ -132,11 +133,23 @@ class User extends Authenticatable implements JWTSubject
         //return free plan that will expire in the future
         //if there is non
         //return free plan with no expiry date
+       return $this
+            ->activePlans()
+            ->where('is_free', true)
+            ->orderBy('expire_at', 'asc')
+            ->limit(1)
+            ->first();
+    }
 
-        return $this->currentPlans()->whereBetween('expire_at', [now(), now()->endOfDay()])
-        ->orWhere('expire_at', now()->endOfDay())
-        ->orWhere('expire_at', '>', now()->endOfDay())
-        ->orWhereNull('expire_at')->first();
+    public function getNextPaidPlan()
+    {
+       return $this
+            ->activePlans()
+            ->where('is_free', false)
+            ->orderBy('created_at', 'asc')
+            ->limit(1)
+            ->first();
+
     }
 
     public function categories()
