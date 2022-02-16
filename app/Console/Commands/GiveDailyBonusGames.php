@@ -8,14 +8,14 @@ use App\Models\UserPlan;
 use App\Models\User;
 use App\Models\Plan;
 
-class GiveFreeGames extends Command
+class GiveDailyBonusGames extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'daily:bonus';
+    protected $signature = 'bonus:daily-activate';
 
     /**
      * The console command description.
@@ -49,6 +49,7 @@ class GiveFreeGames extends Command
                 'plan_id' => $freePlan->id,
                 'user_id' => $user->id,
                 'used_count' => 0,
+                'plan_count' => 10,
                 'is_active' => true,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

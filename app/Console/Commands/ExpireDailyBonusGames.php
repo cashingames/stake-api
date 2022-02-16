@@ -7,14 +7,14 @@ use Illuminate\Support\Carbon;
 use App\Models\UserPlan;
 use App\Models\Plan;
 
-class ExpireFreeGames extends Command
+class ExpireDailyBonusGames extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'deactivate:bonus';
+    protected $signature = 'bonus:daily-expire';
 
     /**
      * The console command description.

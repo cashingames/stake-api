@@ -170,12 +170,9 @@ class GameController extends BaseController
         $mode = GameMode::find($request->mode);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
 
-        $planId = 0;
+        $plan = $this->user->randomFreePlan();
 
-        $freePlan = UserPlan::where('user_id', $this->user->id)
-            ->where('plan_id', 1)->where('is_active', true)->first();
-
-        if ($freePlan !== null) {
+        if ($plan !== null) {
             $planId = $freePlan->plan_id;
         } else {
             $activePlan = UserPlan::where('user_id', $this->user->id)->where('plan_id', '>', 1)->where('is_active', true)->first();
