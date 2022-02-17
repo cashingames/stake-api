@@ -21,7 +21,7 @@ class PlanSeeder extends Seeder
                 'name' => 'Free',
                 'description' => 'Play 10 times',
                 'price' => 0.00,
-                'game_count' => 10,
+                'game_count' => 1,
                 'background_color'=> '#FAC502',
                 'is_free'=>true
             ]

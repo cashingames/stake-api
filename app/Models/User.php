@@ -120,10 +120,10 @@ class User extends Authenticatable implements JWTSubject
             ->plans()
             ->wherePivot('is_active', true)
             ->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
-            ->wherePivot('expire_at', '>', now())
+            ->orWherePivot('expire_at', '>', now())
             ->orWherePivot('expire_at', NULL);
     }
-
+    
     public function getNextFreePlan()
     {
         //returns the first active free plan that will expire next
@@ -215,15 +215,6 @@ class User extends Authenticatable implements JWTSubject
     public function getPlayedGamesCountAttribute()
     {
         return GameSession::where('user_id', $this->id)->count();
-    }
-
-
-    public function hasPaidPlan(){
-        $paid_plan = UserPlan::where('user_id', $this->id)->where('is_active',true)->where('plan_id','>',1)->first();
-        if($paid_plan !== null){
-            return true;
-        }
-        return false;
     }
 
     public function getChallengesPlayedAttribute()

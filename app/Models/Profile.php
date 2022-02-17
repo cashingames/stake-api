@@ -27,6 +27,11 @@ class Profile extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getReferrerProfile()
+    {
+        return Profile::where('referral_code',$this->referrer)->first();
+    }
+
     public function getFullNameAttribute()
     {
         return $this->first_name . " " . $this->last_name;

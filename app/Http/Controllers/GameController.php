@@ -170,16 +170,16 @@ class GameController extends BaseController
         $mode = GameMode::find($request->mode);
         $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
 
-        $plan = $this->user->getNextFreePlan();
-        if($plan == null){
-            $plan = $this->user->getNextPaidPlan();
+        $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
+        if ($plan == null) {
+            return $this->sendResponse('No available games', 'No available games');
+        } else{
+            $plan->update(['used_count' => $plan->used_count + 1]);
+            
+            if($plan->game_count * $plan->plan_count > $plan->used_count){
+                $plan->update(['is_active' => false]);
+            }
         }
-        // if ($plan !== null) {
-        //     $planId = $freePlan->plan_id;
-        // } else {
-        //     $activePlan = UserPlan::where('user_id', $this->user->id)->where('plan_id', '>', 1)->where('is_active', true)->first();
-        //     $planId = $activePlan->plan_id;
-        // }
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -202,11 +202,6 @@ class GameController extends BaseController
             'questions' => $questions,
             'game' => $gameInfo
         ];
-
-        $playedPlan = UserPlan::where('user_id', $this->user->id)->where('plan_id', $planId)
-            ->where('is_active', true)->first();
-
-        $playedPlan->update(['used_count' => $playedPlan->used_count + 1]);
 
         return $this->sendResponse($result, 'Game Started');
     }
@@ -297,6 +292,29 @@ class GameController extends BaseController
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
 
+    private function giftReferrerOnFirstGame(){
+        if($this->user->gameSessions->count() > 1){
+          return;
+        } 
+
+        $referrerProfile = $this->user->profile->getReferrerProfile();
+        if( config('trivia.bonus.enabled') &&
+            config('trivia.bonus.signup.referral') &&
+            config('trivia.bonus.signup.referral_on_first_game') &&
+            isset($referrerProfile)
+        ){
+
+            DB::table('user_plans')->insert([
+                'user_id' => $referrerProfile->user_id,
+                'plan_id' => 1,
+                'is_active'=> true,
+                'used_count'=> 0,
+                'plan_count' => 2,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+        }
+    }
 
     public function endSingleGame(Request $request)
     {
