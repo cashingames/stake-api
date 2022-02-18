@@ -116,12 +116,22 @@ class User extends Authenticatable implements JWTSubject
         // - isactive is true and
         // - games_count * plan_count> used_count and 
         // - expiry is greater than the current datetime or expiry is null
+        // return $this
+        //     ->plans()
+        //     ->wherePivot('is_active', true)
+        //     ->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
+        //     ->orWherePivot('expire_at', '>', now())
+        //     ->orWherePivot('expire_at', NULL);
+
         return $this
             ->plans()
             ->wherePivot('is_active', true)
-            ->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
-            ->orWherePivot('expire_at', '>', now())
-            ->orWherePivot('expire_at', NULL);
+            ->where(function($query)
+            {
+                $query->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
+                ->orWhere('expire_at', '>', now())
+                ->orWhere('expire_at', NULL);
+            });
     }
     
     public function getNextFreePlan()
@@ -150,6 +160,14 @@ class User extends Authenticatable implements JWTSubject
             ->limit(1)
             ->first();
 
+    }
+
+    public function hasActivePlan(){
+        if(is_null($this->getNextFreePlan()) 
+        && is_null($this->getNextPaidPlan())){
+            return false;
+        }
+        return true;
     }
 
     public function categories()
