@@ -116,13 +116,6 @@ class User extends Authenticatable implements JWTSubject
         // - isactive is true and
         // - games_count * plan_count> used_count and 
         // - expiry is greater than the current datetime or expiry is null
-        // return $this
-        //     ->plans()
-        //     ->wherePivot('is_active', true)
-        //     ->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
-        //     ->orWherePivot('expire_at', '>', now())
-        //     ->orWherePivot('expire_at', NULL);
-
         return $this
             ->plans()
             ->wherePivot('is_active', true)
@@ -133,7 +126,53 @@ class User extends Authenticatable implements JWTSubject
                 ->orWhere('expire_at', NULL);
             });
     }
-    
+
+    public function getActivePlans()
+    {   
+        $subscribedPlan = $this->activePlans()->get();
+
+        if($subscribedPlan->count() === 0){
+          return [];
+        }
+        
+        $subscribedPlans = [];
+        $purchasedPlan =  new stdClass;
+        $purchasedPlan->name = "Purchased Games";
+        $purchasedPlan->background_color = "#D9E0FF";
+        $purchasedPlan->is_free = false;
+
+        $sumOfPurchasedPlanGames = 0;
+        $sumOfBonusPlanGames = 0;
+
+        $bonusPlan = new stdClass;
+        $bonusPlan->name = "Bonus Games";
+        $bonusPlan->background_color = "#FFFFFF";
+        $bonusPlan->is_free = true;
+       
+        foreach($subscribedPlan as $activePlan){  
+            if($activePlan->is_free){
+                $sumOfBonusPlanGames += $activePlan->pivot->plan_count - $activePlan->pivot->used_count; 
+                $bonusPlan->description = $sumOfBonusPlanGames. " games remaining" ;
+                $bonusPlan->game_count = $sumOfBonusPlanGames;
+               
+            }else{
+                $sumOfPurchasedPlanGames += $activePlan->game_count - $activePlan->pivot->used_count;
+            }
+
+        }; 
+        if ( $sumOfBonusPlanGames > 0){
+            $subscribedPlans[] = $bonusPlan;
+        }
+       
+        $purchasedPlan->game_count = $sumOfPurchasedPlanGames;
+        $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
+       
+        if ( $sumOfPurchasedPlanGames > 0){
+            $subscribedPlans[] = $purchasedPlan;
+        }
+        return $subscribedPlans;
+    }
+
     public function getNextFreePlan()
     {
         //returns the first active free plan that will expire next

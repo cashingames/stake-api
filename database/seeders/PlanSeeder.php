@@ -19,7 +19,7 @@ class PlanSeeder extends Seeder
         DB::table('plans')->insert(
             [
                 'name' => 'Free',
-                'description' => 'Play 10 times',
+                'description' => 'Play a game',
                 'price' => 0.00,
                 'game_count' => 1,
                 'background_color'=> '#FAC502',

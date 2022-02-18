@@ -174,10 +174,12 @@ class GameController extends BaseController
         if ($plan == null) {
             return $this->sendResponse('No available games', 'No available games');
         } else{
-            $plan->update(['used_count' => $plan->used_count + 1]);
+            $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
             
-            if($plan->game_count * $plan->plan_count > $plan->used_count){
-                $plan->update(['is_active' => false]);
+            $userPlan->update(['used_count' => $userPlan->used_count + 1]);
+            
+            if($plan->game_count * $plan->plan_count <= $plan->used_count){
+                $userPlan->update(['is_active' => false]);
             }
         }
 
@@ -202,6 +204,8 @@ class GameController extends BaseController
             'questions' => $questions,
             'game' => $gameInfo
         ];
+
+        $this->giftReferrerOnFirstGame();
 
         return $this->sendResponse($result, 'Game Started');
     }
