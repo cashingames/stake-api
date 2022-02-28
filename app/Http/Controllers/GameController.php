@@ -175,10 +175,9 @@ class GameController extends BaseController
             return $this->sendResponse('No available games', 'No available games');
         } else{
             $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-            
             $userPlan->update(['used_count' => $userPlan->used_count + 1]);
             
-            if($plan->game_count * $plan->plan_count <= $plan->used_count){
+            if($plan->game_count * $userPlan->plan_count <= $userPlan->used_count){
                 $userPlan->update(['is_active' => false]);
             }
         }
