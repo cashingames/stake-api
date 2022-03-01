@@ -45,7 +45,8 @@ class ProfileTest extends TestCase
             'gender' => 'male',
             'dateOfBirth' => '23-09-1998'
         ]);
-      
+        
+        $response->dump();
         $response->assertStatus(200);
     }
 

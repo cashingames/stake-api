@@ -50,7 +50,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate', 'active_plans'
+        'challenges_played', 'win_rate'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
