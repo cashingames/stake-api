@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class UserController extends BaseController
-{
+{   
 
     public function profile()
     {
@@ -48,8 +48,7 @@ class UserController extends BaseController
         $result->friends = $this->user->friends();
         $result->pointsTransaction = $this->user->getUserPointTransactions();
         $result->hasActivePlan = $this->user->hasActivePlan();
-        $result->activePlans = $this->user->active_plans;
-        $result->hasPaidActivePlan = $this->user->hasPaidPlan();
+        $result->activePlans = $this->composeUserPlans();
 
         // $result->gamePerformance = 
         /**
@@ -104,5 +103,59 @@ class UserController extends BaseController
         return $this->sendResponse('Online status updated', "Online status updated");
     }
 
+    private function composeUserPlans(){
+        //get all the active plans the user has
+        //If user has no active plan, return and empty array
+        //If user has active plans, check if a user has bonus plans
+        //if the user has bonus plans, check if user has expirable bonus plan
+        // Add the number of expirable and non expirable bonus plans 
+
+        //check if a user has purchased plans
+        //if user has purchased plans, add the number of purchased plans
+
+        //return user's bonus plans and user's purchased plans
+
+        $subscribedPlan = $this->user->activePlans()->get();
+
+        if($subscribedPlan->count() === 0){
+          return [];
+        }
+
+        
+        $sumOfPurchasedPlanGames = 0;
+        $sumOfBonusPlanGames = 0;
+        foreach($subscribedPlan as $activePlan){  
+            $activePlanCount = ($activePlan->game_count * $activePlan->pivot->plan_count) - $activePlan->pivot->used_count; 
+            if($activePlan->is_free){
+                $sumOfBonusPlanGames += $activePlanCount;
+            }else{
+                $sumOfPurchasedPlanGames += $activePlanCount;
+            }
+        }; 
+        
+        $subscribedPlans = [];
+        if ( $sumOfPurchasedPlanGames > 0){
+            $purchasedPlan =  new stdClass;
+            $purchasedPlan->name = "Purchased Games";
+            $purchasedPlan->background_color = "#D9E0FF";
+            $purchasedPlan->is_free = false;
+            $purchasedPlan->game_count = $sumOfPurchasedPlanGames;
+            $purchasedPlan->description = $sumOfPurchasedPlanGames. " games remaining" ;
+            $subscribedPlans[] = $purchasedPlan;
+            
+        }
+
+        if ( $sumOfBonusPlanGames > 0){
+            $bonusPlan = new stdClass;
+            $bonusPlan->name = "Bonus Games";
+            $bonusPlan->background_color = "#FFFFFF";
+            $bonusPlan->is_free = true;
+            $bonusPlan->description = $sumOfBonusPlanGames. " games remaining" ;
+            $bonusPlan->game_count = $sumOfBonusPlanGames;
+            $subscribedPlans[] = $bonusPlan;
+        }
+
+        return $subscribedPlans;
+    }
 
 }

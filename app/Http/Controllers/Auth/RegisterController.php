@@ -107,6 +107,7 @@ class RegisterController extends BaseController
             'plan_id' => 1,
             'is_active'=> true,
             'used_count'=> 0,
+            'plan_count' => 10,
             'created_at'=>Carbon::now(),
             'updated_at'=>Carbon::now()
         ]);
