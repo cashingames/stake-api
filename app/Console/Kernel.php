@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        Commands\ExpireDailyBonusGames::class,
+        Commands\GiveDailyBonusGames::class,
     ];
 
     /**
@@ -24,7 +26,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('bonus:daily-expire')
+        ->dailyAt('00:01');
+        $schedule->command('bonus:daily-activate')
+        ->dailyAt('00:03');
     }
 
     /**
