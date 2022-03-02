@@ -145,7 +145,7 @@ class UserController extends BaseController
             
         }
 
-        if ( $sumOfBonusPlanGames > 0){
+        
             $bonusPlan = new stdClass;
             $bonusPlan->name = "Bonus Games";
             $bonusPlan->background_color = "#FFFFFF";
@@ -153,7 +153,7 @@ class UserController extends BaseController
             $bonusPlan->description = $sumOfBonusPlanGames. " games remaining" ;
             $bonusPlan->game_count = $sumOfBonusPlanGames;
             $subscribedPlans[] = $bonusPlan;
-        }
+        
 
         return $subscribedPlans;
     }
