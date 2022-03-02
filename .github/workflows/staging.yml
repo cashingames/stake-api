@@ -39,9 +39,9 @@ jobs:
           FTP_SERVER: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: api-user@stg.cashingames.com
           FTP_PASSWORD: ${{ secrets.STG_FTP_PASSWORD }}
-      # - name: deploy-production
-      #   uses: SamKirkland/FTP-Deploy-Action@2.0.0
-      #   env:
-      #     FTP_SERVER: ${{ secrets.FTP_HOST }}
-      #     FTP_USERNAME: api-user@cashingames.com
-      #     FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      - name: deploy-production
+        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        env:
+          FTP_SERVER: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: api-user@cashingames.com
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
