@@ -26,15 +26,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('bonus:daily-expire')
-        // ->dailyAt('00:01');
-        // $schedule->command('bonus:daily-activate')
-        // ->dailyAt('00:03');
-
         $schedule->command('bonus:daily-expire')
-        ->everyTenMinutes();
+        ->dailyAt('00:01');
         $schedule->command('bonus:daily-activate')
-        ->everyFifteenMinutes();
+        ->dailyAt('00:03');
+
+        // $schedule->command('bonus:daily-expire')
+        // ->everyTenMinutes();
+        // $schedule->command('bonus:daily-activate')
+        // ->everyFifteenMinutes();
     }
 
     /**
