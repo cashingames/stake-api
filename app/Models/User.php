@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 use Illuminate\Support\Carbon;
@@ -105,8 +105,8 @@ class User extends Authenticatable implements JWTSubject
     public function plans()
     {
         return $this
-        ->belongsToMany(Plan::class, 'user_plans')
-        ->withPivot('id', 'plan_count', 'is_active', 'expire_at', 'used_count');
+            ->belongsToMany(Plan::class, 'user_plans')
+            ->withPivot('id', 'plan_count', 'is_active', 'expire_at', 'used_count');
     }
 
     public function scopeActivePlans()
@@ -119,11 +119,10 @@ class User extends Authenticatable implements JWTSubject
         return $this
             ->plans()
             ->wherePivot('is_active', true)
-            ->where(function($query)
-            {
+            ->where(function ($query) {
                 $query->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
-                ->orWhere('expire_at', '>', now())
-                ->orWhere('expire_at', NULL);
+                    ->orWhere('expire_at', '>', now())
+                    ->orWhere('expire_at', NULL);
             });
     }
 
@@ -136,7 +135,7 @@ class User extends Authenticatable implements JWTSubject
         //return free plan that will expire in the future
         //if there is non
         //return free plan with no expiry date
-       return $this
+        return $this
             ->activePlans()
             ->where('is_free', true)
             ->orderBy('expire_at', 'asc')
@@ -146,18 +145,20 @@ class User extends Authenticatable implements JWTSubject
 
     public function getNextPaidPlan()
     {
-       return $this
+        return $this
             ->activePlans()
             ->where('is_free', false)
             ->orderBy('created_at', 'asc')
             ->limit(1)
             ->first();
-
     }
 
-    public function hasActivePlan(){
-        if(is_null($this->getNextFreePlan()) 
-        && is_null($this->getNextPaidPlan())){
+    public function hasActivePlan()
+    {
+        if (
+            is_null($this->getNextFreePlan())
+            && is_null($this->getNextPaidPlan())
+        ) {
             return false;
         }
         return true;
@@ -299,7 +300,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_id', $this->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id','boosts.icon','boosts.description','name', 'user_boosts.boost_count as count')
+            })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
 }
