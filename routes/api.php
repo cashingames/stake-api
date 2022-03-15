@@ -107,7 +107,9 @@ Route::prefix('v2')->group(function () {
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
         Route::get('leaders/global', [LeadersController::class, 'global']);
+        Route::get('leaders/global/{startTime}/{endTime}', [LeadersController::class, 'global']);
         Route::get('leaders/categories', [LeadersController::class, 'categories']);
+        Route::get('leaders/categories/{startTime}/{endTime}', [LeadersController::class, 'categories']);
 
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
