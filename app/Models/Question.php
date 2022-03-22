@@ -23,7 +23,7 @@ class Question extends Model
     'game_id', 'created_at', 'updated_at'
   ];
 
-  protected $fillable = ['created_by'];
+  protected $fillable = ['created_by','is_published'];
   //
   public function options()
   {
