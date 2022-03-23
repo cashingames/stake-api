@@ -18,7 +18,7 @@ class LeadersController extends BaseController
             $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
             $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
         } else {
-            $_startDate = today();
+            $_startDate =Carbon::createFromTimestamp('1546297200')->toDateTimeString(); //Jan 01 2019 
             $_endDate = Carbon::tomorrow();
         }
 
@@ -50,7 +50,7 @@ class LeadersController extends BaseController
             $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
             $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
         } else {
-            $_startDate = today();
+            $_startDate =Carbon::createFromTimestamp('1546297200')->toDateTimeString(); //Jan 01 2019 
             $_endDate = Carbon::tomorrow();
         }
 
