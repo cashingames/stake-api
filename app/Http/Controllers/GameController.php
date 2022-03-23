@@ -49,7 +49,7 @@ class GameController extends BaseController
                         FROM questions q
                         JOIN categories c ON c.id = q.category_id
                         JOIN game_types gt ON gt.id = q.game_type_id 
-                        WHERE q.deleted_at IS NULL
+                        WHERE q.deleted_at IS NULL AND q.is_published = true
                         GROUP by q.category_id, q.game_type_id
                         HAVING count(q.id) > 0
                     ");
@@ -168,7 +168,9 @@ class GameController extends BaseController
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
-        $questions = $category->questions()->inRandomOrder()->take(20)->get()->shuffle();
+        $questions = $category->questions()
+                    ->whereNull('deleted_at')
+                    ->where('is_published',true)->inRandomOrder()->take(20)->get()->shuffle();
 
         $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
         if ($plan == null) {
