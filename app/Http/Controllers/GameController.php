@@ -20,6 +20,7 @@ use App\Models\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\ChallengeInvite;
+use App\Models\TriviaQuestion;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -164,10 +165,26 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {
+    {   
+        $isTrivia = false ;
+        
+        if($request->has('trivia')){
+            $isTrivia = true;
+        }
+
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
+        $questions = [];
+        
+        if($isTrivia){
+            TriviaQuestion::where('trivia_id',$request->trivia)->get()->map(function ($q) {
+               $_question = Question::find($q->question_id);
+                
+               $questions[] = $_question;
+            });
+        }
+
         $questions = $category->questions()
             ->whereNull('deleted_at')
             ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
