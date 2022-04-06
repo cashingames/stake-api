@@ -35,5 +35,15 @@ class GameModeSeeder extends Seeder
                 'background_color' => '#FAEEFF'
             ]
         );
+
+        DB::table('game_modes')->insert(
+            [
+                'name' => "TOURNAMENT",
+                'display_name' => "Tournament",
+                'description' => "Participate in a tournament",
+                'icon' => 'icons/tournament_icon.png',
+                'background_color' => '#FCF4DB'
+            ]
+        );
     }
 }

@@ -30,4 +30,9 @@ class Category extends Model
   {
     return $this->belongsToMany(Category::class, 'game_sessions')->withPivot('points_gained', 'user_id');
   }
+
+  public function trivias()
+  {
+    return $this->hasMany(Trivia::class);
+  }
 }
