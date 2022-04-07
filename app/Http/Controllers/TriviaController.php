@@ -6,14 +6,18 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Trivia;
 use App\Models\TriviaQuestion;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class TriviaController extends BaseController
 {   
     public function getRunningTrivia()
     {
-
-        return $this->sendResponse(Trivia::where('is_on', true)->get(), "Triva");
+        $trivia = Trivia::where('start_time','<=', Carbon::now())
+        ->where('end_time', '>', Carbon::now())
+        ->get();
+        
+        return $this->sendResponse($trivia, "Triva");
     }
 
     public function getTriviaData($triviaId)

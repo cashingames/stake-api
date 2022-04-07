@@ -21,7 +21,6 @@ return new class extends Migration
             $table->timestamp('start_time');
             $table->timestamp('end_time');
             $table->bigInteger('grand_price');
-            $table->boolean("is_on")->default(false);
             $table->timestamps();
         });
     }

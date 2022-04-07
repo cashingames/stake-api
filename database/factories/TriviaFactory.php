@@ -26,7 +26,6 @@ class TriviaFactory extends Factory
             'category_id' => $this->faker->randomElement(array(501,503,504)),
             'grand_price'=> 1000,
             'point_eligibility'=>500,
-            'is_on' =>$this->faker->randomElement(array(true,false)),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addHour()
         ];
