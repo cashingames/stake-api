@@ -36,7 +36,10 @@ class LeaderboardTest extends TestCase
     public function test_global_leaderboard_should_return_data_since_inception_if_no_filter_date_is_passed(){
    
         $response = $this->get(self::GLOBAL_LEADERS_URL);
-        $response->assertStatus(200);
+
+        
+        $response->assertJsonCount(5, 'data');
+        
     }
 
     public function test_global_leaderboard_should_return_data_based_on_date_range_if_date_range_filter_is_passed(){
@@ -45,14 +48,16 @@ class LeaderboardTest extends TestCase
         $endDate = Carbon::today()->addDays(rand(0, 365));
 
         $response = $this->get(self::GLOBAL_LEADERS_URL.$startDate.'/'.$endDate);
-        $response->assertStatus(200);
+        $response->assertJsonCount(5, 'data');
     }
 
     public function test_categories_leaderboard_should_return_data_since_inception_if_no_filter_date_is_passed(){
      
 
         $response = $this->get(self::CATEGORIES_LEADERS_URL);
-        $response->assertStatus(200);
+
+        $response->dump();
+        $response->assertJsonCount(2, 'data');
     }
 
     public function test_categories_leaderboard_should_return_data_based_on_date_range_if_date_range_filter_is_passed(){
@@ -61,6 +66,7 @@ class LeaderboardTest extends TestCase
         $endDate = Carbon::today()->addDays(rand(0, 365));
 
         $response = $this->get(self::CATEGORIES_LEADERS_URL.$startDate.'/'.$endDate);
-        $response->assertStatus(200);
+        $response->dump();
+        $response->assertJsonCount(2, 'data');
     }
 }
