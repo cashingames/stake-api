@@ -16,13 +16,13 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             // CategorySeeder::class,
-            // GameTypeSeeder::class,
-            // GameModeSeeder::class,
-            // AchievementSeeder::class,
-            // BoostSeeder::class,
+            GameTypeSeeder::class,
+            GameModeSeeder::class,
+            AchievementSeeder::class,
+            BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,
-            TriviaSeeder::class,
+            //TriviaSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,
