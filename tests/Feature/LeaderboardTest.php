@@ -34,7 +34,7 @@ class LeaderboardTest extends TestCase
         $response = $this->get(self::GLOBAL_LEADERS_URL);
 
         
-        $response->assertJsonCount(15, 'data');
+        $response->assertJsonCount(5, 'data');
         
     }
 
@@ -44,7 +44,7 @@ class LeaderboardTest extends TestCase
         $endDate = Carbon::now();
 
         $response = $this->get(self::GLOBAL_LEADERS_URL.$startDate.'/'.$endDate);
-        $response->assertJsonCount(20, 'data');
+        $response->assertJsonCount(5, 'data');
     }
 
     public function test_categories_leaderboard_should_return_data_since_inception_if_no_filter_date_is_passed(){
