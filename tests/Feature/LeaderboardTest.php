@@ -12,11 +12,6 @@ use Carbon\Carbon;
 class LeaderboardTest extends TestCase
 {   
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
 
     const GLOBAL_LEADERS_URL = '/api/v2/leaders/global/';
     const CATEGORIES_LEADERS_URL = '/api/v2/leaders/categories/';
@@ -29,6 +24,8 @@ class LeaderboardTest extends TestCase
         $this->user = User::first(); 
 
         $this->actingAs($this->user);
+
+
 
     }
 
@@ -61,7 +58,7 @@ class LeaderboardTest extends TestCase
         $this->seed(CategorySeeder::class);
 
         $startDate = Carbon::today()->subDays(1);
-        $endDate = Carbon::now();
+        $endDate = Carbon::now()->addMinute();
 
         $response = $this->get(self::CATEGORIES_LEADERS_URL.$startDate.'/'.$endDate);
 
