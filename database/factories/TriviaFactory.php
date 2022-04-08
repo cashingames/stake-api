@@ -24,6 +24,8 @@ class TriviaFactory extends Factory
             //
             'name' => $this->faker->word(),
             'category_id' => $this->faker->randomElement(array(501,503,504)),
+            'game_mode_id' => 1,
+            'game_type_id'=>2,
             'grand_price'=> 1000,
             'point_eligibility'=>500,
             'start_time' => Carbon::now(),

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('category_id');
+            $table->foreignId('game_mode_id');
+            $table->foreignId('game_type_id');
             $table->bigInteger('point_eligibility');
             $table->timestamp('start_time');
             $table->timestamp('end_time');

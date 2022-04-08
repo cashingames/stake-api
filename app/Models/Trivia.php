@@ -12,7 +12,7 @@ class Trivia extends Model
 
     protected $table = 'trivias';
 
-    protected $fillable = ['name' ,'category_id','grand_price','point_eligibility', 'start_time', 'end_time'];
+    protected $fillable = ['name' ,'category_id','game_type_id','game_mode_id','grand_price','point_eligibility', 'start_time', 'end_time'];
 
     public function category(){
        return $this->belongsTo(Category::class);

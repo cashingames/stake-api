@@ -166,28 +166,27 @@ class GameController extends BaseController
 
     public function startSingleGame(Request $request)
     {   
-       
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
        
-        $triviaQuestions = [];
+        $questions = [];
 
         if($request->has('trivia')){
 
             $fetchTriviaQuestions = TriviaQuestion::where('trivia_id',$request->trivia)->get();
 
             foreach($fetchTriviaQuestions as $q){
-                $_question = Question::find($q->question_id);
+                $_question = Question::find($q->question_id); //@TODO: Improve performance bottleneck
                 if($_question !== null){
-                    $triviaQuestions[] = $_question;
+                    $questions[] = $_question;
                 }
             }
+        }else{
+            $questions = $category->questions()
+                ->whereNull('deleted_at')
+                ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
         }
-        
-        $questions = $category->questions()
-            ->whereNull('deleted_at')
-            ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
 
         $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
         if ($plan == null) {
@@ -219,7 +218,7 @@ class GameController extends BaseController
         $gameInfo->endTime = $gameSession->end_time;
 
         $result = [
-            'questions' => $request->has('trivia')? $triviaQuestions : $questions,
+            'questions' => $questions,
             'game' => $gameInfo
         ];
 
