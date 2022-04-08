@@ -15,7 +15,7 @@ return [
     'enabled' => env('IS_ON_TOURNAMENT', false),
     'start_time' => env('TOURNAMENT_START_TIME',"00:00:00"),
     'end_time' => env('TOURNAMENT_END_TIME', "00:00:00"),
-    'categories' => [env('TOURNAMENT_CATEGORY1',''), env('TOURNAMENT_CATEGORY2', '')]
+    'categories' => [env('TOURNAMENT_CATEGORY1',''), env('TOURNAMENT_CATEGORY2', '')],
   ],
   'product_launch'=>[
     'is_launching'=>env('IS_LAUNCHING', false),

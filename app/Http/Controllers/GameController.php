@@ -20,6 +20,7 @@ use App\Models\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\ChallengeInvite;
+use App\Models\TriviaQuestion;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,13 +29,13 @@ use stdClass;
 
 class GameController extends BaseController
 {
-
     public function getCommonData()
     {
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
         $result->plans = Plan::where('is_free', false)->get();
+
         $result->gameModes = GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get();
         $gameTypes = GameType::has('questions')->inRandomOrder()->get();
 
@@ -168,32 +169,49 @@ class GameController extends BaseController
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
-        $questions = $category->questions()
-                    ->whereNull('deleted_at')
-                    ->where('is_published',true)->inRandomOrder()->take(20)->get()->shuffle();
-
-        $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
-        if ($plan == null) {
-            return $this->sendResponse('No available games', 'No available games');
-        } else{
-            $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-            $userPlan->update(['used_count' => $userPlan->used_count + 1]);
-            
-            if($plan->game_count * $userPlan->plan_count <= $userPlan->used_count){
-                $userPlan->update(['is_active' => false]);
-            }
-        }
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
         $gameSession->category_id = $category->id;
-        $gameSession->plan_id = $plan->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
+
+        $questions = [];
+
+        if ($request->has('trivia')) {
+
+            $fetchTriviaQuestions = TriviaQuestion::where('trivia_id', $request->trivia)->get();
+
+            foreach ($fetchTriviaQuestions as $q) {
+                $_question = Question::find($q->question_id); //@TODO: Improve performance bottleneck
+                if ($_question !== null) {
+                    $questions[] = $_question;
+                }
+            }
+            $gameSession->trivia_id = $request->trivia;
+        } else {
+            $questions = $category->questions()
+                ->whereNull('deleted_at')
+                ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
+
+            $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
+            if ($plan == null) {
+                return $this->sendResponse('No available games', 'No available games');
+            } else {
+                $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
+                $userPlan->update(['used_count' => $userPlan->used_count + 1]);
+
+                if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
+                    $userPlan->update(['is_active' => false]);
+                }
+            }
+            $gameSession->plan_id = $plan->id;
+        }
+
         $gameSession->save();
 
         $gameInfo = new stdClass;
@@ -297,23 +315,25 @@ class GameController extends BaseController
         return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
     }
 
-    private function giftReferrerOnFirstGame(){
-        if($this->user->gameSessions->count() > 1){
-          return;
-        } 
+    private function giftReferrerOnFirstGame()
+    {
+        if ($this->user->gameSessions->count() > 1) {
+            return;
+        }
 
         $referrerProfile = $this->user->profile->getReferrerProfile();
-        if( config('trivia.bonus.enabled') &&
+        if (
+            config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
             config('trivia.bonus.signup.referral_on_first_game') &&
             isset($referrerProfile)
-        ){
+        ) {
 
             DB::table('user_plans')->insert([
                 'user_id' => $referrerProfile->user_id,
                 'plan_id' => 1,
-                'is_active'=> true,
-                'used_count'=> 0,
+                'is_active' => true,
+                'used_count' => 0,
                 'plan_count' => 2,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
