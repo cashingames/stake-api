@@ -22,13 +22,7 @@ class UserSeeder extends Seeder
         ->hasWallet(1)
         ->hasTransactions(5)
         ->hasUserPlan(1)
-        ->has(GameSession::factory()
-            ->count(10)->sequence(fn ($sequence) => [
-                'created_at' => Carbon::now()->subMinutes(5),
-                'created_at' => Carbon::now(),
-                ])
-        )
-        // , hasGameSessions(10)->s
+        ->hasGameSessions(10)
         ->create();
     }
 }
