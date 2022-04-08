@@ -70,13 +70,13 @@ class LeadersController extends BaseController
 
         $sql .= $filter ? ' WHERE gs.created_at >= ? AND gs.created_at < ?' : '';
 
-        $sql .= 'group by c.category_id, gs.user_id
-                order by points desc 
+        $sql .= ' GROUP BY c.category_id, gs.user_id
+                ORDER BY points desc 
                 limit 25
             ) r
             join profiles p on p.user_id = r.user_id
             join categories c on c.id = r.category_id
-            order by r.points desc';
+            ORDER BY r.points desc';
 
         if ($filter) {
             $leaders = DB::select($sql, [$_startDate,  $_endDate]);
