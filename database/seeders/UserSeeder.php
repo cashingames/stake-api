@@ -4,7 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-
+use Carbon\Carbon;
+use App\Models\GameSession;
 class UserSeeder extends Seeder
 {
     /**
@@ -21,6 +22,7 @@ class UserSeeder extends Seeder
         ->hasWallet(1)
         ->hasTransactions(5)
         ->hasUserPlan(1)
+        ->hasGameSessions(10)
         ->create();
     }
 }

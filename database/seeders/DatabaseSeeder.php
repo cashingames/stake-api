@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            CategorySeeder::class,
-            GameTypeSeeder::class,
-            GameModeSeeder::class,
-            AchievementSeeder::class,
-            BoostSeeder::class,
+            // CategorySeeder::class,
+            // GameTypeSeeder::class,
+            // GameModeSeeder::class,
+            // AchievementSeeder::class,
+            // BoostSeeder::class,
             UserSeeder::class,
-            PlanSeeder::class,
+            // PlanSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,
