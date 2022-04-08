@@ -165,51 +165,53 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {   
+    {
         $category = Category::find($request->category);
         $type = GameType::find($request->type);
         $mode = GameMode::find($request->mode);
-       
-        $questions = [];
-
-        if($request->has('trivia')){
-
-            $fetchTriviaQuestions = TriviaQuestion::where('trivia_id',$request->trivia)->get();
-
-            foreach($fetchTriviaQuestions as $q){
-                $_question = Question::find($q->question_id); //@TODO: Improve performance bottleneck
-                if($_question !== null){
-                    $questions[] = $_question;
-                }
-            }
-        }else{
-            $questions = $category->questions()
-                ->whereNull('deleted_at')
-                ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
-        }
-
-        $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
-        if ($plan == null) {
-            return $this->sendResponse('No available games', 'No available games');
-        } else {
-            $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-            $userPlan->update(['used_count' => $userPlan->used_count + 1]);
-
-            if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
-                $userPlan->update(['is_active' => false]);
-            }
-        }
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
         $gameSession->game_type_id = $type->id;
         $gameSession->category_id = $category->id;
-        $gameSession->plan_id = $plan->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
+
+        $questions = [];
+
+        if ($request->has('trivia')) {
+
+            $fetchTriviaQuestions = TriviaQuestion::where('trivia_id', $request->trivia)->get();
+
+            foreach ($fetchTriviaQuestions as $q) {
+                $_question = Question::find($q->question_id); //@TODO: Improve performance bottleneck
+                if ($_question !== null) {
+                    $questions[] = $_question;
+                }
+            }
+            $gameSession->trivia_id = $request->trivia;
+        } else {
+            $questions = $category->questions()
+                ->whereNull('deleted_at')
+                ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
+
+            $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
+            if ($plan == null) {
+                return $this->sendResponse('No available games', 'No available games');
+            } else {
+                $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
+                $userPlan->update(['used_count' => $userPlan->used_count + 1]);
+
+                if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
+                    $userPlan->update(['is_active' => false]);
+                }
+            }
+            $gameSession->plan_id = $plan->id;
+        }
+
         $gameSession->save();
 
         $gameInfo = new stdClass;
