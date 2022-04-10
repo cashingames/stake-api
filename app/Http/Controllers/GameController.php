@@ -111,6 +111,7 @@ class GameController extends BaseController
         }
 
         $result->gameTypes = $toReturnTypes;
+        $result->hasLiveTrivia = config('trivia.live_trivia.enabled') ? true : false;
 
         return $this->sendResponse($result, "");
     }

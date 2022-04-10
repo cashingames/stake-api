@@ -24,7 +24,9 @@ return [
   'game'=>[
     'questions_count'=>env('GAME_QUESTIONS_COUNT',10),
   ],
-
+  'live_trivia'=>[
+    'enabled' => env('HAS_LIVE_TRIVIA',false)
+  ],
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
