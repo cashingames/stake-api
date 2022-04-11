@@ -33,8 +33,10 @@ class TriviaController extends BaseController
             'category_id' => $category->id,
             'game_mode_id' => 1,
             'game_type_id' => 2,
-            'start_time' => Carbon::parse($data['start_time'])->toDateTimeString(),
-            'end_time' => Carbon::parse($data['end_time'])->toDateTimeString(),
+            'start_time' => Carbon::createFromTimestamp($data['start_time']),
+            'end_time' => Carbon::createFromTimestamp($data['end_time'])
+
+            
         ]);
 
         return $this->sendResponse(true, "Triva saved");
@@ -95,7 +97,7 @@ class TriviaController extends BaseController
             
             $questions = $trivia->category->questions()
                 ->whereNull('deleted_at')
-                ->where('is_published', true)->inRandomOrder()->take(10)->get();
+                ->where('is_published', true)->inRandomOrder()->take(20)->get();
                 
             foreach ($questions as $q) {
                 TriviaQuestion::create([
