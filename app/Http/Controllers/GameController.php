@@ -16,6 +16,7 @@ use App\Models\CategoryRanking;
 use App\Models\Achievement;
 use App\Models\GameSession;
 use App\Models\Question;
+use App\Models\Trivia;
 use App\Models\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -111,9 +112,20 @@ class GameController extends BaseController
         }
 
         $result->gameTypes = $toReturnTypes;
-        $result->hasLiveTrivia = config('trivia.live_trivia.enabled') ? true : false;
+        $result->hasLiveTrivia = $this->getTriviaState();
 
         return $this->sendResponse($result, "");
+    }
+
+    private function getTriviaState(){
+        $trivia = Trivia::where('start_time', '<=', Carbon::now())
+        ->where('end_time', '>', Carbon::now())
+        ->get()->count();
+
+        if($trivia > 0){
+            return true;
+        }
+        return false;
     }
 
     public function claimAchievement($achievementId)
