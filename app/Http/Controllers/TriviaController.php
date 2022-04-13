@@ -22,6 +22,8 @@ class TriviaController extends BaseController
             'point_eligibility' => ['required', 'integer'],
             'start_time' => ['required', 'string'],
             'end_time' => ['required', 'string'],
+            'game_duration' => ['nullable'],
+            'question_count'=>['nullable']
         ]);
 
         $category = Category::where('name', $data['category'])->first();
@@ -34,10 +36,18 @@ class TriviaController extends BaseController
             'game_mode_id' => 1,
             'game_type_id' => 2,
             'start_time' => Carbon::createFromTimestamp($data['start_time']),
-            'end_time' => Carbon::createFromTimestamp($data['end_time'])
-
-
+            'end_time' => Carbon::createFromTimestamp($data['end_time']),
         ]);
+
+        if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
+            $trivia->game_duration = $data['game_duration'];
+            $trivia->save();
+        };
+        if (isset($data['question_count'])&&  !is_null($data['question_count'])){
+            $trivia->question_count= $data['question_count'];
+            $trivia->save();
+        }
+
 
         $questions = $trivia->category->questions()
             ->whereNull('deleted_at')
