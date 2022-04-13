@@ -26,7 +26,7 @@ class TriviaController extends BaseController
 
         $category = Category::where('name', $data['category'])->first();
 
-        Trivia::create([
+        $trivia = Trivia::create([
             'name' => $data['name'],
             'grand_price' => $data['grand_price'],
             'point_eligibility' => $data['point_eligibility'],
@@ -36,8 +36,19 @@ class TriviaController extends BaseController
             'start_time' => Carbon::createFromTimestamp($data['start_time']),
             'end_time' => Carbon::createFromTimestamp($data['end_time'])
 
-            
+
         ]);
+
+        $questions = $trivia->category->questions()
+            ->whereNull('deleted_at')
+            ->where('is_published', true)->inRandomOrder()->take(20)->get();
+
+        foreach ($questions as $q) {
+            TriviaQuestion::create([
+                'trivia_id' => $trivia->id,
+                'question_id' => $q->id
+            ]);
+        }
 
         return $this->sendResponse(true, "Triva saved");
     }
@@ -89,16 +100,16 @@ class TriviaController extends BaseController
     }
 
     public function saveTriviaQuestions(Request $request)
-    {   
-       
+    {
+
         $trivia = Trivia::find($request->triviaId);
-        
+
         if ($trivia !== null) {
-            
+
             $questions = $trivia->category->questions()
                 ->whereNull('deleted_at')
                 ->where('is_published', true)->inRandomOrder()->take(20)->get();
-                
+
             foreach ($questions as $q) {
                 TriviaQuestion::create([
                     'trivia_id' => $trivia->id,
