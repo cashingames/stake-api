@@ -22,7 +22,7 @@ class TriviaController extends BaseController
             'point_eligibility' => ['required', 'integer'],
             'start_time' => ['required', 'string'],
             'end_time' => ['required', 'string'],
-            'duration' => ['nullable'],
+            'game_duration' => ['nullable'],
             'question_count'=>['nullable']
         ]);
 
@@ -39,8 +39,8 @@ class TriviaController extends BaseController
             'end_time' => Carbon::createFromTimestamp($data['end_time']),
         ]);
 
-        if (isset($data['duration'])&&  !is_null($data['duration'])){
-            $trivia->duration = $data['duration'];
+        if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
+            $trivia->game_duration = $data['game_duration'];
             $trivia->save();
         };
         if (isset($data['question_count'])&&  !is_null($data['question_count'])){

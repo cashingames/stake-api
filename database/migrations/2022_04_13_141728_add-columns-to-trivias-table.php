@@ -16,7 +16,7 @@ return new class extends Migration
         //
         Schema::table('trivias', function (Blueprint $table) {
 
-            $table->bigInteger('duration')->default(60);
+            $table->bigInteger('game_duration')->default(60);
             $table->bigInteger('question_count')->default(10);
         });
     }
@@ -30,7 +30,7 @@ return new class extends Migration
     {
         Schema::table('trivias', function (Blueprint $table) {
             //
-            $table->dropColumn('duration');
+            $table->dropColumn('game_duration');
             $table->dropColumn('question_count');
         });
     }
