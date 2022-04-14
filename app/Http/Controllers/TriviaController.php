@@ -51,7 +51,7 @@ class TriviaController extends BaseController
 
         $questions = $trivia->category->questions()
             ->whereNull('deleted_at')
-            ->where('is_published', true)->inRandomOrder()->take(20)->get();
+            ->where('is_published', true)->inRandomOrder()->take($data['question_count'] + 10)->get();
 
         foreach ($questions as $q) {
             TriviaQuestion::create([
