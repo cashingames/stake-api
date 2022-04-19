@@ -16,6 +16,10 @@ return new class extends Migration
         Schema::table('trivias', function (Blueprint $table) {
             //
             $table->dropColumn('start_time');
+           
+        });
+        Schema::table('trivias', function (Blueprint $table) {
+            //
             $table->dropColumn('end_time');
 
            
@@ -37,10 +41,15 @@ return new class extends Migration
         Schema::table('trivias', function (Blueprint $table) {
             //
             $table->dropColumn('start_time');
-            $table->dropColumn('end_time');
-
             // $table->timestamp('start_time');
             // $table->timestamp('end_time');
+        });
+
+        Schema::table('trivias', function (Blueprint $table) {
+            //
+            $table->dropColumn('end_time');
+
+           
         });
     }
 };
