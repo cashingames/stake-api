@@ -27,18 +27,20 @@ class TriviaController extends BaseController
         ]);
 
         $category = Category::where('name', $data['category'])->first();
+        $startTime = Carbon::createFromTimestamp($data['start_time'],'Africa/Lagos');
+        $endTime = Carbon::createFromTimestamp($data['end_time'],'Africa/Lagos');
 
-        $trivia = Trivia::create([
-            'name' => $data['name'],
-            'grand_price' => $data['grand_price'],
-            'point_eligibility' => $data['point_eligibility'],
-            'category_id' => $category->id,
-            'game_mode_id' => 1,
-            'game_type_id' => 2,
-            'start_time' => Carbon::createFromTimestampUTC($data['start_time']),
-            'end_time' => Carbon::createFromTimestampUTC($data['end_time']),
-        ]);
-
+        $trivia = new Trivia;
+        $trivia->name = $data['name'];
+        $trivia->grand_price = $data['grand_price'];
+        $trivia->point_eligibility = $data['point_eligibility'];
+        $trivia->category_id = $category->id;
+        $trivia->game_mode_id = 1;
+        $trivia->game_type_id = 2;
+        $trivia->start_time = $startTime;
+        $trivia->end_time = $endTime;
+        $trivia->save();
+       
         if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
             $trivia->game_duration = $data['game_duration'];
             $trivia->save();
@@ -65,8 +67,8 @@ class TriviaController extends BaseController
 
     public function getRunningTrivia()
     {
-        $trivia = Trivia::where('start_time', '<=', Carbon::now())
-            ->where('end_time', '>', Carbon::now())
+        $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
+            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
             ->get();
 
         return $this->sendResponse($trivia, "Triva");
