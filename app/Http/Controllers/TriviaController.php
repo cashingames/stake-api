@@ -35,8 +35,8 @@ class TriviaController extends BaseController
             'category_id' => $category->id,
             'game_mode_id' => 1,
             'game_type_id' => 2,
-            'start_time' => Carbon::createFromTimestamp($data['start_time']),
-            'end_time' => Carbon::createFromTimestamp($data['end_time']),
+            'start_time' => Carbon::createFromTimestampUTC($data['start_time']),
+            'end_time' => Carbon::createFromTimestampUTC($data['end_time']),
         ]);
 
         if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
