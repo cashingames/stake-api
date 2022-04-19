@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,8 +27,8 @@ return new class extends Migration
         });
 
         Schema::table('trivias', function (Blueprint $table){
-            $table->dateTime('start_time');
-            $table->dateTime('end_time');
+            $table->dateTime('start_time')->default(Carbon::now('Africa/Lagos'));
+            $table->dateTime('end_time')->default(Carbon::now('Africa/Lagos'));
         });
     }
 
