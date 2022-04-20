@@ -118,8 +118,8 @@ class GameController extends BaseController
     }
 
     private function getTriviaState(){
-        $trivia = Trivia::where('start_time', '<=', Carbon::now())
-        ->where('end_time', '>', Carbon::now())
+        $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
+        ->where('end_time', '>', Carbon::now('Africa/Lagos'))
         ->get()->count();
 
         if($trivia > 0){
