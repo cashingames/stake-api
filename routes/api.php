@@ -40,7 +40,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);
         Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::get('fetch/trivia', [TriviaController::class, 'getRunningTrivia']);
+        Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getTriviaData']);
     }
 );

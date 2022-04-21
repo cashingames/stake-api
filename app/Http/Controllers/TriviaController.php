@@ -65,12 +65,12 @@ class TriviaController extends BaseController
         return $this->sendResponse(true, "Triva saved");
     }
 
-    public function getRunningTrivia()
+    public function getTrivia()
     {
-        $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
-            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
-            ->get();
-
+        // $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
+        //     ->where('end_time', '>', Carbon::now('Africa/Lagos'))
+        //     ->get();
+        $trivia = Trivia::limit(10)->orderBy('created_at','DESC')->get();
         return $this->sendResponse($trivia, "Triva");
     }
 
