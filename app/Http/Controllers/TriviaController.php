@@ -83,7 +83,7 @@ class TriviaController extends BaseController
             SELECT SUM(points_gained) AS points, user_id, username FROM game_sessions gs
             INNER JOIN users ON users.id = gs.user_id WHERE gs.trivia_id = ? group by gs.user_id
                 order by points desc 
-                limit 25
+                limit 100
             ) r
             join profiles p on p.user_id = r.user_id
             order by r.points desc';
