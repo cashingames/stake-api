@@ -138,7 +138,15 @@ class RegisterController extends BaseController
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
-            $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
+            $referrerId = 0;
+            $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
+
+           if ( $profileReferral === null){
+               $referrerId = User::where('username', $data["referrer"])->first()->id;
+           } else{
+               $referrerId = $profileReferral->user_id;
+           }
+           
             $this->creditPoints($referrerId, 50, "Referral bonus");
         }
 

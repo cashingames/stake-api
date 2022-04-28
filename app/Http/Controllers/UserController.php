@@ -33,7 +33,7 @@ class UserController extends BaseController
         $result->dateOfBirth = $this->user->profile->date_of_birth;
         $result->gender = $this->user->profile->gender;
         $result->avatar = $this->user->profile->avatar;
-        $result->referralCode = $this->user->profile->referral_code;
+        $result->referralCode = $this->user->username;
         $result->points = $this->user->points();
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
