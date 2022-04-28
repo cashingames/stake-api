@@ -63,7 +63,7 @@ class RegisterController extends BaseController
             'phone_number' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:profiles,referral_code']
+            'referrer' => ['nullable', 'string', 'exists:users,username']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
