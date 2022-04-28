@@ -93,7 +93,7 @@ class RegisterController extends BaseController
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
-                'referral_code' => $data['username'] . "_" . mt_rand(1111, 9999),
+                'referral_code' => $data['username'],
                 'referrer' => $data['referrer'] ?? null,
             ]);
 
