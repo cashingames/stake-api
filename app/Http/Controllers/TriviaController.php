@@ -27,8 +27,6 @@ class TriviaController extends BaseController
         ]);
 
         $category = Category::where('name', $data['category'])->first();
-        $startTime = Carbon::createFromTimestamp($data['start_time'],'Africa/Lagos');
-        $endTime = Carbon::createFromTimestamp($data['end_time'],'Africa/Lagos');
 
         $trivia = new Trivia;
         $trivia->name = $data['name'];
@@ -37,8 +35,8 @@ class TriviaController extends BaseController
         $trivia->category_id = $category->id;
         $trivia->game_mode_id = 1;
         $trivia->game_type_id = 2;
-        $trivia->start_time = $startTime;
-        $trivia->end_time = $endTime;
+        $trivia->start_time = $data['start_time'];
+        $trivia->end_time = $data['end_time'];
         $trivia->save();
        
         if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
