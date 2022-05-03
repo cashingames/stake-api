@@ -28,8 +28,13 @@ class Profile extends Model
     }
 
     public function getReferrerProfile()
-    {
-        return Profile::where('referral_code',$this->referrer)->first();
+    {   
+        $profileRefferrer = Profile::where('referral_code',$this->referrer)->first();
+        
+        if( $profileRefferrer === null){
+            return User::where('username',$this->referrer )->first()->profile;
+        }
+        return $profileRefferrer;
     }
 
     public function getFullNameAttribute()

@@ -63,7 +63,7 @@ class RegisterController extends BaseController
             'phone_number' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:profiles,referral_code']
+            'referrer' => ['nullable', 'string', 'exists:users,username']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -93,7 +93,7 @@ class RegisterController extends BaseController
             ->create([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
-                'referral_code' => $data['username'] . "_" . mt_rand(1111, 9999),
+                'referral_code' => $data['username'],
                 'referrer' => $data['referrer'] ?? null,
             ]);
 
@@ -138,7 +138,15 @@ class RegisterController extends BaseController
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
-            $referrerId = Profile::where('referral_code', $data["referrer"])->value('user_id');
+            $referrerId = 0;
+            $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
+
+           if ( $profileReferral === null){
+               $referrerId = User::where('username', $data["referrer"])->first()->id;
+           } else{
+               $referrerId = $profileReferral->user_id;
+           }
+           
             $this->creditPoints($referrerId, 50, "Referral bonus");
         }
 
