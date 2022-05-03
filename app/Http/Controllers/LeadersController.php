@@ -21,6 +21,10 @@ class LeadersController extends BaseController
             $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
             $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
             $filter = true;
+        } else {
+            $_startDate = Carbon::today()->startOfDay();
+            $_endDate = Carbon::tomorrow()->startOfDay();
+            $filter = true;
         }
 
         $sql = 'SELECT g.points, p.avatar, p.first_name , p.last_name, g.username
@@ -58,6 +62,10 @@ class LeadersController extends BaseController
         if ($startDate && $endDate) {
             $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
             $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
+            $filter = true;
+        } else {
+            $_startDate = Carbon::today()->startOfDay();
+            $_endDate = Carbon::tomorrow()->startOfDay();
             $filter = true;
         }
 
