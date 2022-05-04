@@ -37,6 +37,7 @@ class TriviaController extends BaseController
         $trivia->game_type_id = 2;
         $trivia->start_time = $data['start_time'];
         $trivia->end_time = $data['end_time'];
+        $trivia->is_published = false;
         $trivia->save();
        
         if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
@@ -68,7 +69,7 @@ class TriviaController extends BaseController
         // $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
         //     ->where('end_time', '>', Carbon::now('Africa/Lagos'))
         //     ->get();
-        $trivia = Trivia::limit(10)->orderBy('created_at','DESC')->get();
+        $trivia = Trivia::where('is_published',true)->limit(10)->orderBy('created_at','DESC')->get();
         return $this->sendResponse($trivia, "Triva");
     }
 
