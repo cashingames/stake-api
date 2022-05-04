@@ -117,12 +117,13 @@ class GameController extends BaseController
         return $this->sendResponse($result, "");
     }
 
-    private function getTriviaState(){
+    private function getTriviaState()
+    {
         $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
-        ->where('end_time', '>', Carbon::now('Africa/Lagos'))
-        ->get()->count();
+            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
+            ->get()->count();
 
-        if($trivia > 0){
+        if ($trivia > 0) {
             return true;
         }
         return false;
@@ -330,11 +331,17 @@ class GameController extends BaseController
 
     private function giftReferrerOnFirstGame()
     {
+        $referrerProfile = $this->user->profile->getReferrerProfile();
+
+        if ($referrerProfile === null) {
+            Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
+            return;
+        }
+
         if ($this->user->gameSessions->count() > 1) {
             return;
         }
 
-        $referrerProfile = $this->user->profile->getReferrerProfile();
         if (
             config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
