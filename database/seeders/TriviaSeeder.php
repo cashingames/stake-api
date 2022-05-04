@@ -18,8 +18,8 @@ class TriviaSeeder extends Seeder
         //
         Trivia::factory()
         ->count(5)
-        ->hasTriviaQuestions(10)
-        ->hasGameSessions(10)
+        // ->hasTriviaQuestions(10)
+        // ->hasGameSessions(10)
         ->create();
 
     }
