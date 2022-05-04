@@ -29,9 +29,14 @@ class ProfileFactory extends Factory
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'bank_name' => $this->faker->company,
-            'account_number'=> $this->faker->bankAccountNumber,
-            'account_name'=> $this->faker->name,
-            'referral_code'=> Str::random(10)
+            'account_number' => $this->faker->bankAccountNumber,
+            'account_name' => $this->faker->name,
+            'referral_code' => function (array $attributes) {
+                return User::find($attributes['user_id'])->username;
+            },
+            // 'referrer' => function (array $attributes) {
+            //     return User::find($attributes['user_id'])->type;
+            // },
         ];
     }
 }

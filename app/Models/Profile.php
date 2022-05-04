@@ -34,15 +34,14 @@ class Profile extends Model
             return null;
         }
 
-        if ($profileRefferrer = Profile::where('referral_code', $this->referrer)->firstOrDefault()) {
-            return $profileRefferrer;
+        $profile = null;
+        if ($profileRefferrer = Profile::where('referral_code', $this->referrer)->first()) {
+            $profile = $profileRefferrer;
+        } else if ($user = User::where('username', $this->referrer)->first()) {
+            $profile = $user->profile;
         }
 
-        if ($user = User::where('username', $this->referrer)->firstOrDefault()) {
-            return $user->profile;
-        }
-
-        return null;
+        return $profile;
     }
 
     public function getFullNameAttribute()
