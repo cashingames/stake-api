@@ -63,7 +63,8 @@ class RegisterController extends BaseController
             'phone_number' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
+            'is_from_mobile' =>['required','boolean']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -86,7 +87,14 @@ class RegisterController extends BaseController
                 'password' => bcrypt($data['password']),
                 'is_on_line' => true,
             ]);
-
+        
+        if($data['is_from_mobile']){
+            $user->source = 'MOBILE';
+            $user->save();
+        }else{
+            $user->source = 'WEB';
+            $user->save();
+        }
         //create the profile
         $user
             ->profile()
