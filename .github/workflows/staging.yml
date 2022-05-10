@@ -15,12 +15,8 @@ jobs:
         with:
           php-version: "8.1"
           coverage: xdebug
-      - name: Prepare the application
-        run: |
-          php -r "file_exists('.env') || copy('.env.example', '.env');"
-          php artisan key:generate
-          mkdir -p database
-          touch database/database.sqlite
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
       - name: Get composer cache directory
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -32,18 +28,18 @@ jobs:
           # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Install Composer dependencies
+      - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Clear Config
-        run: php artisan config:clear
-      - name: Run migration
+      - name: Create Database
         run: |
+          mkdir -p database
+          touch database/database.sqlite
           php artisan migrate --seed
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-        run: php artisan test --coverage-text
+        run: php artisan test --coverage
   deploy:
     needs: build-test
     runs-on: ubuntu-latest
