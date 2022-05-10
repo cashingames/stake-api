@@ -23,7 +23,7 @@ class TriviaController extends BaseController
             'start_time' => ['required', 'string'],
             'end_time' => ['required', 'string'],
             'game_duration' => ['nullable'],
-            'question_count'=>['nullable']
+            'question_count' => ['nullable']
         ]);
 
         $category = Category::where('name', $data['category'])->first();
@@ -39,13 +39,13 @@ class TriviaController extends BaseController
         $trivia->end_time = $data['end_time'];
         $trivia->is_published = false;
         $trivia->save();
-       
-        if (isset($data['game_duration'])&&  !is_null($data['game_duration'])){
+
+        if (isset($data['game_duration']) &&  !is_null($data['game_duration'])) {
             $trivia->game_duration = $data['game_duration'];
             $trivia->save();
         };
-        if (isset($data['question_count'])&&  !is_null($data['question_count'])){
-            $trivia->question_count= $data['question_count'];
+        if (isset($data['question_count']) &&  !is_null($data['question_count'])) {
+            $trivia->question_count = $data['question_count'];
             $trivia->save();
         }
 
@@ -66,10 +66,7 @@ class TriviaController extends BaseController
 
     public function getTrivia()
     {
-        // $trivia = Trivia::where('start_time', '<=', Carbon::now('Africa/Lagos'))
-        //     ->where('end_time', '>', Carbon::now('Africa/Lagos'))
-        //     ->get();
-        $trivia = Trivia::where('is_published',true)->limit(10)->orderBy('created_at','DESC')->get();
+        $trivia = Trivia::where('is_published', true)->orderBy('created_at', 'DESC')->limit(10)->get();
         return $this->sendResponse($trivia, "Triva");
     }
 
