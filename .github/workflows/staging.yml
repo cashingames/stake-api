@@ -19,6 +19,7 @@ jobs:
         run: |
           php -r "file_exists('.env') || copy('.env.example', '.env');"
           php artisan key:generate
+          mkdir -p database
           touch database/database.sqlite
       - name: Get composer cache directory
         id: composer-cache
