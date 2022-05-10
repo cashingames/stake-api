@@ -64,11 +64,10 @@ class RegisterController extends BaseController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
-            'is_from_mobile' =>['required','boolean']
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
-
+   
     /**
      * Create a new user instance after a valid registration.
      *
@@ -77,7 +76,6 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
-
         //create the user
         $user =
             User::create([
@@ -88,13 +86,6 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
             ]);
         
-        if($data['is_from_mobile']){
-            $user->source = 'MOBILE';
-            $user->save();
-        }else{
-            $user->source = 'WEB';
-            $user->save();
-        }
         //create the profile
         $user
             ->profile()
@@ -169,7 +160,12 @@ class RegisterController extends BaseController
      * @return mixed
      */
     protected function registered(Request $request, $user)
-    {
+    {   
+        if ($request->hasHeader('source')) {
+            $user->source = strtoupper($request->header('source'));
+            $user->save();
+        }
+
         $token = auth()->tokenById($user->id);
         return $this->sendResponse($token, 'Registration token');
     }

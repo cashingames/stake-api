@@ -46,7 +46,6 @@ class RegisterTest extends TestCase
             'email' => 'user@user.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => true
         ]);
 
         $response->assertStatus(200);
@@ -64,8 +63,6 @@ class RegisterTest extends TestCase
             'email' => '',
             'password' => '',
             'password_confirmation' => '',
-            'is_from_mobile' => ''
-
         ]);
 
         $response->assertStatus(422);
@@ -83,7 +80,6 @@ class RegisterTest extends TestCase
             'email' => 'user@user.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => false
         ]);
 
         $response->assertStatus(422);
@@ -101,7 +97,6 @@ class RegisterTest extends TestCase
             'email' => 'user.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => false
         ]);
 
         $response->assertStatus(422);
@@ -118,7 +113,6 @@ class RegisterTest extends TestCase
             'email' => 'email@user.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => true
         ]);
         $response->assertStatus(422);
     }
@@ -135,7 +129,6 @@ class RegisterTest extends TestCase
             'email' => $this->user->email,
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => true
         ]);
 
         $response->assertStatus(422);
@@ -145,7 +138,9 @@ class RegisterTest extends TestCase
     public function a_user_source_can_be_registered_as_mobile()
     {
 
-        $this->postjson('/api/auth/register', [
+        $this->withHeaders([
+            'source' => 'mobile',
+        ])->postjson('/api/auth/register', [
             'first_name' => 'Jane',
             'last_name' => 'Doe',
             'username' => '@jane09309',
@@ -153,7 +148,6 @@ class RegisterTest extends TestCase
             'email' => 'jane@email.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => true
         ]);
 
         $this->assertDatabaseHas('users', [
@@ -165,8 +159,9 @@ class RegisterTest extends TestCase
     /** @test */
     public function a_user_source_can_be_registered_as_web()
     {
-
-        $this->postjson('/api/auth/register', [
+        $this->withHeaders([
+            'source' => 'web',
+        ])->postjson('/api/auth/register', [
             'first_name' => 'John',
             'last_name' => 'Doe',
             'username' => '@johnDoe09856',
@@ -174,12 +169,30 @@ class RegisterTest extends TestCase
             'email' => 'johnDoey@email.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'is_from_mobile' => false
         ]);
 
         $this->assertDatabaseHas('users', [
             'username' => '@johnDoe09856',
             'source' => 'WEB'
+        ]);
+    }
+
+    /** @test */
+    public function a_user_source_is_set_as_null_if_no_source_header_is_set()
+    {
+        $this->postjson('/api/auth/register', [
+            'first_name' => 'May',
+            'last_name' => 'Doe',
+            'username' => '@may09856',
+            'phone_number' => '10340078909',
+            'email' => 'mayUsesr@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'username' => '@may09856',
+            'source' => NULL
         ]);
     }
 }
