@@ -112,6 +112,7 @@ class GameController extends BaseController
         }
 
         $result->gameTypes = $toReturnTypes;
+        $result->minVersionCode = "1.0.32";
         $result->hasLiveTrivia = $this->getTriviaState();
 
         return $this->sendResponse($result, "");
