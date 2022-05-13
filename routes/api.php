@@ -110,10 +110,10 @@ Route::prefix('v2')->group(function () {
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
         Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
-        Route::get('leaders/global', [LeadersController::class, 'global']);
-        Route::get('leaders/global/{startDate}/{endDate}', [LeadersController::class, 'global']);
-        Route::get('leaders/categories', [LeadersController::class, 'categories']);
-        Route::get('leaders/categories/{startDate}/{endDate}', [LeadersController::class, 'categories']);
+        Route::post('leaders/global', [LeadersController::class, 'global']);
+        //Route::get('leaders/global/{startDate}/{endDate}', [LeadersController::class, 'global']);
+        Route::post('leaders/categories', [LeadersController::class, 'categories']);
+        //Route::get('leaders/categories/{startDate}/{endDate}', [LeadersController::class, 'categories']);
 
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);

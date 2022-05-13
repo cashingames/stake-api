@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\Request;
 
 class LeadersController extends BaseController
 {
@@ -12,18 +13,19 @@ class LeadersController extends BaseController
      * Returns just the global leaders
      * This is useful for dashboard where we only need global leaders
      */
-    public function global($startDate = null, $endDate = null)
+    public function global(Request $request)
     {
         $filter = false;
         $_startDate = null;
         $_endDate = null;
-        if ($startDate && $endDate) {
-            $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
-            $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
+        if ($request->has(['startDate','endDate'])) {
+            $_startDate = Carbon::parse($request->startDate)->startOfDay('Africa/Lagos');
+            $_endDate = Carbon::parse($request->endDate)->tomorrow('Africa/Lagos');
             $filter = true;
-        } else {
-            $_startDate = Carbon::today()->startOfDay();
-            $_endDate = Carbon::tomorrow()->startOfDay();
+        }
+        else {
+            $_startDate = Carbon::today()->startOfDay('Africa/Lagos');
+            $_endDate = Carbon::tomorrow()->startOfDay('Africa/Lagos');
             $filter = true;
         }
 
@@ -54,18 +56,19 @@ class LeadersController extends BaseController
      * Returns all the leaders for the categories in the system
      * This can be useful in the future for anything else we need to implement
      */
-    public function categories($startDate = null, $endDate = null)
+    public function categories(Request $request)
     {
         $filter = false;
         $_startDate = null;
         $_endDate = null;
-        if ($startDate && $endDate) {
-            $_startDate = Carbon::createFromTimestamp($startDate)->startOfDay();
-            $_endDate = Carbon::createFromTimestamp($endDate)->tomorrow();
+
+        if ($request->has(['startDate','endDate'])) {
+            $_startDate = Carbon::parse($request->startDate)->startOfDay('Africa/Lagos');
+            $_endDate = Carbon::parse($request->endDate)->tomorrow('Africa/Lagos');
             $filter = true;
         } else {
-            $_startDate = Carbon::today()->startOfDay();
-            $_endDate = Carbon::tomorrow()->startOfDay();
+            $_startDate = Carbon::today()->startOfDay('Africa/Lagos');
+            $_endDate = Carbon::tomorrow()->startOfDay('Africa/Lagos');
             $filter = true;
         }
 
