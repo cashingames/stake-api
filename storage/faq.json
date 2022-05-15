@@ -1,5 +1,9 @@
 [
     {
+        "question": "How can I contact customer care?",
+        "answer": "You can send us a message on whatsapp +234(0)817 959 0128 or send an email to hello@cashingames.com"
+    },
+    {
         "question": "How can I win on Cashingames?",
         "answer": "Winning on Cashingames is very easy. You choose the category you’re most knowledgeable in, answer the questions and you stand a chance to win. The more questions you answer, the more you increase your winnings."
     },
@@ -29,11 +33,7 @@
     },
     {
         "question": "How can I send in my questions or suggestions?",
-        "answer": "You can send in your questions via our email to dumebi@cashingames.com"
-    },
-    {
-        "question": "How can I contact customer care?",
-        "answer": "You can call our customer care on +234(0)817 959 0128 or send an email to dumebi@cashingames.com"
+        "answer": "You can send in your questions via our email to hello@cashingames.com"
     },
     {
         "question": "What is the minimum amount I can withdraw from my winnings?",
@@ -48,20 +48,15 @@
         "answer": "No, you cannot withdraw your referral bonus until it matures up to ₦2000."
     },
     {
-        "question": "Can I change my username?",
-        "answer": "Yes, you are allowed to change your username. However, to ensure you maintain your winning track record, it’s best you limit the number of times you do. There could be winning prizes for longest top winner."
-    },
-    {
         "question": "How will I fund my wallet?",
         "answer": "You can fund your wallet by clicking the “fund” tab in your wallet."
     },
     {
-        "question": "Can I delete my account?",
-        "answer": "Yes, you can."
-    },
-    {
         "question": "Why should I link my Bank account to Cashingames?",
         "answer": "This is important so you can be able to withdraw your cash prizes."
+    },
+    {
+        "question": "Can I delete my account?",
+        "answer": "Yes, you can."
     }
-
 ]
