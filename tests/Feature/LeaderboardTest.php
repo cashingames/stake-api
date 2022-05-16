@@ -65,4 +65,33 @@ class LeaderboardTest extends TestCase
 
         $response->assertJsonCount(0, 'data.*.*');
     }
+
+    public function test_global_leaders_can_be_fetched_by_post_method_without_dates(){
+       
+        $response = $this->post(self::GLOBAL_LEADERS_URL);
+        $response->assertStatus(200);
+    }
+
+    public function test_global_leaders_can_be_fetched_by_post_method_with_dates(){
+       
+        $response = $this->post(self::GLOBAL_LEADERS_URL,[
+            'startDate' => Carbon::today()->startOfDay('Africa/Lagos'),
+            'endDate' => Carbon::tomorrow()->startOfDay('Africa/Lagos')
+        ]);
+        $response->assertStatus(200);
+    }
+    public function test_categories_leaders_can_be_fetched_by_post_method_without_dates(){
+       
+        $response = $this->post(self::CATEGORIES_LEADERS_URL);
+        $response->assertStatus(200);
+    }
+
+    public function test_categories_leaders_can_be_fetched_by_post_method_with_dates(){
+       
+        $response = $this->post(self::CATEGORIES_LEADERS_URL,[
+            'startDate' => Carbon::today()->startOfDay('Africa/Lagos'),
+            'endDate' => Carbon::tomorrow()->startOfDay('Africa/Lagos')
+        ]);
+        $response->assertStatus(200);
+    }
 }
