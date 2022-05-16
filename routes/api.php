@@ -115,6 +115,9 @@ Route::prefix('v2')->group(function () {
         Route::get('leaders/categories', [LeadersController::class, 'categories']);
         Route::get('leaders/categories/{startDate}/{endDate}', [LeadersController::class, 'categories']);
 
+        //updated leaders endpoint
+        Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
+        Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
 
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
