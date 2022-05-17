@@ -8,8 +8,13 @@ use Tests\TestCase;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\CategorySeeder;
+use GameTypeSeeder;
+use GameModeSeeder;
+use App\Models\Question;
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Trivia;
+use Illuminate\Support\Carbon;
 
 class LiveTriviaTest extends TestCase
 {   
@@ -21,7 +26,7 @@ class LiveTriviaTest extends TestCase
      */
     // use RefreshDatabase;
 
-    protected $user;
+    protected $user, $trivia, $category;
 
     protected function setUp(): void
     {
@@ -30,7 +35,11 @@ class LiveTriviaTest extends TestCase
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
         $this->seed(TriviaSeeder::class);
+        $this->seed(GameTypeSeeder::class);
+        $this->seed(GameModeSeeder::class);
         $this->user = User::first();
+        $this->trivia = Trivia::first();
+        $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->actingAs($this->user);
     }
 
@@ -72,6 +81,23 @@ class LiveTriviaTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+    }
+
+    public function test_live_trivia_can_be_started(){
+        Question::factory()
+        ->count(50)
+        ->create();
+
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "trivia" => $this->trivia->id
+        ]);
+        $response->assertJson([
+            'message' => 'Game Started',
+        ]);
+      
     }
   
 }
