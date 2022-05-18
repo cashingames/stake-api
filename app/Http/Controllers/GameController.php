@@ -372,7 +372,7 @@ class GameController extends BaseController
         Log::info($request->all());
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
-        if (!$game) {
+        if ($game === null) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
 

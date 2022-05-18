@@ -15,7 +15,9 @@ use CategorySeeder;
 use UserSeeder;
 use AchievementSeeder;
 use App\Models\Achievement;
+use App\Models\Boost;
 use App\Models\Category;
+use App\Models\UserBoost;
 use BoostSeeder;
 use PlanSeeder;
 use GameTypeSeeder;
@@ -33,6 +35,8 @@ class GameTest extends TestCase
     const COMMON_DATA_URL = '/api/v3/game/common';
     const CLAIM_ACHIEVEMENT_URL = '/api/v2/claim/achievement/';
     const START_SINGLE_GAME_URL = '/api/v2/game/start/single-player';
+    const END_SINGLE_GAME_URL = '/api/v2/game/end/single-player';
+
 
     protected $user;
     protected $category;
@@ -134,4 +138,45 @@ class GameTest extends TestCase
             'message' => 'Game Started',
         ]);
     }
+
+    public function test_single_game_can_be_ended_without_boosts_and_options(){
+        $gameSession = GameSession::first();
+       
+        $response = $this->postjson(self::END_SINGLE_GAME_URL, [
+            "token" => $gameSession->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+        $response->assertJson([
+            'message' => 'Game Ended',
+        ]);
+    }
+
+    public function test_single_game_can_be_ended_with_boosts_and_no_options(){
+        $gameSession = GameSession::first();
+        $boost = Boost::inRandomOrder()->first();
+        
+        UserBoost::create([
+            'user_id' => $this->user->id,
+            'boost_id' => $boost->id,
+            'boost_count' => $boost->pack_count,
+            'used_count' => 0
+        ]);
+
+        $userBoost = $this->user->userBoosts();
+        
+        $response = $this->postjson(self::END_SINGLE_GAME_URL, [
+            "token" => $gameSession->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => [
+                ['boost'=> Boost::where('id',$userBoost[0]->id)->first()]
+            ]
+        ]);
+
+     
+        $response->assertJson([
+            'message' => 'Game Ended',
+        ]);
+    }
+
 }
