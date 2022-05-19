@@ -53,8 +53,6 @@ Route::middleware('api')->prefix('v3')->group(
     }
 );
 
-
-
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
     Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
@@ -79,7 +77,7 @@ Route::prefix('v2')->group(function () {
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
 
-       
+
         Route::get('wallet/get/withdrawals', [WalletController::class, 'getWithdrawals']);
         Route::get('me/points', [UserController::class, 'getPoints']);
         Route::get('me/points/log/history', [UserController::class, 'getPointsLog']);
@@ -119,8 +117,5 @@ Route::prefix('v2')->group(function () {
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
-
-       
     });
-
 });
