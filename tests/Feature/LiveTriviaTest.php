@@ -7,11 +7,18 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\CategorySeeder;
+use GameTypeSeeder;
+use GameModeSeeder;
+use App\Models\Question;
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Trivia;
+use Illuminate\Support\Carbon;
 
 class LiveTriviaTest extends TestCase
-{
+{   
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -19,16 +26,27 @@ class LiveTriviaTest extends TestCase
      */
     // use RefreshDatabase;
 
-    protected $user;
+    protected $user, $trivia, $category;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(UserSeeder::class);
+        $this->seed(CategorySeeder::class);
         $this->seed(TriviaSeeder::class);
+        $this->seed(GameTypeSeeder::class);
+        $this->seed(GameModeSeeder::class);
         $this->user = User::first();
+        $this->trivia = Trivia::first();
+        $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->actingAs($this->user);
+    }
+
+    public function test_live_trivia_can_be_fetched(){
+        $response = $this->get('/api/v3/fetch/trivia');
+
+        $response->assertStatus(200);
     }
 
     public function test_no_trivia_can_be_fetched_if_not_published()
@@ -37,7 +55,7 @@ class LiveTriviaTest extends TestCase
 
         $response->assertJson([
             'data' => [],
-        ]);;
+        ]);
     }
 
     public function test_trivia_can_only_be_fetched_if_published()
@@ -49,5 +67,37 @@ class LiveTriviaTest extends TestCase
         $response->assertJsonCount(1, $key = 'data');
     }
 
+
+    public function test_live_trivia_can_be_created(){
+        $response = $this->post('/api/v3/trivia/create',[
+            'name' => 'Test Trivia',
+            'category' => 'Naija Music',
+            'grand_price' => 1000,
+            'point_eligibility' => 0,
+            'start_time' => '2022/05/06 02:04:00',
+            'end_time' => '2022/05/07 02:04:00',
+            'game_duration' => 180,
+            'question_count' => 30
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_live_trivia_can_be_started(){
+        Question::factory()
+        ->count(50)
+        ->create();
+
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "trivia" => $this->trivia->id
+        ]);
+        $response->assertJson([
+            'message' => 'Game Started',
+        ]);
+      
+    }
   
 }
