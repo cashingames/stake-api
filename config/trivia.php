@@ -27,6 +27,8 @@ return [
   'live_trivia'=>[
     'enabled' => env('HAS_LIVE_TRIVIA',false)
   ],
+  'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
+  'min_version_force' => env('MIN_VERSION_FORCE', false),
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
