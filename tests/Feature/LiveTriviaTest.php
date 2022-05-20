@@ -14,7 +14,9 @@ use App\Models\Question;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Trivia;
+use App\Models\GameSession;
 use Illuminate\Support\Carbon;
+use Ramsey\Uuid\Type\Integer;
 
 class LiveTriviaTest extends TestCase
 {   
@@ -38,7 +40,7 @@ class LiveTriviaTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->user = User::first();
-        $this->trivia = Trivia::first();
+        $this->trivia = Trivia::inRandomOrder()->first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->actingAs($this->user);
     }
@@ -60,7 +62,7 @@ class LiveTriviaTest extends TestCase
 
     public function test_trivia_can_only_be_fetched_if_published()
     {   
-        Trivia::first()->update(['is_published'=>true]);
+        $this->trivia->update(['is_published'=>true]);
 
         $response = $this->get('/api/v3/fetch/trivia');
 
@@ -99,5 +101,23 @@ class LiveTriviaTest extends TestCase
         ]);
       
     }
+
+    public function test_live_trivia_leaders_can_be_fetched(){
+        GameSession::factory()
+        ->count(20)
+        ->create();
+
+        $response = $this->get('/api/v3/trivia/leaders/'.$this->trivia->id);
+        
+            
+        $response->assertJson([
+            'data' => [
+                "leaders" =>[],
+            ],
+        ]);
+      
+    }
+
+  
   
 }

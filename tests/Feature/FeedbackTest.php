@@ -3,13 +3,18 @@
 namespace Tests\Feature;
 
 use App\Mail\Feedback;
+use App\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use Database\Seeders\UserSeeder;
+use Database\Seeders\NotificationSeeder;
 
 class FeedbackTest extends TestCase
-{
+{   
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -46,8 +51,7 @@ class FeedbackTest extends TestCase
     }
 
     public function test_faq_and_answers_can_be_fetched()
-    {
-
+    {   
         $response = $this->get('/api/v2/faq/fetch');
 
         $response->assertJsonStructure([
@@ -58,5 +62,48 @@ class FeedbackTest extends TestCase
                 ]
             ]
         ]);
+    }
+
+    public function test_all_notifications_can_be_fetched(){
+        
+        $this->seed(UserSeeder::class);
+        $this->seed(NotificationSeeder::class);
+
+        $user = User::first();
+        $this->actingAs($user);
+
+        $response = $this->get("/api/v2/user/fetch/notifications");
+
+        $response->assertStatus(200);
+    }
+
+    public function test_a_notification_can_be_read(){
+        
+        $this->seed(UserSeeder::class);
+        $this->seed(NotificationSeeder::class);
+
+        $user = User::first();
+        $notification = Notification::first();
+
+        $this->actingAs($user);
+
+        $response = $this->post("/api/v2/user/read/notification/".$notification->id);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_all_notifications_can_be_read(){
+        
+        $this->seed(UserSeeder::class);
+        $this->seed(NotificationSeeder::class);
+
+        $user = User::first();
+        Notification::first()->update(['user_id' => $user->id]);
+    
+        $this->actingAs($user);
+
+        $response = $this->post("/api/v2/user/read/all/notifications");
+
+        $response->assertStatus(200);
     }
 }
