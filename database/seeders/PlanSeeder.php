@@ -29,10 +29,32 @@ class PlanSeeder extends Seeder
 
         DB::table('plans')->insert(
             [
+                'name' => 'Least Plan',
+                'description' => 'Play 2 times',
+                'price' => 100.00,
+                'game_count' => 2,
+                'background_color'=>'#EF2F55',
+                'is_free'=>false
+            ]
+        );
+
+        DB::table('plans')->insert(
+            [
+                'name' => 'Mini Plan',
+                'description' => 'Play 5 times',
+                'price' => 200.00,
+                'game_count' => 5,
+                'background_color'=>'#2D9CDB',
+                'is_free'=>false
+            ]
+        );
+
+        DB::table('plans')->insert(
+            [
                 'name' => 'Double O',
-                'description' => 'Play 15 times',
+                'description' => 'Play 12 times',
                 'price' => 500.00,
-                'game_count' => 15,
+                'game_count' => 12,
                 'background_color'=>'#A35EBB',
                 'is_free'=>false
             ]
@@ -41,9 +63,9 @@ class PlanSeeder extends Seeder
         DB::table('plans')->insert(
             [
                 'name' => 'Dicey Multiples',
-                'description' => 'Play 20 times',
+                'description' => 'Play 18 times',
                 'price' => 800.00,
-                'game_count' => 20,
+                'game_count' => 18,
                 'background_color'=> '#2D9CDB',
                 'is_free'=>false
             ]

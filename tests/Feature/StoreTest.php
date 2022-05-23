@@ -200,7 +200,7 @@ class StoreTest extends TestCase
         $this->seed(PlanSeeder::class);
         $response = $this->get(self::GAME_COMMON_DATA_URL);
 
-        $response->assertJsonCount(3, 'data.plans.*');
+        $response->assertJsonCount(5, 'data.plans.*');
     }
 
     public function test_a_plan_must_first_exist_to_be_subscribable()
