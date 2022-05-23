@@ -49,7 +49,7 @@ class GiveDailyBonusGames extends Command
                 'plan_id' => $freePlan->id,
                 'user_id' => $user->id,
                 'used_count' => 0,
-                'plan_count' => 10,
+                'plan_count' => 5,
                 'is_active' => true,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

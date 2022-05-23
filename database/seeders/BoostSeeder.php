@@ -55,7 +55,7 @@ class BoostSeeder extends Seeder
                 'name' => "Time Freeze",
                 'description' => "Freezes game time For 15 Seconds",
                 'point_value' => 100,
-                'currency_value' => 49.3,
+                'currency_value' => 60.0,
                 'pack_count' => 5,
                 'icon' => 'icons/time_freeze_icon.png'
             ]
@@ -66,7 +66,7 @@ class BoostSeeder extends Seeder
                 'name' => "Bomb",
                 'description' => "Takes out two options",
                 'point_value' => 100,
-                'currency_value' => 115.033333,
+                'currency_value' => 50.0000000,
                 'pack_count' => 3,
                 'icon' => 'icons/bomb_icon.png'
             ]
@@ -77,7 +77,7 @@ class BoostSeeder extends Seeder
                 'name' => "Skip",
                 'description' => "Skips a question",
                 'point_value' => 83.3333333,
-                'currency_value' => 65.7333333,
+                'currency_value' => 50.0000000,
                 'pack_count' => 3,
                 'icon' => 'icons/skip_icon.png'
             ]
