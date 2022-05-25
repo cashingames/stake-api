@@ -35,7 +35,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
-        $result->plans = Plan::where('is_free', false)->orderBy('price','ASC')->get();
+        $result->plans = Plan::where('is_free', false)->orderBy('price', 'ASC')->get();
 
         $result->gameModes = GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get();
         $gameTypes = GameType::has('questions')->inRandomOrder()->get();
@@ -114,7 +114,8 @@ class GameController extends BaseController
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
-        $result->hasLiveTrivia = $this->getTriviaState();
+        $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, don't depend on this
+        $result->upcomingTrivia = Trivia::nextUpcoming()->first();
 
         return $this->sendResponse($result, "");
     }
