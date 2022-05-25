@@ -60,10 +60,10 @@ class Trivia extends Model
     /**
      * Scope a query to only include the most recent upcoming live trivia.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Contracts\Database\Eloquent\Builder
      */
-    public function scopeNextUpcoming(Builder $query): Builder
+    public function scopeUpcoming(Builder $query): Builder
     {
         return $query
             ->where('is_published', true)
