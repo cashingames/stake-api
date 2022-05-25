@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -60,12 +59,12 @@ class Trivia extends Model
     /**
      * Scope a query to only include the most recent upcoming live trivia.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Contracts\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
      */
-    public function scopeUpcoming(Builder $query): Builder
+    public function scopeUpcoming($query): void
     {
-        return $query
+        $query
             ->where('is_published', true)
             ->where('start_time', '>=', Carbon::now('Africa/Lagos'))
             ->orderBy('start_time', 'ASC');
