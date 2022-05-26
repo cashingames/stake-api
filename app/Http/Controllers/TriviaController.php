@@ -11,59 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class TriviaController extends BaseController
 {
-
-    public function createTrivia(Request $request)
-    {
-
-        $data = $request->validate([
-            'name' => ['required', 'string'],
-            'category' => ['required', 'string'],
-            'grand_price' => ['required', 'integer'],
-            'point_eligibility' => ['required', 'integer'],
-            'start_time' => ['required', 'string'],
-            'end_time' => ['required', 'string'],
-            'game_duration' => ['nullable'],
-            'question_count' => ['nullable']
-        ]);
-
-        $category = Category::where('name', $data['category'])->first();
-
-        $trivia = new Trivia;
-        $trivia->name = $data['name'];
-        $trivia->grand_price = $data['grand_price'];
-        $trivia->point_eligibility = $data['point_eligibility'];
-        $trivia->category_id = $category->id;
-        $trivia->game_mode_id = 1;
-        $trivia->game_type_id = 2;
-        $trivia->start_time = $data['start_time'];
-        $trivia->end_time = $data['end_time'];
-        $trivia->is_published = false;
-        $trivia->save();
-
-        if (isset($data['game_duration']) &&  !is_null($data['game_duration'])) {
-            $trivia->game_duration = $data['game_duration'];
-            $trivia->save();
-        };
-        if (isset($data['question_count']) &&  !is_null($data['question_count'])) {
-            $trivia->question_count = $data['question_count'];
-            $trivia->save();
-        }
-
-
-        $questions = $trivia->category->questions()
-            ->whereNull('deleted_at')
-            ->where('is_published', true)->inRandomOrder()->take($data['question_count'] + 10)->get();
-
-        foreach ($questions as $q) {
-            TriviaQuestion::create([
-                'trivia_id' => $trivia->id,
-                'question_id' => $q->id
-            ]);
-        }
-
-        return $this->sendResponse(true, "Triva saved");
-    }
-
     public function getTrivia()
     {
         $trivia = Trivia::where('is_published', true)->orderBy('created_at', 'DESC')->limit(10)->get();

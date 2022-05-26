@@ -49,7 +49,6 @@ Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::post('trivia/questions/save', [TriviaController::class, 'saveTriviaQuestions']);
-        Route::post('trivia/create', [TriviaController::class, 'createTrivia']);
     }
 );
 
