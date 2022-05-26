@@ -69,22 +69,6 @@ class LiveTriviaTest extends TestCase
         $response->assertJsonCount(1, $key = 'data');
     }
 
-
-    public function test_live_trivia_can_be_created(){
-        $response = $this->post('/api/v3/trivia/create',[
-            'name' => 'Test Trivia',
-            'category' => 'Naija Music',
-            'grand_price' => 1000,
-            'point_eligibility' => 0,
-            'start_time' => '2022/05/06 02:04:00',
-            'end_time' => '2022/05/07 02:04:00',
-            'game_duration' => 180,
-            'question_count' => 30
-        ]);
-
-        $response->assertStatus(200);
-    }
-
     public function test_live_trivia_can_be_started(){
         Question::factory()
         ->count(50)
