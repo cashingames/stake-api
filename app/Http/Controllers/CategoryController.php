@@ -11,29 +11,29 @@ use Illuminate\Http\Request;
 class CategoryController extends BaseController
 {
 
-    public function timesPlayed($catId)
-    {
-        $category = Category::find($catId);
-        if ($category === null) {
-            return $this->sendError("Invalid Category", " Invalid Category");
-        }
+    // public function timesPlayed($catId)
+    // {
+    //     $category = Category::find($catId);
+    //     if ($category === null) {
+    //         return $this->sendError("Invalid Category", " Invalid Category");
+    //     }
 
-        $hasSubCategory = Category::where('category_id', $category->id)->get();
+    //     $hasSubCategory = Category::where('category_id', $category->id)->get();
 
-        if (count($hasSubCategory) == 0) {
-            $countAsUser = GameSession::where('category_id', $category->id)->where('user_id', $this->user->id)->count();
-            $countAsOpponent = GameSession::where('category_id', $category->id)->where('opponent_id', $this->user->id)->count();
+    //     if (count($hasSubCategory) == 0) {
+    //         $countAsUser = GameSession::where('category_id', $category->id)->where('user_id', $this->user->id)->count();
+    //         $countAsOpponent = GameSession::where('category_id', $category->id)->where('opponent_id', $this->user->id)->count();
 
-            return $this->sendResponse($countAsUser + $countAsOpponent, " times played");
-        }
+    //         return $this->sendResponse($countAsUser + $countAsOpponent, " times played");
+    //     }
 
-        $subPlayedCount = [];
-        foreach ($hasSubCategory as $sub) {
-            $countAsUser = GameSession::where('category_id', $sub->id)->where('user_id', $this->user->id)->count();
-            $countAsOpponent = GameSession::where('category_id', $sub->id)->where('opponent_id', $this->user->id)->count();
+    //     $subPlayedCount = [];
+    //     foreach ($hasSubCategory as $sub) {
+    //         $countAsUser = GameSession::where('category_id', $sub->id)->where('user_id', $this->user->id)->count();
+    //         $countAsOpponent = GameSession::where('category_id', $sub->id)->where('opponent_id', $this->user->id)->count();
 
-            $subPlayedCount[] = $countAsUser + $countAsOpponent;
-        }
-        return $this->sendResponse(array_sum($subPlayedCount), " times played");
-    }
+    //         $subPlayedCount[] = $countAsUser + $countAsOpponent;
+    //     }
+    //     return $this->sendResponse(array_sum($subPlayedCount), " times played");
+    // }
 }

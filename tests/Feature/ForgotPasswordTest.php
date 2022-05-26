@@ -5,11 +5,12 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-
 use App\Models\User;
 use App\Mail\TokenGenerated;
+use Illuminate\Support\Carbon;
 use UserSeeder;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class ForgotPasswordTest extends TestCase
 {   
@@ -22,6 +23,7 @@ class ForgotPasswordTest extends TestCase
 
     protected $user;
     const RESET_EMAIL_URL = '/api/auth/password/email';
+    const VERIFY_TOKEN_URL = '/api/auth/token/verify';
 
     protected function setUp(): void{
         parent::setUp();
@@ -47,6 +49,44 @@ class ForgotPasswordTest extends TestCase
         ]);
 
         $response->assertStatus(400);
+    }
+
+    public function test_that_reset_token_can_be_verified(){
+        $now = Carbon::now();
+        $token = mt_rand(10000,99999);
+
+        DB::table('password_resets')->insert(['token' => $token, 
+        'email' => $this->user->email, 'created_at' => $now]);
+
+        $response = $this->postjson(self::VERIFY_TOKEN_URL,[
+            "token" => strval($token),
+        ]);
+
+        $response->assertStatus(200);
+
+    }
+
+    public function test_that_reset_token_must_be_of_type_string(){
+       
+        $response = $this->postjson(self::VERIFY_TOKEN_URL,[
+            "token" => 3466,
+        ]);
+
+        $response->assertJson([
+            'message' => 'The token must be a string.',
+        ]);
+
+    }
+
+    public function test_that_reset_token_must_exist_to_be_verified(){
+    
+        $response = $this->postjson(self::VERIFY_TOKEN_URL,[
+            "token" => "9850",
+        ]);
+
+        $response->assertJson([
+            'message' => 'Invalid verification code',
+        ]);
     }
 
 }

@@ -246,91 +246,7 @@ class GameController extends BaseController
         return $this->sendResponse($result, 'Game Started');
     }
 
-    public function startChallenge(Request $request)
-    {
-        if ($request->modeId == 2 && !($request->has('challengeId'))) {
-            return $this->sendError('Challenge Mode requires the Challenge Id', 'Challenge Mode requires the Challenge Id');
-        }
-        if ($request->modeId == 2 && !($request->has('opponentId'))) {
-            return $this->sendError('Challenge Mode requires an Opponent', 'Challenge Mode requires an Opponent');
-        }
 
-        if ($request->has('challengeId') && $request->has('opponentId')) {
-            $challenge = Challenge::find($request->challengeId);
-
-            if ($challenge === null) {
-                return $this->sendError(
-                    'Opponent is yet to accept the challenge',
-                    'Opponent is yet to accept the challenge.
-                You will be notified when your challenge request is accepted'
-                );
-            }
-            $opponent = User::find($request->opponentId);
-
-            if (($opponent === null)) {
-                return $this->sendError(
-                    'Invalid Opponent',
-                    'Invalid Opponent'
-                );
-            }
-            $subCat = Category::find($request->subCatId);
-            $gameType = GameType::find($request->gameTypeId);
-            $mode = Mode::find($request->modeId);
-
-            if (($subCat || $gameType || $mode) === null) {
-                return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
-            }
-
-            $isSelected = Question::where('challenge_id', $challenge->id)->get();
-
-            if (count($isSelected) == 0) {
-                $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-                $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-                $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
-
-                $selectedQuestions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
-
-                //tag questions to challenge
-                foreach ($selectedQuestions as $q) {
-                    Question::where('id', $q->id)->update([
-                        'challenge_id' => $challenge->id,
-                    ]);
-                }
-
-                $gameSession = new GameSession();
-
-                $gameSession->user_id = $this->user->id;
-                $gameSession->mode_id = $mode->id;
-                $gameSession->game_type_id = $gameType->id;
-                $gameSession->category_id = $subCat->id;
-                $gameSession->challenge_id = $request->challengeId;
-                $gameSession->opponent_id = $opponent->id;
-                $gameSession->session_token = Str::random(40);
-                $gameSession->start_time = Carbon::now();
-                $gameSession->end_time = Carbon::now()->addMinutes(1);
-                $gameSession->state = 'ONGOING';
-                $gameSession->save();
-
-                $challenge->game_session_id = $gameSession->id;
-                $challenge->save();
-
-                $result = [
-                    'questions' => $selectedQuestions,
-                    'game' => $gameSession
-                ];
-                return $this->sendResponse($result, 'Game Started');
-            }
-
-            $gameSession = GameSession::where('id', $challenge->game_session_id)->first();
-            $result = [
-                'questions' => $isSelected,
-                'game' => $gameSession
-            ];
-
-            return $this->sendResponse($result, 'Game Started');
-        }
-        return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
-    }
 
     private function giftReferrerOnFirstGame()
     {
@@ -426,179 +342,263 @@ class GameController extends BaseController
         return $this->sendResponse($game, 'Game Ended');
     }
 
+        // public function startChallenge(Request $request)
+    // {
+    //     if ($request->modeId == 2 && !($request->has('challengeId'))) {
+    //         return $this->sendError('Challenge Mode requires the Challenge Id', 'Challenge Mode requires the Challenge Id');
+    //     }
+    //     if ($request->modeId == 2 && !($request->has('opponentId'))) {
+    //         return $this->sendError('Challenge Mode requires an Opponent', 'Challenge Mode requires an Opponent');
+    //     }
 
-    public function endChallengeGame(Request $request)
-    {
-        $request->validate([
-            'sessionToken' => ['required', 'string'],
-            'opponentId' => ['required', 'string'],
-            'userPointsGained' => ['required', 'string'],
-            'userWrongCount' => ['required', 'string'],
-            'userCorrectCount' => ['required', 'string'],
-            'opponentPointsGained' => ['required', 'string'],
-            'opponentWrongCount' => ['required', 'string',],
-            'opponentCorrectCount' => ['required', 'string'],
-        ]);
+    //     if ($request->has('challengeId') && $request->has('opponentId')) {
+    //         $challenge = Challenge::find($request->challengeId);
 
-        $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
+    //         if ($challenge === null) {
+    //             return $this->sendError(
+    //                 'Opponent is yet to accept the challenge',
+    //                 'Opponent is yet to accept the challenge.
+    //             You will be notified when your challenge request is accepted'
+    //             );
+    //         }
+    //         $opponent = User::find($request->opponentId);
 
-        if ($gameSession == null) {
-            return $this->sendError('Game Session does not exist', 'Game Session does not exist');
-        }
-        //credit user with points
-        $isChallenge = Mode::where("id", $gameSession->mode_id)->first();
+    //         if (($opponent === null)) {
+    //             return $this->sendError(
+    //                 'Invalid Opponent',
+    //                 'Invalid Opponent'
+    //             );
+    //         }
+    //         $subCat = Category::find($request->subCatId);
+    //         $gameType = GameType::find($request->gameTypeId);
+    //         $mode = Mode::find($request->modeId);
 
-        if (($isChallenge->name) != "Challenge") {
-            return $this->sendError('This Game was not played in Challenge mode', 'This Game was not played in Challenge mode');
-        }
+    //         if (($subCat || $gameType || $mode) === null) {
+    //             return $this->sendResponse('Invalid subcategory, game type or mode.', 'Invalid subcategory, game type or mode.');
+    //         }
 
-        $this->creditPoints($this->user->id, $request->userPointsGained, "Points gained from correct game answers");
-        //credit opponent with points
-        $this->creditPoints($request->opponentId, $request->opponentPointsGained, "Points gained from correct game answers");
+    //         $isSelected = Question::where('challenge_id', $challenge->id)->get();
 
-        //save  details
-        $gameSession->state = "COMPLETED";
-        $gameSession->user_points_gained = $request->userPointsGained;
-        $gameSession->user_wrong_count = $request->userWrongCount;
-        $gameSession->user_correct_count = $request->userCorrectCount;
-        $gameSession->opponent_points_gained = $request->opponentPointsGained;
-        $gameSession->opponent_wrong_count = $request->opponentWrongCount;
-        $gameSession->opponent_correct_count = $request->opponentCorrectCount;
+    //         if (count($isSelected) == 0) {
+    //             $easyQuestions = $subCat->questions()->where('level', 'easy')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
+    //             $mediumQuestions =  $subCat->questions()->where('level', 'medium')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
+    //             $hardQuestions = $subCat->questions()->where('level', 'hard')->where('game_type_id', $gameType->id)->inRandomOrder()->take(config('trivia.game.questions_count') / 3);
 
-        if ($request->userPointsGained > $request->opponentPointsGained) {
-            $gameSession->user_won = true;
-        }
-        if ($request->opponentPointsGained > $request->userPointsGained) {
-            $gameSession->opponent_won = true;
-        }
-        $gameSession->save();
+    //             $selectedQuestions = $hardQuestions->union($mediumQuestions)->union($easyQuestions)->get()->shuffle();
 
-        return $this->sendResponse($gameSession, 'Game Ended');
-    }
+    //             //tag questions to challenge
+    //             foreach ($selectedQuestions as $q) {
+    //                 Question::where('id', $q->id)->update([
+    //                     'challenge_id' => $challenge->id,
+    //                 ]);
+    //             }
 
-    public function consumeBoost($boostId)
-    {
-        $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $boostId)->first();
-        if ($userBoost === null) {
-            return $this->sendError('You are not subscribed to this boost', 'You are not subscribed to this boost');
-        }
+    //             $gameSession = new GameSession();
 
-        if ($userBoost->boost_count <= 0) {
-            return $this->sendError('You have used up this boost', 'You have used up this boost');
-        }
+    //             $gameSession->user_id = $this->user->id;
+    //             $gameSession->mode_id = $mode->id;
+    //             $gameSession->game_type_id = $gameType->id;
+    //             $gameSession->category_id = $subCat->id;
+    //             $gameSession->challenge_id = $request->challengeId;
+    //             $gameSession->opponent_id = $opponent->id;
+    //             $gameSession->session_token = Str::random(40);
+    //             $gameSession->start_time = Carbon::now();
+    //             $gameSession->end_time = Carbon::now()->addMinutes(1);
+    //             $gameSession->state = 'ONGOING';
+    //             $gameSession->save();
 
-        $userBoost->update([
-            'used_count' => $userBoost->used_count + 1,
-            'boost_count' => $userBoost->boost_count - 1
-        ]);
+    //             $challenge->game_session_id = $gameSession->id;
+    //             $challenge->save();
 
-        return $this->sendResponse($userBoost, 'Boost consumed');
-    }
+    //             $result = [
+    //                 'questions' => $selectedQuestions,
+    //                 'game' => $gameSession
+    //             ];
+    //             return $this->sendResponse($result, 'Game Started');
+    //         }
 
-    public function sendChallengeInvite(Request $request)
-    {
-        $request->validate([
-            'opponentId' => ['required'],
-            'categoryId' => ['required'],
-            'gameTypeId' => ['required'],
-        ]);
+    //         $gameSession = GameSession::where('id', $challenge->game_session_id)->first();
+    //         $result = [
+    //             'questions' => $isSelected,
+    //             'game' => $gameSession
+    //         ];
 
-        $opponent = User::find($request->opponentId);
+    //         return $this->sendResponse($result, 'Game Started');
+    //     }
+    //     return $this->sendError('This Challenge could not be started', 'This Challenge could not be started');
+    // }
+    // public function endChallengeGame(Request $request)
+    // {
+    //     $request->validate([
+    //         'sessionToken' => ['required', 'string'],
+    //         'opponentId' => ['required', 'string'],
+    //         'userPointsGained' => ['required', 'string'],
+    //         'userWrongCount' => ['required', 'string'],
+    //         'userCorrectCount' => ['required', 'string'],
+    //         'opponentPointsGained' => ['required', 'string'],
+    //         'opponentWrongCount' => ['required', 'string',],
+    //         'opponentCorrectCount' => ['required', 'string'],
+    //     ]);
 
-        if ($opponent === null) {
-            return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');
-        }
+    //     $gameSession = GameSession::where("session_token", $request->sessionToken)->first();
 
-        $challenge = Challenge::create([
-            'user_id' => $this->user->id,
-            'opponent_id' => $opponent->id,
-            'category_id' => $request->categoryId,
-            'game_type_id' => $request->gameTypeId,
-            'status' => 'PENDING',
-        ]);
+    //     if ($gameSession == null) {
+    //         return $this->sendError('Game Session does not exist', 'Game Session does not exist');
+    //     }
+    //     //credit user with points
+    //     $isChallenge = Mode::where("id", $gameSession->mode_id)->first();
 
-        Mail::send(new ChallengeInvite($opponent, $challenge->id));
-        return $this->sendResponse($challenge, 'Challenge Invite Sent! You will be notified when your opponent responds.');
-    }
+    //     if (($isChallenge->name) != "Challenge") {
+    //         return $this->sendError('This Game was not played in Challenge mode', 'This Game was not played in Challenge mode');
+    //     }
 
-    public function acceptChallenge($challengeId)
-    {
+    //     $this->creditPoints($this->user->id, $request->userPointsGained, "Points gained from correct game answers");
+    //     //credit opponent with points
+    //     $this->creditPoints($request->opponentId, $request->opponentPointsGained, "Points gained from correct game answers");
 
-        $challenge = Challenge::find($challengeId);
+    //     //save  details
+    //     $gameSession->state = "COMPLETED";
+    //     $gameSession->user_points_gained = $request->userPointsGained;
+    //     $gameSession->user_wrong_count = $request->userWrongCount;
+    //     $gameSession->user_correct_count = $request->userCorrectCount;
+    //     $gameSession->opponent_points_gained = $request->opponentPointsGained;
+    //     $gameSession->opponent_wrong_count = $request->opponentWrongCount;
+    //     $gameSession->opponent_correct_count = $request->opponentCorrectCount;
 
-        if ($challenge === null) {
-            return $this->sendError('No challenge found', 'No Challenge found');
-        }
+    //     if ($request->userPointsGained > $request->opponentPointsGained) {
+    //         $gameSession->user_won = true;
+    //     }
+    //     if ($request->opponentPointsGained > $request->userPointsGained) {
+    //         $gameSession->opponent_won = true;
+    //     }
+    //     $gameSession->save();
 
-        $challenge->update(["status" => 'ACCEPTED']);
+    //     return $this->sendResponse($gameSession, 'Game Ended');
+    // }
 
-        $opponent = User::where("id", $challenge->user_id)->first();
-        $me = User::where("id", $challenge->opponent_id)->first();
+    // public function consumeBoost($boostId)
+    // {
+    //     $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $boostId)->first();
+    //     if ($userBoost === null) {
+    //         return $this->sendError('You are not subscribed to this boost', 'You are not subscribed to this boost');
+    //     }
 
-        $result = [
-            "challenge" => $challenge,
-            "opponent" => $opponent
-        ];
+    //     if ($userBoost->boost_count <= 0) {
+    //         return $this->sendError('You have used up this boost', 'You have used up this boost');
+    //     }
 
-        //notify challenger of accepted challenge
-        Notification::create([
-            'user_id' => $challenge->user_id,
-            'title' => 'CHALLENGE ACCEPTED',
-            'message' => $me->username . ' has accepted your challenge. Start game here: ' . config("app.web_app_url") . '/duel/profile',
-        ]);
-        return $this->sendResponse($result, 'Challenge Accepted');
-    }
+    //     $userBoost->update([
+    //         'used_count' => $userBoost->used_count + 1,
+    //         'boost_count' => $userBoost->boost_count - 1
+    //     ]);
 
-    public function declineChallenge($challengeId)
-    {
+    //     return $this->sendResponse($userBoost, 'Boost consumed');
+    // }
 
-        $challenge = Challenge::find($challengeId);
+    // public function sendChallengeInvite(Request $request)
+    // {
+    //     $request->validate([
+    //         'opponentId' => ['required'],
+    //         'categoryId' => ['required'],
+    //         'gameTypeId' => ['required'],
+    //     ]);
 
-        if ($challenge === null) {
-            return $this->sendError('No challenge found', 'No Challenge found');
-        }
+    //     $opponent = User::find($request->opponentId);
 
-        $challenge->update(["status" => "DECLINED"]);
+    //     if ($opponent === null) {
+    //         return $this->sendError('The selected opponent does not exist', 'The selected opponent does not exist');
+    //     }
 
-        $me = User::where("id", $challenge->opponent_id)->first();
+    //     $challenge = Challenge::create([
+    //         'user_id' => $this->user->id,
+    //         'opponent_id' => $opponent->id,
+    //         'category_id' => $request->categoryId,
+    //         'game_type_id' => $request->gameTypeId,
+    //         'status' => 'PENDING',
+    //     ]);
 
-        //notify challenger of declined challenge
-        Notification::create([
-            'user_id' => $challenge->user_id,
-            'title' => 'CHALLENGE DECLINED',
-            'message' => 'Your challenge invite to ' . $me->username . ' was declined.'
-        ]);
+    //     Mail::send(new ChallengeInvite($opponent, $challenge->id));
+    //     return $this->sendResponse($challenge, 'Challenge Invite Sent! You will be notified when your opponent responds.');
+    // }
 
-        return $this->sendResponse("Challenge Declined", 'Challenge Declined');
-    }
+    // public function acceptChallenge($challengeId)
+    // {
 
-    private function getSampleEndData()
-    {
-        return '{
-   "started":true,
-   "ended":false,
-   "token":"1MGuGBwrzjnOVWGIYwvUpK8faHPPtFdriDPHXHQZ",
-   "startTime":"2021-10-27T05:29:38.236304Z",
-   "endTime":"2021-10-27T05:30:38.236366Z",
-   "chosenOptions":[
-      {
-         "id":57,
-         "question_id":"15",
-         "title":"YXQ=",
-         "is_correct":"MA==",
-         "isSelected":true
-      }
-   ],
-   "consumedBoosts":[
-      {
-         "boostId":"4",
-         "questionId":15
-      },
-      {
-         "boostId":"4",
-         "questionId":15
-      }
-   ]
-}';
-    }
+    //     $challenge = Challenge::find($challengeId);
+
+    //     if ($challenge === null) {
+    //         return $this->sendError('No challenge found', 'No Challenge found');
+    //     }
+
+    //     $challenge->update(["status" => 'ACCEPTED']);
+
+    //     $opponent = User::where("id", $challenge->user_id)->first();
+    //     $me = User::where("id", $challenge->opponent_id)->first();
+
+    //     $result = [
+    //         "challenge" => $challenge,
+    //         "opponent" => $opponent
+    //     ];
+
+    //     //notify challenger of accepted challenge
+    //     Notification::create([
+    //         'user_id' => $challenge->user_id,
+    //         'title' => 'CHALLENGE ACCEPTED',
+    //         'message' => $me->username . ' has accepted your challenge. Start game here: ' . config("app.web_app_url") . '/duel/profile',
+    //     ]);
+    //     return $this->sendResponse($result, 'Challenge Accepted');
+    // }
+
+    // public function declineChallenge($challengeId)
+    // {
+
+    //     $challenge = Challenge::find($challengeId);
+
+    //     if ($challenge === null) {
+    //         return $this->sendError('No challenge found', 'No Challenge found');
+    //     }
+
+    //     $challenge->update(["status" => "DECLINED"]);
+
+    //     $me = User::where("id", $challenge->opponent_id)->first();
+
+    //     //notify challenger of declined challenge
+    //     Notification::create([
+    //         'user_id' => $challenge->user_id,
+    //         'title' => 'CHALLENGE DECLINED',
+    //         'message' => 'Your challenge invite to ' . $me->username . ' was declined.'
+    //     ]);
+
+    //     return $this->sendResponse("Challenge Declined", 'Challenge Declined');
+    // }
+
+//     private function getSampleEndData()
+//     {
+//         return '{
+//    "started":true,
+//    "ended":false,
+//    "token":"1MGuGBwrzjnOVWGIYwvUpK8faHPPtFdriDPHXHQZ",
+//    "startTime":"2021-10-27T05:29:38.236304Z",
+//    "endTime":"2021-10-27T05:30:38.236366Z",
+//    "chosenOptions":[
+//       {
+//          "id":57,
+//          "question_id":"15",
+//          "title":"YXQ=",
+//          "is_correct":"MA==",
+//          "isSelected":true
+//       }
+//    ],
+//    "consumedBoosts":[
+//       {
+//          "boostId":"4",
+//          "questionId":15
+//       },
+//       {
+//          "boostId":"4",
+//          "questionId":15
+//       }
+//    ]
+// }';
+//     }
 }

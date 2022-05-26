@@ -45,11 +45,11 @@ class LoginTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_login_with_invalid_credentials()
+    public function a_user_cannot_login_with_non_existent_email()
     {
 
         $response = $this->postjson(self::AUTH_URL, [
-            "email" => "4995858595",
+            "email" => "4995858595@email.com",
             "password" => "kkkfjffj",
         ]);
 
@@ -79,4 +79,29 @@ class LoginTest extends TestCase
 
         $response->assertStatus(400);
     }
+
+    public function test_a_user_can_login_with_username()
+    {
+
+        $response = $this->postjson(self::AUTH_URL, [
+            "email" => $this->user->username,
+            "password" => "password",
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_a_user_cannot_login_with_non_existent_username()
+    {
+
+        $response = $this->postjson(self::AUTH_URL, [
+            "email" => "randomString",
+            "password" => "password",
+        ]);
+
+        $response->assertJson([
+            'error' => 'Invalid email or password',
+        ]);
+    }
+    
 }
