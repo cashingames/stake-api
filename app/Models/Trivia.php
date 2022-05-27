@@ -59,7 +59,11 @@ class Trivia extends Model
 
     public function getCountdownStartTimeSpanAttribute()
     {   
-       return Carbon::parse($this->start_time, 'Africa/Lagos')->diffInMilliseconds(Carbon::now('Africa/Lagos')); 
+        if (Carbon::parse($this->start_time, 'Africa/Lagos') >= Carbon::now('Africa/Lagos')){
+            return Carbon::parse($this->start_time, 'Africa/Lagos')
+            ->diffInMilliseconds(Carbon::now('Africa/Lagos')); 
+        }
+        return null;
     }
 
     /**
