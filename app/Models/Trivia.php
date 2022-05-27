@@ -15,7 +15,7 @@ class Trivia extends Model
     protected $table = 'trivias';
 
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published'];
-    protected $appends = ['is_active', 'has_played', 'countdown_start_timespan'];
+    protected $appends = ['is_active', 'has_played', 'start_timespan'];
     protected $casts = ['is_published' => 'boolean'];
 
     public function category()
@@ -57,13 +57,13 @@ class Trivia extends Model
         return true;
     }
 
-    public function getCountdownStartTimeSpanAttribute()
+    public function getStartTimeSpanAttribute()
     {   
         if (Carbon::parse($this->start_time, 'Africa/Lagos') >= Carbon::now('Africa/Lagos')){
             return Carbon::parse($this->start_time, 'Africa/Lagos')
             ->diffInMilliseconds(Carbon::now('Africa/Lagos')); 
         }
-        return null;
+        return 0;
     }
 
     /**
