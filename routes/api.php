@@ -48,6 +48,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
 Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::get('game/common', [GameController::class, 'getCommonData']);
+        Route::post('paystack/transaction/webhook', [WalletController::class, "paystack_webhook"]);
     }
 );
 
