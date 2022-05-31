@@ -41,14 +41,13 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('user/profile', [UserController::class, 'profile']);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
-        Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getTriviaData']);
+        Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
     }
 );
 
 Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::post('trivia/questions/save', [TriviaController::class, 'saveTriviaQuestions']);
     }
 );
 
