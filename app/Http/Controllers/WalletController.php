@@ -109,7 +109,7 @@ class WalletController extends BaseController
         return response()->json($result, 200);
     }
 
-    public function paystack_webhook()
+    public function paystackWebhook()
     {   
     
         if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') || !array_key_exists('x-paystack-signature', $_SERVER))
