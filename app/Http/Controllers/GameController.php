@@ -243,6 +243,10 @@ class GameController extends BaseController
 
     private function giftReferrerOnFirstGame()
     {
+        if ($this->user->gameSessions->count() > 1) {
+            return;
+        }
+
         $referrerProfile = $this->user->profile->getReferrerProfile();
 
         if ($referrerProfile === null) {
@@ -250,9 +254,7 @@ class GameController extends BaseController
             return;
         }
 
-        if ($this->user->gameSessions->count() > 1) {
-            return;
-        }
+
 
         if (
             config('trivia.bonus.enabled') &&

@@ -28,9 +28,9 @@ class TriviaController extends BaseController
             INNER JOIN users ON users.id = gs.user_id 
             WHERE gs.trivia_id = ? 
             GROUP BY gs.user_id
-            ORDER BY points DESC 
         ) r
-        JOIN profiles p ON p.user_id = r.user_id';
+        JOIN profiles p ON p.user_id = r.user_id
+        ORDER BY points DESC ';
 
         $leaders = DB::select($query, [$triviaId]);
 
