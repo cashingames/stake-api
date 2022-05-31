@@ -6,6 +6,7 @@ use App\Models\WalletTransaction;
 use App\Models\Plan;
 use App\Models\UserPoint;
 use App\Models\UserPlan;
+use App\Models\User;
 use App\Models\Boost;
 use GuzzleHttp\Client;
 use stdClass;
@@ -108,6 +109,38 @@ class WalletController extends BaseController
         return response()->json($result, 200);
     }
 
+    public function paystackWebhook()
+    {   
+    
+        if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') || !array_key_exists('x-paystack-signature', $_SERVER))
+            exit();
+
+        $input = @file_get_contents("php://input");
+
+        define('PAYSTACK_SECRET_KEY', config('trivia.payment_key'));
+
+        if ($_SERVER['HTTP_X_PAYSTACK_SIGNATURE'] !== hash_hmac('sha512', $input, PAYSTACK_SECRET_KEY))
+            exit();
+
+        http_response_code(200);
+
+        $event = json_decode($input);
+        $user = User::where('email', $event->data->customer->email)->first();
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($event->data->amount) / 100,
+            'description' => 'Fund Wallet',
+            'reference' => $event->data->reference,
+        ]);
+
+        $user->wallet->balance += ($event->data->amount) / 100;
+        $user->wallet->save();
+        
+        exit();
+    }
+
     //when a user chooses to buy boost with points
     public function buyBoostsWithPoints($boostId)
     {
@@ -195,24 +228,25 @@ class WalletController extends BaseController
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
 
-    public function subscribeToPlan($planId){
+    public function subscribeToPlan($planId)
+    {
         $plan = Plan::find($planId);
-        
-        if($plan === null){
+
+        if ($plan === null) {
             return $this->sendError('Plan does not exist', 'Plan does not exist');
         }
 
-        if($plan->price > $this->user->wallet->balance){
+        if ($plan->price > $this->user->wallet->balance) {
             return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
         }
 
         $this->user->wallet->balance -= $plan->price;
-    
+
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
-            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES' ,
+            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'reference' => Str::random(10),
         ]);
 
@@ -221,14 +255,15 @@ class WalletController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $this->user->id,
             'plan_id' => $plan->id,
-            'is_active'=> true,
-            'used_count'=> 0,
+            'is_active' => true,
+            'used_count' => 0,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
 
-        return $this->sendResponse('You have successfully bought '.$plan->game_count .' games',
-        'You have successfully bought '.$plan->game_count .' games');   
-       
+        return $this->sendResponse(
+            'You have successfully bought ' . $plan->game_count . ' games',
+            'You have successfully bought ' . $plan->game_count . ' games'
+        );
     }
 }
