@@ -53,12 +53,6 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
-        $transactionReference = WalletTransaction::where('reference', $reference)->first();
-
-        if($transactionReference !== null){
-            return $this->sendResponse(true, 'Payment was successful');
-        }
-
         $client = new Client();
         $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
@@ -77,24 +71,31 @@ class WalletController extends BaseController
             return $this->_failedPaymentVerification();
         }
 
-        $wallet = $this->user->wallet;
+        $transactionReference = WalletTransaction::where('reference', $reference)->first();
 
-        //#paystack returns in kobo hence divide by 100 for naira
-        $value = ($result->data->amount / 100);
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => $value,
-            'description' => 'Fund Wallet',
-            'reference' => $result->data->reference,
-        ]);
+        if ($transactionReference !== null) {
+            return $this->sendResponse(true, 'Payment was successful');
+        } else {
 
-        $wallet->balance += $value;
-        $wallet->save();
+            $wallet = $this->user->wallet;
 
-        // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
+            //#paystack returns in kobo hence divide by 100 for naira
+            $value = ($result->data->amount / 100);
 
-        return $this->sendResponse(true, 'Payment was successful');
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $value,
+                'description' => 'Fund Wallet',
+                'reference' => $result->data->reference,
+            ]);
+
+            $wallet->balance += $value;
+            $wallet->save();
+            // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
+
+            return $this->sendResponse(true, 'Payment was successful');
+        }
     }
 
     public function getBanks()
@@ -121,30 +122,31 @@ class WalletController extends BaseController
         $input = @file_get_contents("php://input");
         $event = json_decode($input);
 
-        if($event->data->status !== "success"){
+        if ($event->data->status !== "success") {
             return response("", 200);
         }
 
         $transactionReference = WalletTransaction::where('reference', $event->data->reference)->first();
-        
-        if($transactionReference !== null){
+
+        if ($transactionReference !== null) {
+            return response("", 200);
+        } else {
+
+            $user = User::where('email', $event->data->customer->email)->first();
+
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => ($event->data->amount) / 100,
+                'description' => 'Fund Wallet',
+                'reference' => $event->data->reference,
+            ]);
+
+            $user->wallet->balance += ($event->data->amount) / 100;
+            $user->wallet->save();
+            Log::info('recieved info from paystack.');
             return response("", 200);
         }
-
-        $user = User::where('email', $event->data->customer->email)->first();
-
-        WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($event->data->amount) / 100,
-            'description' => 'Fund Wallet',
-            'reference' => $event->data->reference,
-        ]);
-
-        $user->wallet->balance += ($event->data->amount) / 100;
-        $user->wallet->save();
-        Log::info('recieved info from paystack.');
-        return response("", 200);
     }
 
     //when a user chooses to buy boost with points
