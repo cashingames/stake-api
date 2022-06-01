@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use stdClass;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WithdrawalRequest;
+use App\Models\Wallet;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,12 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
+        $transactionReference = WalletTransaction::where('reference', $reference)->first();
+
+        if($transactionReference !== null){
+            return $this->sendResponse(true, 'Payment was successful');
+        }
+
         $client = new Client();
         $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
@@ -111,46 +118,33 @@ class WalletController extends BaseController
 
     public function paymentEventProcessor()
     {
-
-        // Retrieve the request's body and parse it as JSON
         $input = @file_get_contents("php://input");
         $event = json_decode($input);
-        // Do something with $event
-        // echo('recieved info from paystack.');
+
+        if($event->data->status !== "success"){
+            return response("", 200);
+        }
+
+        $transactionReference = WalletTransaction::where('reference', $event->data->reference)->first();
+        
+        if($transactionReference !== null){
+            return response("", 200);
+        }
+
+        $user = User::where('email', $event->data->customer->email)->first();
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($event->data->amount) / 100,
+            'description' => 'Fund Wallet',
+            'reference' => $event->data->reference,
+        ]);
+
+        $user->wallet->balance += ($event->data->amount) / 100;
+        $user->wallet->save();
         Log::info('recieved info from paystack.');
-        Log::info($event);
-
         return response("", 200);
-
-        // if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') || !array_key_exists('x-paystack-signature', $_SERVER))
-        //     exit();
-
-        // $input = @file_get_contents("php://input");
-
-        // define('PAYSTACK_SECRET_KEY', config('trivia.payment_key'));
-
-        // if ($_SERVER['HTTP_X_PAYSTACK_SIGNATURE'] !== hash_hmac('sha512', $input, PAYSTACK_SECRET_KEY))
-        //     exit();
-
-        // http_response_code(200);
-
-        // $event = json_decode($input);
-        // $user = User::where('email', $event->data->customer->email)->first();
-
-        // WalletTransaction::create([
-        //     'wallet_id' => $user->wallet->id,
-        //     'transaction_type' => 'CREDIT',
-        //     'amount' => ($event->data->amount) / 100,
-        //     'description' => 'Fund Wallet',
-        //     'reference' => $event->data->reference,
-        // ]);
-
-        // $user->wallet->balance += ($event->data->amount) / 100;
-        // $user->wallet->save();
-
-        // exit();
-
-
     }
 
     //when a user chooses to buy boost with points
