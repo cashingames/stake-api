@@ -118,6 +118,7 @@ class WalletController extends BaseController
         // Do something with $event
         // echo('recieved info from paystack.');
         Log::info('recieved info from paystack.');
+        Log::info($event);
 
         return response("", 200);
 
