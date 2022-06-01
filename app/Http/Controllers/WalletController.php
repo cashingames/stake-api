@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\Log;
 
 class WalletController extends BaseController
 {
@@ -109,36 +109,47 @@ class WalletController extends BaseController
         return response()->json($result, 200);
     }
 
-    public function paystackWebhook()
-    {   
-    
-        if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') || !array_key_exists('x-paystack-signature', $_SERVER))
-            exit();
+    public function paymentEventProcessor()
+    {
 
+        // Retrieve the request's body and parse it as JSON
         $input = @file_get_contents("php://input");
-
-        define('PAYSTACK_SECRET_KEY', config('trivia.payment_key'));
-
-        if ($_SERVER['HTTP_X_PAYSTACK_SIGNATURE'] !== hash_hmac('sha512', $input, PAYSTACK_SECRET_KEY))
-            exit();
-
-        http_response_code(200);
-
         $event = json_decode($input);
-        $user = User::where('email', $event->data->customer->email)->first();
+        // Do something with $event
+        // echo('recieved info from paystack.');
+        Log::info('recieved info from paystack.');
 
-        WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($event->data->amount) / 100,
-            'description' => 'Fund Wallet',
-            'reference' => $event->data->reference,
-        ]);
+        return response("", 200);
 
-        $user->wallet->balance += ($event->data->amount) / 100;
-        $user->wallet->save();
-        
-        exit();
+        // if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') || !array_key_exists('x-paystack-signature', $_SERVER))
+        //     exit();
+
+        // $input = @file_get_contents("php://input");
+
+        // define('PAYSTACK_SECRET_KEY', config('trivia.payment_key'));
+
+        // if ($_SERVER['HTTP_X_PAYSTACK_SIGNATURE'] !== hash_hmac('sha512', $input, PAYSTACK_SECRET_KEY))
+        //     exit();
+
+        // http_response_code(200);
+
+        // $event = json_decode($input);
+        // $user = User::where('email', $event->data->customer->email)->first();
+
+        // WalletTransaction::create([
+        //     'wallet_id' => $user->wallet->id,
+        //     'transaction_type' => 'CREDIT',
+        //     'amount' => ($event->data->amount) / 100,
+        //     'description' => 'Fund Wallet',
+        //     'reference' => $event->data->reference,
+        // ]);
+
+        // $user->wallet->balance += ($event->data->amount) / 100;
+        // $user->wallet->save();
+
+        // exit();
+
+
     }
 
     //when a user chooses to buy boost with points
