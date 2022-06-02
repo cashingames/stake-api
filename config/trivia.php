@@ -25,7 +25,8 @@ return [
     'questions_count'=>env('GAME_QUESTIONS_COUNT',10),
   ],
   'live_trivia'=>[
-    'enabled' => env('HAS_LIVE_TRIVIA',false)
+    'enabled' => env('HAS_LIVE_TRIVIA',false),
+    'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
