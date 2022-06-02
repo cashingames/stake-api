@@ -15,7 +15,7 @@ class Trivia extends Model
     protected $table = 'trivias';
 
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published'];
-    protected $appends = ['is_active', 'has_played', 'start_timespan'];
+    protected $appends = ['is_active', 'has_played', 'start_timespan', 'status'];
     protected $casts = ['is_published' => 'boolean'];
 
     public function category()
@@ -64,6 +64,10 @@ class Trivia extends Model
                 ->diffInMilliseconds(Carbon::now('Africa/Lagos'));
         }
         return 0;
+    }
+
+    public function getStatusAttribute()
+    {
     }
 
     /**
