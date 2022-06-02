@@ -108,9 +108,10 @@ class GameController extends BaseController
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
         $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
-        $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
+        $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return playedStatus for users that have played and status 
+        $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
 
-        return $this->sendResponse($result, "");
+        return $this->sendResponse($result, "Common data");
     }
 
     private function getTriviaState()
@@ -238,8 +239,6 @@ class GameController extends BaseController
 
         return $this->sendResponse($result, 'Game Started');
     }
-
-
 
     private function giftReferrerOnFirstGame()
     {

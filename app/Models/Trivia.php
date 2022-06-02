@@ -58,10 +58,10 @@ class Trivia extends Model
     }
 
     public function getStartTimeSpanAttribute()
-    {   
-        if (Carbon::parse($this->start_time, 'Africa/Lagos') >= Carbon::now('Africa/Lagos')){
+    {
+        if (Carbon::parse($this->start_time, 'Africa/Lagos') >= Carbon::now('Africa/Lagos')) {
             return Carbon::parse($this->start_time, 'Africa/Lagos')
-            ->diffInMilliseconds(Carbon::now('Africa/Lagos')); 
+                ->diffInMilliseconds(Carbon::now('Africa/Lagos'));
         }
         return 0;
     }
@@ -77,6 +77,14 @@ class Trivia extends Model
         $query
             ->where('is_published', true)
             ->where('start_time', '>=', Carbon::now('Africa/Lagos'))
+            ->orderBy('start_time', 'ASC');
+    }
+
+    public function scopeOngoingLiveTrivia($query): void
+    {
+        $query
+            ->where('is_published', true)
+            ->where('end_time', '>=', Carbon::now('Africa/Lagos')->addHour(1))
             ->orderBy('start_time', 'ASC');
     }
 }
