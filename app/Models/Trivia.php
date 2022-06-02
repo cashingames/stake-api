@@ -68,6 +68,38 @@ class Trivia extends Model
 
     public function getStatusAttribute()
     {
+        /**
+         * Status : 1) When a live trivia is published but start time has not reached 
+         *              State = "UP COMING"
+         *          2) When a live trivia is published and start time has reached but end time has not
+         *              State = "RUNNING or IN PROGRESS"
+         *          3) When a live trivia is published and start time and end time has passed
+         *              State = "CLOSED"
+         *          4) When a live trivia is published and is closed , but end time is X-time ago
+         *              State = "EXPIRED"
+         */
+        if ($this->is_published) {
+            if (($this->start_time > Carbon::now('Africa/Lagos')) &&
+                ($this->end_time > Carbon::now('Africa/Lagos'))
+            ) {
+                return "UP_COMING";
+            }
+            if (($this->start_time <= Carbon::now('Africa/Lagos')) &&
+                ($this->end_time > Carbon::now('Africa/Lagos'))
+            ) {
+                return "RUNNING";
+            }
+            if (($this->start_time <= Carbon::now('Africa/Lagos')) &&
+                ($this->end_time <= Carbon::now('Africa/Lagos'))
+            ) {
+                if (Carbon::parse($this->end_time, 'Africa/Lagos')->addHour(config('trivia.live_trivia.display_shelf_life')) 
+                <= Carbon::now('Africa/Lagos')) {
+                    return "EXPIRED";
+                }
+                return "CLOSED";
+            }
+        }
+        return "UNPUBLISHED";
     }
 
     /**
