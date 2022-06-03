@@ -36,8 +36,8 @@ class Trivia extends Model
     public function getIsActiveAttribute()
     {
         if ($this->is_published) {
-            if (($this->start_time <= Carbon::now()) &&
-                ($this->end_time > Carbon::now())
+            if (($this->start_time <= now()) &&
+                ($this->end_time > now())
             ) {
                 return true;
             }
@@ -58,7 +58,7 @@ class Trivia extends Model
     public function getStartTimeSpanAttribute()
     {
         $start = Carbon::parse($this->start_time);
-        if ($start >= now()) {
+        if ($start >= Carbon::now()) {
             return $start->diffInMilliseconds(now());
         }
         return 0;
@@ -78,7 +78,7 @@ class Trivia extends Model
             $status = "WAITING";
         } else if ($end > now()) {
             $status =  "ONGOING";
-        } else if ($end->addHour(config('trivia.live_trivia.display_shelf_life')) > now()) {
+        } else if ($end->addHour(config('trivia.live_trivia.display_shelf_life')) >  now()) {
             $status =  "CLOSED";
         } else {
             $status =  "EXPIRED";
