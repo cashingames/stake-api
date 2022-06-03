@@ -44,22 +44,11 @@ class UserController extends BaseController
         $result->boosts = $this->user->userBoosts();
         $result->achievements = $this->user->userAchievements();
         $result->recentGames = $this->user->recentGames();
-        $result->transactions = $this->user->userTransactions();
-        $result->friends = $this->user->friends();
-        $result->pointsTransaction = $this->user->getUserPointTransactions();
+        $result->transactions = $this->user->userTransactions(); //remove to wallet endpint
+        // $result->friends = $this->user->friends(); //remove to friends screen
+        $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();
-
-        // $result->gamePerformance = 
-        /**
-         * 1.fetch userscore last weeks
-         * 2.fetch userscore last two weeks
-         * 
-         * if( 1 > 2) then increase, % increase = (1-2)%. gamePermance = Your result was up X% last week. You can try harder this week.
-         * else if( 2 > 1) then decrease % decrease = (2-1)% gamePermance = Oops, your result was X% down last week. You can try harder this week.
-         * 
-         * return 
-         */
 
         return $this->sendResponse($result, 'User details');
     }

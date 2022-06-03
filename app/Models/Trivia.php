@@ -36,8 +36,8 @@ class Trivia extends Model
     public function getIsActiveAttribute()
     {
         if ($this->is_published) {
-            if (($this->start_time <= Carbon::now('Africa/Lagos')) &&
-                ($this->end_time > Carbon::now('Africa/Lagos'))
+            if (($this->start_time <= Carbon::now()) &&
+                ($this->end_time > Carbon::now())
             ) {
                 return true;
             }
@@ -49,57 +49,42 @@ class Trivia extends Model
     public function getHasPlayedAttribute()
     {
         $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
-
         if ($gameSession === null) {
             return false;
         }
-
         return true;
     }
 
     public function getStartTimeSpanAttribute()
     {
-        if (Carbon::parse($this->start_time, 'Africa/Lagos') >= Carbon::now('Africa/Lagos')) {
-            return Carbon::parse($this->start_time, 'Africa/Lagos')
-                ->diffInMilliseconds(Carbon::now('Africa/Lagos'));
+        $start = Carbon::parse($this->start_time);
+        if ($start >= now()) {
+            return $start->diffInMilliseconds(now());
         }
         return 0;
     }
 
     public function getStatusAttribute()
     {
-        /**
-         * Status : 1) When a live trivia is published but start time has not reached 
-         *              State = "UP COMING"
-         *          2) When a live trivia is published and start time has reached but end time has not
-         *              State = "RUNNING or IN PROGRESS"
-         *          3) When a live trivia is published and start time and end time has passed
-         *              State = "CLOSED"
-         *          4) When a live trivia is published and is closed , but end time is X-time ago
-         *              State = "EXPIRED"
-         */
-        if ($this->is_published) {
-            if (($this->start_time > Carbon::now('Africa/Lagos')) &&
-                ($this->end_time > Carbon::now('Africa/Lagos'))
-            ) {
-                return "UP_COMING";
-            }
-            if (($this->start_time <= Carbon::now('Africa/Lagos')) &&
-                ($this->end_time > Carbon::now('Africa/Lagos'))
-            ) {
-                return "RUNNING";
-            }
-            if (($this->start_time <= Carbon::now('Africa/Lagos')) &&
-                ($this->end_time <= Carbon::now('Africa/Lagos'))
-            ) {
-                if (Carbon::parse($this->end_time, 'Africa/Lagos')->addHour(config('trivia.live_trivia.display_shelf_life')) 
-                <= Carbon::now('Africa/Lagos')) {
-                    return "EXPIRED";
-                }
-                return "CLOSED";
-            }
+        $status = "";
+        if (!$this->is_published) {
+            return $status;
         }
-        return "UNPUBLISHED";
+
+        $start = Carbon::parse($this->start_time);
+        $end =  Carbon::parse($this->end_time);
+
+        if ($start > now()) {
+            $status = "WAITING";
+        } else if ($end > now()) {
+            $status =  "ONGOING";
+        } else if ($end->addHour(config('trivia.live_trivia.display_shelf_life')) > now()) {
+            $status =  "CLOSED";
+        } else {
+            $status =  "EXPIRED";
+        }
+
+        return $status;
     }
 
     /**
@@ -112,7 +97,7 @@ class Trivia extends Model
     {
         $query
             ->where('is_published', true)
-            ->where('start_time', '>=', Carbon::now('Africa/Lagos'))
+            ->where('start_time', '>=', Carbon::now())
             ->orderBy('start_time', 'ASC');
     }
 
@@ -120,7 +105,7 @@ class Trivia extends Model
     {
         $query
             ->where('is_published', true)
-            ->where('end_time', '>=', Carbon::now('Africa/Lagos')->addHour(1))
+            ->where('end_time', '>=', Carbon::now()->addHour(1))
             ->orderBy('start_time', 'ASC');
     }
 }

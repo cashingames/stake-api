@@ -25,6 +25,7 @@ class GameController extends BaseController
 {
     public function getCommonData()
     {
+
         $result = new stdClass;
         $result->achievements = Achievement::all();
         $result->boosts = Boost::all();
@@ -205,21 +206,29 @@ class GameController extends BaseController
             }
             $gameSession->trivia_id = $request->trivia;
         } else {
-            $questions = $category->questions()
-                ->whereNull('deleted_at')
-                ->where('is_published', true)->inRandomOrder()->take(20)->get()->shuffle();
 
             $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
             if ($plan == null) {
                 return $this->sendResponse('No available games', 'No available games');
-            } else {
-                $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-                $userPlan->update(['used_count' => $userPlan->used_count + 1]);
-
-                if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
-                    $userPlan->update(['is_active' => false]);
-                }
             }
+
+            $query = $category
+                ->questions()
+                ->where('is_published', true);
+
+            if ($plan->is_free) {
+                $query = $query->where('level', 'easy');
+            }
+
+            $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
+
+            $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
+            $userPlan->update(['used_count' => $userPlan->used_count + 1]);
+
+            if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
+                $userPlan->update(['is_active' => false]);
+            }
+
             $gameSession->plan_id = $plan->id;
         }
 

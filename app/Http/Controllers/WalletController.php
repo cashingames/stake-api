@@ -53,6 +53,11 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
+
+        if ($transaction = WalletTransaction::where('reference', $reference)->first()) {
+            return $this->sendResponse(true, 'Payment was successful');
+        }
+
         $client = new Client();
         $url = 'https://api.paystack.co/transaction/verify/' . $reference;
         $response = null;
@@ -71,31 +76,25 @@ class WalletController extends BaseController
             return $this->_failedPaymentVerification();
         }
 
-        $transactionReference = WalletTransaction::where('reference', $reference)->first();
+        //#paystack returns in kobo hence divide by 100 for naira
+        $value = ($result->data->amount / 100);
 
-        if ($transactionReference !== null) {
-            return $this->sendResponse(true, 'Payment was successful');
-        } else {
+        $wallet = $this->user->wallet;
+        $wallet->balance += $value;
+        $wallet->save()->reload();
 
-            $wallet = $this->user->wallet;
+        WalletTransaction::create([
+            'wallet_id' => $wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => $value,
+            'balance' => $wallet->balance,
+            'description' => 'Fund Wallet',
+            'reference' => $result->data->reference,
+        ]);
 
-            //#paystack returns in kobo hence divide by 100 for naira
-            $value = ($result->data->amount / 100);
+        // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
 
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $value,
-                'description' => 'Fund Wallet',
-                'reference' => $result->data->reference,
-            ]);
-
-            $wallet->balance += $value;
-            $wallet->save();
-            // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
-
-            return $this->sendResponse(true, 'Payment was successful');
-        }
+        return $this->sendResponse(true, 'Payment was successful');
     }
 
     public function getBanks()
@@ -126,27 +125,27 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        $transactionReference = WalletTransaction::where('reference', $event->data->reference)->first();
-
-        if ($transactionReference !== null) {
-            return response("", 200);
-        } else {
-
-            $user = User::where('email', $event->data->customer->email)->first();
-
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => ($event->data->amount) / 100,
-                'description' => 'Fund Wallet',
-                'reference' => $event->data->reference,
-            ]);
-
-            $user->wallet->balance += ($event->data->amount) / 100;
-            $user->wallet->save();
-            Log::info('recieved info from paystack.');
+        if ($transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
             return response("", 200);
         }
+
+        $user = User::where('email', $event->data->customer->email)->first();
+
+        $user->wallet->balance += ($event->data->amount) / 100;
+        $user->wallet->save();
+        $user->reload();
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($event->data->amount) / 100,
+            'balance' => $user->wallet->balance,
+            'description' => 'Fund Wallet',
+            'reference' => $event->data->reference,
+        ]);
+
+        Log::info('recieved info from paystack.');
+        return response("", 200);
     }
 
     //when a user chooses to buy boost with points
@@ -203,16 +202,18 @@ class WalletController extends BaseController
             return $this->sendError([], 'You do not have enough money in your wallet.');
         }
 
+        $wallet->balance -= $boost->currency_value;
+        $wallet->save();
+
+
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
+            'balance' => $wallet->balance,
             'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
             'reference' => Str::random(10),
         ]);
-
-        $wallet->balance -= $boost->currency_value;
-        $wallet->save();
 
         $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
 
@@ -249,16 +250,17 @@ class WalletController extends BaseController
         }
 
         $this->user->wallet->balance -= $plan->price;
+        $this->user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
+            'balance' => $this->user->wallet->balance,
             'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'reference' => Str::random(10),
         ]);
 
-        $this->user->wallet->save();
 
         DB::table('user_plans')->insert([
             'user_id' => $this->user->id,
