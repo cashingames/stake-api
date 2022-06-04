@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\TriviaQuestion;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
@@ -25,16 +26,24 @@ class GameController extends BaseController
 {
     public function getCommonData()
     {
-
         $result = new stdClass;
-        $result->achievements = Achievement::all();
-        $result->boosts = Boost::all();
-        $result->plans = Plan::where('is_free', false)->orderBy('price', 'ASC')->get();
 
-        $result->gameModes = GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get();
-        $gameTypes = GameType::has('questions')->inRandomOrder()->get();
+        $result->achievements = Cache::rememberForever('achievements', fn () => Achievement::all());
 
-        $categories = Category::all();
+        $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
+
+        $result->plans = Cache::rememberForever('plans', fn () => Plan::where('is_free', false)->orderBy('price', 'ASC')->get());
+
+        $result->gameModes = Cache::rememberForever(
+            'gameModes',
+            fn () =>
+            GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get()
+        );
+
+        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
+
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
+
 
         $gameInfo = DB::select("
                         SELECT 
@@ -108,23 +117,9 @@ class GameController extends BaseController
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
-        $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
-        $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return playedStatus for users that have played and status 
-        $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
+        $result->liveTrivia = Trivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
 
         return $this->sendResponse($result, "Common data");
-    }
-
-    private function getTriviaState()
-    {
-        $trivia = Trivia::where('is_published', true)->where('start_time', '<=', Carbon::now('Africa/Lagos'))
-            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
-            ->get()->count();
-
-        if ($trivia > 0) {
-            return true;
-        }
-        return false;
     }
 
     public function claimAchievement($achievementId)
@@ -178,9 +173,9 @@ class GameController extends BaseController
 
     public function startSingleGame(Request $request)
     {
-        $category = Category::find($request->category);
-        $type = GameType::find($request->type);
-        $mode = GameMode::find($request->mode);
+        $category = Cache::rememberForever(`category-$request->category`, fn () => Category::find($request->category));
+        $type = Cache::rememberForever(`gametype-$request->type`, fn () => GameType::find($request->type));
+        $mode = Cache::rememberForever(`gamemode-$request->mode`, fn () => GameMode::find($request->type));
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -217,7 +212,7 @@ class GameController extends BaseController
                 ->where('is_published', true);
 
             if ($plan->is_free) {
-                $query = $query->where('level', 'easy');
+                $query->whereLevel('easy');
             }
 
             $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
@@ -285,11 +280,6 @@ class GameController extends BaseController
 
     public function endSingleGame(Request $request)
     {
-
-        // $request = json_decode($this->getSampleEndData());
-
-        //get the session information
-
         Log::info($request->all());
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();

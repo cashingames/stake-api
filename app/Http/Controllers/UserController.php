@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Profile;
-use App\Models\GameType;
 use App\Models\UserQuiz;
 use App\Models\OnlineTimeline;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -45,7 +42,7 @@ class UserController extends BaseController
         $result->achievements = $this->user->userAchievements();
         $result->recentGames = $this->user->recentGames();
         $result->transactions = $this->user->userTransactions(); //remove to wallet endpint
-        // $result->friends = $this->user->friends(); //remove to friends screen
+        // $result->friends = $this->user->friends(); //remove to friends screen/endpoints
         $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();

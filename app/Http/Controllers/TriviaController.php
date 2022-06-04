@@ -2,11 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use Illuminate\Http\Request;
 use App\Models\Trivia;
-use App\Models\TriviaQuestion;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class TriviaController extends BaseController

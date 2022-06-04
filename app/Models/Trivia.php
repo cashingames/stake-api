@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -101,11 +100,12 @@ class Trivia extends Model
             ->orderBy('start_time', 'ASC');
     }
 
-    public function scopeOngoingLiveTrivia($query): void
+    public function scopeActive($query): void
     {
+        $closedVisibilityDuration = config('trivia.live_trivia.display_shelf_life');
         $query
             ->where('is_published', true)
-            ->where('end_time', '>=', Carbon::now()->addHour(1))
+            ->where('end_time', '>=', Carbon::now()->addHour($closedVisibilityDuration))
             ->orderBy('start_time', 'ASC');
     }
 }

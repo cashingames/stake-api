@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
 {
-  use HasFactory , SoftDeletes;
+  use HasFactory, SoftDeletes;
 
   protected $with = [
     'options'
@@ -23,7 +23,7 @@ class Question extends Model
     'game_id', 'created_at', 'updated_at'
   ];
 
-  protected $fillable = ['created_by','is_published'];
+  protected $fillable = ['created_by', 'is_published'];
   //
   public function options()
   {
@@ -40,7 +40,8 @@ class Question extends Model
     return $this->hasMany(Game::class);
   }
 
-  public function triviaQuestions(){
+  public function triviaQuestions()
+  {
     return $this->hasMany(TriviaQuestion::class);
   }
 
@@ -50,6 +51,7 @@ class Question extends Model
   }
   public function getLevelAttribute($value)
   {
-    return base64_encode($value);
+    return $value;
+    // return base64_encode($value);
   }
 }
