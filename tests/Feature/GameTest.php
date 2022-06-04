@@ -80,8 +80,7 @@ class GameTest extends TestCase
                 'plans' => [],
                 'gameModes' => [],
                 'gameTypes' => [],
-                'minVersionCode' => [],
-                'hasLiveTrivia' => []
+                'minVersionCode' => []
             ]
         ]);
     }
@@ -89,15 +88,15 @@ class GameTest extends TestCase
     public function test_achievement_can_be_claimed()
     {
         $achievement = Achievement::first();
-        
+
         UserPoint::create([
             'user_id' => $this->user->id,
             'value' => 5000,
-            'description'=> 'Test points added',
-            'point_flow_type'=>'POINTS_ADDED'
+            'description' => 'Test points added',
+            'point_flow_type' => 'POINTS_ADDED'
         ]);
 
-        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL.$achievement->id);
+        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL . $achievement->id);
 
         $response->assertStatus(200);
     }
@@ -105,24 +104,25 @@ class GameTest extends TestCase
     public function test_achievement_cannot_be_claimed_if_points_are_not_enough()
     {
         $achievement = Achievement::first();
-        
-        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL.$achievement->id);
+
+        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL . $achievement->id);
 
         $response->assertJson([
             'errors' => 'You do not have enough points to claim this achievement',
         ]);
     }
 
-    public function test_single_game_can_be_started(){
+    public function test_single_game_can_be_started()
+    {
         Question::factory()
-        ->count(50)
-        ->create();
-        
+            ->count(50)
+            ->create();
+
         UserPlan::create([
             'plan_id' => $this->plan->id,
             'user_id' => $this->user->id,
             'used_count' => 0,
-            'plan_count' =>1,
+            'plan_count' => 1,
             'is_active' => true,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
@@ -139,9 +139,10 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_single_game_can_be_ended_without_boosts_and_options(){
+    public function test_single_game_can_be_ended_without_boosts_and_options()
+    {
         $gameSession = GameSession::first();
-       
+
         $response = $this->postjson(self::END_SINGLE_GAME_URL, [
             "token" => $gameSession->session_token,
             "chosenOptions" => [],
@@ -152,10 +153,11 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_single_game_can_be_ended_with_boosts_and_no_options(){
+    public function test_single_game_can_be_ended_with_boosts_and_no_options()
+    {
         $gameSession = GameSession::first();
         $boost = Boost::inRandomOrder()->first();
-        
+
         UserBoost::create([
             'user_id' => $this->user->id,
             'boost_id' => $boost->id,
@@ -164,19 +166,18 @@ class GameTest extends TestCase
         ]);
 
         $userBoost = $this->user->userBoosts();
-        
+
         $response = $this->postjson(self::END_SINGLE_GAME_URL, [
             "token" => $gameSession->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => [
-                ['boost'=> Boost::where('id',$userBoost[0]->id)->first()]
+                ['boost' => Boost::where('id', $userBoost[0]->id)->first()]
             ]
         ]);
 
-     
+
         $response->assertJson([
             'message' => 'Game Ended',
         ]);
     }
-
 }
