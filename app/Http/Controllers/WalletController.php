@@ -47,48 +47,6 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
-
-        if ($transaction = WalletTransaction::where('reference', $reference)->first()) {
-            return $this->sendResponse(true, 'Payment was successful');
-        }
-
-        $client = new Client();
-        $url = 'https://api.paystack.co/transaction/verify/' . $reference;
-        $response = null;
-        try {
-            $response = $client->request('GET', $url, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
-                ]
-            ]);
-        } catch (\Exception $ex) {
-            return $this->_failedPaymentVerification();
-        }
-
-        $result = \json_decode((string) $response->getBody());
-        if (!$result->status) {
-            return $this->_failedPaymentVerification();
-        }
-
-        //#paystack returns in kobo hence divide by 100 for naira
-        $value = ($result->data->amount / 100);
-
-        $wallet = $this->user->wallet;
-        $wallet->balance += $value;
-
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => $value,
-            'balance' => $wallet->balance,
-            'description' => 'Fund Wallet',
-            'reference' => $result->data->reference,
-        ]);
-
-        $wallet->save();
-
-        Log::info('payment successful from app');
-
         return $this->sendResponse(true, 'Payment was successful');
     }
 
