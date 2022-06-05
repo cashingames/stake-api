@@ -75,7 +75,7 @@ class WalletController extends BaseController
 
         $wallet = $this->user->wallet;
         $wallet->balance += $value;
-        $wallet->save()->reload();
+        $wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
@@ -85,8 +85,6 @@ class WalletController extends BaseController
             'description' => 'Fund Wallet',
             'reference' => $result->data->reference,
         ]);
-
-        // $this->creditPoints($this->user->id, ($value * 5 / 100), "5% cashback for funding wallet");
 
         return $this->sendResponse(true, 'Payment was successful');
     }
@@ -127,7 +125,6 @@ class WalletController extends BaseController
 
         $user->wallet->balance += ($event->data->amount) / 100;
         $user->wallet->save();
-        $user->reload();
 
         WalletTransaction::create([
             'wallet_id' => $user->wallet->id,

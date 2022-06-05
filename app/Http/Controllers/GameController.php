@@ -173,9 +173,9 @@ class GameController extends BaseController
 
     public function startSingleGame(Request $request)
     {
-        $category = Cache::rememberForever(`category-$request->category`, fn () => Category::find($request->category));
-        $type = Cache::rememberForever(`gametype-$request->type`, fn () => GameType::find($request->type));
-        $mode = Cache::rememberForever(`gamemode-$request->mode`, fn () => GameMode::find($request->type));
+        $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
+        $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
+        $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->type));
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -246,7 +246,7 @@ class GameController extends BaseController
 
     private function giftReferrerOnFirstGame()
     {
-        if ($this->user->gameSessions->count() > 1) {
+        if ($this->user->withCount('gameSessions')->first()->game_sessions_count > 1) {
             return;
         }
 
@@ -256,8 +256,6 @@ class GameController extends BaseController
             Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
             return;
         }
-
-
 
         if (
             config('trivia.bonus.enabled') &&
@@ -286,20 +284,20 @@ class GameController extends BaseController
         if ($game === null) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
+        //@TODO Remove after fixing double submission bug.
+        if ($game->state === "COMPLETED") {
+            return $this->sendResponse($game, 'Game Ended');
+        }
 
         $game->end_time = Carbon::now()->subSeconds(1);
         $game->state = 'COMPLETED';
 
-        $questions = Question::whereIn('id', array_column($request->chosenOptions, 'question_id'))->get();
+        $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
         $points = 0;
         $wrongs = 0;
         foreach ($request->chosenOptions as $a) {
 
-            $isCorect = $questions->find($a['question_id'])
-                ->options()
-                ->where('id', $a['id'])
-                ->where('is_correct', true)
-                ->first();
+            $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
 
             if ($isCorect != null) {
                 $points = $points + 1;
