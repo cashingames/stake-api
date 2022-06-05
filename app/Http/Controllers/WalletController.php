@@ -89,6 +89,39 @@ class WalletController extends BaseController
         return $this->sendResponse(true, 'Payment was successful');
     }
 
+
+    public function paymentEventProcessor()
+    {
+        $input = @file_get_contents("php://input");
+        $event = json_decode($input);
+
+        if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
+            return response("", 200);
+        } else {
+            $user = User::where('email', $event->data->customer->email)->first();
+            return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
+        }
+    }
+
+    private function savePaymentTransaction($reference, $user, $amount)
+    {
+        $user->wallet->balance += ($amount) / 100;
+        $user->wallet->save();
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($amount) / 100,
+            'balance' => $user->wallet->balance,
+            'description' => 'Fund Wallet',
+            'reference' => $reference,
+        ]);
+
+        Log::info('payment successful');
+        return response("", 200);
+    }
+
+
     public function getBanks()
     {
         $client = new Client();
@@ -106,39 +139,6 @@ class WalletController extends BaseController
 
         $result = \json_decode((string) $response->getBody());
         return response()->json($result, 200);
-    }
-
-    public function paymentEventProcessor()
-    {
-        $input = @file_get_contents("php://input");
-        $event = json_decode($input);
-
-        if ($event->data->status !== "success") {
-            return response("", 200);
-            exit();
-        }
-
-        if ($transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
-            return response("", 200);
-            exit();
-        }
-
-        $user = User::where('email', $event->data->customer->email)->first();
-
-        $user->wallet->balance += ($event->data->amount) / 100;
-        $user->wallet->save();
-
-        WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($event->data->amount) / 100,
-            'balance' => $user->wallet->balance,
-            'description' => 'Fund Wallet',
-            'reference' => $event->data->reference,
-        ]);
-
-        Log::info('recieved info from paystack.');
-        return response("", 200);
     }
 
     //when a user chooses to buy boost with points
