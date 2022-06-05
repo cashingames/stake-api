@@ -51,7 +51,6 @@ class Question extends Model
   }
   public function getLevelAttribute($value)
   {
-    return $value;
-    // return base64_encode($value);
+    return base64_encode($value);
   }
 }
