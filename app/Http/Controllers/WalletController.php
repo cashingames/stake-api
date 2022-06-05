@@ -75,7 +75,6 @@ class WalletController extends BaseController
 
         $wallet = $this->user->wallet;
         $wallet->balance += $value;
-        $wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $wallet->id,
@@ -85,6 +84,10 @@ class WalletController extends BaseController
             'description' => 'Fund Wallet',
             'reference' => $result->data->reference,
         ]);
+
+        $wallet->save();
+
+        Log::info('payment successful from app');
 
         return $this->sendResponse(true, 'Payment was successful');
     }
@@ -106,7 +109,6 @@ class WalletController extends BaseController
     private function savePaymentTransaction($reference, $user, $amount)
     {
         $user->wallet->balance += ($amount) / 100;
-        $user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
@@ -116,8 +118,9 @@ class WalletController extends BaseController
             'description' => 'Fund Wallet',
             'reference' => $reference,
         ]);
+        $user->wallet->save();
 
-        Log::info('payment successful');
+        Log::info('payment successful from paystack');
         return response("", 200);
     }
 
