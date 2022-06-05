@@ -117,6 +117,8 @@ class GameController extends BaseController
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
+        $result->hasLiveTrivia =  false;
+        $result->upcomingTrivia =  null;
         $result->liveTrivia = Trivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
 
         return $this->sendResponse($result, "Common data");
@@ -175,7 +177,7 @@ class GameController extends BaseController
     {
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
-        $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->type));
+        $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
