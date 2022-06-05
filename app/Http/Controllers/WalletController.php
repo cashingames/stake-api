@@ -115,10 +115,12 @@ class WalletController extends BaseController
 
         if ($event->data->status !== "success") {
             return response("", 200);
+            exit();
         }
 
         if ($transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
             return response("", 200);
+            exit();
         }
 
         $user = User::where('email', $event->data->customer->email)->first();
