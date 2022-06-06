@@ -13,6 +13,8 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LeadersController;
+use App\Http\Controllers\LiveTriviaStatusController;
+use App\Http\Controllers\PlayGroundController;
 use App\Http\Controllers\TriviaController;
 
 /*
@@ -25,6 +27,8 @@ use App\Http\Controllers\TriviaController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('playground', PlayGroundController::class);
 
 Route::post('auth/login', [LoginController::class, 'login']);
 Route::post('auth/google/login', [LoginController::class, 'loginWithGoogle']);
@@ -49,6 +53,7 @@ Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::post('paystack/transaction/webhook/', [WalletController::class, "paymentEventProcessor"]);
+        Route::get('live-trivia/status', LiveTriviaStatusController::class);
     }
 );
 

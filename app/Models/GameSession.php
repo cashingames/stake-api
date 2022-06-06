@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class GameSession extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['plan_id', 'trivia_id'];
 
 
@@ -32,7 +32,13 @@ class GameSession extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function trivia(){
+    public function trivia()
+    {
         return $this->belongsTo(Trivia::class);
+    }
+
+    public function liveTrivia()
+    {
+        return $this->belongsTo(LiveTrivia::class, 'trivia_id');
     }
 }

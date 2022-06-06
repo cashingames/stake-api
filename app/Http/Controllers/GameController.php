@@ -36,8 +36,7 @@ class GameController extends BaseController
 
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn () =>
-            GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get()
+            fn () => GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get()
         );
 
         $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
@@ -117,11 +116,23 @@ class GameController extends BaseController
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
-        $result->hasLiveTrivia =  false;
-        $result->upcomingTrivia =  null;
-        $result->liveTrivia = Trivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
+        $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
+        $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
+        $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
 
         return $this->sendResponse($result, "Common data");
+    }
+
+    private function getTriviaState()
+    {
+        $trivia = Trivia::where('is_published', true)->where('start_time', '<=', Carbon::now('Africa/Lagos'))
+            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
+            ->get()->count();
+
+        if ($trivia > 0) {
+            return true;
+        }
+        return false;
     }
 
     public function claimAchievement($achievementId)
