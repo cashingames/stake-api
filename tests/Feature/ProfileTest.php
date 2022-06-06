@@ -21,6 +21,7 @@ class ProfileTest extends TestCase
      * @return void
      */
 
+    const CHANGE_PASSWORD_URL = '/api/v2/profile/me/password/change';
     protected $user;
 
     protected function setUp(): void
@@ -145,5 +146,44 @@ class ProfileTest extends TestCase
 
         //assert
         $this->assertEquals($response->first_name, $profile1->first_name);
+    }
+
+    public function test_that_password_can_be_changed(){
+        $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
+            'password' => 'password',
+            'new_password' => 'password123',
+            'new_password_confirmation' => 'password123'
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => 'Password Changed!.',
+        ]);
+    }
+
+    public function test_that_old_password_must_be_correct_before_being_changed(){
+        $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
+            'password' => 'password111',
+            'new_password' => 'password123',
+            'new_password_confirmation' => 'password123'
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJson([
+            'message' => 'Old password inputed does not match existing password.',
+        ]);
+    }
+
+    public function test_that_old_password_must_differ_from_new_password(){
+        $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
+            'password' => 'password111',
+            'new_password' => 'password111',
+            'new_password_confirmation' => 'password111'
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJson([
+            'message' => 'The new password must be different from the old password.',
+        ]);
     }
 }
