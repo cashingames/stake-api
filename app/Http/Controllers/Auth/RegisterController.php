@@ -105,13 +105,13 @@ class RegisterController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $user->id,
             'plan_id' => 1,
-            'is_active'=> true,
-            'used_count'=> 0,
+            'is_active' => true,
+            'used_count' => 0,
             'plan_count' => 10,
-            'created_at'=>Carbon::now(),
-            'updated_at'=>Carbon::now()
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
         ]);
-        
+
         //give user sign up bonus
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
@@ -141,13 +141,14 @@ class RegisterController extends BaseController
             $referrerId = 0;
             $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
 
-           if ( $profileReferral === null){
-               $referrerId = User::where('username', $data["referrer"])->first()->id;
-           } else{
-               $referrerId = $profileReferral->user_id;
-           }
-           
-            $this->creditPoints($referrerId, 50, "Referral bonus");
+            if ($profileReferral === null) {
+                $referrerId = User::where('username', $data["referrer"])->first()->id;
+            } else {
+                $referrerId = $profileReferral->user_id;
+            }
+
+            /** @TODO: this needs to be changed to plan */
+            // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
 
         return $user;

@@ -259,7 +259,8 @@ class GameController extends BaseController
 
     private function giftReferrerOnFirstGame()
     {
-        if ($this->user->withCount('gameSessions')->first()->game_sessions_count > 1) {
+        if (GameSession::where('user_id', $this->user->id)->count() > 1) {
+            Log::info($this->user->username . ' has more than 1 game played already, so no referrer bonus check');
             return;
         }
 
@@ -276,6 +277,8 @@ class GameController extends BaseController
             config('trivia.bonus.signup.referral_on_first_game') &&
             isset($referrerProfile)
         ) {
+
+            Log::info('Giving : ' . $this->user->profile->referrer . " bonus for " . $this->user->username);
 
             DB::table('user_plans')->insert([
                 'user_id' => $referrerProfile->user_id,
