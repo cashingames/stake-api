@@ -20,6 +20,13 @@ class DateUtilsTest extends TestCase
 
     }
 
+    public function test_that_date_can_be_converted_to_timezone() {
+      
+        $test = $this->trait->toTimeZone(Carbon::now(),'Africa/Lagos', 'Asia/Baghdad');
+
+        $this->assertEquals(Carbon::parse($test)->timezoneName, 'Asia/Baghdad');
+    }
+
     public function test_that_date_can_be_converted_to_UTC() {
       
         $test = $this->trait->toUtc(Carbon::now(),'Africa/Lagos');
