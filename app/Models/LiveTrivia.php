@@ -14,13 +14,33 @@ class LiveTrivia extends Model
 
     protected $table = 'trivias';
 
-    protected $appends = ['status', 'start_time_utc'];
+    protected $appends = ['status', 'start_time_utc', 'player_status'];
     protected $casts = ['is_published' => 'boolean'];
+
+    public function gameSessions()
+    {
+        return $this->hasMany(GameSession::class);
+    }
 
     public function getStartTimeUtcAttribute()
     {
         return $this->toTimestamp($this->start_time);
     }
+
+    /**
+     * @TODO: Point requirement check
+     */
+    public function getPlayerStatusAttribute()
+    {
+        $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
+
+        if ($gameSession === null) {
+            return "";
+        }
+
+        return "PLAYED";
+    }
+
 
     public function getStatusAttribute()
     {

@@ -13,7 +13,6 @@ class LiveTriviaStatusController extends Controller
      */
     public function __invoke()
     {
-        $liveTrivia = LiveTrivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
-        return $liveTrivia;
+        return LiveTrivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
     }
 }
