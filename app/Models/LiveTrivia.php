@@ -14,6 +14,7 @@ class LiveTrivia extends Model
 
     protected $table = 'trivias';
 
+    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published'];
     protected $appends = ['status', 'start_time_utc', 'player_status'];
     protected $casts = ['is_published' => 'boolean'];
 
@@ -60,7 +61,7 @@ class LiveTrivia extends Model
             $status = "WAITING";
         } else if ($end > now()) {
             $status =  "ONGOING";
-        } else if ($end->addHour(config('trivia.live_trivia.display_shelf_life')) >  now()) {
+        } else if ($end->addHours(config('trivia.live_trivia.display_shelf_life')) >  now()) {
             $status =  "CLOSED";
         } else {
             $status =  "EXPIRED";
