@@ -54,12 +54,6 @@ Route::middleware('auth:api')->prefix('v3')->group(
     }
 );
 
-// Route::middleware('api')->prefix('v3')->group(
-//     function () {
-
-//     }
-// );
-
 Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
     Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);

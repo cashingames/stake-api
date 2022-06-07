@@ -17,4 +17,18 @@ class UserPoint extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeToday($query): void
+    {
+        $query
+            ->where('point_flow_type', 'POINTS_ADDED')
+            ->where('created_at', '>=', now()->startOfDay());
+    }
+
+    public function getCurrentUserPoints($query): int
+    {
+        return $query
+            ->where('user_id', auth()->user()->id)
+            ->sum('value');
+    }
 }

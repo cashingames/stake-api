@@ -30,21 +30,18 @@ class LiveTrivia extends Model
 
     public function getPlayerStatusAttribute()
     {
+        $hasPlayed = $this->gameSessions()->where('user_id', auth()->user()->id)->exists();
+        if ($hasPlayed) {
+            return "PLAYED";
+        }
 
-        $points = auth()->user()->points();
-        /**
-         * @TODO: Point requirement check
-         */
+        $points = UserPoint::today()->getCurrentUserPoints();
+
         if ($points < $this->point_eligibility) {
             return "INSUFFICIENTPOINTS";
         }
 
-        $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
-        if ($gameSession === null) {
-            return "CANPLAY";
-        }
-
-        return "PLAYED";
+        return "CANPLAY";
     }
 
 

@@ -93,6 +93,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserPlan::class);
     }
 
+    public function userPoints()
+    {
+        return $this->hasMany(UserPoint::class);
+    }
+
     public function boosts()
     {
         return $this->hasMany(UserBoost::class);
@@ -185,6 +190,7 @@ class User extends Authenticatable implements JWTSubject
             ->sum('value');
         return $pointsAdded -  $pointsSubtracted;
     }
+
 
     public function getAchievementAttribute()
     {
