@@ -19,7 +19,7 @@ class LiveTrivia extends Model
 
     public function gameSessions()
     {
-        return $this->hasMany(GameSession::class);
+        return $this->hasMany(GameSession::class, 'trivia_id');
     }
 
     public function getStartTimeUtcAttribute()
@@ -27,15 +27,21 @@ class LiveTrivia extends Model
         return $this->toTimestamp($this->start_time);
     }
 
-    /**
-     * @TODO: Point requirement check
-     */
+
     public function getPlayerStatusAttribute()
     {
-        $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
 
+        $points = auth()->user()->points();
+        /**
+         * @TODO: Point requirement check
+         */
+        if ($points < $this->point_eligibility) {
+            return "INSUFFICIENTPOINTS";
+        }
+
+        $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
         if ($gameSession === null) {
-            return "";
+            return "CANPLAY";
         }
 
         return "PLAYED";
