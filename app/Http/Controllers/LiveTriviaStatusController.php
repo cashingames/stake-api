@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\LiveTrivia;
-use App\Traits\Utils\DateUtils;
-use Illuminate\Http\Request;
 
-class LiveTriviaStatusController extends BaseController
+class LiveTriviaStatusController extends Controller
 {
-    use DateUtils;
     /**
      * Single action playground
      *
