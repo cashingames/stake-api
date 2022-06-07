@@ -37,8 +37,6 @@ Route::post('auth/username/verify/{username}', [RegisterController::class, 'veri
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
-Route::post('game/challenge/accept/{challengeId}', [GameController::class, 'acceptChallenge']);
-Route::post('game/challenge/decline/{challengeId}', [GameController::class, 'declineChallenge']);
 
 Route::middleware('auth:api')->prefix('v3')->group(
     function () {
@@ -96,19 +94,14 @@ Route::prefix('v2')->group(function () {
         Route::get('game/categories', [CategoryController::class, 'get']);
         Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'getGameTypeCategories']);
         Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
-        //Route::get('game/all', [CategoryController::class, 'allGames']);
         Route::get('category/times-played/{catId}', [CategoryController::class, 'timesPlayed']);
 
-        Route::get('friends/quizzes', [UserController::class, 'friendQuizzes']);
         Route::get('me/friends', [UserController::class, 'friends']);
 
         Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
-        Route::post('game/start/challenge', [GameController::class, 'startChallenge']);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
-        Route::post('game/end/challenge', [GameController::class, 'endChallengeGame']);
         Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
-        Route::post('game/challenge/invite', [GameController::class, 'sendChallengeInvite']);
         Route::get('leaders/global', [LeadersController::class, 'global']);
         Route::get('leaders/global/{startDate}/{endDate}', [LeadersController::class, 'global']);
         Route::get('leaders/categories', [LeadersController::class, 'categories']);
