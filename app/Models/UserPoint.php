@@ -25,10 +25,9 @@ class UserPoint extends Model
             ->where('created_at', '>=', now()->startOfDay());
     }
 
-    public function getCurrentUserPoints($query): int
+    public function getTotalPointsToday($query): int
     {
-        return $query
-            ->where('user_id', auth()->user()->id)
+        return $query->where('user_id', auth()->user()->id)
             ->sum('value');
     }
 }

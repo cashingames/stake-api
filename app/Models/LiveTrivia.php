@@ -35,7 +35,8 @@ class LiveTrivia extends Model
             return "PLAYED";
         }
 
-        $points = UserPoint::today()->getCurrentUserPoints();
+        $points = UserPoint::today()->where('user_id', auth()->user()->id)
+            ->sum('value');
 
         if ($points < $this->point_eligibility) {
             return "INSUFFICIENTPOINTS";
