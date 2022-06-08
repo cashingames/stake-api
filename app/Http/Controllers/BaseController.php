@@ -12,18 +12,19 @@ class BaseController extends Controller
     public $token;
     public $user;
 
-    function __construct (){
+    function __construct()
+    {
         $this->user = auth()->user();
     }
 
-     /**
+    /**
      * success response method.
      *
      * @return \Illuminate\Http\JsonResponse
-      */
+     */
     public function sendResponse($result, $message)
     {
-    	$response = [
+        $response = [
             'success' => true,
             'data'    => $result,
             'message' => $message,
@@ -33,7 +34,8 @@ class BaseController extends Controller
         return response()->json($response, 200);
     }
 
-    public function sendError($errors, $message){
+    public function sendError($errors, $message)
+    {
         $response = [
             'success' => false,
             'errors'    => $errors,
@@ -43,28 +45,27 @@ class BaseController extends Controller
         return response()->json($response, 400);
     }
 
-    public function creditPoints($userId, $points, $description){
+    public function creditPoints($userId, $points, $description)
+    {
 
         //create point traffic log
         UserPoint::create([
             'user_id' => $userId,
             'value' => $points,
-            'description'=> $description,
-            'point_flow_type'=>'POINTS_ADDED'
+            'description' => $description,
+            'point_flow_type' => 'POINTS_ADDED'
         ]);
-
     }
 
-    public function subtractPoints($userId, $points, $description){
+    public function subtractPoints($userId, $points, $description)
+    {
 
         //create point traffic log
         UserPoint::create([
             'user_id' => $userId,
             'value' => $points,
-            'description'=> $description,
-            'point_flow_type'=>'POINTS_SUBTRACTED'
+            'description' => $description,
+            'point_flow_type' => 'POINTS_SUBTRACTED'
         ]);
-
     }
-
 }
