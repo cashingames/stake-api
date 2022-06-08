@@ -204,6 +204,11 @@ class GameController extends BaseController
 
         if ($request->has('trivia')) {
 
+            //ensure that this user has not played this trivia
+            if ($this->user()->gameSessions()->where('trivia_id', $request->trivia)->exist()) {
+                return $this->sendError(['You have already played this triva.'], "Attempt to play trivia twice");
+            }
+
             $fetchTriviaQuestions = TriviaQuestion::where('trivia_id', $request->trivia)->get();
 
             foreach ($fetchTriviaQuestions as $q) {
