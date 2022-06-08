@@ -16,10 +16,10 @@ use App\Models\User;
 use App\Models\Trivia;
 use App\Models\GameSession;
 use Illuminate\Support\Carbon;
-use Ramsey\Uuid\Type\Integer;
+use Illuminate\Support\Str;
 
 class LiveTriviaTest extends TestCase
-{   
+{
     use RefreshDatabase;
     /**
      * A basic feature test example.
@@ -45,14 +45,15 @@ class LiveTriviaTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_live_trivia_can_be_fetched(){
+    public function test_live_trivia_can_be_fetched()
+    {
         $response = $this->get('/api/v3/fetch/trivia');
 
         $response->assertStatus(200);
     }
 
     public function test_no_trivia_can_be_fetched_if_not_published()
-    {   
+    {
         $response = $this->get('/api/v3/fetch/trivia');
 
         $response->assertJson([
@@ -61,18 +62,19 @@ class LiveTriviaTest extends TestCase
     }
 
     public function test_trivia_can_only_be_fetched_if_published()
-    {   
-        $this->trivia->update(['is_published'=>true]);
+    {
+        $this->trivia->update(['is_published' => true]);
 
         $response = $this->get('/api/v3/fetch/trivia');
 
         $response->assertJsonCount(1, $key = 'data');
     }
 
-    public function test_live_trivia_can_be_started(){
+    public function test_live_trivia_can_be_started()
+    {
         Question::factory()
-        ->count(50)
-        ->create();
+            ->count(50)
+            ->create();
 
         $response = $this->postjson('/api/v2/game/start/single-player', [
             "category" => $this->category->id,
@@ -80,28 +82,63 @@ class LiveTriviaTest extends TestCase
             "type" => 2,
             "trivia" => $this->trivia->id
         ]);
+
+
         $response->assertJson([
             'message' => 'Game Started',
         ]);
-      
     }
 
-    public function test_live_trivia_leaders_can_be_fetched(){
-        GameSession::factory()
-        ->count(20)
-        ->create();
+    public function test_live_trivia_cannot_be_played_more_than_once_by_the_same_user()
+    {
+        Question::factory()
+            ->count(50)
+            ->create();
 
-        $response = $this->get('/api/v3/trivia/leaders/'.$this->trivia->id);
-        
-            
+        GameSession::create([
+                'category_id' => 101,
+                'trivia_id' => $this->trivia->id,
+                'game_mode_id'=> 2,
+                'game_type_id' => 2,
+                'plan_id'=>1,
+                'user_id' => $this->user->id,
+                'start_time' => Carbon::now(),
+                'end_time' => Carbon::now()->addMinutes(1),
+                'session_token' => Str::random(20),
+                'state' => 'COMPLETED',
+                'correct_count' => 4,
+                'wrong_count' => 6,
+                'total_count' =>10,
+                'points_gained' =>15,
+                'created_at' => Carbon::today(),
+                'updated_at' => Carbon::now()
+            ]);
+
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "trivia" => $this->trivia->id
+        ]);
+
+        $response->assertJson([
+            'message' => 'Attempt to play trivia twice',
+        ]);
+    }
+
+    public function test_live_trivia_leaders_can_be_fetched()
+    {
+        GameSession::factory()
+            ->count(20)
+            ->create();
+
+        $response = $this->get('/api/v3/trivia/leaders/' . $this->trivia->id);
+
+
         $response->assertJson([
             'data' => [
-                "leaders" =>[],
+                "leaders" => [],
             ],
         ]);
-      
     }
-
-  
-  
 }

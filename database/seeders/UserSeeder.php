@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
         ->hasWallet(1)
         // ->hasTransactions(5)
         // ->hasUserPlan(1)
-        ->hasGameSessions(10)
+        //->hasGameSessions(10)
         ->create();
     }
 }

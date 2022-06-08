@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use UserSeeder;
-use CategorySeeder;
+use App\Models\GameSession;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -23,6 +23,9 @@ class LeaderboardTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->user = User::first();
+        GameSession::factory()
+        ->count(20)
+        ->create();
 
         $this->actingAs($this->user);
     }
@@ -43,7 +46,7 @@ class LeaderboardTest extends TestCase
         $endDate = Carbon::now();
 
         $response = $this->get(self::GLOBAL_LEADERS_URL . $startDate . '/' . $endDate);
-        $response->assertJsonCount(5, 'data');
+        $response->assertJsonCount(0, 'data');
     }
 
     public function test_categories_leaderboard_should_return_data_since_inception_if_no_filter_date_is_passed()
