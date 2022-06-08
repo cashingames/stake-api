@@ -141,10 +141,10 @@ class GameTest extends TestCase
 
     public function test_single_game_can_be_ended_without_boosts_and_options()
     {
-        $gameSession = GameSession::first();
-
+        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        
         $response = $this->postjson(self::END_SINGLE_GAME_URL, [
-            "token" => $gameSession->session_token,
+            "token" => $this->user->gameSessions()->first()->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => []
         ]);
@@ -155,7 +155,8 @@ class GameTest extends TestCase
 
     public function test_single_game_can_be_ended_with_boosts_and_no_options()
     {
-        $gameSession = GameSession::first();
+        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        
         $boost = Boost::inRandomOrder()->first();
 
         UserBoost::create([
@@ -168,7 +169,7 @@ class GameTest extends TestCase
         $userBoost = $this->user->userBoosts();
 
         $response = $this->postjson(self::END_SINGLE_GAME_URL, [
-            "token" => $gameSession->session_token,
+            "token" => $this->user->gameSessions()->first()->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => [
                 ['boost' => Boost::where('id', $userBoost[0]->id)->first()]
