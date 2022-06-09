@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\PlayerStatus;
+use App\Enums\LiveTriviaStatus;
 
 class LiveTrivia extends Model
 {
@@ -17,7 +19,7 @@ class LiveTrivia extends Model
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published'];
     protected $appends = ['status', 'start_time_utc', 'player_status'];
     protected $casts = ['is_published' => 'boolean'];
-
+   
     public function gameSessions()
     {
         return $this->hasMany(GameSession::class, 'trivia_id');
@@ -33,17 +35,17 @@ class LiveTrivia extends Model
     {
         $hasPlayed = $this->gameSessions()->where('user_id', auth()->user()->id)->exists();
         if ($hasPlayed) {
-            return "PLAYED";
+            return PlayerStatus::Played;
         }
 
         $points = UserPoint::today()->where('user_id', auth()->user()->id)
             ->sum('value');
 
         if ($points < $this->point_eligibility) {
-            return "INSUFFICIENTPOINTS";
+            return PlayerStatus::InsufficientPoints;
         }
 
-        return "CANPLAY";
+        return PlayerStatus::CanPlay;
     }
 
 
@@ -58,13 +60,13 @@ class LiveTrivia extends Model
         $end =  Carbon::parse($this->end_time);
 
         if ($start > now()) {
-            $status = "WAITING";
+            $status = LiveTriviaStatus::Waiting;
         } else if ($end > now()) {
-            $status =  "ONGOING";
+            $status =  LiveTriviaStatus::Ongoing;
         } else if ($end->addHours(config('trivia.live_trivia.display_shelf_life')) >  now()) {
-            $status =  "CLOSED";
+            $status =  LiveTriviaStatus::Closed;
         } else {
-            $status =  "EXPIRED";
+            $status =  LiveTriviaStatus::Expired;
         }
 
         return $status;
