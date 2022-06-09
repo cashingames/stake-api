@@ -44,34 +44,24 @@ class LiveTriviaStatusTest extends TestCase
 
     public function test_that_live_trivia_status_endpoint_returns_data()
     {
+        $start = Carbon::now();
+        $end = Carbon::now()->addHour();
 
-        $this->createTestLiveTrivia(Carbon::now(), Carbon::now()->addHour());
+        $this->createTestLiveTrivia($start,$end );
 
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
-
-        /**
-         * @TODO: Asset that the fields from the response hold the correct values like yoy did in the next test below.
-         * Asserting just the structure of the json is not a correct way of testing
-         */
-        $response->assertJsonStructure([
-            "id",
-            "name",
-            "category_id",
-            "game_mode_id",
-            "game_type_id",
-            "point_eligibility",
-            "grand_price",
-            "created_at",
-            "updated_at",
-            "game_duration",
-            "question_count",
-            "start_time",
-            "end_time",
-            "deleted_at",
-            "is_published",
-            "status",
-            "start_time_utc",
-            "player_status"
+        
+        $response->assertJson([
+            "id" => 1,
+            "name" => "Test Live Trivia",
+            "category_id" => $this->category->id,
+            "game_mode_id" => 1,
+            "game_type_id" => 2,
+            "point_eligibility" => 500,
+            "grand_price" => 1000,
+            "start_time" => $start,
+            "end_time" => $end,
+            "is_published" => true,
         ]);
     }
 
