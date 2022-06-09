@@ -38,6 +38,12 @@ Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail'
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 
+Route::middleware('api')->prefix('v3')->group(
+    function () {
+        Route::post('paystack/transaction/webhook', [WalletController::class, "paymentEventProcessor"]);
+    }
+);
+
 Route::middleware('auth:api')->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);

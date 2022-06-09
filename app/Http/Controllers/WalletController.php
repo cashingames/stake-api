@@ -47,7 +47,7 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
-        Log::info('payment successful from app verification ', $this->user->username);
+        Log::info("payment successful from app verification $this->user->username");
 
         return $this->sendResponse(true, 'Payment was successful');
     }
