@@ -16,11 +16,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 
 class LiveTriviaStatusTest extends TestCase
-{   
+{
     use RefreshDatabase;
 
     protected $user;
-    
+
     const LIVE_TRIVIA_STATUS_URL = '/api/v3/live-trivia/status';
 
     protected function setUp(): void
@@ -36,20 +36,23 @@ class LiveTriviaStatusTest extends TestCase
         UserPoint::create([
             'user_id' => $this->user->id,
             'value' => 500,
-            'description'=> 'test points',
-            'point_flow_type'=>'POINTS_ADDED',
+            'description' => 'test points',
+            'point_flow_type' => 'POINTS_ADDED',
             'created_at' => Carbon::now(),
         ]);
-
     }
 
     public function test_that_live_trivia_status_endpoint_returns_data()
-    {   
-       
-        $this->createTestLiveTrivia(Carbon::now(),Carbon::now()->addHour());
+    {
+
+        $this->createTestLiveTrivia(Carbon::now(), Carbon::now()->addHour());
 
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
+        /**
+         * @TODO: Asset that the fields from the response hold the correct values like yoy did in the next test below.
+         * Asserting just the structure of the json is not a correct way of testing
+         */
         $response->assertJsonStructure([
             "id",
             "name",
@@ -73,51 +76,50 @@ class LiveTriviaStatusTest extends TestCase
     }
 
     public function test_that_live_trivia_status_endpoint_returns_trivia_waiting_status()
-    {   
+    {
 
-        $this->createTestLiveTrivia(Carbon::now()->addHour(),Carbon::now()->addHours(2));
+        $this->createTestLiveTrivia(Carbon::now()->addHour(), Carbon::now()->addHours(2));
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
         $response->assertJsonFragment([
-            "status" =>"WAITING",
+            "status" => "WAITING",
         ]);
     }
 
     public function test_that_live_trivia_status_endpoint_returns_trivia_ongoing_status()
-    {  
-        $this->createTestLiveTrivia(Carbon::now(),Carbon::now()->addHour());
+    {
+        $this->createTestLiveTrivia(Carbon::now(), Carbon::now()->addHour());
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
         $response->assertJsonFragment([
-            "status" =>"ONGOING",
+            "status" => "ONGOING",
         ]);
     }
 
     public function test_that_live_trivia_status_endpoint_returns_trivia_closed_status()
-    {   
+    {
         Config::set('trivia.live_trivia.display_shelf_life', 1);
-      
+
         $this->createTestLiveTrivia(Carbon::now()->subHour(), Carbon::now());
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
         $response->assertJsonFragment([
-            "status" =>"CLOSED",
+            "status" => "CLOSED",
         ]);
     }
 
-    private function createTestLiveTrivia($start,$end){
+    private function createTestLiveTrivia($start, $end)
+    {
         LiveTrivia::create([
             "name" => "Test Live Trivia",
             "category_id" => $this->category->id,
             'game_mode_id' => 1,
-            'game_type_id'=>2,
-            'grand_price'=> 1000,
-            'point_eligibility'=>500,
-            'is_published'=> true,
+            'game_type_id' => 2,
+            'grand_price' => 1000,
+            'point_eligibility' => 500,
+            'is_published' => true,
             'start_time' => $start,
             'end_time' => $end
         ]);
-
     }
-  
 }

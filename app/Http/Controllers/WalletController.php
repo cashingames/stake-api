@@ -47,14 +47,17 @@ class WalletController extends BaseController
 
     public function verifyTransaction(string $reference)
     {
+        Log::info('payment successful from app verification ', $this->user->username);
+
         return $this->sendResponse(true, 'Payment was successful');
     }
-
 
     public function paymentEventProcessor()
     {
         $input = @file_get_contents("php://input");
         $event = json_decode($input);
+
+        Log::info('event from paystack ', $event);
 
         if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
             return response("", 200);

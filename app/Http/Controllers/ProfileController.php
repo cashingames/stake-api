@@ -18,17 +18,13 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => ['nullable', 'string', 'max:11'],
-            'password' => ['nullable', 'string'],
+            'phoneNumber' => ['string', 'min:11', 'max:11', 'unique:users'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
         if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
             $this->user->phone_number = $data['phoneNumber'];
-        }
-        if (isset($data['password']) &&  !is_null($data['password'])) {
-            $this->user->password = bcrypt($data['password']);
         }
 
         $profile = $this->user->profile;
@@ -90,7 +86,7 @@ class ProfileController extends BaseController
 
         if ($request->hasFile('avatar')) {
             $image = $request->file('avatar');
-            $name = uniqid().$this->user->username . "." . $image->guessExtension();
+            $name = uniqid() . $this->user->username . "." . $image->guessExtension();
             $destinationPath = public_path('avatar');
             $profile->avatar = 'avatar/' . $name;
             $image->move($destinationPath, $name);
