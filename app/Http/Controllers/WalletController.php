@@ -8,6 +8,7 @@ use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -65,6 +66,43 @@ class WalletController extends BaseController
             $user = User::where('email', $event->data->customer->email)->first();
             return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
         }
+    }
+
+    public function paymentsTransactionsReconciler(Request $request)
+    {
+        $client = new Client();
+        $url = null;
+        if ($request->has(['startDate', 'endDate'])) {
+
+            $_startDate = Carbon::parse($request->startDate)->startOfDay()->toISOString();
+            $_endDate = Carbon::parse($request->endDate)->tomorrow()->toISOString();
+            $url = "https://api.paystack.co/transaction?status=success&from=$_startDate&to=$_endDate";
+        } else {
+            $url = 'https://api.paystack.co/transaction?status=success';
+        }
+        $response = null;
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
+                ]
+            ]);
+        } catch (\Exception $ex) {
+            return $this->sendResponse(false, 'Transactions could not be fetched.');
+        }
+
+        $result = \json_decode((string) $response->getBody());
+
+        foreach ($result->data as $data) {
+            $existingReference = WalletTransaction::where('reference', $data->reference)->first();
+            $user = User::where('email', $data->customer->email)->first();
+
+            if ($existingReference === null) {
+                $this->savePaymentTransaction($data->reference, $user, $data->amount);
+            }
+        }
+
+        return $this->sendResponse(true, 'Transactions reconciled');
     }
 
     private function savePaymentTransaction($reference, $user, $amount)
