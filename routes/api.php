@@ -51,7 +51,6 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::post('paystack/transaction/webhook/', [WalletController::class, "paymentEventProcessor"]);
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
         Route::get('live-trivia/{id}/leaderboard', LiveTriviaStatusController::class);

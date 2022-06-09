@@ -57,7 +57,7 @@ class WalletController extends BaseController
         $input = @file_get_contents("php://input");
         $event = json_decode($input);
 
-        Log::info('event from paystack ', $event);
+        Log::info("event from paystack ");
 
         if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
             return response("", 200);
