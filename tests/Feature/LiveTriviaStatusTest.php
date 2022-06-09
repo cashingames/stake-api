@@ -50,8 +50,8 @@ class LiveTriviaStatusTest extends TestCase
         $this->createTestLiveTrivia($start,$end );
 
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
-        
-        $response->assertJson([
+
+        $response->assertJsonFragment([
             "id" => 1,
             "name" => "Test Live Trivia",
             "category_id" => $this->category->id,
@@ -59,8 +59,8 @@ class LiveTriviaStatusTest extends TestCase
             "game_type_id" => 2,
             "point_eligibility" => 500,
             "grand_price" => 1000,
-            "start_time" => $start,
-            "end_time" => $end,
+            "start_time" => $start->toDateTimeString(),
+            "end_time" => $end->toDateTimeString(),
             "is_published" => true,
         ]);
     }
