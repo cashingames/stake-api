@@ -73,14 +73,18 @@ class WalletController extends BaseController
         $client = new Client();
         $url = null;
         if ($request->has(['startDate', 'endDate'])) {
-
             $_startDate = Carbon::parse($request->startDate)->startOfDay()->toISOString();
             $_endDate = Carbon::parse($request->endDate)->tomorrow()->toISOString();
             $url = "https://api.paystack.co/transaction?status=success&from=$_startDate&to=$_endDate";
+
+            Log::info("url with dates : $url");
+
         } else {
             $url = 'https://api.paystack.co/transaction?status=success';
+            Log::info("url with no dates : $url");
         }
         $response = null;
+        Log::info("about to fetch transactions from paystack ");
         try {
             $response = $client->request('GET', $url, [
                 'headers' => [
@@ -88,20 +92,22 @@ class WalletController extends BaseController
                 ]
             ]);
         } catch (\Exception $ex) {
+            Log::info("Something went wrong, could not fetch transactions");
             return $this->sendResponse(false, 'Transactions could not be fetched.');
         }
-
         $result = \json_decode((string) $response->getBody());
+        Log::info("transactions fetched ", $result->data);
 
         foreach ($result->data as $data) {
             $existingReference = WalletTransaction::where('reference', $data->reference)->first();
             $user = User::where('email', $data->customer->email)->first();
 
             if ($existingReference === null) {
+                Log::info("successful transaction reference: $data->reference with no record found, inserting... ");
                 $this->savePaymentTransaction($data->reference, $user, $data->amount);
             }
         }
-
+        Log::info("Records reconciled ");
         return $this->sendResponse(true, 'Transactions reconciled');
     }
 

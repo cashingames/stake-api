@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-enum PlayerStatus : string {
+enum LiveTriviaPlayerStatus : string {
     case Played = "PLAYED";
-    case InsufficientPoints = "INSUFFICIENTPOINTS";
+    case LowPoints = "INSUFFICIENTPOINTS";
     case CanPlay = "CANPLAY";
 }

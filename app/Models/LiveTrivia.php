@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\PlayerStatus;
+use App\Enums\LiveTriviaPlayerStatus;
 use App\Enums\LiveTriviaStatus;
 
 class LiveTrivia extends Model
@@ -35,17 +35,17 @@ class LiveTrivia extends Model
     {
         $hasPlayed = $this->gameSessions()->where('user_id', auth()->user()->id)->exists();
         if ($hasPlayed) {
-            return PlayerStatus::Played;
+            return LiveTriviaPlayerStatus::Played;
         }
 
         $points = UserPoint::today()->where('user_id', auth()->user()->id)
             ->sum('value');
 
         if ($points < $this->point_eligibility) {
-            return PlayerStatus::InsufficientPoints;
+            return LiveTriviaPlayerStatus::LowPoints;
         }
 
-        return PlayerStatus::CanPlay;
+        return LiveTriviaPlayerStatus::CanPlay;
     }
 
 
