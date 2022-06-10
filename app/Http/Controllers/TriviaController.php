@@ -17,7 +17,7 @@ class TriviaController extends BaseController
     {
         //get trivia leaders
 
-        $query = 'SELECT r.points, p.first_name , p.last_name, p.user_id, r.duration
+        $query = 'SELECT r.points, r.username, p.first_name , p.last_name, p.user_id, r.duration
         FROM (
             SELECT SUM(points_gained) AS points, user_id, username , TIMESTAMPDIFF(SECOND, gs.start_time, gs.end_time) AS duration
             FROM game_sessions gs
