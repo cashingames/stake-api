@@ -96,23 +96,23 @@ class LiveTriviaTest extends TestCase
             ->create();
 
         GameSession::create([
-                'category_id' => 101,
-                'trivia_id' => $this->trivia->id,
-                'game_mode_id'=> 2,
-                'game_type_id' => 2,
-                'plan_id'=>1,
-                'user_id' => $this->user->id,
-                'start_time' => Carbon::now(),
-                'end_time' => Carbon::now()->addMinutes(1),
-                'session_token' => Str::random(20),
-                'state' => 'COMPLETED',
-                'correct_count' => 4,
-                'wrong_count' => 6,
-                'total_count' =>10,
-                'points_gained' =>15,
-                'created_at' => Carbon::today(),
-                'updated_at' => Carbon::now()
-            ]);
+            'category_id' => 101,
+            'trivia_id' => $this->trivia->id,
+            'game_mode_id' => 2,
+            'game_type_id' => 2,
+            'plan_id' => 1,
+            'user_id' => $this->user->id,
+            'start_time' => Carbon::now(),
+            'end_time' => Carbon::now()->addMinutes(1),
+            'session_token' => Str::random(20),
+            'state' => 'COMPLETED',
+            'correct_count' => 4,
+            'wrong_count' => 6,
+            'total_count' => 10,
+            'points_gained' => 15,
+            'created_at' => Carbon::today(),
+            'updated_at' => Carbon::now()
+        ]);
 
         $response = $this->postjson('/api/v2/game/start/single-player', [
             "category" => $this->category->id,
@@ -126,19 +126,19 @@ class LiveTriviaTest extends TestCase
         ]);
     }
 
-    public function test_live_trivia_leaders_can_be_fetched()
-    {
-        GameSession::factory()
-            ->count(20)
-            ->create();
+    // public function test_live_trivia_leaders_can_be_fetched()
+    // {
+    //     GameSession::factory()
+    //         ->count(20)
+    //         ->create();
 
-        $response = $this->get('/api/v3/trivia/leaders/' . $this->trivia->id);
+    //     $response = $this->get('/api/v3/trivia/leaders/' . $this->trivia->id);
 
 
-        $response->assertJson([
-            'data' => [
-                "leaders" => [],
-            ],
-        ]);
-    }
+    //     $response->assertJson([
+    //         'data' => [
+    //             "leaders" => [],
+    //         ],
+    //     ]);
+    // }
 }
