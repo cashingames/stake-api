@@ -8,17 +8,7 @@ use Carbon\Carbon;
 
 class DateUtilsTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     * @TODO: Always remove the sample tests
-     *
-     * @return void
-     */
-    public function test_example()
-    {
-        $this->assertTrue(true);
-    }
-
+  
     public $trait;
 
     protected function setUp(): void
