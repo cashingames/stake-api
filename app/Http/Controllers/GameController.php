@@ -310,7 +310,7 @@ class GameController extends BaseController
             return $this->sendResponse($game, 'Game Ended');
         }
 
-        $game->end_time = Carbon::now()->subSeconds(1);
+        $game->end_time = Carbon::now()->subMilliseconds(500);
         $game->state = 'COMPLETED';
 
         $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());

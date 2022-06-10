@@ -17,16 +17,16 @@ class TriviaController extends BaseController
     {
         //get trivia leaders
 
-        $query = 'SELECT r.points, p.first_name , p.last_name, p.user_id
+        $query = 'SELECT r.points, p.first_name , p.last_name, p.user_id, r.duration
         FROM (
-            SELECT SUM(points_gained) AS points, user_id, username 
+            SELECT SUM(points_gained) AS points, user_id, username , TIMESTAMPDIFF(SECOND, gs.start_time, gs.end_time) AS duration
             FROM game_sessions gs
             INNER JOIN users ON users.id = gs.user_id 
             WHERE gs.trivia_id = ? 
             GROUP BY gs.user_id
         ) r
         JOIN profiles p ON p.user_id = r.user_id
-        ORDER BY points DESC ';
+        ORDER BY points DESC, duration ASC ';
 
         $leaders = DB::select($query, [$triviaId]);
 
