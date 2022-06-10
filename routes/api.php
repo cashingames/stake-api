@@ -38,6 +38,13 @@ Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail'
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 
+Route::middleware('api')->prefix('v3')->group(
+    function () {
+        Route::post('paystack/transaction/webhook', [WalletController::class, "paymentEventProcessor"]);
+        Route::post('paystack/reconcile/payments', [WalletController::class, "paymentsTransactionsReconciler"]);
+    }
+);
+
 Route::middleware('auth:api')->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);
@@ -45,7 +52,6 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::post('paystack/transaction/webhook/', [WalletController::class, "paymentEventProcessor"]);
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
         Route::get('live-trivia/{id}/leaderboard', LiveTriviaStatusController::class);
