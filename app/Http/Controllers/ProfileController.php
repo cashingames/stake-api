@@ -18,7 +18,7 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => ['string', 'min:11', 'max:11', 'unique:users'],
+            'phoneNumber' => ['string', 'min:11', 'max:11', 'unique:users,phone_number'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);

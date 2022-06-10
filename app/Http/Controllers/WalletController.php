@@ -80,8 +80,8 @@ class WalletController extends BaseController
             Log::info("url with dates : $url");
 
         } else {
-            Log::info("url with no dates : $url");
             $url = 'https://api.paystack.co/transaction?status=success';
+            Log::info("url with no dates : $url");
         }
         $response = null;
         Log::info("about to fetch transactions from paystack ");
