@@ -103,10 +103,11 @@ class WalletController extends BaseController
             $user = User::where('email', $data->customer->email)->first();
 
             if ($existingReference === null) {
+                Log::info("successful transaction reference: $data->reference with no record found, inserting... ");
                 $this->savePaymentTransaction($data->reference, $user, $data->amount);
             }
         }
-        Log::info("Records inserted ");
+        Log::info("Records reconciled ");
         return $this->sendResponse(true, 'Transactions reconciled');
     }
 
