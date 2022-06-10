@@ -41,6 +41,7 @@ Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::post('paystack/transaction/webhook', [WalletController::class, "paymentEventProcessor"]);
+        Route::post('paystack/reconcile/payments', [WalletController::class, "paymentsTransactionsReconciler"]);
     }
 );
 
