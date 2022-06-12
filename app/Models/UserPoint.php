@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserPoint extends Model
 {
@@ -18,16 +18,17 @@ class UserPoint extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeToday($query): void
+    public function scopeBetween($query, $startDate, $endDate): void
+    {
+        $query
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $endDate);
+    }
+
+    public function scopeAddedBetween($query, $startDate, $endDate)
     {
         $query
             ->where('point_flow_type', 'POINTS_ADDED')
-            ->where('created_at', '>=', now()->startOfDay());
-    }
-
-    public function getTotalPointsToday($query): int
-    {
-        return $query->where('user_id', auth()->user()->id)
-            ->sum('value');
+            ->between($startDate, $endDate);
     }
 }

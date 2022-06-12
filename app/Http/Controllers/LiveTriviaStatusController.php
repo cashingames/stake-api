@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LiveTrivia;
+use App\Http\ResponseHelpers\LiveTriviaStatusResponse;
 
 class LiveTriviaStatusController extends Controller
 {
@@ -13,6 +14,7 @@ class LiveTriviaStatusController extends Controller
      */
     public function __invoke()
     {
-        return LiveTrivia::active()->first(); //@TODO: return playedStatus for users that have played and status 
+        $liveTrivia = LiveTrivia::active()->first();
+        return (new LiveTriviaStatusResponse())->transform($liveTrivia);
     }
 }

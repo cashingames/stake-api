@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use stdClass;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Support\Facades\DB;
-use stdClass;
-use Illuminate\Support\Carbon;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -308,5 +306,10 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
             })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->where('user_boosts.boost_count', '>', 0)->get();
+    }
+
+    public function hasPlayedTrivia($triviaId)
+    {
+        return $this->gameSessions()->where('trivia_id', $triviaId)->exists();
     }
 }

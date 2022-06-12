@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class WalletController extends BaseController
@@ -78,7 +79,6 @@ class WalletController extends BaseController
             $url = "https://api.paystack.co/transaction?status=success&from=$_startDate&to=$_endDate";
 
             Log::info("url with dates : $url");
-
         } else {
             $url = 'https://api.paystack.co/transaction?status=success';
             Log::info("url with no dates : $url");
@@ -132,6 +132,11 @@ class WalletController extends BaseController
 
     public function getBanks()
     {
+        $result = cache('banks');
+        if ($result) {
+            return response()->json($result, 200);
+        }
+
         $client = new Client();
         $url = 'https://api.paystack.co/bank';
         $response = null;
@@ -146,6 +151,8 @@ class WalletController extends BaseController
         }
 
         $result = \json_decode((string) $response->getBody());
+        Cache::forever('banks', $result);
+
         return response()->json($result, 200);
     }
 

@@ -77,7 +77,6 @@ Route::prefix('v2')->group(function () {
         Route::get('wallet/me/transactions/earnings', [WalletController::class, 'earnings']);
         Route::get('wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"]);
         Route::get('wallet/banks', [WalletController::class, 'getBanks']);
-        //Route::post('wallet/me/withdrawal/request', [WalletController::class,'withdrawRequest']);
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
