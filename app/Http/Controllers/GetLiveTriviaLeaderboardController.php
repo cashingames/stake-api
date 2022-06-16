@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\LiveTrivia;
-use App\Http\ResponseHelpers\LiveTriviaStatusResponse;
+use App\Http\ResponseHelpers\LiveTriviaLeaderboardResponse;
 
 class GetLiveTriviaLeaderboardController extends Controller
 {
 
     public function __invoke($id)
     {
-        //get trivia leaders
-
         $query = 'SELECT r.points, r.username, p.first_name , p.last_name, p.user_id
         FROM (
             SELECT SUM(points_gained) AS points, start_time AS startTime, end_time As endTime, user_id, username 
@@ -26,8 +22,8 @@ class GetLiveTriviaLeaderboardController extends Controller
         ORDER BY points DESC ';
 
         $leaders = DB::select($query, [$id]);
-
-        return response()->json($leaders);
+        
+        return (new LiveTriviaLeaderboardResponse())->transform(collect($leaders));
     }
 
 }
