@@ -10,7 +10,7 @@ class GetLiveTriviaLeaderboardController extends Controller
 
     public function __invoke($id)
     {
-        $query = 'SELECT r.points, r.username, p.first_name , p.last_name, p.user_id
+        $query = 'SELECT r.points, r.username, r.startTime, r.endTime, p.user_id, p.avatar
         FROM (
             SELECT SUM(points_gained) AS points, start_time AS startTime, end_time As endTime, user_id, username 
             FROM game_sessions gs
