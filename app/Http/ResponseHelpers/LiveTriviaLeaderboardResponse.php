@@ -41,7 +41,10 @@ class LiveTriviaLeaderboardResponse
     }
 
     private function getAvatarUrl($avatar)
-    {
-        return config('app.url').'/'.$avatar;
+    {   
+        if ($avatar !== null){
+            return config('app.url').'/'.$avatar;
+        }
+        return $avatar;
     }
 }
