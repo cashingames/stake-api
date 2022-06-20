@@ -32,6 +32,7 @@ class UserController extends BaseController
         $result->avatar = $this->user->profile->avatar;
         $result->referralCode = $this->user->username;
         $result->points = $this->user->points();
+        $result->todaysPoints = $this->user->todaysPoints();
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
         $result->walletBalance = $this->user->wallet->balance;
