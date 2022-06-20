@@ -36,4 +36,10 @@ class LiveTrivia extends Model
             ->where('end_time', '>=', now())
             ->orderBy('start_time', 'ASC');
     }
+
+    public function scopeRecent($query): void
+    {
+        $query->where('is_published', true)
+        ->orderBy('created_at', 'DESC');
+    }
 }

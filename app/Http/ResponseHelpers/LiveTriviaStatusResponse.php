@@ -58,6 +58,31 @@ class LiveTriviaStatusResponse
         return response()->json($response);
     }
 
+    public function returnAsObject($model): Object
+    {
+        $response = new LiveTriviaStatusResponse;
+        $response->id = $model->id;
+        $response->categoryId = $model->category_id;
+        $response->modeId = $model->game_mode_id;
+        $response->typeId = $model->game_type_id;
+        $response->title = $model->name;
+        $response->prize = $model->grand_price;
+        $response->duration = $model->game_duration;
+        $response->questionsCount = $model->question_count;
+        $response->pointsRequired = $model->point_eligibility;
+        $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
+
+        $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
+        $response->startAtUtc = $this->toTimestamp($model->start_time);
+        $response->status = $this->getStatus($model);
+        $response->playerStatus = $this->getPlayerStatus($model, $response->pointsAcquiredBeforeStart);
+        $response->prizeDisplayText = $this->getPrizeDisplayText($response->prize);
+        $response->statusDisplayText = $this->getStatusDisplayText($response->status);
+        $response->startDateDisplayText = $this->getStartDateDisplayText($response->startAt);
+        $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
+        return $response;
+    }
+    
     private function getPlayerStatus($model, $pointsAcquiredBefore): LiveTriviaPlayerStatus
     {
         $user = auth()->user();
