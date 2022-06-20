@@ -17,7 +17,7 @@ class LiveTriviaStatusController extends Controller
         $liveTrivia = LiveTrivia::active()->first();
 
         if($liveTrivia === null){
-            return response()->json($liveTrivia);
+            return null;
         }
         return (new LiveTriviaStatusResponse())->transform($liveTrivia);
     }
