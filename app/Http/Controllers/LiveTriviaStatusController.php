@@ -15,6 +15,10 @@ class LiveTriviaStatusController extends Controller
     public function __invoke()
     {
         $liveTrivia = LiveTrivia::active()->first();
+
+        if($liveTrivia === null){
+            return null;
+        }
         return (new LiveTriviaStatusResponse())->transform($liveTrivia);
     }
 }
