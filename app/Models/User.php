@@ -195,15 +195,17 @@ class User extends Authenticatable implements JWTSubject
     public function todaysPoints()
     {
 
-        $startOfToday = $this->toNigerianTimeZone(Carbon::now()->startOfDay(), 'UTC');
-        $endOfToday = $this->toNigerianTimeZone(Carbon::now()->endOfDay(), 'UTC');
+        //start in nigeria 20 00:000:00
+        //in utc = 19 23:00:00
+        $now = $this->toNigeriaTimeZoneFromUtc(now());
+        $startOfToday = $this->toUtcFromNigeriaTimeZone($now->startOfDay());
+        $endOfToday = $this->toUtcFromNigeriaTimeZone($now->endOfDay());
+        $pointsAdded = $this->userPoints()
+            ->addedBetween(
+                $startOfToday,
+                $endOfToday
+            )->sum('value');
 
-        $pointsAdded = UserPoint::where('user_id', $this->id)
-            ->where('created_at', '>=', $startOfToday)
-            ->where('created_at', '<=', $endOfToday)
-            ->where('point_flow_type', 'POINTS_ADDED')
-            ->sum('value');
-       
         return $pointsAdded;
     }
 
