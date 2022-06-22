@@ -288,6 +288,8 @@ class GameController extends BaseController
             DB::table('user_plans')->insert([
                 'user_id' => $referrerProfile->user_id,
                 'plan_id' => 1,
+                'description' => 'Bonus Plan for referring ' . $this->user->username,
+
                 'is_active' => true,
                 'used_count' => 0,
                 'plan_count' => 2,
