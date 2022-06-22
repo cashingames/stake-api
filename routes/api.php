@@ -15,6 +15,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LeadersController;
 use App\Http\Controllers\LiveTriviaStatusController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
+use App\Http\Controllers\GetRecentLiveTriviaController;
 use App\Http\Controllers\PlayGroundController;
 use App\Http\Controllers\TriviaController;
 
@@ -51,12 +52,13 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('user/profile', [UserController::class, 'profile']);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
+        Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
-        //Route::get('live-trivia/{id}/leaderboard', LiveTriviaStatusController::class);
+      
     }
 );
 

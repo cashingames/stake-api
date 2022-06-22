@@ -7,4 +7,5 @@ enum LiveTriviaStatus : string {
     case Ongoing = "ONGOING";
     case Closed = "CLOSED";
     case Expired = "EXPIRED";
+    case Unpublished = "UNPUBLISHED";
 }
