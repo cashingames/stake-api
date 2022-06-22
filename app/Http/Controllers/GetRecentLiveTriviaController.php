@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\LiveTrivia;
+use Illuminate\Support\Facades\DB;
 use App\Http\ResponseHelpers\LiveTriviaStatusResponse;
 
 
@@ -17,7 +17,10 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
-        $recentLiveTrivia = LiveTrivia::recent()->limit(10)->get();
+        $recentLiveTrivia = DB::select(
+            "select * from trivias order by created_at desc
+            limit 10"
+        );
 
         $response = [];
        

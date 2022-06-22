@@ -101,7 +101,7 @@ class LiveTriviaStatusResponse
     private function getStatus($model): LiveTriviaStatus
     {
         if (!$model->is_published) {
-            return "";
+            return LiveTriviaStatus::Unpublished;
         }
 
         $start = Carbon::parse($model->start_time);
