@@ -58,7 +58,7 @@ class LiveTriviaStatusResponse
         return response()->json($response);
     }
 
-    public function returnAsObject($model): Object
+    public function transformAndReturnObject($model): Object
     {
         $response = new LiveTriviaStatusResponse;
         $response->id = $model->id;
