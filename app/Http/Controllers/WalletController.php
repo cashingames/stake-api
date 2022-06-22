@@ -273,6 +273,7 @@ class WalletController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $this->user->id,
             'plan_id' => $plan->id,
+            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'is_active' => true,
             'used_count' => 0,
             'created_at' => Carbon::now(),
