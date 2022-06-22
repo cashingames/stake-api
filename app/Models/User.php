@@ -9,10 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Carbon\Carbon;
+use App\Traits\Utils\DateUtils;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
+    use DateUtils;
 
     /**
      * The attributes that are mass assignable.
@@ -187,6 +190,23 @@ class User extends Authenticatable implements JWTSubject
             ->where('point_flow_type', 'POINTS_SUBTRACTED')
             ->sum('value');
         return $pointsAdded -  $pointsSubtracted;
+    }
+
+    public function todaysPoints()
+    {
+
+        //start in nigeria 20 00:000:00
+        //in utc = 19 23:00:00
+        $now = $this->toNigeriaTimeZoneFromUtc(now());
+        $startOfToday = $this->toUtcFromNigeriaTimeZone($now->startOfDay());
+        $endOfToday = $this->toUtcFromNigeriaTimeZone($now->endOfDay());
+        $pointsAdded = $this->userPoints()
+            ->addedBetween(
+                $startOfToday,
+                $endOfToday
+            )->sum('value');
+
+        return $pointsAdded;
     }
 
 

@@ -105,6 +105,7 @@ class RegisterController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $user->id,
             'plan_id' => 1,
+            'description' => 'Registration Bonus Plan',
             'is_active' => true,
             'used_count' => 0,
             'plan_count' => 10,
