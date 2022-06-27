@@ -23,21 +23,13 @@ class LiveTriviaLeaderboardResponse
             $presenter->userId = $data->user_id;
             $presenter->points = $data->points;
             $presenter->username = $data->username;
-            $presenter->duration = $this->getGameDurationInSeconds($data->startTime, $data->endTime);
+            $presenter->duration = $data->duration;
             $presenter->avatar = $this->getAvatarUrl($data->avatar);
 
             $response[] = $presenter;
         }
 
         return response()->json($response);
-    }
-
-    private function getGameDurationInSeconds($startTime, $endTime)
-    {
-        $start = Carbon::parse($startTime);
-        $end = Carbon::parse($endTime);
-
-        return $start->diffInSeconds($end);
     }
 
     private function getAvatarUrl($avatar)
