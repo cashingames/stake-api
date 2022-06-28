@@ -247,6 +247,15 @@ class GameController extends BaseController
 
         $gameSession->save();
 
+        $questions->map(function ( $question) use ($gameSession ) {
+            DB::table('game_session_questions')->insert([
+                'question_id' => $question->id,
+                'game_session_id' => $gameSession->id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+        });
+
         $gameInfo = new stdClass;
         $gameInfo->token = $gameSession->session_token;
         $gameInfo->startTime = $gameSession->start_time;
