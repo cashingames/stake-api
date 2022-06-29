@@ -40,14 +40,15 @@ class GiveDailyBonusGames extends Command
      * @return int
      */
     public function handle()
-    {  
+    {
         User::all()->map(function ($user) {
-            
-            $freePlan = Plan::where('is_free',true)->first();
+
+            $freePlan = Plan::where('is_free', true)->first();
 
             UserPlan::create([
                 'plan_id' => $freePlan->id,
                 'user_id' => $user->id,
+                'description' => 'Daily bonus games plan',
                 'used_count' => 0,
                 'plan_count' => 5,
                 'is_active' => true,
@@ -56,6 +57,5 @@ class GiveDailyBonusGames extends Command
                 'expire_at' => Carbon::now()->endOfDay()
             ]);
         });
-
     }
 }
