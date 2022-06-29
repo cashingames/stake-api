@@ -247,7 +247,7 @@ class GameController extends BaseController
 
         $gameSession->save();
 
-        Log::info('About to log selected game questions in table');
+        Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 
         $data=[];
 
@@ -262,7 +262,7 @@ class GameController extends BaseController
         
         DB::table('game_session_questions')->insert($data);
 
-        Log::info('questions logged');
+        Log::info("questions logged for game session $gameSession->id and user $this->user");
 
         $gameInfo = new stdClass;
         $gameInfo->token = $gameSession->session_token;
