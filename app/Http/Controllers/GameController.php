@@ -247,6 +247,23 @@ class GameController extends BaseController
 
         $gameSession->save();
 
+        Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
+
+        $data=[];
+
+        foreach($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'game_session_id' => $gameSession->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        
+        DB::table('game_session_questions')->insert($data);
+
+        Log::info("questions logged for game session $gameSession->id and user $this->user");
+
         $gameInfo = new stdClass;
         $gameInfo->token = $gameSession->session_token;
         $gameInfo->startTime = $gameSession->start_time;
