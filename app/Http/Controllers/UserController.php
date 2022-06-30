@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\ResponseHelpers\FriendsDataResponse;
 use App\Models\Profile;
 use App\Models\UserQuiz;
 use App\Models\OnlineTimeline;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use stdClass;
@@ -46,7 +43,6 @@ class UserController extends BaseController
         $result->achievements = $this->user->userAchievements();
         $result->recentGames = $this->user->recentGames();
         $result->transactions = $this->user->userTransactions(); //remove to wallet endpint
-        $result->friends = $this->user->friends(); //remove to friends screen/endpoints
         $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();
@@ -61,32 +57,6 @@ class UserController extends BaseController
         $quizzes = UserQuiz::where('user_id', $user->id)->get();
 
         return $this->sendResponse($quizzes, "User Quizzes");
-    }
-
-    public function searchFriends(Request $request)
-    {
-        // $user_array = array();
-
-        if (!is_null($request)) {
-            $search = $request['search'];
-            $result = User::where('phone_number', 'like', '%' . $search . '%')
-                ->orWhere('username', 'like', '%' . $search . '%')
-                ->limit(10)->get()->map(function ($friend) {
-                    $data = new stdClass;
-                    $data->id = $friend->id;
-                    //$data->fullName = $friend->profile->full_name;
-                    $data->username = $friend->username;
-                    $data->avatar = $friend->profile->avatar;
-                    return $data;
-                });
-
-            // return $this->sendResponse($result, "Retrieved result for friends");
-            return (new FriendsDataResponse())->transform(collect($result));
-        }
-
-
-
-        return $this->sendResponse([], "Retrieved result for friends");
     }
 
 

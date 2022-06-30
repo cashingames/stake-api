@@ -12,6 +12,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GetFriendsController;
 use App\Http\Controllers\LeadersController;
 use App\Http\Controllers\LiveTriviaStatusController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
@@ -50,8 +51,7 @@ Route::middleware('api')->prefix('v3')->group(
 Route::middleware('auth:api')->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);
-        Route::get('user/search/friends', [UserController::class, 'searchFriends']);
-
+        Route::get('user/search/friends', GetFriendsController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);

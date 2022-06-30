@@ -11,9 +11,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Carbon\Carbon;
 use App\Traits\Utils\DateUtils;
-use Google\Service\Docs\Request;
-
-use function PHPUnit\Framework\isNull;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -267,39 +264,6 @@ class User extends Authenticatable implements JWTSubject
         $gameWins = GameSession::where('correct_count', '>=', 5)->count();
         return ($gameWins / 100);
     }
-
-    public function friends()
-    {
-        $referralcode = $this->profile->referral_code;
-        $getProfiles =  Profile::where('referrer', $referralcode)->get();
-        if ($getProfiles->count() > 0) {
-            return Profile::where('referrer', $referralcode)->get()->map(function ($friend) {
-                $data = new stdClass;
-                $data->id = $friend->user->id;
-                $data->username = $friend->user->username;
-                $data->avatar = $this->getAvatarUrl($friend->avatar);
-                return $data;
-            });
-        } else {
-
-            return User::where('id', '!=', $this->id)->limit(10)->get()->map(function ($friend) {
-                $data = new stdClass;
-                $data->id = $friend->id;
-                $data->username = $friend->username;
-                $data->avatar = $this->getAvatarUrl($friend->profile->avatar);
-                return $data;
-            });
-        }
-    }
-
-    private function getAvatarUrl($avatar)
-    {
-        if ($avatar !== null) {
-            return config('app.url') . '/' . $avatar;
-        }
-        return $avatar;
-    }
-
 
     public function pointTransactions()
     {

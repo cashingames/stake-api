@@ -17,11 +17,12 @@ class FriendsDataResponse
 
         $response = [];
 
-        foreach ($friends as $data) {
+        foreach ($friends as $friend) {
             $presenter = new FriendsDataResponse;
-            $presenter->id = $data->id;
-            $presenter->username = $data->username;
-            $presenter->avatar = $this->getAvatarUrl($data->avatar);
+
+            $presenter->id = $friend->id;
+            $presenter->username = $friend->username;
+            $presenter->avatar = $this->getAvatarUrl($friend->profile->avatar);
 
             $response[] = $presenter;
         }
