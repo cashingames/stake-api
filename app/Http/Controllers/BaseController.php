@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\UserPoint;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class BaseController extends Controller
 {
@@ -30,6 +31,10 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
+        Log::info("Response sent to Frontend for  "
+            . $this->user->username . " from endpoint  "
+            .  url()->current() . " response " . json_encode($result));
+
 
         return response()->json($response, 200);
     }
@@ -41,6 +46,11 @@ class BaseController extends Controller
             'errors'    => $errors,
             'message' => $message,
         ];
+
+        Log::info("Response sent to Frontend for  "
+            . $this->user->username . " from endpoint  "
+            . url()->current() . " response " . json_encode($errors));
+
 
         return response()->json($response, 400);
     }
