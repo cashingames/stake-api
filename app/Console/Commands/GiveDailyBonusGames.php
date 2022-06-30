@@ -41,14 +41,14 @@ class GiveDailyBonusGames extends Command
      */
     public function handle()
     {
-        User::all()->map(function ($user) {
+        $freePlan = Plan::where('is_free', true)->first();
 
-            $freePlan = Plan::where('is_free', true)->first();
+        User::all()->map(function ($user) use ($freePlan) {
 
             UserPlan::create([
                 'plan_id' => $freePlan->id,
                 'user_id' => $user->id,
-                'description' => 'Daily bonus games plan',
+                'description' => "Daily bonus plan for " . $user->username,
                 'used_count' => 0,
                 'plan_count' => 5,
                 'is_active' => true,
