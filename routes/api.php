@@ -50,6 +50,8 @@ Route::middleware('api')->prefix('v3')->group(
 Route::middleware('auth:api')->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);
+        Route::get('user/search/friends', [UserController::class, 'searchFriends']);
+
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);
@@ -58,7 +60,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
-      
+
     }
 );
 
