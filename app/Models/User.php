@@ -265,19 +265,6 @@ class User extends Authenticatable implements JWTSubject
         return ($gameWins / 100);
     }
 
-    public function friends()
-    {
-        return User::where('id', '!=', $this->id)->get()->map(function ($friend) {
-            $data = new stdClass;
-            $data->id = $friend->id;
-            $data->fullName = $friend->profile->full_name;
-            $data->username = $friend->username;
-            $data->avatar = $friend->profile->avatar;
-            return $data;
-        });
-    }
-
-
     public function pointTransactions()
     {
         return $this->hasMany(UserPoint::class);

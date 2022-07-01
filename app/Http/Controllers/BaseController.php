@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\UserPoint;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class BaseController extends Controller
@@ -32,7 +30,7 @@ class BaseController extends Controller
         ];
 
         Log::info("Response sent to Frontend for  "
-            . $this->user->username . " from endpoint  "
+            . $this->user?->username . " from endpoint  "
             .  url()->current() . " response " . json_encode($result));
 
 
@@ -48,7 +46,7 @@ class BaseController extends Controller
         ];
 
         Log::info("Response sent to Frontend for  "
-            . $this->user->username . " from endpoint  "
+            .  $this->user?->username . " from endpoint  "
             . url()->current() . " response " . json_encode($errors));
 
 
