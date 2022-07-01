@@ -44,6 +44,11 @@ class Profile extends Model
         return $profile;
     }
 
+    public function scopeReferrals()
+    {
+        return Profile::where('referrer', $this->referral_code);
+    }
+
     public function getFullNameAttribute()
     {
         return $this->first_name . " " . $this->last_name;
