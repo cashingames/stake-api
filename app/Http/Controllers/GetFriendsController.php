@@ -24,19 +24,8 @@ class GetFriendsController extends BaseController
         return (new FriendsDataResponse())->transform($result);
     }
 
-
-
-    /**
-     * Returns initial friends based on our business logic
-     */
     function getFriends()
     {
-
-        /**
-         * return all my referral
-         * if I don't have referrals, first random 10 profiles
-         */
-        //load only the field we need in profile for performance gains
         $result = User::withWhereHas(
             'profile',
             fn ($query) =>
@@ -44,12 +33,11 @@ class GetFriendsController extends BaseController
         )->get();
 
 
-        return (! $result->isEmpty()) ? $result : User::with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(10)->get();
+        return ! $result->isEmpty() ? $result : User::with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(10)->get();
     }
 
     function searchForFriends($search)
     {
-        //load only the field we need in profile for performance gains
         return User::with('profile:user_id,avatar')->where('phone_number', 'like', '%' . $search . '%')
             ->orWhere('username', 'like', '%' . $search . '%')
             ->get();
