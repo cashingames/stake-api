@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\UserPoint;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
-
-use function PHPUnit\Framework\isNull;
 
 class BaseController extends Controller
 {
@@ -34,7 +30,7 @@ class BaseController extends Controller
         ];
 
         Log::info("Response sent to Frontend for  "
-            . is_null($this->user) ? " undefined " : $this->user->username . " from endpoint  "
+            . $this->user?->username . " from endpoint  "
             .  url()->current() . " response " . json_encode($result));
 
 
@@ -50,7 +46,7 @@ class BaseController extends Controller
         ];
 
         Log::info("Response sent to Frontend for  "
-            . is_null($this->user) ? " undefined " : $this->user->username . " from endpoint  "
+            .  $this->user?->username . " from endpoint  "
             . url()->current() . " response " . json_encode($errors));
 
 

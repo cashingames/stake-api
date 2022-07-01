@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\ResponseHelpers\FriendsDataResponse;
-use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use stdClass;
 
-class GetFriendsController extends Controller
+
+
+class GetFriendsController extends BaseController
 {
     /**
      * Handle the incoming request.
@@ -17,28 +16,42 @@ class GetFriendsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    function __invoke(Request $request)
     {
-        if (!$request->has('search')) {
-            $referralcode = Auth::user()->profile->referral_code;
-            $getProfiles =  Profile::where('referrer', $referralcode)->get();
-            if ($getProfiles->count() > 0) {
-                $result = User::withWhereHas(
-                    'profile',
-                    fn ($query) =>
-                    $query->where('referrer', $referralcode)
-                )->get();
-                return (new FriendsDataResponse())->transform($result);
-            } else {
 
-                $result = User::with('profile')->where('id', '!=', Auth::user()->id)->limit(10)->get();
-                return (new FriendsDataResponse())->transform($result);
-            }
-        }
-        $search = $request->search;
-        $result = User::with('profile')->where('phone_number', 'like', '%' . $search . '%')
+        $result = $request->has('search') ? $this->searchForFriends($request->search) : $this->getFriends();
+
+        return (new FriendsDataResponse())->transform($result);
+    }
+
+
+
+    /**
+     * Returns initial friends based on our business logic
+     */
+    function getFriends()
+    {
+
+        /**
+         * return all my referral
+         * if I don't have referrals, first random 10 profiles
+         */
+        //load only the field we need in profile for performance gains
+        $result = User::withWhereHas(
+            'profile',
+            fn ($query) =>
+            $query->where('referrer', $this->user->profile->referral_code)
+        )->get();
+
+
+        return (! $result->isEmpty()) ? $result : User::with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(10)->get();
+    }
+
+    function searchForFriends($search)
+    {
+        //load only the field we need in profile for performance gains
+        return User::with('profile:user_id,avatar')->where('phone_number', 'like', '%' . $search . '%')
             ->orWhere('username', 'like', '%' . $search . '%')
             ->get();
-        return (new FriendsDataResponse())->transform($result);
     }
 }
