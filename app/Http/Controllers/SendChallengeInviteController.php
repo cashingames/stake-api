@@ -6,6 +6,7 @@ use App\Mail\ChallengeInvite;
 use App\Models\Challenge;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendChallengeInviteController extends BaseController
@@ -30,6 +31,8 @@ class SendChallengeInviteController extends BaseController
 
             Mail::send(new ChallengeInvite($request->friendId, $challenge->id));
 
+            Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
+            
             return $this->sendResponse('Invite Sent', 'Invite Sent');
         }
 
