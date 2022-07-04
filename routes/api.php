@@ -18,6 +18,7 @@ use App\Http\Controllers\LiveTriviaStatusController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\GetRecentLiveTriviaController;
 use App\Http\Controllers\PlayGroundController;
+use App\Http\Controllers\SendChallengeInviteController;
 use App\Http\Controllers\TriviaController;
 
 /*
@@ -60,7 +61,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
-
+        Route::post('challenge/send-invite', SendChallengeInviteController::class);
     }
 );
 

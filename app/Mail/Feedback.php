@@ -35,6 +35,7 @@ class Feedback extends Mailable
     public function build()
     {   
         return $this->to(config('app.admin_email'))
+        ->from($this->email)
         ->subject('FEEDBACK')
         ->view('emails.feedback')
         ->with([

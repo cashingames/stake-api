@@ -22,9 +22,10 @@ class ChallengeInvite extends Mailable
     public $opponent;
     public $challengeId;
 
-    public function __construct(User $opponent, $challengeId)
-    {
-        $this->opponent = $opponent;
+    public function __construct($opponent, $challengeId)
+    {   
+        
+        $this->opponent = User::find($opponent);
         $this->challengeId = $challengeId;
     }
 
@@ -36,10 +37,11 @@ class ChallengeInvite extends Mailable
     public function build()
     {
         return $this->to($this->opponent->email)
+            ->from('noreply@cashingames.com')
             ->subject('Cashingames Invitation! : Play a Challenge Game!')
             ->view('emails.users.challengeInvite')
             ->with([
-                'opponent' => $this->opponent->email,
+                'opponent' => $this->opponent->username,
                 'user' => auth()->user()->username,
                 'year' => Carbon::now()->year,
                 'challengeId'=>$this->challengeId
