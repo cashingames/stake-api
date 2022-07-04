@@ -18,13 +18,16 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => ['string', 'min:11', 'max:11', 'unique:users,phone_number'],
+            'phoneNumber' => ['required','string', 'min:11', 'max:11'],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
         if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
-            $this->user->phone_number = $data['phoneNumber'];
+            $isExisting= User::where('phone_number',$data['phoneNumber'])->exists();
+            if(!$isExisting){
+                $this->user->phone_number = $data['phoneNumber'];
+            }
         }
 
         $profile = $this->user->profile;
