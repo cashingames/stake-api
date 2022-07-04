@@ -27,11 +27,10 @@ class ProfileController extends BaseController
             $isExisting= User::where('phone_number',$data['phoneNumber'])->exists();
             if(!$isExisting){
                 $this->user->phone_number = $data['phoneNumber'];
+                $this->user->save();
             }
         }
-
         $profile = $this->user->profile;
-
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
 
@@ -42,8 +41,6 @@ class ProfileController extends BaseController
         if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
             $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
-
-        $this->user->save();
         $profile->save();
 
         return $this->sendResponse($this->user, "Profile Updated.");
