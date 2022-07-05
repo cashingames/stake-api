@@ -9,6 +9,7 @@ use URL;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends BaseController
 {
@@ -18,17 +19,19 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => ['string', 'min:11', 'max:11', 'unique:users,phone_number'],
+            'phoneNumber' => [
+                'required','min:11','max:11',
+                Rule::unique('users','phone_number')->ignore($this->user->id),
+            ],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
+        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) { 
             $this->user->phone_number = $data['phoneNumber'];
+            $this->user->save();
         }
-
         $profile = $this->user->profile;
-
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
 
@@ -39,8 +42,6 @@ class ProfileController extends BaseController
         if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
             $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
-
-        $this->user->save();
         $profile->save();
 
         return $this->sendResponse($this->user, "Profile Updated.");
