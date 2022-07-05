@@ -27,7 +27,7 @@ class GetFriendsController extends BaseController
     function getFriends()
     {
          $result =  User::with('profile:user_id,avatar')->whereRelation('profile', 'referrer', $this->user->profile->referral_code)->get();
-        return ! $result->isEmpty() ? $result : User::with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(10)->get();
+        return ! $result->isEmpty() ? $result : User::with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->inRandomOrder()->limit(10)->get();
     }
 
     function searchForFriends($search)

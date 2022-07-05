@@ -35,6 +35,7 @@ class TokenGenerated extends Mailable
     public function build()
     {
         return $this->to($this->user->email, $this->user->username)
+            ->from('noreply@cashingames.com')
             ->subject('Cashingames: Reset Password')
             ->view('emails.users.token')
             ->with([
