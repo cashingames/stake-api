@@ -9,6 +9,7 @@ use URL;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends BaseController
 {
@@ -18,17 +19,17 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => ['required','string', 'min:11', 'max:11'],
+            'phoneNumber' => [
+                'required','min:11','max:11',
+                Rule::unique('users','phone_number')->ignore($this->user->id),
+            ],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
-            $isExisting= User::where('phone_number',$data['phoneNumber'])->exists();
-            if(!$isExisting){
-                $this->user->phone_number = $data['phoneNumber'];
-                $this->user->save();
-            }
+        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) { 
+            $this->user->phone_number = $data['phoneNumber'];
+            $this->user->save();
         }
         $profile = $this->user->profile;
         $profile->first_name = $data['firstName'];
