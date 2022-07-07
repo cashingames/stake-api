@@ -19,7 +19,7 @@ class ChallengeInviteStatusController extends BaseController
         if (!$request->has('challenge_id')) {
             return $this->sendError('Challenge info not found', 'Challenge info not found');
         }
-        $status = $request->status==1 ? "ACCEPTED" : "DECLINED";
+        $status = $request->status === 1 ? "ACCEPTED" : "DECLINED";
         $getChallengeInfo =  Challenge::find($request->challenge_id);
         $getChallengeInfo->status =  $status;
         $getChallengeInfo->save();
