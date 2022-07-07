@@ -124,14 +124,18 @@ class LiveTriviaStatusResponse
 
         if ($status == LiveTriviaStatus::Waiting) {
             $result = "";
-        } else if ($status == LiveTriviaStatus::Ongoing) {
+        }
+        if($status == LiveTriviaStatus::Ongoing) {
             if ($playerStatus == LiveTriviaPlayerStatus::LowPoints) {
                 $result = "Play now";
             } else if ($playerStatus == LiveTriviaPlayerStatus::Played) {
                 $result = "Leaderboard";
             } else if ($playerStatus == LiveTriviaPlayerStatus::CanPlay) {
                 $result = "Play now";
-            }
+            }   
+        }
+        if($status == LiveTriviaStatus::Expired){
+            $result = "Leaderboard";
         }
 
         return $result;
