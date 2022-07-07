@@ -33,7 +33,6 @@ class ChallengeInviteStatusController extends BaseController
 
         Log::info("Challenge $request->challenge_id  response has been sent from ". $this->user->username );
 
-       // return $this->sendResponse($getChallengeInfo, "Challenge $status");
         return (new ChallengeInviteResponse())->transform($getChallengeInfo);
     }
 }
