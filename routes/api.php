@@ -63,7 +63,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('live-trivia/status', LiveTriviaStatusController::class); //gets the most recent upcoming/running/closed
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); //@TODO 
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
-        Route::post('challenge/invite-status', ChallengeInviteStatusController::class);
+        Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
 
     }
 );

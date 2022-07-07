@@ -10,4 +10,10 @@ class Challenge extends Model
     use HasFactory;
 
     protected $fillable = ['category_id', 'user_id','opponent_id','status'];
+
+    public function users(){
+      
+        return $this->belongsTo(User::class);
+      
+    }
 }
