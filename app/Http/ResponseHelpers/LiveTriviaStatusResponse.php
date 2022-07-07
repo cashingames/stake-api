@@ -134,7 +134,7 @@ class LiveTriviaStatusResponse
                 $result = "Play now";
             }   
         }
-        if($status == LiveTriviaStatus::Expired){
+        if($status == LiveTriviaStatus::Expired || $status == LiveTriviaStatus::Closed){
             $result = "Leaderboard";
         }
 
