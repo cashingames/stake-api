@@ -21,13 +21,13 @@ class RespondToChallengeInvite extends Mailable
      */
 
     public $status;
-    public $user;
+    public $player;
     public $challengeId;
 
-    public function __construct($status, $user_id, $challengeId)
+    public function __construct($status, $player, $challengeId)
     {   
         $this->status = $status;
-        $this->user = User::find($user_id);
+        $this->player = $player;
         $this->challengeId = $challengeId;
     }
 
@@ -38,13 +38,13 @@ class RespondToChallengeInvite extends Mailable
      */
     public function build()
     {
-        return $this->to($this->user->email)
+        return $this->to($this->player->email)
             ->from('noreply@cashingames.com')
             ->subject('Your Challenge Response !')
             ->view('emails.users.respondToChallengeInvite')
             ->with([
                 'opponent' => auth()->user()->username,
-                'user' => $this->user->username,
+                'user' => $this->player->username,
                 'year' => Carbon::now()->year,
                 'challengeId'=>$this->challengeId,
                 'status' => $this->status

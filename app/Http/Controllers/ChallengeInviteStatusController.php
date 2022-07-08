@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\ResponseHelpers\ChallengeInviteResponse;
+use App\Http\ResponseHelpers\ChallengeDetailsResponse;
 use App\Mail\RespondToChallengeInvite;
 use App\Models\Challenge;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -23,16 +24,16 @@ class ChallengeInviteStatusController extends BaseController
             return $this->sendError('Challenge info not found', 'Challenge info not found');
         }
         $status = $request->status == 1 ? "ACCEPTED" : "DECLINED";
-        $getChallengeInfo =  Challenge::find($request->challenge_id);
-        $getChallengeInfo->status =  $status;
-        $getChallengeInfo->save();
+        $updatedChallenge = Challenge::changeChallengeStatus($status, $request->challenge_id);
 
-        Log::info("Challenge with ID: " .$request->challenge_id. "  has been " . $status. " by ". $this->user->username);
+        $player = User::find($updatedChallenge->user_id);
 
-        Mail::send(new RespondToChallengeInvite($status, $getChallengeInfo->user_id, $getChallengeInfo->id ));
+        Log::info("Challenge with ID: " . $request->challenge_id . "  has been " . $status . " by " . $this->user->username);
 
-        Log::info("Challenge $request->challenge_id  response has been sent from ". $this->user->username );
+        Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-        return (new ChallengeInviteResponse())->transform($getChallengeInfo);
+        Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
+
+        return $this->sendResponse('Response email sent', 'Response email sent');
     }
 }
