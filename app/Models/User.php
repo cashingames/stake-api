@@ -181,6 +181,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(GameSession::class);
     }
 
+    public function challenges(){
+        return $this->hasMany(Challenge::class);
+    }
+
     public function points()
     {
         $pointsAdded = UserPoint::where('user_id', $this->id)
