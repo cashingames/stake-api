@@ -78,7 +78,7 @@ class LiveTriviaStatusResponse
         $response->playerStatus = $this->getPlayerStatus($model, $response->pointsAcquiredBeforeStart);
         $response->prizeDisplayText = $this->getPrizeDisplayText($response->prize);
         $response->statusDisplayText = $this->getStatusDisplayText($response->status);
-        $response->startDateDisplayText = $this->getStartDateDisplayText($response->startAt);
+        $response->startDateDisplayText = $this->getStartDateDisplayText($model->start_time);
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         return $response;
     }
@@ -124,14 +124,18 @@ class LiveTriviaStatusResponse
 
         if ($status == LiveTriviaStatus::Waiting) {
             $result = "";
-        } else if ($status == LiveTriviaStatus::Ongoing) {
+        }
+        if($status == LiveTriviaStatus::Ongoing) {
             if ($playerStatus == LiveTriviaPlayerStatus::LowPoints) {
                 $result = "Play now";
             } else if ($playerStatus == LiveTriviaPlayerStatus::Played) {
                 $result = "Leaderboard";
             } else if ($playerStatus == LiveTriviaPlayerStatus::CanPlay) {
                 $result = "Play now";
-            }
+            }   
+        }
+        if($status == LiveTriviaStatus::Expired || $status == LiveTriviaStatus::Closed){
+            $result = "Leaderboard";
         }
 
         return $result;
