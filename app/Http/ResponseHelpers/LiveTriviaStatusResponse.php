@@ -53,7 +53,7 @@ class LiveTriviaStatusResponse
         $response->playerStatus = $this->getPlayerStatus($model, $response->pointsAcquiredBeforeStart);
         $response->prizeDisplayText = $this->getPrizeDisplayText($response->prize);
         $response->statusDisplayText = $this->getStatusDisplayText($response->status);
-        $response->startDateDisplayText = $this->getStartDateDisplayText($response->startAt);
+        $response->startDateDisplayText = $this->getStartDateDisplayText($model->start_time);
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         return response()->json($response);
     }
