@@ -54,7 +54,7 @@
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                                     @if ($status === "ACCEPTED")
-                                        <span>Click on <a href= "cashingames://instructions/{{$challengeId}}"><b>this link</b></a> to play this challenge.</span>
+                                        <span>Click on <a href= "cashingames://instructions/:{{$challengeId}}"><b>this link</b></a> to play this challenge.</span>
                                     @else
                                         <span>Click to <a href= "cashingames://home"><b>play other games.</b></a> . </span>
                                     @endif
