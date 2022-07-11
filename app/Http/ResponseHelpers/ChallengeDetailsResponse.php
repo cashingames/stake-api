@@ -2,8 +2,6 @@
 
 namespace App\Http\ResponseHelpers;
 
-use App\Enums\ChallengeStatus;
-use App\Models\User;
 use \Illuminate\Http\JsonResponse;
 use App\Traits\Utils\AvatarUtils;
 
@@ -22,6 +20,7 @@ class ChallengeDetailsResponse
     public $opponentAvatar;
     public string $gameModeName;
     public int $gameModeId;
+    public int $categoryId;
     public $status;
 
 
@@ -31,6 +30,7 @@ class ChallengeDetailsResponse
         $presenter = new ChallengeDetailsResponse;
 
         $presenter->challenegeId = $data->challengeDetails->id;
+        $presenter->categoryId = $data->challengeDetails->category_id;
         $presenter->playerId = $data->challengeDetails->user_id;
         $presenter->playerUsername = $data->playerUsername;
         $presenter->playerAvatar = $this->getAvatarUrl($data->playerAvatar);

@@ -20,22 +20,26 @@ class SendChallengeInviteController extends BaseController
     public function __invoke(Request $request)
     {   
 
-        if ($request->has('opponentId') ) {
-
-            $challenge = Challenge::create([
-                'status' => 'PENDING',
-                'user_id' => $this->user->id,
-                'opponent_id' => $request->opponentId
-            ]);
-
-            Mail::send(new ChallengeInvite($request->opponentId, $challenge->id));
-
-            Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
+        if (!$request->has('opponentId') || !$request->has('categoryId') ) {
             
-            return $this->sendResponse('Invite Sent', 'Invite Sent');
+            return $this->sendError('Friend or category not found', 'Friend or category not found');
+
         }
 
-        return $this->sendError('Friend not found', 'Friend not found');
+        $challenge = Challenge::create([
+            'status' => 'PENDING',
+            'user_id' => $this->user->id,
+            'category_id' => $request->categoryId,
+            'opponent_id' => $request->opponentId
+        ]);
+
+        $opponent = User::find($request->opponentId);
+        Mail::send(new ChallengeInvite($opponent, $challenge->id));
+
+        Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
+        
+        return $this->sendResponse('Invite Sent', 'Invite Sent');
+      
     }
 
 }

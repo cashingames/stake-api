@@ -25,7 +25,7 @@ class ChallengeInvite extends Mailable
     public function __construct($opponent, $challengeId)
     {   
         
-        $this->opponent = User::find($opponent);
+        $this->opponent = $opponent;
         $this->challengeId = $challengeId;
     }
 
