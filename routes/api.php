@@ -21,6 +21,7 @@ use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\GetRecentLiveTriviaController;
 use App\Http\Controllers\PlayGroundController;
 use App\Http\Controllers\SendChallengeInviteController;
+use App\Http\Controllers\StartChallengeGameController;
 use App\Http\Controllers\TriviaController;
 
 /*
@@ -66,6 +67,8 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
         Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
         Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class);
+        Route::post('challenge/start/game', StartChallengeGameController::class);
+
     }
 );
 
