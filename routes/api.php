@@ -13,6 +13,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChallengeInviteStatusController;
+use App\Http\Controllers\EndChallengeGameController;
 use App\Http\Controllers\GetChallengeDetailsController;
 use App\Http\Controllers\GetFriendsController;
 use App\Http\Controllers\LeadersController;
@@ -68,6 +69,8 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
         Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class);
         Route::post('challenge/start/game', StartChallengeGameController::class);
+        Route::post('challenge/end/game', EndChallengeGameController::class);
+
 
     }
 );
