@@ -17,10 +17,8 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
-        $recentLiveTrivia = DB::select(
-            "select * from trivias order by created_at desc
-            limit 10"
-        );
+    
+        $recentLiveTrivia = DB::table('trivias')->where('is_published', true)->latest()->limit(10)->get();
 
         $response = [];
        
