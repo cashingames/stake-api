@@ -53,7 +53,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
-                                    <span>Click on <a href= "{{config('app.web_app_url')}}/redirect-to-mobile/challenge/{{$challengeId}}"><b>this link</b></a> to accept or decline this challenge</span>
+                                    <span>Click on <a href= "{{config('app.url')}}/redirect-respond-to-challenge?challengeId={{$challengeId}}"><b>this link</b></a> to accept or decline this challenge</span>
                                 </td>
                             </tr>
                         </table>

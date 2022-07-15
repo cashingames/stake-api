@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+<body>
+    <script>
+        function getParams() {
+            let currentUrl = window.location.search;
+            let urlParams = new URLSearchParams(currentUrl);
+
+            let param = urlParams.get('challengeId');
+           
+            window.location.replace(`cashingames://instructions/${param}`);
+           
+        }  
+        getParams();
+    
+    </script>
+</body>
+
+</html>

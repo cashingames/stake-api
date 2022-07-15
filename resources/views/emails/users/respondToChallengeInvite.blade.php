@@ -54,9 +54,9 @@
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                                     @if ($status === "ACCEPTED")
-                                        <span>Click on <a href= "{{config('app.web_app_url')}}/redirect-to-mobile/instructions/{{$challengeId}}"><b>this link</b></a> to play this challenge.</span>
+                                        <span>Click on <a href= "{{config('app.url')}}/redirect-instructions?challengeId={{$challengeId}}"><b>this link</b></a> to play this challenge.</span>
                                     @else
-                                        <span>Click to <a href= "{{config('app.web_app_url')}}/redirect-to-mobile/home"><b>play other games.</b></a> . </span>
+                                        <span>Click to <a href= "{{config('app.url')}}/redirect-home"><b>play other games.</b></a> . </span>
                                     @endif
                                     
                                 </td>

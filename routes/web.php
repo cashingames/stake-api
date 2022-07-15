@@ -20,3 +20,14 @@ Route::get('/salient-testing', function () {
 Route::get('/debug-sentry', function () {
     throw new Exception('Sentry error!');
 });
+
+Route::get('/redirect-respond-to-challenge', function () {
+    return view('redirectToRespondToChallenge');
+});
+Route::get('/redirect-home', function () {
+    return view('redirectToHome');
+});
+Route::get('/redirect-instructions', function () {
+    return view('redirectToInstructions');
+});
+
