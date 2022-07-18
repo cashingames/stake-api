@@ -6,9 +6,11 @@ use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Traits\Utils\DateUtils;
 
 class LeadersController extends BaseController
-{
+{   
+    use DateUtils;
     /**
      * Returns just the global leaders
      * This is useful for dashboard where we only need global leaders
@@ -106,13 +108,15 @@ class LeadersController extends BaseController
         $_startDate = null;
         $_endDate = null;
         if ($request->has(['startDate','endDate'])) {
-            $_startDate = Carbon::parse($request->startDate)->startOfDay('Africa/Lagos');
-            $_endDate = Carbon::parse($request->endDate)->tomorrow('Africa/Lagos');
+            $_startDate = $this->utcDateConverter(Carbon::parse($request->startDate)->startOfDay()) ;
+            $_endDate = $this->utcDateConverter(Carbon::parse($request->endDate)->tomorrow());
+
             $filter = true;
         }
         else {
-            $_startDate = Carbon::today()->startOfDay('Africa/Lagos');
-            $_endDate = Carbon::tomorrow()->startOfDay('Africa/Lagos');
+            $_startDate = $this->utcDateConverter(Carbon::today()->startOfDay());
+            $_endDate = $this->utcDateConverter(Carbon::tomorrow()->startOfDay());
+
             $filter = true;
         }
 
@@ -150,12 +154,14 @@ class LeadersController extends BaseController
         $_endDate = null;
 
         if ($request->has(['startDate','endDate'])) {
-            $_startDate = Carbon::parse($request->startDate)->startOfDay('Africa/Lagos');
-            $_endDate = Carbon::parse($request->endDate)->tomorrow('Africa/Lagos');
+            $_startDate = $this->utcDateConverter(Carbon::parse($request->startDate)->startOfDay()) ;
+            $_endDate = $this->utcDateConverter(Carbon::parse($request->endDate)->tomorrow());
+
             $filter = true;
         } else {
-            $_startDate = Carbon::today()->startOfDay('Africa/Lagos');
-            $_endDate = Carbon::tomorrow()->startOfDay('Africa/Lagos');
+            $_startDate = $this->utcDateConverter(Carbon::today()->startOfDay());
+            $_endDate = $this->utcDateConverter(Carbon::tomorrow()->startOfDay());
+            
             $filter = true;
         }
 
@@ -187,5 +193,12 @@ class LeadersController extends BaseController
             $response[$leader->category_name][] = $leader;
         }
         return $this->sendResponse($response, 'Categories leaderboard');
+    }
+
+    private function utcDateConverter($date){
+        $toNigerianTime = $this->toNigeriaTimeZoneFromUtc($date);
+        $toUtcTimeZone = $this->toUtcFromNigeriaTimeZone($toNigerianTime);
+
+        return $toUtcTimeZone;
     }
 }
