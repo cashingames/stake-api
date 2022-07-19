@@ -14,7 +14,7 @@ class UserChallengeResponse
     public  $date;
     public string $subcategory;
     public int $challengeId;
-    public ChallengeStatus $status;
+    public string $status;
 
 
     public function transform($challenges): JsonResponse
@@ -40,10 +40,10 @@ class UserChallengeResponse
     private function getStatus($challengeId): ChallengeStatus
     {
         $getChallengeGameSession = ChallengeGameSession::where('challenge_id', $challengeId);
-        if ($getChallengeGameSession->count() <= 1 || $getChallengeGameSession->where('state', NULL)->count() == 2) {
-           return  ChallengeStatus::Pending;
-        } else if ($getChallengeGameSession->where('state', 'COMPLETED')->count() == 2) {
-           return ChallengeStatus::Closed;
+        if ($getChallengeGameSession->count() <= 0) {
+            return  ChallengeStatus::Pending;
+        } else if ($getChallengeGameSession->where('state', 'COMPLETED')->count() >= 2) {
+            return ChallengeStatus::Closed;
         } else {
             return ChallengeStatus::Ongoing;
         }
