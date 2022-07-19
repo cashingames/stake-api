@@ -72,7 +72,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class);
         Route::post('challenge/start/game', StartChallengeGameController::class);
         Route::post('challenge/end/game', EndChallengeGameController::class);
-        Route::get('challenge/{userId}/leaderboard', GetChallengeLeaderboardController::class);
+        Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
     }
 );
