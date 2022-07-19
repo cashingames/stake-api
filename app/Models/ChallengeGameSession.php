@@ -33,6 +33,11 @@ class ChallengeGameSession extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function opponent()
+    {
+        return $this->belongsTo(User::class, 'opponent_id', 'id');
+    }
+
     public function challenge()
     {
         return $this->belongsTo(Challenge::class);
