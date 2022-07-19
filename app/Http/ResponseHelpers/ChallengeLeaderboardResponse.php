@@ -27,11 +27,11 @@ class ChallengeLeaderboardResponse
         $presenter->opponentUsername = $data->opponentUsername;
         $presenter->challengerAvatar = $this->getAvatarUrl($data->avatar);
         $presenter->opponentAvatar = $this->getAvatarUrl($data->opponentAvatar);
-        $presenter->challengerPoint = $data->challengerPoint;
+        $presenter->challengerPoint = ($data->challengerPoint == NULL) ? 0: $data->challengerPoint;
         $presenter->opponentPoint = ($data->opponentPoint == NULL) ? 0 : $data->opponentPoint;
-        $presenter->challengerDuration = $data->challengerFinishduration;
+        $presenter->challengerDuration = ($data->challengerFinishduration==NULL)? 0: $data->challengerFinishduration;
         $presenter->opponentDuration = ($data->opponentFinishduration == NULL) ? 0 : $data->opponentFinishduration;
-        $presenter->challengerStatus = $data->challengerStatus;
+        $presenter->challengerStatus = ($data->challengerStatus==NULL)? 'PENDING': $data->challengerStatus;
         $presenter->opponentStatus = ($data->opponentStatus == null) ? 'PENDING' :  $data->opponentStatus;
         return response()->json($presenter);
     }
