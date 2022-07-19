@@ -10,8 +10,6 @@ class GetChallengeLeaderboardController extends Controller
 
     public function __invoke($challengeId)
     {
-
-
        $query = 'SELECT u.username, up.avatar, op.avatar as opponentAvatar, o.username as opponentUsername, 
         sum(cgsu.points_gained) as challengerPoint, 
         sum(cgso.points_gained) as opponentPoint,
@@ -27,7 +25,6 @@ class GetChallengeLeaderboardController extends Controller
         INNER JOIN profiles op on op.id = challenges.opponent_id
         WHERE challenges.id = ?';
         $result = DB::select($query, [$challengeId]);
-       
-        return (new ChallengeLeaderboardResponse())->transform(collect($result));
+        return (new ChallengeLeaderboardResponse())->transform(collect($result)->first());
     }
 }
