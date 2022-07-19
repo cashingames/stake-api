@@ -2,7 +2,7 @@
 
 namespace App\Http\ResponseHelpers;
 
-use App\Enums\ChallengeGameSessionStatus;
+use App\Enums\ChallengeStatus;
 use \Illuminate\Http\JsonResponse;
 use App\Traits\Utils\AvatarUtils;
 
@@ -12,7 +12,8 @@ class ChallengeLeaderboardResponse
 
     public string $challengerUsername;
     public string $opponentUsername;
-    public ChallengeGameSessionStatus $status;
+    public string $status;
+    public ChallengeStatus $challengeStatus;
     public int $challengerDuration;
     public int $opponentDuration;
     public int $challengerPoint;
@@ -31,23 +32,25 @@ class ChallengeLeaderboardResponse
         $presenter->opponentPoint = ($data->opponentPoint == NULL) ? 0 : $data->opponentPoint;
         $presenter->challengerDuration = ($data->challengerFinishduration == NULL) ? 0 : $data->challengerFinishduration;
         $presenter->opponentDuration = ($data->opponentFinishduration == NULL) ? 0 : $data->opponentFinishduration;
-        $presenter->status =  $this->getStatus($data->challengerStatus, $data->opponentStatus);
+        $presenter->challengerStatus = ($data->challengerStatus == NULL) ? 'PENDING' : $data->challengerStatus;
+        $presenter->opponentStatus = ($data->opponentStatus == null) ? 'PENDING' :  $data->opponentStatus;
+        $presenter->challengeStatus = $this->getStatus($data->challengerStatus, $data->opponentStatus);
         return response()->json($presenter);
     }
 
 
-    private function getStatus($challengerStatus, $opponentStatus): ChallengeGameSessionStatus
+    private function getStatus($challengerStatus, $opponentStatus): ChallengeStatus
     {
         if ($challengerStatus == 'PENDING' && $opponentStatus == 'PENDING') {
-            return ChallengeGameSessionStatus::Pending;
+            return ChallengeStatus::Pending;
         } else if ($challengerStatus == NULL && $opponentStatus  == NULL) {
-            return ChallengeGameSessionStatus::Pending;
+            return ChallengeStatus::Pending;
         } 
         else if ($challengerStatus != 'COMPLETED' && $opponentStatus != 'COMPLETED') {
-            return ChallengeGameSessionStatus::Ongoing;
+            return ChallengeStatus::Ongoing;
         }
          else {
-            return ChallengeGameSessionStatus::Closed;
+            return ChallengeStatus::Closed;
         }
 
     }

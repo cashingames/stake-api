@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ChallengeGameSessionStatus: string {
+enum ChallengeStatus: string {
     case Ongoing = "ONGOING";
     case Closed = "CLOSED";
     case Pending = "PENDING";
