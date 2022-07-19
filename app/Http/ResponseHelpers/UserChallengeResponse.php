@@ -10,8 +10,10 @@ class UserChallengeResponse
     public string $playerUsername;
     public string $opponentUsername;
     public  $date;
-    public string $category;
+    public string $subcategory;
+     public int $challengeId;
     public $status;
+   
 
     public function transform($challenges): JsonResponse
     {
@@ -20,10 +22,11 @@ class UserChallengeResponse
         foreach ($challenges as $data) {
 
             $presenter = new UserChallengeResponse;
-            $presenter->category = $data->name;
+            $presenter->subcategory = $data->name;
             $presenter->playerUsername = $data->username;
             $presenter->opponentUsername = $data->opponentUsername;
             $presenter->status = $data->status;
+            $presenter->challengeId = $data->id;
             $presenter->date = $data->created_at;
             $response[] = $presenter;
         }

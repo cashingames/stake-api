@@ -327,7 +327,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function userChallenges()
     {
-        return  DB::select('SELECT u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges 
+        return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges 
         INNER JOIN categories on categories.id = challenges.category_id
         INNER JOIN users u on u.id = challenges.user_id
         INNER JOIN users o on o.id = challenges.opponent_id');

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class GetChallengeLeaderboardController extends Controller
 {
 
-    public function __invoke($userId)
+    public function __invoke($challengeId)
     {
 
 
@@ -25,8 +25,8 @@ class GetChallengeLeaderboardController extends Controller
         INNER JOIN users o on o.id = challenges.opponent_id
         INNER JOIN profiles up on up.id = challenges.user_id
         INNER JOIN profiles op on op.id = challenges.opponent_id
-        WHERE challenges.user_id = ? or challenges.opponent_id = ?';
-        $result = DB::select($query, [$userId, $userId]);
+        WHERE challenges.id = ?';
+        $result = DB::select($query, [$challengeId]);
        
         return (new ChallengeLeaderboardResponse())->transform(collect($result));
     }
