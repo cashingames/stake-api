@@ -30,4 +30,7 @@ Route::get('/redirect-home', function () {
 Route::get('/redirect-instructions', function () {
     return view('redirectToInstructions');
 });
+Route::get('/redirect-verified-email', function () {
+    return view('redirectToEmailVerified');
+});
 

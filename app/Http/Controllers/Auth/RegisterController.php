@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Http\Controllers\BaseController;
+use App\Mail\VerifyEmail;
 use App\Models\Boost;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,8 @@ use App\Models\UserPoint;
 use App\Models\Profile;
 use App\Models\Wallet;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends BaseController
 {
@@ -151,7 +154,11 @@ class RegisterController extends BaseController
             /** @TODO: this needs to be changed to plan */
             // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
+      
+        Mail::send(new VerifyEmail($user));
 
+        Log::info("Email verification sent to " . $user->email);
+        
         return $user;
     }
 
