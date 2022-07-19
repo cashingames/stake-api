@@ -4,7 +4,17 @@
 <head>
 <body>
     <script>
-        window.location.replace("cashingames://email-verified");
+        function getParams() {
+            let currentUrl = window.location.search;
+            let urlParams = new URLSearchParams(currentUrl);
+
+            let param = urlParams.get('email');
+           
+            window.location.replace(`cashingames://email-verify/${param}`);
+           
+        }  
+        getParams();
+    
     </script>
 </body>
 

@@ -22,8 +22,8 @@ class VerifyEmail extends Mailable
     public $user;
 
     public function __construct($user)
-    {   
-        
+    {
+
         $this->user = $user;
     }
 
@@ -40,6 +40,7 @@ class VerifyEmail extends Mailable
             ->view('emails.users.verifyEmail')
             ->with([
                 'username' => $this->user->username,
+                'email' => $this->user->email,
                 'year' => Carbon::now()->year,
             ]);
     }
