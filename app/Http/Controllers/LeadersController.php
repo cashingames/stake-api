@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use App\Traits\Utils\DateUtils;
 
 class LeadersController extends BaseController
-{   
+{
     use DateUtils;
     /**
      * Returns just the global leaders
@@ -104,41 +104,26 @@ class LeadersController extends BaseController
 
     public function globalLeaders(Request $request)
     {
-        $filter = false;
-        $_startDate = null;
-        $_endDate = null;
-        if ($request->has(['startDate','endDate'])) {
-            $_startDate = $this->utcDateConverter(Carbon::parse($request->startDate)->startOfDay()) ;
-            $_endDate = $this->utcDateConverter(Carbon::parse($request->endDate)->tomorrow());
+        $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
+        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::tomorrow()->startOfDay());
 
-            $filter = true;
+        if ($request->has(['startDate', 'endDate'])) {
+            $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->startDate)->startOfDay());
+            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->tomorrow());
         }
-        else {
-            $_startDate = $this->utcDateConverter(Carbon::today()->startOfDay());
-            $_endDate = $this->utcDateConverter(Carbon::tomorrow()->startOfDay());
-
-            $filter = true;
-        }
-
         $sql = 'SELECT g.points, p.avatar, p.first_name , p.last_name, g.username
             FROM (
                 SELECT SUM(points_gained) AS points, user_id, username FROM game_sessions gs
-                INNER JOIN users ON users.id = gs.user_id';
-
-        $sql .= $filter ? ' WHERE gs.created_at >= ? AND gs.created_at < ?' : '';
-
-        $sql .= ' GROUP BY user_id
+                INNER JOIN users ON users.id = gs.user_id WHERE gs.created_at >= ? AND gs.created_at < ?  GROUP BY user_id
                 ORDER BY points DESC
                 LIMIT 25
             ) g
             INNER JOIN profiles p ON g.user_id = p.user_id
             ORDER BY g.points DESC';
 
-        if ($filter) {
-            $leaders = DB::select($sql, [$_startDate,  $_endDate]);
-        } else {
-            $leaders = DB::select($sql);
-        }
+
+        $leaders = DB::select($sql, [$this->toUtcFromNigeriaTimeZone($_startDate),  $this->toUtcFromNigeriaTimeZone($_endDate)]);
+
 
         return $this->sendResponse($leaders, "Global Leaders");
     }
@@ -149,20 +134,12 @@ class LeadersController extends BaseController
      */
     public function categoriesLeaders(Request $request)
     {
-        $filter = false;
-        $_startDate = null;
-        $_endDate = null;
+        $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
+        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::tomorrow()->startOfDay());
 
-        if ($request->has(['startDate','endDate'])) {
-            $_startDate = $this->utcDateConverter(Carbon::parse($request->startDate)->startOfDay()) ;
-            $_endDate = $this->utcDateConverter(Carbon::parse($request->endDate)->tomorrow());
-
-            $filter = true;
-        } else {
-            $_startDate = $this->utcDateConverter(Carbon::today()->startOfDay());
-            $_endDate = $this->utcDateConverter(Carbon::tomorrow()->startOfDay());
-            
-            $filter = true;
+        if ($request->has(['startDate', 'endDate'])) {
+            $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->startDate)->startOfDay());
+            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->tomorrow());
         }
 
         $sql = 'SELECT p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name, r.username
@@ -170,11 +147,7 @@ class LeadersController extends BaseController
             (SELECT sum(points_gained) points, gs.user_id, c.category_id, u.username
                 FROM game_sessions gs
                 INNER JOIN categories c on c.id = gs.category_id
-                INNER JOIN users u on u.id = gs.user_id';
-
-        $sql .= $filter ? ' WHERE gs.created_at >= ? AND gs.created_at < ?' : '';
-
-        $sql .= ' GROUP BY c.category_id, gs.user_id
+                INNER JOIN users u on u.id = gs.user_id WHERE gs.created_at >= ? AND gs.created_at < ? GROUP BY c.category_id, gs.user_id
                 ORDER BY points desc 
                 limit 25
             ) r
@@ -182,23 +155,13 @@ class LeadersController extends BaseController
             join categories c on c.id = r.category_id
             ORDER BY r.points desc';
 
-        if ($filter) {
-            $leaders = DB::select($sql, [$_startDate,  $_endDate]);
-        } else {
-            $leaders = DB::select($sql);
-        }
+        $leaders = DB::select($sql, [$this->toUtcFromNigeriaTimeZone($_startDate),  $this->toUtcFromNigeriaTimeZone($_endDate)]);
+
 
         $response = [];
         foreach ($leaders as $leader) {
             $response[$leader->category_name][] = $leader;
         }
         return $this->sendResponse($response, 'Categories leaderboard');
-    }
-
-    private function utcDateConverter($date){
-        $toNigerianTime = $this->toNigeriaTimeZoneFromUtc($date);
-        $toUtcTimeZone = $this->toUtcFromNigeriaTimeZone($toNigerianTime);
-
-        return $toUtcTimeZone;
     }
 }
