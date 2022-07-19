@@ -15,7 +15,25 @@ class Challenge extends Model
     public function users()
     {
 
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function opponent()
+    {
+        return $this->belongsTo(User::class, 'opponent_id', 'id');
+    }
+
+
+
+    public function challengeGameSessions()
+    {
+        return $this->hasMany(ChallengeGameSession::class);
     }
 
     public static function changeChallengeStatus($status, $id)
