@@ -14,15 +14,13 @@ class UserChallengeResponse
     public  $date;
     public string $subcategory;
     public int $challengeId;
-    public string $status;
+    public ChallengeStatus $status;
 
 
     public function transform($challenges): JsonResponse
     {
-
         $response = [];
         foreach ($challenges as $data) {
-
             $presenter = new UserChallengeResponse;
             $presenter->subcategory = $data->name;
             $presenter->playerUsername = $data->username;
