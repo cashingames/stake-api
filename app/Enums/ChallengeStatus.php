@@ -6,4 +6,5 @@ enum ChallengeStatus: string {
     case Ongoing = "ONGOING";
     case Closed = "CLOSED";
     case Pending = "PENDING";
+    case Declined = "DECLINED";
 }

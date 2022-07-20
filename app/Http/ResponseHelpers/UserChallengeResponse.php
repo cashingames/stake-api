@@ -3,7 +3,9 @@
 namespace App\Http\ResponseHelpers;
 
 use App\Enums\ChallengeStatus;
+use App\Models\Challenge;
 use App\Models\ChallengeGameSession;
+use Hamcrest\Core\IsNull;
 use \Illuminate\Http\JsonResponse;
 
 
@@ -38,7 +40,10 @@ class UserChallengeResponse
     private function getStatus($challengeId): ChallengeStatus
     {
         $getChallengeGameSession = ChallengeGameSession::where('challenge_id', $challengeId);
-        if ($getChallengeGameSession->count() <= 0) {
+        $declinedChallenge = Challenge::where('id', $challengeId)->where('status', 'DECLINED')->first();
+        if (!is_null($declinedChallenge)) {
+            return ChallengeStatus::Declined;
+        } else if ($getChallengeGameSession->count() <= 0 && is_null($declinedChallenge)) {
             return  ChallengeStatus::Pending;
         } else if ($getChallengeGameSession->where('state', 'COMPLETED')->count() >= 2) {
             return ChallengeStatus::Closed;
