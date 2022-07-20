@@ -5,12 +5,15 @@ namespace App\Http\ResponseHelpers;
 use App\Enums\ChallengeStatus;
 use App\Models\Challenge;
 use App\Models\ChallengeGameSession;
+use App\Traits\Utils\DateUtils;
 use Hamcrest\Core\IsNull;
 use \Illuminate\Http\JsonResponse;
 
 
 class UserChallengeResponse
 {
+    use DateUtils;
+
     public string $playerUsername;
     public string $opponentUsername;
     public  $date;
@@ -29,7 +32,7 @@ class UserChallengeResponse
             $presenter->opponentUsername = $data->opponentUsername;
             $presenter->status = $this->getStatus($data->id);
             $presenter->challengeId = $data->id;
-            $presenter->date = $data->created_at;
+            $presenter->date = $this->toNigeriaTimeZoneFromUtc($data->created_at);
             $response[] = $presenter;
         }
 
