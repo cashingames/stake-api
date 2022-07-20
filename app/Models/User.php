@@ -331,7 +331,8 @@ class User extends Authenticatable implements JWTSubject
         INNER JOIN categories on categories.id = challenges.category_id
         INNER JOIN users u on u.id = challenges.user_id
         INNER JOIN users o on o.id = challenges.opponent_id
-        WHERE u.id = ? or o.id = ? 
+        WHERE u.id = ? or o.id = ?
+        LIMIT 10
         ', [$this->id, $this->id]);
     }
     public function hasPlayedTrivia($triviaId)
