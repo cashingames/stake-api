@@ -9,10 +9,9 @@
             let currentUrl = window.location.search;
             let urlParams = new URLSearchParams(currentUrl);
 
-            let param = urlParams.get('p');
+            let param = urlParams.get('xyz');
          
-            window.location.replace(`cashingames://email-verify/${param}`);
-           
+            window.location.replace(`cashingames://verifyemail/${param}`);
         }  
         getParams();
     

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
@@ -47,6 +48,7 @@ Route::post('auth/username/verify/{username}', [RegisterController::class, 'veri
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
+Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
 
 Route::middleware('api')->prefix('v3')->group(
     function () {
