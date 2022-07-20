@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\ChallengeGameSession;
+use App\Models\ChallengeQuestion;
 use App\Models\GameType;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -36,35 +37,65 @@ class StartChallengeGameController extends  BaseController
         $challengeGameSession->challenge_id = $request->challenge_id;
         $challengeGameSession->state = "ONGOING";
 
+
+        //check for questions if the questions has been added for that challengeid
         $questions = [];
 
-        $query = $category
-            ->questions()
-            ->where('is_published', true);
 
-        $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
+        $findQuestions = ChallengeQuestion::where('challenge_id', $request->challenge_id)->get();
 
+        if ($findQuestions->isEmpty()) {
 
 
-        $challengeGameSession->save();
+            $query = $category
+                ->questions()
+                ->where('is_published', true);
 
-        Log::info("About to log selected game questions for game session $challengeGameSession->id and user $this->user");
+            $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
 
-        $data = [];
 
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'challenge_game_session_id' => $challengeGameSession->id,
-                'challenge_id' => $request->challenge_id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+
+            $challengeGameSession->save();
+
+            Log::info("About to log selected game questions for game session $challengeGameSession->id and user $this->user");
+
+            $data = [];
+
+            foreach ($questions as $question) {
+                $data[] = [
+                    'question_id' => $question->id,
+                    'challenge_game_session_id' => $challengeGameSession->id,
+                    'challenge_id' => $request->challenge_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            DB::table('challenge_questions')->insert($data);
+
+            Log::info("questions logged for game session $challengeGameSession->id and user $this->user");
+        } else {
+        
+            $questions = $findQuestions;
+            $challengeGameSession->save();
+            Log::info("About to log selected game questions for game session $challengeGameSession->id and user $this->user");
+
+            $data = [];
+
+            foreach ($questions as $question) {
+                $data[] = [
+                    'question_id' => $question->id,
+                    'challenge_game_session_id' => $challengeGameSession->id,
+                    'challenge_id' => $request->challenge_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            DB::table('challenge_questions')->insert($data);
+            Log::info("questions logged for game session $challengeGameSession->id and user $this->user");
         }
 
-        DB::table('challenge_questions')->insert($data);
-
-        Log::info("questions logged for game session $challengeGameSession->id and user $this->user");
 
         $gameInfo = new stdClass;
         $gameInfo->token = $challengeGameSession->session_token;
@@ -75,9 +106,6 @@ class StartChallengeGameController extends  BaseController
             'questions' => $questions,
             'game' => $gameInfo
         ];
-
-
         return $this->sendResponse($result, 'Challenge Game Started');
     }
-
 }
