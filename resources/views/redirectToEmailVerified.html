@@ -3,13 +3,14 @@
 
 <head>
 <body>
+    
     <script>
         function getParams() {
             let currentUrl = window.location.search;
             let urlParams = new URLSearchParams(currentUrl);
 
-            let param = urlParams.get('email');
-           
+            let param = urlParams.get('p');
+         
             window.location.replace(`cashingames://email-verify/${param}`);
            
         }  
