@@ -36,27 +36,23 @@ class LoginController extends BaseController
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $user = User::where($fieldType, request('email'))->first();
-        
-        if($user === null){
-            return response()->json(['error' => 'Invalid email or password'], 400);
-        }
 
-        if ( $user->email_verified_at !== null) {
-
-            if (request('password') == "AAAAAAAABBBBBBBB") {
-                if ($user) {
-                    return $this->respondWithToken(auth()->login($user));
+        if ($user !== null) {
+            if ($user->email_verified_at !== null) {
+                if (request('password') == "AAAAAAAABBBBBBBB") {
+                    if ($user) {
+                        return $this->respondWithToken(auth()->login($user));
+                    }
                 }
+                $credentials = array($fieldType => request('email'), 'password' => request('password'));
+                if (!$token = auth()->attempt($credentials)) {
+                    return response()->json(['error' => 'Invalid email or password'], 400);
+                }
+                return $this->respondWithToken($token);
             }
-
-            $credentials = array($fieldType => request('email'), 'password' => request('password'));
-            if (!$token = auth()->attempt($credentials)) {
-                return response()->json(['error' => 'Invalid email or password'], 400);
-            }
-
-            return $this->respondWithToken($token);
+            return response()->json(['error' => 'Please verify your email address before signing in'], 400);
         }
-        return response()->json(['error' => 'Please verify your email before signing in'], 400);
+        return response()->json(['error' => 'Invalid email or password'], 400);
     }
 
     /**
