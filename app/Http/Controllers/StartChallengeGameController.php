@@ -36,65 +36,15 @@ class StartChallengeGameController extends  BaseController
         $challengeGameSession->end_time = Carbon::now()->addMinutes(1);
         $challengeGameSession->challenge_id = $request->challenge_id;
         $challengeGameSession->state = "ONGOING";
-
-
         //check for questions if the questions has been added for that challengeid
-
-
         $findQuestions = ChallengeQuestion::where('challenge_id', $request->challenge_id);
-
+        $questions = [];
+        $challengeGameSession->save();
         if ($findQuestions->get()->isEmpty()) {
-
-            $questions = [];
-            $query = $category
-                ->questions()
-                ->where('is_published', true);
-
-            $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
-
-            $challengeGameSession->save();
-
-            Log::info("About to log selected game questions for game session $challengeGameSession->id and user $this->user");
-
-            $data = [];
-
-            foreach ($questions as $question) {
-                $data[] = [
-                    'question_id' => $question->id,
-                    'challenge_game_session_id' => $challengeGameSession->id,
-                    'challenge_id' => $request->challenge_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            DB::table('challenge_questions')->insert($data);
-
-            Log::info("questions logged for game session $challengeGameSession->id and user $this->user");
+            $questions = $this->startFirstGame($category, $request->challenge_id, $challengeGameSession->id);
         } else {
-            $qstArray = $findQuestions->pluck('question_id')->toArray();
-            //$unsortIds = implode(',', $qstArray); 
-            $challengeGameSession->save();
-            Log::info("About to log selected game questions for game session $challengeGameSession->id and user $this->user");
-
-            $data = [];
-            foreach ($findQuestions->get() as $question) {
-                $data[] = [
-                    'question_id' => $question->question_id,
-                    'challenge_game_session_id' => $challengeGameSession->id,
-                    'challenge_id' => $request->challenge_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-            $questions = $category->questions()
-                ->whereIn('id', $qstArray)
-                ->get();
-            // ->orderByRaw(DB::raw("FIELD(id, $unsortIds)"))
-            DB::table('challenge_questions')->insert($data);
-            Log::info("questions logged for game session $challengeGameSession->id and user $this->user");
+            $questions = $this->startSecondGame($category, $findQuestions, $request->challenge_id, $challengeGameSession->id);
         }
-
         $gameInfo = new stdClass;
         $gameInfo->token = $challengeGameSession->session_token;
         $gameInfo->startTime = $challengeGameSession->start_time;
@@ -104,5 +54,55 @@ class StartChallengeGameController extends  BaseController
             'game' => $gameInfo
         ];
         return $this->sendResponse($result, 'Challenge Game Started');
+    }
+
+    private function startFirstGame($category, $challengeId, $challengeGameSessionId)
+    {
+        $query = $category
+            ->questions()
+            ->where('is_published', true);
+
+        $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
+        Log::info("About to log selected game questions for game session $challengeGameSessionId and user $this->user");
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'challenge_game_session_id' => $challengeGameSessionId,
+                'challenge_id' => $challengeId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        DB::table('challenge_questions')->insert($data);
+        Log::info("questions logged for game session $challengeGameSessionId and user $this->user");
+        return $question;
+    }
+
+
+    private function startSecondGame($category, $findQuestions, $challengeId, $challengeGameSessionId)
+    {
+        $qstArray = $findQuestions->pluck('question_id')->toArray();
+        //$unsortIds = implode(',', $qstArray); 
+        Log::info("About to log selected game questions for game session $challengeGameSessionId and user $this->user");
+        $data = [];
+        foreach ($findQuestions->get() as $question) {
+            $data[] = [
+                'question_id' => $question->question_id,
+                'challenge_game_session_id' => $challengeGameSessionId,
+                'challenge_id' => $challengeId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        $questions = $category->questions()
+            ->whereIn('id', $qstArray)
+            ->get();
+        // ->orderByRaw(DB::raw("FIELD(id, $unsortIds)"))
+        DB::table('challenge_questions')->insert($data);
+        Log::info("questions logged for game session $challengeGameSessionId and user $this->user");
+        return $questions;
     }
 }
