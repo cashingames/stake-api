@@ -197,7 +197,7 @@ class GameController extends BaseController
         $gameSession->category_id = $category->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
-        $gameSession->end_time = Carbon::now()->addMinutes(1);
+        $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
         $questions = [];
@@ -320,21 +320,26 @@ class GameController extends BaseController
     {
         Log::info($request->all());
 
-        $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->whereNot("state", "COMPLETED")->first();
         if ($game === null) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
-        //@TODO Remove after fixing double submission bug.
-        if ($game->state === "COMPLETED") {
-            return $this->sendResponse($game, 'Game Ended');
-        }
 
-        $game->end_time = Carbon::now()->subMilliseconds(500);
+        $game->end_time = Carbon::now()->subMinute();
         $game->state = 'COMPLETED';
 
         $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
+
+        
         $points = 0;
         $wrongs = 0;
+
+        //users are using postman to increase the no of chosenOptions and sending. 
+        //since we are not validating the expected no of questions
+
+        //@TODO: If chosen option is more than expected throw error saying and log for tracing incase customer complains
+        //@TODO: Change our encryption method from base 64.
+        //@TODO: Remove is correct from frontend for now, it's causing security issue as hackers can decode it.
         foreach ($request->chosenOptions as $a) {
 
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
