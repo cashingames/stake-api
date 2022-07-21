@@ -32,7 +32,7 @@ class UserChallengeResponse
             $presenter->opponentUsername = $data->opponentUsername;
             $presenter->status = $this->getStatus($data->id);
             $presenter->challengeId = $data->id;
-            $presenter->date = $this->toNigeriaTimeZoneFromUtc($data->created_at);
+            $presenter->date = $this->toNigeriaTimeZoneFromUtc($data->created_at)->toDateTimeString();
             $response[] = $presenter;
         }
 
