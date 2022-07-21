@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 use App\Models\User;
@@ -28,26 +29,34 @@ class LoginController extends BaseController
      * Get a JWT via given credentials.
      *
      * @return \Illuminate\Http\JsonResponse
-    */
+     */
     public function login()
     {
 
-
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (request('password') == "AAAAAAAABBBBBBBB") {
-            $user = User::where($fieldType, request('email'))->first();
-            if ($user) {
-                return $this->respondWithToken(auth()->login($user));
-            }
-        }
-
-        $credentials = array($fieldType => request('email'), 'password' => request('password'));
-        if (!$token = auth()->attempt($credentials)) {
+        $user = User::where($fieldType, request('email'))->first();
+        
+        if($user === null){
             return response()->json(['error' => 'Invalid email or password'], 400);
         }
 
-        return $this->respondWithToken($token);
+        if ( $user->email_verified_at !== null) {
+
+            if (request('password') == "AAAAAAAABBBBBBBB") {
+                if ($user) {
+                    return $this->respondWithToken(auth()->login($user));
+                }
+            }
+
+            $credentials = array($fieldType => request('email'), 'password' => request('password'));
+            if (!$token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Invalid email or password'], 400);
+            }
+
+            return $this->respondWithToken($token);
+        }
+        return response()->json(['error' => 'Please verify your email before signing in'], 400);
     }
 
     /**
@@ -80,11 +89,11 @@ class LoginController extends BaseController
     //         'first_name' => ['required', 'string', 'max:100'],
     //         'last_name' => ['required', 'string', 'max:100'],
     //     ]);
-        
+
     //     $returningUser = User::where('email', $data['email'])->first();
-        
+
     //     if($returningUser == null){
-           
+
     //         $user = User::create([
     //             'username' => $data['first_name'] . "_" . mt_rand(1111, 9999),
     //             'email' => $data['email'],
@@ -115,7 +124,7 @@ class LoginController extends BaseController
     //             'created_at'=>Carbon::now(),
     //             'updated_at'=>Carbon::now()
     //         ]);
-        
+
     //         //give user sign up bonus
 
     //         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
@@ -144,24 +153,24 @@ class LoginController extends BaseController
     //             ) {
     //                 $referrerId = 0;
     //                 $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
-        
+
     //                if ( $profileReferral === null){
     //                    $referrerId = User::where('username', $data["referrer"])->first()->id;
     //                } else{
     //                    $referrerId = $profileReferral->user_id;
     //                }
-                   
+
     //                 $this->creditPoints($referrerId, 50, "Referral bonus");
     //         }
 
     //         $token = auth()->tokenById($user->id);
-            
+
     //         return $this->sendResponse($token, 'Token');
-    
+
     //     }
 
     //     $token = auth()->tokenById($returningUser->id);
-           
+
     //     return $this->sendResponse($token, 'Token');
     // }
 }
