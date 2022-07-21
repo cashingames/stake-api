@@ -36,6 +36,7 @@ class StartChallengeGameController extends  BaseController
         $challengeGameSession->end_time = Carbon::now()->addMinutes(1);
         $challengeGameSession->challenge_id = $request->challenge_id;
         $challengeGameSession->state = "ONGOING";
+
         //check for questions if the questions has been added for that challengeid
         $findQuestions = ChallengeQuestion::where('challenge_id', $request->challenge_id);
         $questions = [];
@@ -78,7 +79,7 @@ class StartChallengeGameController extends  BaseController
         }
         DB::table('challenge_questions')->insert($data);
         Log::info("questions logged for game session $challengeGameSessionId and user $this->user");
-        return $question;
+        return $questions;
     }
 
 
