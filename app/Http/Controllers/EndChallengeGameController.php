@@ -21,7 +21,7 @@ class EndChallengeGameController extends  BaseController
     {
         Log::info($request->all());
 
-        $game = ChallengeGameSession::where('session_token', $request->token)->first();
+        $game = $this->user->challengegameSessions->where('session_token', $request->token)->first();
         if ($game === null) {
             return $this->sendError('Challenge Game Session does not exist', 'Challenge Game Session does not exist');
         }
@@ -34,6 +34,13 @@ class EndChallengeGameController extends  BaseController
         $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
         $points = 0;
         $wrongs = 0;
+
+        $questionsCount =  10;
+        if (count($request->chosenOptions) > $questionsCount) {
+            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token on Challenge");
+            return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
+        }
+
         foreach ($request->chosenOptions as $a) {
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
 
