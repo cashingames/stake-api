@@ -320,7 +320,7 @@ class GameController extends BaseController
     {
         Log::info($request->all());
 
-        $game = $this->user->gameSessions()->where('session_token', $request->token)->whereNot("state", "COMPLETED")->first();
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->where("state",'!=', "COMPLETED")->first();
         if ($game === null) {
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }

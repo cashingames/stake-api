@@ -35,7 +35,7 @@ class GameSessionFactory extends Factory
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addMinutes(1),
             'session_token' => Str::random(20),
-            'trivia_id' => $this->faker->randomElement(array(1,2,3,4,5)),
+            // 'trivia_id' => $this->faker->randomElement(array(1,2,3,4,5)),
             'state' => 'COMPLETED',
             'correct_count' => $this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10)),
             'wrong_count' => $this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10)),
