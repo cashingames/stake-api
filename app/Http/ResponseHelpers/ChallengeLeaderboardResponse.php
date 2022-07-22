@@ -20,6 +20,7 @@ class ChallengeLeaderboardResponse
     public int $opponentPoint;
     public $challengerAvatar;
     public $opponentAvatar;
+    public string $flag;
 
     public function transform($data): JsonResponse
     {
@@ -35,6 +36,7 @@ class ChallengeLeaderboardResponse
         $presenter->challengerStatus = ($data->challengerStatus == NULL) ? 'PENDING' : $data->challengerStatus;
         $presenter->opponentStatus = ($data->opponentStatus == null) ? 'PENDING' :  $data->opponentStatus;
         $presenter->challengeStatus = $this->getStatus($data->challengerStatus, $data->opponentStatus);
+        $presenter->flag = $this->getFlag($data->username, $data->opponentUsername, $data->challengerPoint, $data->opponentPoint);
         return response()->json($presenter);
     }
 
@@ -45,13 +47,22 @@ class ChallengeLeaderboardResponse
             return ChallengeStatus::Pending;
         } else if ($challengerStatus == NULL && $opponentStatus  == NULL) {
             return ChallengeStatus::Pending;
-        } 
-        else if ($challengerStatus != 'COMPLETED' && $opponentStatus != 'COMPLETED') {
+        } else if ($challengerStatus != 'COMPLETED' && $opponentStatus != 'COMPLETED') {
             return ChallengeStatus::Ongoing;
-        }
-         else {
+        } else {
             return ChallengeStatus::Closed;
         }
+    }
 
+    private function getFlag($challengerUsername, $opponentUsername, $challengerPoint, $opponentPoint)
+    {
+        $user = auth()->user();
+        if ($opponentPoint > $challengerPoint) {
+            return $user->username == $opponentUsername ? "WON" : "LOST";
+        } else if ($opponentPoint < $challengerPoint) {
+            return $user->username == $challengerUsername ? "WON" : "LOST";
+        } else {
+            return "DRAW";
+        }
     }
 }
