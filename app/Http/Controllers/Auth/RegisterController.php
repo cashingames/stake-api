@@ -120,7 +120,7 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $this->creditPoints($user->id, 100, "Sign up bonus points");
+            $this->creditPoints($user->id, 50, "Sign up bonus points");
 
             $user->boosts()->create([
                 'user_id' => $user->id,
