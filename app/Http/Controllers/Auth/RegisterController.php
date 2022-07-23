@@ -120,7 +120,18 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $this->creditPoints($user->id, 50, "Sign up bonus points");
+            $user->wallet->balance += 50;
+
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => 50,
+                'balance' => $user->wallet->balance,
+                'description' => 'Sign Up Bonus',
+                'reference' => Str::random(10),
+            ]);
+
+            $user->wallet->save();
 
             $user->boosts()->create([
                 'user_id' => $user->id,

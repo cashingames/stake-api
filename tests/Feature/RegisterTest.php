@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -9,6 +10,7 @@ use Database\Seeders\DatabaseSeeder;
 use UserSeeder;
 use BoostSeeder;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterTest extends TestCase
 {   
@@ -38,6 +40,7 @@ class RegisterTest extends TestCase
     /** @test */
     public function a_user_can_register()
     {   
+        Mail::fake();
         $response = $this->postjson('/api/auth/register',[
             'first_name' => 'User',
             'last_name'=>'Test',
@@ -49,6 +52,7 @@ class RegisterTest extends TestCase
            
         ]);
 
+        Mail::assertSent(VerifyEmail::class);
         $response->assertStatus(200);
        
         
