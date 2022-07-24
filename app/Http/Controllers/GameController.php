@@ -320,17 +320,19 @@ class GameController extends BaseController
     {
         Log::info($request->all());
 
-        $game = $this->user->gameSessions()->where('session_token', $request->token)->where("state", '!=', "COMPLETED")->first();
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if ($game === null) {
-            Log::info($this->user->username . " ends game a second time ");
-            return $this->sendResponse('Game Session does not exist', 'Game Session does not exist');
+            Log::info($this->user->username . " tries to end game with invalid token ". $request->token);
+            return $this->sendError('Game Session does not exist', 'Game Session does not exist');
+        }
+        //@TODO Remove after fixing double submission bug.
+        if ($game->state === "COMPLETED") {
+            Log::info($this->user->username . " trying to end game a second time with ".$request->token );
+            return $this->sendResponse($game, 'Game Ended');
         }
 
         $game->end_time = Carbon::now()->subMinute();
         $game->state = 'COMPLETED';
-
-        $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
-
 
         $points = 0;
         $wrongs = 0;
@@ -344,14 +346,14 @@ class GameController extends BaseController
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
         $chosenOptions =  $request->chosenOptions;
 
-        if (count($request->chosenOptions) > $questionsCount) {
-            //$chosenOptions = $request->chosenOptions->take($questionsCount);
+        if (count($chosenOptions) > $questionsCount) {
             Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
             array_slice($chosenOptions, $questionsCount);
-            // print_r($chosenOptions);
-            // die();
+
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         }
+
+        $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
 
         foreach ($chosenOptions as $a) {
 
