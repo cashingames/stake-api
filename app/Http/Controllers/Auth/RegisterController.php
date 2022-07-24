@@ -111,7 +111,7 @@ class RegisterController extends BaseController
             'description' => 'Registration Bonus Plan',
             'is_active' => true,
             'used_count' => 0,
-            'plan_count' => 10,
+            'plan_count' => 5,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);

@@ -320,9 +320,9 @@ class GameController extends BaseController
     {
         Log::info($request->all());
 
-        $game = $this->user->gameSessions()->where('session_token', $request->token)->where("state",'!=', "COMPLETED")->first();
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->where("state", '!=', "COMPLETED")->first();
         if ($game === null) {
-            Log::info($this->user->username ." ends game a second time " );
+            Log::info($this->user->username . " ends game a second time ");
             return $this->sendResponse('Game Session does not exist', 'Game Session does not exist');
         }
 
@@ -342,13 +342,16 @@ class GameController extends BaseController
         //@TODO: Remove is correct from frontend for now, it's causing security issue as hackers can decode it.
 
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
+        $chosenOptions =  $request->chosenOptions;
 
         if (count($request->chosenOptions) > $questionsCount) {
-            $chosenOptions = $request->chosenOptions->take($questionsCount);
-            Log::info($this->user->username ." sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
+            //$chosenOptions = $request->chosenOptions->take($questionsCount);
+            
+            array_slice($chosenOptions, $questionsCount);
+            // print_r($chosenOptions);
+            // die();
+            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
-        }else{
-            $chosenOptions =  $request->chosenOptions;
         }
 
         foreach ($chosenOptions as $a) {
