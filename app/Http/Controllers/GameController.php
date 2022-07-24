@@ -322,7 +322,8 @@ class GameController extends BaseController
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->where("state",'!=', "COMPLETED")->first();
         if ($game === null) {
-            return $this->sendError('Game Session does not exist', 'Game Session does not exist');
+            Log::info($this->user->username ." ends game a second time " );
+            return $this->sendResponse('Game Session does not exist', 'Game Session does not exist');
         }
 
         $game->end_time = Carbon::now()->subMinute();
@@ -343,11 +344,14 @@ class GameController extends BaseController
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
 
         if (count($request->chosenOptions) > $questionsCount) {
+            $chosenOptions = $request->chosenOptions->take($questionsCount);
             Log::info($this->user->username ." sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
-            return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
+            //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
+        }else{
+            $chosenOptions =  $request->chosenOptions;
         }
 
-        foreach ($request->chosenOptions as $a) {
+        foreach ($chosenOptions as $a) {
 
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
 
