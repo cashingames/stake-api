@@ -31,17 +31,20 @@ class EndChallengeGameController extends  BaseController
         }
         $game->end_time = Carbon::now()->subMilliseconds(500);
         $game->state = 'COMPLETED';
-        $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
         $points = 0;
         $wrongs = 0;
 
         $questionsCount =  10;
-        if (count($request->chosenOptions) > $questionsCount) {
-            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token on Challenge");
-            return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
-        }
+        $chosenOptions =  $request->chosenOptions;
 
-        foreach ($request->chosenOptions as $a) {
+        if (count($chosenOptions) > $questionsCount) {
+            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token on Challenge");
+            array_slice($chosenOptions, $questionsCount);
+            //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
+        }
+        $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
+
+        foreach ($chosenOptions as $a) {
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
 
             if ($isCorect != null) {
@@ -73,4 +76,6 @@ class EndChallengeGameController extends  BaseController
 
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
+
+    
 }

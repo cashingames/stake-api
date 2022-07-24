@@ -353,7 +353,7 @@ class GameController extends BaseController
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         }
 
-        $questions = collect(Question::with('options')->whereIn('id', array_column($request->chosenOptions, 'question_id'))->get());
+        $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
 
         foreach ($chosenOptions as $a) {
 
