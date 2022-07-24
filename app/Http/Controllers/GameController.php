@@ -346,11 +346,10 @@ class GameController extends BaseController
 
         if (count($request->chosenOptions) > $questionsCount) {
             //$chosenOptions = $request->chosenOptions->take($questionsCount);
-            
+            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
             array_slice($chosenOptions, $questionsCount);
             // print_r($chosenOptions);
             // die();
-            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         }
 
