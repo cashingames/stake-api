@@ -108,12 +108,13 @@ class RegisterController extends BaseController
         DB::table('user_plans')->insert([
             'user_id' => $user->id,
             'plan_id' => 1,
-            'description' => 'Registration Bonus Plan',
+            'description' => "Registration Daily bonus plan for " . $user->username,
             'is_active' => true,
             'used_count' => 0,
             'plan_count' => 5,
             'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
         ]);
 
         //give user sign up bonus
