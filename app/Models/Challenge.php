@@ -45,6 +45,11 @@ class Challenge extends Model
         return $challenge;
     }
 
+    public static function hasOpponentData($id, $opponentId)
+    {
+        return Challenge::find($id)->where('opponent_id', $opponentId)->exists();
+    }
+
     public static function challengeDetails(int $id)
     {   
         $challenge = Challenge::find($id);

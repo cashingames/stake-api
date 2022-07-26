@@ -18,6 +18,7 @@ class UserController extends BaseController
         Log::info('Showing the user profile for user: ' . $this->user->username);
 
         $result = new stdClass;
+        $result->id = $this->user->id;
         $result->username = $this->user->username;
         $result->email = $this->user->email;
         $result->lastName = $this->user->profile->last_name;

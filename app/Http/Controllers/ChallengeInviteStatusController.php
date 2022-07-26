@@ -23,6 +23,15 @@ class ChallengeInviteStatusController extends BaseController
         if (!$request->has('challenge_id')) {
             return $this->sendError('Challenge info not found', 'Challenge info not found');
         }
+
+        if (!$request->has('opponent')) {
+            return $this->sendError('User not found', 'User not found');
+        }
+
+       if(! Challenge::hasOpponentData($request->challenge_id, $request->opponentId)){
+            return $this->sendError('Failed to accept invite. Invite account doesn not match', 'Failed to accept invite. Invite account doesn not match');
+       }
+
         $status = $request->status == 1 ? "ACCEPTED" : "DECLINED";
         $updatedChallenge = Challenge::changeChallengeStatus($status, $request->challenge_id);
 
