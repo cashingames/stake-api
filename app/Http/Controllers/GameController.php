@@ -318,37 +318,39 @@ class GameController extends BaseController
 
     public function endSingleGame(Request $request)
     {
+
         Log::info($request->all());
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
-        if ($game === null) {
+        if ($game == null) {
             Log::info($this->user->username . " tries to end game with invalid token ". $request->token);
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
-        //@TODO Remove after fixing double submission bug.
-        if ($game->state === "COMPLETED") {
+
+        if ($game->state == "COMPLETED") {
             Log::info($this->user->username . " trying to end game a second time with ".$request->token );
-            return $this->sendResponse($game, 'Game Ended');
+            return $this->sendError('Error in submission', 'Trying to submit an already completed game');
         }
 
-        $game->end_time = Carbon::now()->subMinute();
-        $game->state = 'COMPLETED';
+        $game->end_time = Carbon::now()->subSeconds(3); //this might be causing negative if the user submitted early
+        $game->state = "COMPLETED";
 
         $points = 0;
         $wrongs = 0;
-
-        //users are using postman to increase the no of chosenOptions and sending. 
-        //since we are not validating the expected no of questions
 
         //@TODO: Change our encryption method from base 64.
         //@TODO: Remove is correct from frontend for now, it's causing security issue as hackers can decode it.
 
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
-        $chosenOptions =  $request->chosenOptions;
+        $chosenOptions =  [];
 
-        if (count($chosenOptions) > $questionsCount) {
+        if (count($request->chosenOptions) > $questionsCount) {
             Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
-            array_slice($chosenOptions, $questionsCount);
+
+            //we choose to pick first X options to avoid errors
+            //refractor this to unique question id and pick 1 option for each
+            //@ CJ
+            $chosenOptions = array_slice($chosenOptions, 0, $questionsCount);
 
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         }
@@ -356,7 +358,6 @@ class GameController extends BaseController
         $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
 
         foreach ($chosenOptions as $a) {
-
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
 
             if ($isCorect != null) {
@@ -376,7 +377,6 @@ class GameController extends BaseController
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
-
 
         foreach ($request->consumedBoosts as $row) {
             $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
