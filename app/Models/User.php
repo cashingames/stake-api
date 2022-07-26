@@ -341,4 +341,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->gameSessions()->where('trivia_id', $triviaId)->exists();
     }
+
+    public function hasChallenge()
+    {
+        return Challenge::where('user_id', $this->id)
+        ->orWhere('opponent_id', $this->id)->where('status', 'PENDING')->exists();
+    }
 }

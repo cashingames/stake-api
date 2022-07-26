@@ -119,6 +119,7 @@ class GameController extends BaseController
         $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
         $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
         $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
+        $result->challenge = $this->user->hasChallenge() ? True : False;
 
         return $this->sendResponse($result, "Common data");
     }
@@ -323,12 +324,12 @@ class GameController extends BaseController
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if ($game == null) {
-            Log::info($this->user->username . " tries to end game with invalid token ". $request->token);
+            Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
 
         if ($game->state == "COMPLETED") {
-            Log::info($this->user->username . " trying to end game a second time with ".$request->token );
+            Log::info($this->user->username . " trying to end game a second time with " . $request->token);
             return $this->sendResponse($game, 'Game Ended');
         }
 
