@@ -52,7 +52,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
-                                    <span>Click on <a  href= "{{config('app.url')}}:8000/redirect-verified-email/{{$email}}?xyz={{$email}}"><b>this link</b></a> to verify your account.</span>
+                                    <span>Click on <a  href= "{{config('app.url')}}/redirect-verified-email/{{$email}}?xyz={{$email}}"><b>this link</b></a> to verify your account.</span>
                                 </td>
                             </tr>
                         </table>
