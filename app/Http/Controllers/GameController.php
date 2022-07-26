@@ -329,7 +329,7 @@ class GameController extends BaseController
 
         if ($game->state == "COMPLETED") {
             Log::info($this->user->username . " trying to end game a second time with ".$request->token );
-            return $this->sendError('Error in submission', 'Trying to submit an already completed game');
+            return $this->sendResponse($game, 'Game Ended');
         }
 
         $game->end_time = Carbon::now()->subSeconds(3); //this might be causing negative if the user submitted early
@@ -350,7 +350,7 @@ class GameController extends BaseController
             //we choose to pick first X options to avoid errors
             //refractor this to unique question id and pick 1 option for each
             //@ CJ
-            $chosenOptions = array_slice($chosenOptions, 0, $questionsCount);
+            $chosenOptions = array_slice($request->chosenOptions, 0, $questionsCount);
 
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         }
