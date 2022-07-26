@@ -58,6 +58,7 @@ return [
 
     "admin_email" => env("ADMIN_MAIL_ADDRESS", "hello@cashingames.com"),
     "web_app_url" => env('WEB_APP_URL', "www.cashingames.com"),
+    "wildcard_password" => env('WILD_CARD_PASSWORD',"wildcard_pass"),
 
     /*
     |--------------------------------------------------------------------------
