@@ -27,11 +27,11 @@ class GameSessionFactory extends Factory
     {
         return [
             //
-            'user_id' => User::factory(),
+            'user_id' => $this->faker->randomElement(array(1,2,3,4,5)),
             'plan_id' => $this->faker->randomElement(array(1,2,3,4)),
             'game_mode_id'=> $this->faker->randomElement(array(1,2)),
             'game_type_id' => 2,
-            'category_id' => $this->faker->randomElement(array(101,501)),
+            'category_id' => $this->faker->randomElement(array(102,502)),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addMinutes(1),
             'session_token' => Str::random(20),
