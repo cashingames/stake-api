@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\UpdateEmailVerifiedController;
+use App\Http\Controllers\RedirectUnverifiedUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,5 +32,5 @@ Route::get('/redirect-instructions', function () {
     return view('redirectToInstructions');
 });
 
-Route::get('/redirect-verified-email/{email}', UpdateEmailVerifiedController::class);
+Route::get('/redirect-verified-email/{email}', RedirectUnverifiedUserController::class);
 

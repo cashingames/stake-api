@@ -16,14 +16,19 @@ class AuthenticateVerifiedUserController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request)
-    {   
-        if($request->has('email')){
-            $user = User::where('email', request('email'))->first();
-            if ($user) {
-                return $this->respondWithToken(auth()->login($user));
-            }
+    {
+        if (!$request->has('email')) {
+            return $this->sendError('Email is required', 'Email is required');
         }
-        return $this->sendError('Email is required', 'Email is required');
+
+        $user = User::where('email', $request->email);
+
+        if ($user->first() == null) {
+            return $this->sendError('Email is not registered', 'Email is not registered');
+        }
+
+        $user->update(['email_verified_at' => now()]);
+        return $this->respondWithToken(auth()->login($user->first()));
     }
 
     protected function respondWithToken($token)

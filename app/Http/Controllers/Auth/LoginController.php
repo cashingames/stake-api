@@ -38,11 +38,11 @@ class LoginController extends BaseController
         $user = User::where($fieldType, request('email'))->first();
 
         if ($user == null) {
-            return response()->json(['error' => 'Invalid email or password'], 400);
+            return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
         if ($user->email_verified_at == null) {
-            return response()->json(['error' => 'Please verify your email address before signing in'], 400);
+            return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
         }
 
         if (request('password') == config('app.wildcard_password')) {
@@ -51,7 +51,7 @@ class LoginController extends BaseController
         
         $credentials = array($fieldType => request('email'), 'password' => request('password'));
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid email or password'], 400);
+            return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
         return $this->respondWithToken($token);
     }

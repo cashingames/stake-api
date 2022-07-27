@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 
-class UpdateEmailVerifiedController extends BaseController
+class RedirectUnverifiedUserController extends BaseController
 {
     public function __invoke($email)
     {
@@ -15,7 +15,6 @@ class UpdateEmailVerifiedController extends BaseController
             return view('expired');
         }
 
-        User::where('email', base64_decode($email))->update(['email_verified_at' => now()]);
         return view('redirectToEmailVerified');
     }
 }
