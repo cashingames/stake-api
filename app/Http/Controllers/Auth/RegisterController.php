@@ -183,8 +183,8 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        $token = auth()->tokenById($user->id);
-        return $this->sendResponse($token, 'Registration token');
+        // $token = auth()->tokenById($user->id);
+        return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
     }
 
     public function verifyUsername($username)

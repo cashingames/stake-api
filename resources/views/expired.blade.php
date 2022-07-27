@@ -9,7 +9,7 @@
 </head>
 
 <body class="antialiased">
-    <div> This link has expired. </div>
+    <div> {{$message}} </div>
 </body>
 
 </html>

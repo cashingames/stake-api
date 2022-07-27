@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 
 class VerifyEmail extends Mailable
@@ -39,7 +40,7 @@ class VerifyEmail extends Mailable
             ->view('emails.users.verifyEmail')
             ->with([
                 'username' => $this->user->username,
-                'email' => base64_encode($this->user->email),
+                'email' => Crypt::encryptString($this->user->email),
                 'year' => Carbon::now()->year,
             ]);
     }
