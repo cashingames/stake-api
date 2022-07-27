@@ -40,7 +40,7 @@ class LoginTest extends TestCase
 
         $response->assertStatus(400);
         $response->assertJson([
-            'error' => 'Invalid email or password',
+            'errors' => 'Invalid email or password',
         ]);
     }
 
@@ -55,7 +55,7 @@ class LoginTest extends TestCase
 
         $response->assertStatus(400);
         $response->assertJson([
-            'error' => 'Invalid email or password',
+            'errors' => 'Invalid email or password',
         ]);
     }
 
@@ -100,7 +100,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertJson([
-            'error' => 'Invalid email or password',
+            'errors' => 'Invalid email or password',
         ]);
     }
     
