@@ -15,6 +15,7 @@ use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChallengeInviteStatusController;
 use App\Http\Controllers\EndChallengeGameController;
+use App\Http\Controllers\FrontEndLogsController;
 use App\Http\Controllers\GetChallengeDetailsController;
 use App\Http\Controllers\GetChallengeLeaderboardController;
 use App\Http\Controllers\GetFriendsController;
@@ -76,6 +77,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::post('challenge/end/game', EndChallengeGameController::class);
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
+        Route::post('log/frontend-info', FrontEndLogsController::class);
     }
 );
 

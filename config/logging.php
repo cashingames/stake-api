@@ -100,6 +100,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'frontendLogs' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/frontend/frontendLogs.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];
