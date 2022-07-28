@@ -107,4 +107,12 @@ class MessagesController extends BaseController
 
         return $this->sendResponse('messages read', 'messages read');
     }
+
+    public function fetchFirstTimeBonus()
+    {
+
+        $welcomeBonus = json_decode(file_get_contents(storage_path() . "/welcomeBonus.json"), true);
+
+        return $this->sendResponse($welcomeBonus, 'data fetched');
+    }
 }

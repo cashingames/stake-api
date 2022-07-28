@@ -78,6 +78,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
+        Route::get('first-time-bonus/fetch', [MessagesController::class, 'fetchFirstTimeBonus']);
     }
 );
 

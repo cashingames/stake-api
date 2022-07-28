@@ -1,0 +1,17 @@
+[
+    {
+        "bonus": 50,
+        "bonusName": "Naira",
+        "bonusText": "Get bonus cash in your platform wallet"
+    },
+    {
+        "bonus": 3,
+        "bonusName": "Skips",
+        "bonusText": "Skip a question in a game session"
+    },
+    {
+        "bonus": 3,
+        "bonusName": "Freezes",
+        "bonusText": "Freeze time for 15 seconds during a game session"
+    }
+]
