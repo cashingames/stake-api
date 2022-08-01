@@ -26,6 +26,7 @@ use App\Http\Controllers\GetRecentLiveTriviaController;
 use App\Http\Controllers\GetUserChallengeController;
 use App\Http\Controllers\PlayGroundController;
 use App\Http\Controllers\SendChallengeInviteController;
+use App\Http\Controllers\SocialSignInController;
 use App\Http\Controllers\StartChallengeGameController;
 use App\Http\Controllers\TriviaController;
 
@@ -41,10 +42,10 @@ use App\Http\Controllers\TriviaController;
 */
 
 Route::get('playground', PlayGroundController::class);
-
-Route::post('auth/login', [LoginController::class, 'login']);
-Route::post('auth/google/login', [LoginController::class, 'loginWithGoogle']);
 Route::post('auth/register', [RegisterController::class, 'register']);
+Route::post('auth/login', [LoginController::class, 'login']);
+Route::post('auth/social-login/authenticate', [SocialSignInController::class, 'authenticateUser']);
+Route::post('auth/social-login/create-account', [SocialSignInController::class, 'createUser']);
 Route::post('auth/username/verify/{username}', [RegisterController::class, 'verifyUsername']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
