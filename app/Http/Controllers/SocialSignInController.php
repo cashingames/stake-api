@@ -51,7 +51,7 @@ class SocialSignInController extends BaseController
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phoneNumber' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
+            'phoneNumber' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users,phone_number'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username']
