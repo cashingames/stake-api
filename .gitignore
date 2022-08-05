@@ -16,3 +16,4 @@ yarn-error.log
 /.vscode
 **.xlsx
 **.xlsx#
+/database/database_testing.sqlite
