@@ -17,3 +17,4 @@ yarn-error.log
 **.xlsx
 **.xlsx#
 /database/database_testing.sqlite
+*FCMPushNotificationTest.php
