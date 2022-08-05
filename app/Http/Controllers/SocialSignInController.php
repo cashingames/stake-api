@@ -62,6 +62,7 @@ class SocialSignInController extends BaseController
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
             'is_on_line' => true,
+            'email_verified_at' => now()
         ]);
 
         //create the profile
