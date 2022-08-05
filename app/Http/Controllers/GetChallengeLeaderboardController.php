@@ -17,7 +17,7 @@ class GetChallengeLeaderboardController extends Controller
         TIMESTAMPDIFF(SECOND, cgso.start_time, cgso.end_time) AS opponentFinishduration,
         cgsu.state as challengerStatus, cgso.state as opponentStatus, challenges.created_at 
         FROM challenges
-        INNER JOIN challenge_game_sessions cgsu on cgsu.user_id = challenges.user_id and cgsu.challenge_id = challenges.id
+        LEFT JOIN challenge_game_sessions cgsu on cgsu.user_id = challenges.user_id and cgsu.challenge_id = challenges.id
         LEFT JOIN challenge_game_sessions cgso on cgso.user_id = challenges.opponent_id and cgso.challenge_id = challenges.id
         INNER JOIN users u on u.id = challenges.user_id
         INNER JOIN users o on o.id = challenges.opponent_id
