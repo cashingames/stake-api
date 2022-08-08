@@ -44,6 +44,7 @@ class LeaderboardTest extends TestCase
             'endDate' => $endDate
         ]);
         $response->assertJsonCount(5, 'data');
+        $response->assertStatus(200);
     }
 
     

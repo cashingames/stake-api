@@ -23,7 +23,13 @@ class StartChallengeGameController extends  BaseController
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request)
-    {
+    {   
+        $request->validate([
+            'category' => ['required'],
+            'type' => ['required'],
+            'challenge_id' => ['required']
+        ]);
+
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
 
