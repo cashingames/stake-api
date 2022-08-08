@@ -60,6 +60,7 @@ class SocialSignInController extends BaseController
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
+            'phone_number' => $data['phoneNumber'],
             'password' => bcrypt($data['password']),
             'is_on_line' => true,
             'email_verified_at' => now()
