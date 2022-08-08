@@ -185,7 +185,14 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {
+    {   
+        $request->validate([
+            'category' => ['required'],
+            'type' => ['required'],
+            'mode' => ['required'],
+            'trivia' => ['nullable']
+        ]);
+
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
