@@ -115,6 +115,8 @@ class CloudMessagingService{
      * 
      * If argument $data is not null, the method assumes you want to overwrite the data and notification properties
      * 
+     * This method must be called to actually send out the notification
+     * 
      * @param array|mixed $data
      */
     public function send(array $data=null){

@@ -25,6 +25,7 @@ use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\GetRecentLiveTriviaController;
 use App\Http\Controllers\GetUserChallengeController;
 use App\Http\Controllers\PlayGroundController;
+use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\SendChallengeInviteController;
 use App\Http\Controllers\SocialSignInController;
 use App\Http\Controllers\StartChallengeGameController;
@@ -80,6 +81,7 @@ Route::middleware('auth:api')->prefix('v3')->group(
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
+        Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
     }
 );
 
