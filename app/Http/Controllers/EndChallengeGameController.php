@@ -60,11 +60,6 @@ class EndChallengeGameController extends  BaseController
         $game->total_count = $points + $wrongs;
         $game->save();
 
-        if ($points > 0) {
-            $this->creditPoints($this->user->id, $game->points_gained, "Points gained from challenge game played");
-        }
-
-
         foreach ($request->consumedBoosts as $row) {
             $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
 
