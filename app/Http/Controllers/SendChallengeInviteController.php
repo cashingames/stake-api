@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SendPushNotification;
 use App\Mail\ChallengeInvite;
 use App\Models\Challenge;
 use App\Models\User;
+use App\Services\Firebase\CloudMessagingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -35,6 +37,9 @@ class SendChallengeInviteController extends BaseController
 
         $opponent = User::find($request->opponentId);
         Mail::send(new ChallengeInvite($opponent, $challenge->id));
+
+        $pushAction = new SendPushNotification();
+        $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
 
         Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
         
