@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\FcmPushSubscription;
 
-class RegisterPushDeviceTokenController extends Controller
+class RegisterPushDeviceTokenController extends BaseController
 {
     public function __invoke(Request $request)
     {
@@ -14,7 +14,7 @@ class RegisterPushDeviceTokenController extends Controller
             'topic'   => 'string',
 
         ]);
-        $user = auth()->user();
+        $user = $this->user;
 
         $token = $request->device_token;
         $topic = $request->topic;
