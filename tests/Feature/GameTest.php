@@ -2,27 +2,29 @@
 
 namespace Tests\Feature;
 
-use App\Models\GameSession;
-use App\Models\Question;
-use App\Models\User;
-use App\Models\UserPlan;
-use App\Models\Plan;
-use App\Models\UserPoint;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use CategorySeeder;
-use UserSeeder;
-use AchievementSeeder;
-use App\Models\Achievement;
-use App\Models\Boost;
-use App\Models\Category;
-use App\Models\UserBoost;
-use BoostSeeder;
 use PlanSeeder;
-use GameTypeSeeder;
+use UserSeeder;
+use BoostSeeder;
+use CategorySeeder;
 use GameModeSeeder;
+use GameTypeSeeder;
+use Tests\TestCase;
+use App\Models\Plan;
+use App\Models\User;
+use App\Models\Boost;
+use AchievementSeeder;
+use App\Mail\ChallengeInvite;
+use App\Models\Category;
+use App\Models\Question;
+use App\Models\UserPlan;
+use App\Models\UserBoost;
+use App\Models\UserPoint;
+use App\Models\Achievement;
+use App\Models\GameSession;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GameTest extends TestCase
 {
@@ -36,7 +38,7 @@ class GameTest extends TestCase
     const CLAIM_ACHIEVEMENT_URL = '/api/v2/claim/achievement/';
     const START_SINGLE_GAME_URL = '/api/v2/game/start/single-player';
     const END_SINGLE_GAME_URL = '/api/v2/game/end/single-player';
-
+    const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
 
     protected $user;
     protected $category;
@@ -184,5 +186,20 @@ class GameTest extends TestCase
         $response->assertJson([
             'message' => 'Game Ended',
         ]);
+    }
+
+    public function test_challenge_invite_sent_successfully(){
+        Mail::fake();
+        $player = $this->user;
+        $opponent = User::latest()->limit(2)->first();
+        $category = $this->category;
+
+        $response = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
+            'opponentId' => $opponent->id,
+            'categoryId' => $category->id
+        ]);
+
+        Mail::assertSent(ChallengeInvite::class);
+        $response->assertOk();
     }
 }
