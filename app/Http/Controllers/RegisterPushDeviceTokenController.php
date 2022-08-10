@@ -9,7 +9,7 @@ class RegisterPushDeviceTokenController extends BaseController
 {
     public function __invoke(Request $request)
     {
-        $request->validate($request, [
+        $this->validate($request, [
             'device_token'    => 'required',
             'topic'   => 'string',
 
