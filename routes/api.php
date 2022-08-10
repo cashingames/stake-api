@@ -30,6 +30,7 @@ use App\Http\Controllers\SendChallengeInviteController;
 use App\Http\Controllers\SocialSignInController;
 use App\Http\Controllers\StartChallengeGameController;
 use App\Http\Controllers\TriviaController;
+use App\Http\Controllers\VerifyOTPController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,7 @@ Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail'
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
+Route::post('auth/register/verify-token', VerifyOTPController::class);
 
 Route::middleware('api')->prefix('v3')->group(
     function () {

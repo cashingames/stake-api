@@ -23,7 +23,6 @@ class VerifyEmail extends Mailable
 
     public function __construct($user)
     {
-
         $this->user = $user;
     }
 
@@ -40,7 +39,7 @@ class VerifyEmail extends Mailable
             ->view('emails.users.verifyEmail')
             ->with([
                 'username' => $this->user->username,
-                'email' => Crypt::encryptString($this->user->email),
+                'token' => $this->user->otp_token,
                 'year' => Carbon::now()->year,
             ]);
     }
