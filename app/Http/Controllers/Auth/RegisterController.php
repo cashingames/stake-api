@@ -87,6 +87,7 @@ class RegisterController extends BaseController
                 'phone_number' => $data['phone_number'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
+                'otp_token' => mt_rand(10000,99999),
                 'is_on_line' => true,
             ]);
 
@@ -166,7 +167,7 @@ class RegisterController extends BaseController
             /** @TODO: this needs to be changed to plan */
             // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
-      
+
         Mail::send(new VerifyEmail($user));
 
         Log::info("Email verification sent to " . $user->email);
