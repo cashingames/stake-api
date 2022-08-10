@@ -38,8 +38,10 @@ class SendChallengeInviteController extends BaseController
         $opponent = User::find($request->opponentId);
         Mail::send(new ChallengeInvite($opponent, $challenge->id));
 
-        $pushAction = new SendPushNotification();
-        $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
+        if (env('PUSH_ENABLED')){
+            $pushAction = new SendPushNotification();
+            $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
+        }
 
         Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
         
