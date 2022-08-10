@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RedirectUnverifiedUserController;
+use App\Services\Firebase\CloudMessagingService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,3 +35,23 @@ Route::get('/redirect-instructions', function () {
 
 Route::get('/redirect-verified-email/{email}', RedirectUnverifiedUserController::class);
 
+Route::get('test-fcm', function(){
+    $token = "cP4paGIpQOeXWkQsthIHTP:APA91bEiNMKotfTRFTmb6w8Zep19ZvMZQcOTQ-0rSleKC4fvsHMaY7ukTdpOQ81c6VLgr2k-Af2NGHkDlG03-WojelwP0g4nc-QAvIZc1N6VqgbaUnD0G3Ku7gcKm3cbp-_JdiN8vIwd";
+    $messenger = new CloudMessagingService(config('services.firebase.server_key'));
+    $res = $messenger
+    ->setNotification([
+        'title' => "Welcome to cashingames",
+        'body' => "It's our whole pleasure to have you here",
+        'sound' => 'default',
+    ])
+    ->setData([
+        'subject' => "A warm welcome",
+        'content' => 'Can be the same body',
+        'action_type' => "CHALLENGE",
+        'action_id' => 11,
+        'experienceId' => 'cashingames/cashingames',
+        'scopeKey' => 'cashingames/cashingames',
+    ])->setTo($token)
+    ->send();
+    return $res;
+});

@@ -28,7 +28,7 @@ class SendPushNotification{
                 'body' => "Your friend, {$sender->username} has just sent you a challenge invite"
             ]
         )
-        .setData(
+        ->setData(
             [
                 [
                     'title' => "Cashingames Invitation! : Play a Challenge Game!",
@@ -38,8 +38,8 @@ class SendPushNotification{
                 ]
             ]
         )
-        .setTo($recipient->device_token)
-        .send();
+        ->setTo($recipient->device_token)
+        ->send();
     }
 
     public function sendChallengeStatusChangeNotification($sender, $opponent, $challenge, $status){
@@ -54,7 +54,7 @@ class SendPushNotification{
                 'body' => "Your opponent, {$opponent->username} has {$status} your invite"
             ]
         )
-        .setData(
+        ->setData(
             [
                 'title' => "Cashingames Challenge Status Update",
                 'body' => "Your opponent, {$opponent->username} has {$status} your invite",
@@ -62,8 +62,8 @@ class SendPushNotification{
                 'action_id' => $challenge->id
             ]
         )
-        .setTo($recipient->device_token)
-        .send();
+        ->setTo($recipient->device_token)
+        ->send();
     }
     public function sendChallengeCompletedNotification($sender, $opponent, $challenge){
         $recipient = FcmPushSubscription::where('user_id', $sender->id)->latest()->first();
@@ -76,7 +76,7 @@ class SendPushNotification{
                 'body' => "Your opponent, {$opponent->username} has completed the challenge, check the scores now"
             ]
         )
-            . setData(
+            ->setData(
                 [
                     [
                         'title' => "Cashingames Challenge Completed!",
@@ -86,7 +86,7 @@ class SendPushNotification{
                     ]
                 ]
             )
-            . setTo($recipient->device_token)
-            . send();
+            ->setTo($recipient->device_token)
+            ->send();
     }
 }

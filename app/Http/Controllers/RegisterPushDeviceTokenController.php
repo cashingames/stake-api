@@ -9,7 +9,7 @@ class RegisterPushDeviceTokenController extends BaseController
 {
     public function __invoke(Request $request)
     {
-        $this->validate($request, [
+        $request->validate($request, [
             'device_token'    => 'required',
             'topic'   => 'string',
 
@@ -19,7 +19,7 @@ class RegisterPushDeviceTokenController extends BaseController
         $token = $request->device_token;
         $topic = $request->topic;
 
-        FcmPushSubscription::updateOrCreate([
+        FcmPushSubscription::query()->updateOrCreate([
             'user_id' => $user->id,
             'topic' => $topic
         ], [
