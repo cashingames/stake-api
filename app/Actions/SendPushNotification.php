@@ -25,14 +25,14 @@ class SendPushNotification{
         $this->pushService->setNotification(
             [
                 'title' => "Cashingames Invitation! : Play a Challenge Game!",
-                'body' => "Your friend, {{$sender->username}} has just sent you a challenge invite"
+                'body' => "Your friend, {$sender->username} has just sent you a challenge invite"
             ]
         )
         .setData(
             [
                 [
                     'title' => "Cashingames Invitation! : Play a Challenge Game!",
-                    'body' => "Your friend, {{$sender->username}} has just sent you a challenge invite",
+                    'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
                     'action_type' => PushNotificationType::Challenge,
                     'action_id' => $challenge->id
                 ]
@@ -42,7 +42,30 @@ class SendPushNotification{
         .send();
     }
 
-    public function setChallengeCompletedNotification($sender, $opponent, $challenge){
+    public function sendChallengeStatusChangeNotification($sender, $opponent, $challenge, $status){
+        $recipient = FcmPushSubscription::where('user_id', $sender->id)->latest()->first();
+        if (is_null($recipient)){
+            return;
+        }
+
+        $this->pushService->setNotification(
+            [
+                'title' => "Cashingames Challenge Status Update",
+                'body' => "Your opponent, {$opponent->username} has {$status} your invite"
+            ]
+        )
+        .setData(
+            [
+                'title' => "Cashingames Challenge Status Update",
+                'body' => "Your opponent, {$opponent->username} has {$status} your invite",
+                'action_type' => PushNotificationType::Challenge,
+                'action_id' => $challenge->id
+            ]
+        )
+        .setTo($recipient->device_token)
+        .send();
+    }
+    public function sendChallengeCompletedNotification($sender, $opponent, $challenge){
         $recipient = FcmPushSubscription::where('user_id', $sender->id)->latest()->first();
         if (is_null($recipient)) {
             return;
@@ -50,7 +73,7 @@ class SendPushNotification{
         $this->pushService->setNotification(
             [
                 'title' => "Cashingames Challenge Completed!",
-                'body' => "Your opponent, {{$opponent->username}} has completed the challenge, check the scores now"
+                'body' => "Your opponent, {$opponent->username} has completed the challenge, check the scores now"
             ]
         )
             . setData(
