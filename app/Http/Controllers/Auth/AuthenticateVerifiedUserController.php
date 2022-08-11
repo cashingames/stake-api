@@ -16,14 +16,21 @@ class AuthenticateVerifiedUserController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public $email;
 
     public function __invoke(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'string'],
-        ]);
+        if (!$request->has('email')) {
+            return $this->sendError('Email is required', 'Email is required');
+        }
 
-        $user = User::where('email', $request->email);
+        try {
+            $this->email = Crypt::decryptString($request->email);
+        } catch (DecryptException $e) {
+            return $this->sendError('The payload is invalid', 'The payload is invalid');
+        }
+
+        $user = User::where('email', $this->email);
 
         if ($user->first() == null) {
             return $this->sendError('Email is not registered', 'Email is not registered');
