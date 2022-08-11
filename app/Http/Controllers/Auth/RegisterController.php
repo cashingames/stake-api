@@ -87,6 +87,7 @@ class RegisterController extends BaseController
                 'phone_number' => $data['phone_number'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
+                'otp_token' => mt_rand(10000, 99999),
                 'is_on_line' => true,
             ]);
 
@@ -166,11 +167,6 @@ class RegisterController extends BaseController
             /** @TODO: this needs to be changed to plan */
             // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
-      
-        Mail::send(new VerifyEmail($user));
-
-        Log::info("Email verification sent to " . $user->email);
-        
         return $user;
     }
 
@@ -183,16 +179,18 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, $user)
     {
-        // $token = auth()->tokenById($user->id);
-        return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
-    }
+     
+        Mail::send(new VerifyEmail($user));
 
-    public function verifyUsername($username)
-    {
-        $exists = User::where('username', $username)->first();
-        if ($exists === null) {
-            return $this->sendResponse(true, 'Username is available');
+        Log::info("Email verification sent to " . $user->email);
+
+        if ($request->hasHeader('X-App-Source')) {
+
+            $token = auth()->tokenById($user->id);
+
+            return $this->sendResponse($token, 'Token');
         }
-        return $this->sendResponse(false, 'Username is not available');
+
+        return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
     }
 }
