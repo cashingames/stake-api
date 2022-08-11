@@ -10,12 +10,10 @@
             .inner-body {
                 width: 100% !important;
             }
-
             .footer {
                 width: 100% !important;
             }
         }
-
         @media  only screen and (max-width: 500px) {
             .button {
                 width: 100% !important;
@@ -52,7 +50,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
-                                    <span>Use this code <b>{{$token}}</b></a> to verify your account.</span>
+                                    <span>Click on <a  href= "{{config('app.url')}}/redirect-verified-email/{{$email}}?email={{$email}}"><b>this link</b></a> to verify your account.</span>
                                 </td>
                             </tr>
                         </table>
