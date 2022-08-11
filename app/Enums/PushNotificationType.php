@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PushNotificationType
+enum PushNotificationType: string
 {
-    case Challenge;
+    case Challenge = "CHALLENGE";
 }
