@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\RedirectUnverifiedUserController;
-use App\Services\Firebase\CloudMessagingService;
+use App\Enums\PushNotificationType;
 use Illuminate\Support\Facades\Route;
+use App\Services\Firebase\CloudMessagingService;
+use App\Http\Controllers\RedirectUnverifiedUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,12 +46,10 @@ Route::get('test-fcm', function(){
         'sound' => 'default',
     ])
     ->setData([
-        'subject' => "A warm welcome",
-        'content' => 'Can be the same body',
-        'action_type' => "CHALLENGE",
-        'action_id' => 11,
-        'experienceId' => 'cashingames/cashingames',
-        'scopeKey' => 'cashingames/cashingames',
+        'title' => "You have been invited to a new challenge",
+        'body' => "Your friend, Yetunde has just sent you a challenge invite",
+        'action_type' => PushNotificationType::Challenge,
+        'action_id' => 39
     ])->setTo($token)
     ->send();
     return $res;
