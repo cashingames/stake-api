@@ -11,15 +11,16 @@ use App\Traits\Utils\DateUtils;
 class LeadersController extends BaseController
 {
     use DateUtils;
-   
+
     public function globalLeaders(Request $request)
     {
         $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
-        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::tomorrow()->startOfDay());
+        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
 
         if ($request->has(['startDate', 'endDate'])) {
+
             $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->startDate)->startOfDay());
-            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->tomorrow());
+            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->endOfDay());
         }
         $sql = 'SELECT g.points, p.avatar, p.first_name , p.last_name, g.username
             FROM (
@@ -45,11 +46,11 @@ class LeadersController extends BaseController
     public function categoriesLeaders(Request $request)
     {
         $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
-        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::tomorrow()->startOfDay());
+        $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
 
         if ($request->has(['startDate', 'endDate'])) {
             $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->startDate)->startOfDay());
-            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->tomorrow());
+            $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::parse($request->endDate)->endOfDay());
         }
 
         $sql = 'SELECT p.avatar, p.first_name, p.last_name, r.points, c.id as category_id, c.name as category_name, r.username
