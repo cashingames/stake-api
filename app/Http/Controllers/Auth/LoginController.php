@@ -30,7 +30,7 @@ class LoginController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
 
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -42,13 +42,18 @@ class LoginController extends BaseController
         }
 
         if ($user->email_verified_at == null) {
+           
+            if ($request->hasHeader('X-App-Source')) {
+                return $this->respondWithToken(auth()->login($user));
+            }
+
             return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
         }
 
         if (request('password') == config('app.wildcard_password')) {
             return $this->respondWithToken(auth()->login($user));
         }
-        
+
         $credentials = array($fieldType => request('email'), 'password' => request('password'));
         if (!$token = auth()->attempt($credentials)) {
             return $this->sendError('Invalid email or password', 'Invalid email or password');
@@ -79,5 +84,4 @@ class LoginController extends BaseController
         $user->update(["is_on_line" => true]);
         return $this->sendResponse($token, 'Token');
     }
-
 }
