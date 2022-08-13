@@ -65,8 +65,13 @@ class SendPushNotification{
         ->setTo($recipient->device_token)
         ->send();
     }
-    public function sendChallengeCompletedNotification($sender, $opponent, $challenge){
-        $recipient = FcmPushSubscription::where('user_id', $sender->id)->latest()->first();
+    public function sendChallengeCompletedNotification($player, $challenge){
+        if ($player->id == $challenge->user_id){
+            $opponent = $challenge->opponent;
+        }else{
+            $opponent = $player;
+        }
+        $recipient = FcmPushSubscription::where('user_id', $player->id)->latest()->first();
         if (is_null($recipient)) {
             return;
         }

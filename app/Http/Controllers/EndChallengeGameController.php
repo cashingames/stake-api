@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChallengeGameSession;
+use Carbon\Carbon;
 use App\Models\Question;
 use App\Models\UserBoost;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\ChallengeGameSession;
+use App\Actions\SendPushNotification;
 
 class EndChallengeGameController extends  BaseController
 {
@@ -67,6 +68,11 @@ class EndChallengeGameController extends  BaseController
                 'used_count' => $userBoost->used_count + 1,
                 'boost_count' => $userBoost->boost_count - 1
             ]);
+        }
+
+        if (env('PUSH_ENABLED')) {
+            $pushAction = new SendPushNotification();
+            $pushAction->sendChallengeCompletedNotification($this->user, $game->challenge);
         }
 
         return $this->sendResponse($game, 'Challenge Game Ended');
