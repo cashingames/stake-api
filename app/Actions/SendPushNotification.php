@@ -30,12 +30,12 @@ class SendPushNotification{
         )
         ->setData(
             [
-                [
-                    'title' => "Cashingames Invitation! : Play a Challenge Game!",
-                    'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
-                    'action_type' => PushNotificationType::Challenge,
-                    'action_id' => $challenge->id
-                ]
+                
+                'title' => "Cashingames Invitation! : Play a Challenge Game!",
+                'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
+                'action_type' => PushNotificationType::Challenge,
+                'action_id' => $challenge->id
+            
             ]
         )
         ->setTo($recipient->device_token)
