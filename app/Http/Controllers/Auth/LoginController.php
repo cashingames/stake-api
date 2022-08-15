@@ -34,7 +34,7 @@ class LoginController extends BaseController
     {
 
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
+        $credentials = array($fieldType => request('email'), 'password' => request('password'));
         $user = User::where($fieldType, request('email'))->first();
 
         if ($user == null) {
@@ -42,9 +42,12 @@ class LoginController extends BaseController
         }
 
         if ($user->email_verified_at == null) {
-           
+
             if ($request->hasHeader('X-App-Source')) {
-                return $this->respondWithToken(auth()->login($user));
+                if ($token = auth()->attempt($credentials)) {
+                    return $this->respondWithToken($token);
+                }
+                return $this->sendError('Invalid email or password', 'Invalid email or password');
             }
 
             return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
@@ -54,7 +57,6 @@ class LoginController extends BaseController
             return $this->respondWithToken(auth()->login($user));
         }
 
-        $credentials = array($fieldType => request('email'), 'password' => request('password'));
         if (!$token = auth()->attempt($credentials)) {
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
