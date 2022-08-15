@@ -103,5 +103,18 @@ class LoginTest extends TestCase
             'errors' => 'Invalid email or password',
         ]);
     }
+
+    public function test_a_user_cannot_login_with_wrong_password()
+    {
+
+        $response = $this->postjson(self::AUTH_URL, [
+            "email" => $this->user->email,
+            "password" => "wrongPassword",
+        ]);
+
+        $response->assertJson([
+            'errors' => 'Invalid email or password',
+        ]);
+    }
     
 }
