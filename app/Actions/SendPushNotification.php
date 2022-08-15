@@ -83,12 +83,12 @@ class SendPushNotification{
         )
             ->setData(
                 [
-                    [
-                        'title' => "Cashingames Challenge Completed!",
-                        'body' => "Your opponent, {{$opponent->username}} has completed the challenge, check the scores now",
-                        'action_type' => PushNotificationType::Challenge,
-                        'action_id' => $challenge->id
-                    ]
+                    
+                    'title' => "Cashingames Challenge Completed!",
+                    'body' => "Your opponent, {{$opponent->username}} has completed the challenge, check the scores now",
+                    'action_type' => PushNotificationType::Challenge,
+                    'action_id' => $challenge->id
+                
                 ]
             )
             ->setTo($recipient->device_token)
