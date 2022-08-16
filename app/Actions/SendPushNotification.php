@@ -42,8 +42,8 @@ class SendPushNotification{
         ->send();
     }
 
-    public function sendChallengeStatusChangeNotification($sender, $opponent, $challenge, $status){
-        $recipient = FcmPushSubscription::where('user_id', $sender->id)->latest()->first();
+    public function sendChallengeStatusChangeNotification($player, $opponent, $challenge, $status){
+        $recipient = FcmPushSubscription::where('user_id', $player->id)->latest()->first();
         if (is_null($recipient)){
             return;
         }

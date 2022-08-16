@@ -35,7 +35,7 @@ class ChallengeInviteStatusController extends BaseController
 
         if (env('PUSH_ENABLED')){
             $pushAction = new SendPushNotification();
-            $pushAction->sendChallengeStatusChangeNotification($this->user, $player, $updatedChallenge, $status);
+            $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
         }
 
         Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
