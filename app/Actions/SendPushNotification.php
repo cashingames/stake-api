@@ -56,7 +56,7 @@ class SendPushNotification{
         )
         ->setData(
             [
-                'title' => "Cashingames Challenge Status Update",
+                'title' => "Challenge Status Update",
                 'body' => "Your opponent, {$opponent->username} has {$status} your invite",
                 'action_type' => PushNotificationType::Challenge,
                 'action_id' => $challenge->id
@@ -66,32 +66,38 @@ class SendPushNotification{
         ->send();
     }
     public function sendChallengeCompletedNotification($player, $challenge){
+        //if the current player is the creator, the opponent is the recipient
+        //else the player is the recipient
         if ($player->id == $challenge->user_id){
-            $opponent = $challenge->opponent;
-        }else{
+            $recipient = $challenge->opponent;
             $opponent = $player;
+            
+        }else{
+            $recipient = $player;
+            $opponent = $challenge->opponent;
+            
         }
-        $recipient = FcmPushSubscription::where('user_id', $opponent->id)->latest()->first();
+        $device_token = FcmPushSubscription::where('user_id', $recipient->id)->latest()->first();
         if (is_null($recipient)) {
             return;
         }
         $this->pushService->setNotification(
             [
                 'title' => "Cashingames Challenge Completed!",
-                'body' => "Your opponent, {$player->username} has completed the challenge, check the scores now"
+                'body' => "Your opponent, {$opponent->username} has completed the challenge, check the scores now"
             ]
         )
             ->setData(
                 [
                     
-                    'title' => "Cashingames Challenge Completed!",
-                    'body' => "Your opponent, {$player->username} has completed the challenge, check the scores now",
+                    'title' => "Challenge Completed!",
+                    'body' => "Your opponent, {$opponent->username} has completed the challenge, check the scores now",
                     'action_type' => PushNotificationType::Challenge,
                     'action_id' => $challenge->id
                 
                 ]
             )
-            ->setTo($recipient->device_token)
+            ->setTo($device_token->device_token)
             ->send();
     }
 }
