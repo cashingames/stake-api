@@ -85,7 +85,7 @@ class SendPushNotification{
                 [
                     
                     'title' => "Cashingames Challenge Completed!",
-                    'body' => "Your opponent, {{$opponent->username}} has completed the challenge, check the scores now",
+                    'body' => "Your opponent, {$opponent->username} has completed the challenge, check the scores now",
                     'action_type' => PushNotificationType::Challenge,
                     'action_id' => $challenge->id
                 
