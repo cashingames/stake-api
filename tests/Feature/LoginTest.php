@@ -116,5 +116,33 @@ class LoginTest extends TestCase
             'errors' => 'Invalid email or password',
         ]);
     }
-    
+
+    public function test_login_with_app_source_header_can_login_without_email_verification()
+    {
+        $this->user->update(['email_verified_at' => null]);
+
+        $response = $this->withHeaders([
+            'X-App-Source' => 'web',
+        ])->postjson(self::AUTH_URL, [
+            "email" => $this->user->email,
+            "password" => "password",
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_login_with_app_source_header_cannot_login_with_wrong_password()
+    {
+        $response = $this->withHeaders([
+            'X-App-Source' => 'web',
+        ])->postjson(self::AUTH_URL, [
+            "email" => $this->user->email,
+            "password" => "fakePass",
+        ]);
+
+        $response->assertJson([
+            'errors' => 'Invalid email or password',
+        ]);
+    }
+
 }
