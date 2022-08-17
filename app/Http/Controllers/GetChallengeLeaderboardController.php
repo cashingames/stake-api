@@ -21,8 +21,8 @@ class GetChallengeLeaderboardController extends Controller
         LEFT JOIN challenge_game_sessions cgso on cgso.user_id = challenges.opponent_id and cgso.challenge_id = challenges.id
         INNER JOIN users u on u.id = challenges.user_id
         INNER JOIN users o on o.id = challenges.opponent_id
-        INNER JOIN profiles up on up.id = challenges.user_id
-        INNER JOIN profiles op on op.id = challenges.opponent_id
+        INNER JOIN profiles up on up.user_id = challenges.user_id
+        INNER JOIN profiles op on op.user_id = challenges.opponent_id
         WHERE challenges.id = ?';
         
         $result = DB::select($query, [$challengeId]);
