@@ -25,7 +25,7 @@ class ChallengeLeaderboardResponse
     public function transform($data): JsonResponse
     {
         $presenter = new ChallengeLeaderboardResponse;
-        $presenter->challengerUsername = $data->username;
+        $presenter->challengerUsername = $data->username ?? "unknown";
         $presenter->opponentUsername = $data->opponentUsername;
         $presenter->challengerAvatar = $this->getAvatarUrl($data->avatar);
         $presenter->opponentAvatar = $this->getAvatarUrl($data->opponentAvatar);
