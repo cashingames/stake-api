@@ -27,7 +27,7 @@ class FriendsDataResponse
 
             $presenter->id = $friend->id;
             $presenter->username = $friend->username;
-            $presenter->avatar = $this->getAvatarUrl($friend->profile->avatar);
+            $presenter->avatar = $this->getAvatarUrl($friend->profile->avatar ?? '');
 
             $response[] = $presenter;
         }
