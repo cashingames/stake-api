@@ -47,9 +47,9 @@ Route::get('test-fcm', function(){
     ])
     ->setData([
         'title' => "You have been invited to a new challenge",
-        'body' => "Your friend, Yemoja has just sent you a challenge invite",
+        'body' => "Your friend, Sade has just sent you a challenge invite",
         'action_type' => PushNotificationType::Challenge,
-        'action_id' => 171
+        'action_id' => 194
     ])->setTo($token)
     ->send();
     return $res;

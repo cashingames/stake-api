@@ -33,20 +33,30 @@ class StartChallengeGameController extends  BaseController
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
 
-        $challengeGameSession = new ChallengeGameSession();
-        $challengeGameSession->user_id = $this->user->id;
-        $challengeGameSession->game_type_id = $type->id;
-        $challengeGameSession->category_id = $category->id;
-        $challengeGameSession->session_token = Str::random(40);
-        $challengeGameSession->start_time = Carbon::now();
-        $challengeGameSession->end_time = Carbon::now()->addMinutes(1);
-        $challengeGameSession->challenge_id = $request->challenge_id;
-        $challengeGameSession->state = "ONGOING";
+        $challengeGameSession = ChallengeGameSession::where([
+            'user_id' => $this->user->id,
+            'game_type_id' => $type->id,
+            'category_id' => $category->id,
+            'challenge_id' => $request->challenge_id
+        ])->first();
+        if ($challengeGameSession == null){
+            $challengeGameSession = new ChallengeGameSession();
+            $challengeGameSession->user_id = $this->user->id;
+            $challengeGameSession->game_type_id = $type->id;
+            $challengeGameSession->category_id = $category->id;
+            $challengeGameSession->session_token = Str::random(40);
+            $challengeGameSession->start_time = Carbon::now();
+            $challengeGameSession->end_time = Carbon::now()->addMinutes(1);
+            $challengeGameSession->challenge_id = $request->challenge_id;
+            $challengeGameSession->state = "ONGOING";
+            $challengeGameSession->save();
+        }
+        
 
         //check for questions if the questions has been added for that challengeid
         $findQuestions = ChallengeQuestion::where('challenge_id', $request->challenge_id);
         $questions = [];
-        $challengeGameSession->save();
+        
         if ($findQuestions->get()->isEmpty()) {
             $questions = $this->startFirstGame($category, $request->challenge_id, $challengeGameSession->id);
         } else {
