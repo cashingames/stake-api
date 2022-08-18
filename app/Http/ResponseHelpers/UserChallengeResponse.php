@@ -48,9 +48,11 @@ class UserChallengeResponse
             return false;
         }
         $user = auth()->user();
-        $currentUserScore = $sessions->firstWhere('user_id', $user->id)->value('points_gained');
-        $opponentUserScore = $sessions->firstWhere('user_id', '!=', $user->id)->value('points_gained');
-
+        
+        $currentUserScore = $sessions->firstWhere('user_id', $user->id)->points_gained; //('points_gained')->all();
+        $opponentUserScore = $sessions->firstWhere('user_id', '!=', $user->id)->points_gained; //->get('points_gained')->all();
+        
+        
         if ($currentUserScore > $opponentUserScore){
             return "WON";
         }
