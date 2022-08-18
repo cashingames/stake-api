@@ -41,6 +41,7 @@ class UserChallengeResponse
         return response()->json($response);
     }
 
+    // get flag based on current user
     private function getParticipantFlag($challengeId){
         $sessions = ChallengeGameSession::where('challenge_id', $challengeId)->limit(2)->get();
         if (count($sessions) !== 2) {
