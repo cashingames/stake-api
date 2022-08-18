@@ -26,6 +26,7 @@ class UserChallengeResponse
     {
         $response = [];
         foreach ($challenges as $data) {
+            
             $presenter = new UserChallengeResponse;
             $presenter->subcategory = $data->name;
             $presenter->playerUsername = $data->username;
@@ -33,13 +34,30 @@ class UserChallengeResponse
             $presenter->status = $this->getStatus($data->id);
             $presenter->challengeId = $data->id;
             $presenter->date = $this->toNigeriaTimeZoneFromUtc($data->created_at)->toDateTimeString();
+            $presenter->flag = $this->getParticipantFlag($data->id);
             $response[] = $presenter;
         }
 
         return response()->json($response);
     }
 
+    private function getParticipantFlag($challengeId){
+        $sessions = ChallengeGameSession::where('challenge_id', $challengeId)->limit(2)->get();
+        if (count($sessions) !== 2) {
+            return false;
+        }
+        $user = auth()->user();
+        $currentUserScore = $sessions->firstWhere('user_id', $user->id)->value('points_gained');
+        $opponentUserScore = $sessions->firstWhere('user_id', '!=', $user->id)->value('points_gained');
 
+        if ($currentUserScore > $opponentUserScore){
+            return "WON";
+        }
+        if ($currentUserScore < $opponentUserScore){
+            return "LOST";
+        }
+        return "DRAW";
+    }
     private function getStatus($challengeId): ChallengeStatus
     {
         $getChallengeGameSession = ChallengeGameSession::where('challenge_id', $challengeId);
