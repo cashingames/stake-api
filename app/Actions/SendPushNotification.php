@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\PushNotificationType;
 use App\Models\FcmPushSubscription;
 use App\Services\Firebase\CloudMessagingService;
+use Illuminate\Support\Facades\Log;
 
 class SendPushNotification{
 
@@ -40,6 +41,7 @@ class SendPushNotification{
         )
         ->setTo($recipient->device_token)
         ->send();
+        Log::info("Challenge invitation push notification sent to: " . $opponent->username . " from " . $sender->username);
     }
 
     public function sendChallengeStatusChangeNotification($player, $opponent, $challenge, $status){
@@ -64,6 +66,7 @@ class SendPushNotification{
         )
         ->setTo($recipient->device_token)
         ->send();
+        Log::info("Challenge status update push notification sent to: " . $player->username . " from " . $opponent->username);
     }
     public function sendChallengeCompletedNotification($user, $challenge){
         
@@ -94,5 +97,7 @@ class SendPushNotification{
             )
             ->setTo($device_token->device_token)
             ->send();
+
+        Log::info("Challenge invitation push notification sent to: " . $recipient->username . " from " . $user->username);
     }
 }
