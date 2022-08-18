@@ -33,10 +33,10 @@ class ChallengeInviteStatusController extends BaseController
 
         Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-        if (env('PUSH_ENABLED')){
+        // if (env('PUSH_ENABLED')){
             $pushAction = new SendPushNotification();
             $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
-        }
+        // }
 
         Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
 

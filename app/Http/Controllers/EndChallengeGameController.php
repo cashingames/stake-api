@@ -70,10 +70,10 @@ class EndChallengeGameController extends  BaseController
             ]);
         }
 
-        if (env('PUSH_ENABLED')) {
+        // if (env('PUSH_ENABLED')) {
             $pushAction = new SendPushNotification();
             $pushAction->sendChallengeCompletedNotification($this->user, $game->challenge);
-        }
+        // }
 
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
