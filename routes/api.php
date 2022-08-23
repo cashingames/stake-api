@@ -61,7 +61,7 @@ Route::middleware('api')->prefix('v3')->group(
     }
 );
 
-Route::middleware('auth:api')->prefix('v3')->group(
+Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
     function () {
         Route::get('user/profile', [UserController::class, 'profile']);
         Route::get('user/search/friends', GetFriendsController::class);
@@ -89,7 +89,7 @@ Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
     Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
 
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['auth:api', 'last_active'])->group(function () {
         Route::get('user/me', [UserController::class, 'me']);
         Route::post('me/set/online', [UserController::class, 'setOnline']);
 
