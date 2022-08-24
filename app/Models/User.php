@@ -29,7 +29,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp_token',
         'source',
-        'email_verified_at'
+        'email_verified_at',
+        'last_activity_time'
     ];
 
     /**
@@ -132,6 +133,10 @@ class User extends Authenticatable implements JWTSubject
                     ->orWhere('expire_at', '>', now())
                     ->orWhere('expire_at', NULL);
             });
+    }
+
+    public function scopeMostRecent($query){
+        return $query->orderByRaw('-last_activity_time DESC');
     }
 
     public function getNextFreePlan()

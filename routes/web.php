@@ -44,6 +44,12 @@ Route::get('test-fcm', function(){
         'title' => "Welcome to cashingames",
         'body' => "It's our whole pleasure to have you here",
         'sound' => 'default',
+        'data' => [
+            'heading' => "You have been invited to a new challenge",
+            'desc' => "Your friend, from notification",
+            'action_type' => PushNotificationType::Challenge,
+            'action_id' => 194
+        ]
     ])
     ->setData([
         'title' => "You have been invited to a new challenge",
