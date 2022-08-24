@@ -136,7 +136,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function scopeMostRecent($query){
-        return $query->orderByRaw('-last_activity_time DESC');
+        return $query->orderByRaw('last_activity_time DESC');
     }
 
     public function getNextFreePlan()
