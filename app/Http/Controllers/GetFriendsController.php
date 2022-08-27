@@ -18,15 +18,14 @@ class GetFriendsController extends BaseController
     function __invoke(Request $request)
     {
 
-        $result = $request->has('search') ? $this->searchForFriends($request->search) : $this->getFriends();
+        $result = $request->has('search') ? $this->searchForFriends($request->search) : $this->getOnlineUsers();
 
         return (new FriendsDataResponse())->transform($result);
     }
 
-    function getFriends()
+    function getOnlineUsers()
     {
-         $result =  User::with('profile:user_id,avatar')->whereRelation('profile', 'referrer', $this->user->profile->referral_code)->get();
-        return ! $result->isEmpty() ? $result : User::mostRecent()->with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(20)->get();
+        return User::mostRecent()->with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(20)->get();
     }
 
     function searchForFriends($search)
