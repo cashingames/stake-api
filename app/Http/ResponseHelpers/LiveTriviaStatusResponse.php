@@ -154,7 +154,7 @@ class LiveTriviaStatusResponse
     private function getPrizeDisplayText($prize)
     {
         $formatter = new \NumberFormatter('en_US', \NumberFormatter::DECIMAL);
-        return "₦" . $formatter->format($prize);
+        return "WIN: ₦" . $formatter->format($prize);
     }
 
     private function getPointsAcquiredBeforeStart($model)
