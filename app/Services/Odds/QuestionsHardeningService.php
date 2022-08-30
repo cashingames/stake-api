@@ -23,7 +23,7 @@ class QuestionsHardeningService
             ->where('is_published', true);
 
         if ($gameCount < 3) {
-            $questions =  $query->where('level','medium')->orWhere('level','hard')->inRandomOrder()->take(20)->get()->shuffle();
+            $questions =  $query->where('level','medium')->orWhere('level','hard')->inRandomOrder()->take(20)->get();
             return $questions;
         }
 
@@ -31,17 +31,17 @@ class QuestionsHardeningService
         $recentQuestions = $this->getUserAnsweredQuestions($user);
 
         if ($averageOfRecentThreeGames >= 7) {
-            $questions = $query->where('level','hard')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get()->shuffle();
+            $questions = $query->where('level','hard')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get();
             return $questions;
         }
 
         if ($averageOfRecentThreeGames > 5 && $averageOfRecentThreeGames < 7) {
-            $questions = $query->where('level','medium')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get()->shuffle();
+            $questions = $query->where('level','medium')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get();
             return $questions;
         }
         
         if ($averageOfRecentThreeGames <= 5){
-            $questions = $query->where('level','easy')->inRandomOrder()->take(20)->get()->shuffle();
+            $questions = $query->where('level','easy')->inRandomOrder()->take(20)->get();
             return $questions;
         }
     }
