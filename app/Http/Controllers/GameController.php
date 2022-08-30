@@ -16,6 +16,8 @@ use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\TriviaQuestion;
+use App\Models\User;
+use App\Services\Odds\QuestionsHardeningService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -231,16 +233,9 @@ class GameController extends BaseController
             if ($plan == null) {
                 return $this->sendResponse('No available games', 'No available games');
             }
-
-            $query = $category
-                ->questions()
-                ->where('is_published', true);
-
-            if ($plan->is_free) {
-                $query->whereLevel('easy');
-            }
-
-            $questions = $query->inRandomOrder()->take(20)->get()->shuffle();
+            
+            $questionHardener = new QuestionsHardeningService();
+            $questions = $questionHardener->determineQuestions($this->user , $category);
 
             $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
             $userPlan->update(['used_count' => $userPlan->used_count + 1]);
