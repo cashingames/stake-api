@@ -25,9 +25,7 @@ class LeaderboardTest extends TestCase
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
         $this->user = User::first();
-        GameSession::factory()
-            ->count(20)
-            ->create();
+
 
         $this->actingAs($this->user);
     }
@@ -35,7 +33,6 @@ class LeaderboardTest extends TestCase
 
     public function test_global_leaderboard_should_return_data_based_on_date_range_if_date_range_filter_is_passed()
     {
-
         $startDate = Carbon::today()->subDays(2);
         $endDate = Carbon::now();
 
@@ -43,16 +40,15 @@ class LeaderboardTest extends TestCase
             'startDate' => $startDate,
             'endDate' => $endDate
         ]);
-        $response->assertJsonCount(5, 'data');
+        $response->assertJsonCount(0, 'data');
         $response->assertStatus(200);
     }
 
-    
+
 
     public function test_categories_leaderboard_should_return_data_based_on_date_range_if_date_range_filter_is_passed()
     {
         // $this->seed(CategorySeeder::class);
-
         $startDate = Carbon::today()->subDays(2);
         $endDate = Carbon::now()->addMinute();
 
@@ -61,7 +57,7 @@ class LeaderboardTest extends TestCase
             'endDate' => $endDate
         ]);
 
-        $response->assertJsonCount(2, 'data');
+        $response->assertJsonCount(0, 'data');
     }
 
     public function test_global_leaders_can_be_fetched_by_post_method_without_dates()
