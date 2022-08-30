@@ -23,6 +23,7 @@ use App\Http\Controllers\LeadersController;
 use App\Http\Controllers\LiveTriviaStatusController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\GetRecentLiveTriviaController;
+use App\Http\Controllers\GetStandardOddsController;
 use App\Http\Controllers\GetUserChallengeController;
 use App\Http\Controllers\PlayGroundController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
@@ -82,6 +83,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
+        Route::get('odds/standard', GetStandardOddsController::class);
     }
 );
 
