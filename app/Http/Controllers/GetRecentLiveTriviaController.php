@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\ResponseHelpers\LiveTriviaStatusResponse;
-
+use App\Models\Trivia;
 
 class GetRecentLiveTriviaController extends Controller
 {
@@ -18,7 +18,7 @@ class GetRecentLiveTriviaController extends Controller
     public function __invoke()
     {   
     
-        $recentLiveTrivia = DB::table('trivias')->where('is_published', true)->latest()->limit(10)->get();
+        $recentLiveTrivia = Trivia::whereNull('deleted_at')->where('is_published', true)->latest()->limit(10)->get();
 
         $response = [];
        

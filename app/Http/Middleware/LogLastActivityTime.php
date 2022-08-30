@@ -25,7 +25,7 @@ class LogLastActivityTime
         $user = auth()->user();
         $user->last_activity_time = now();
         $user->save();
-        Log::info("last user activity time for $user->name is: " . now());
+        Log::info("last user activity time for $user->username is: " . now());
         return $next($request);
         
     }
