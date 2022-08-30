@@ -14,6 +14,6 @@ class GetStandardOddsController extends BaseController
      */
     public function __invoke()
     {
-        return $this->sendResponse(config('odds.standard'), 'data fetched');
+        return $this->sendResponse(config('odds.standard'), 'standard odds fetched');
     }
 }
