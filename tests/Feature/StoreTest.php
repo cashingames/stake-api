@@ -195,13 +195,6 @@ class StoreTest extends TestCase
         ]);
     }
 
-    public function test_only_paid_plans_are_returned_to_a_user()
-    {
-        $this->seed(PlanSeeder::class);
-        $response = $this->get(self::GAME_COMMON_DATA_URL);
-        $response->assertJsonCount(5, 'data.plans.*');
-    }
-
     public function test_a_plan_must_first_exist_to_be_subscribable()
     {
         $this->seed(PlanSeeder::class);
