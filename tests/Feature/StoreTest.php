@@ -199,7 +199,6 @@ class StoreTest extends TestCase
     {
         $this->seed(PlanSeeder::class);
         $response = $this->get(self::GAME_COMMON_DATA_URL);
-        // $response->dump();
         $response->assertJsonCount(5, 'data.plans.*');
     }
 

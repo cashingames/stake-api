@@ -35,7 +35,6 @@ jobs:
           mkdir -p database
           touch database/database.sqlite
           php artisan migrate --seed
-          php artisan cache:clear
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: sqlite
