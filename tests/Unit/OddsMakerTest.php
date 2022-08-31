@@ -23,30 +23,49 @@ class OddsMakerTest extends TestCase
         parent::setUp();
 
         $this->seed(UserSeeder::class);
-        // Artisan::call("db:seed --class=UserSeeder")
         
         $this->user = User::first();
     }
 
-    public function test_odds_when_avg_score_less_than_4(){
+    public function test_odds_when_avg_score_less_than_4_in_normal_hours(){
+        $currentHour = intval(date("H"));
+
+        config(['odds.special_hours' => [
+            $currentHour . ":00",
+        ]]);
         $avg_score = 3;
         $oddsComputer = new OddsComputer();
-        $oddMultiplier = $oddsComputer->compute($this->user, $avg_score);
-        $this->assertTrue($oddMultiplier === 1);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $this->assertEquals(1, $oddEffect['oddsMultiplier']);
     }
 
     public function test_odds_when_avg_score_between_5_and_7(){
         $avg_score = 6.5;
         $oddsComputer = new OddsComputer();
-        $oddMultiplier = $oddsComputer->compute($this->user, $avg_score);
-        $this->assertTrue($oddMultiplier === 1.5);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
     }
 
     public function test_odds_when_avg_score_greater_than_7()
     {
         $avg_score = 8.2;
         $oddsComputer = new OddsComputer();
-        $oddMultiplier = $oddsComputer->compute($this->user, $avg_score);
-        $this->assertTrue($oddMultiplier === 1);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $this->assertEquals(1, $oddEffect['oddsMultiplier']);
+    }
+
+    public function test_odds_when_current_time_is_special(){
+        $currentHour = date("H");
+        
+        config(['odds.special_hours' => [
+            $currentHour . ":00",
+            (intval($currentHour) + 1) . ":00"
+        ]]);
+        
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($this->user, 3);
+        
+        $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
+        
     }
 }
