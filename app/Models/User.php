@@ -202,6 +202,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Challenge::class);
     }
 
+    public function stakings()
+    {
+      return $this->hasMany(Staking::class);
+    }
+
     public function points()
     {
         $pointsAdded = UserPoint::where('user_id', $this->id)
