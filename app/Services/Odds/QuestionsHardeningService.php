@@ -46,7 +46,7 @@ class QuestionsHardeningService
         }
     }
 
-    private function getAverageOfLastThreeGames(User $user)
+    public function getAverageOfLastThreeGames(User $user)
     {
 
         $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
@@ -54,7 +54,7 @@ class QuestionsHardeningService
         return  $sumOflastThreeGames / 3;
     }
 
-    private function getUserAnsweredQuestions(User $user)
+    public function getUserAnsweredQuestions(User $user)
     {
         $answeredQuestions = $user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
         return $answeredQuestions;
