@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Models\TriviaQuestion;
 use App\Models\User;
 use App\Services\Odds\QuestionsHardeningService;
+use App\Services\OddsComputer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -199,6 +200,11 @@ class GameController extends BaseController
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
+        $oddMultiplierComputer = new OddsComputer();
+        $questionHardener = new QuestionsHardeningService();
+
+        $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($this->user));
+
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
@@ -208,6 +214,8 @@ class GameController extends BaseController
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
+        $gameSession->odd_multiplier = $odd['oddsMultiplier'];
+        $gameSession->odd_condition = $odd['oddsCondition'];
 
         $questions = [];
 
@@ -234,7 +242,6 @@ class GameController extends BaseController
                 return $this->sendResponse('No available games', 'No available games');
             }
             
-            $questionHardener = new QuestionsHardeningService();
             $questions = $questionHardener->determineQuestions($this->user , $category);
 
             $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
@@ -320,7 +327,7 @@ class GameController extends BaseController
 
     public function endSingleGame(Request $request)
     {
-
+    
         Log::info($request->all());
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
@@ -371,9 +378,18 @@ class GameController extends BaseController
             }
         }
 
+        $pointStandardOdd = 0;
+
+        foreach(config('odds.standard') as $key => $value){
+            if($key == $points){
+                $pointStandardOdd = $value;
+             
+            }
+        }
+       
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = $points * 5; //@TODO to be revised
+        $game->points_gained = $points * $game->odd_multiplier * $pointStandardOdd ; 
         $game->total_count = $points + $wrongs;
 
         $game->save();
