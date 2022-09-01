@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('stakings', function (Blueprint $table) {
+        Schema::create('trivia_stakings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->decimal('amount', 10, 3);
-            $table->bigInteger('standard_odd');
+            $table->foreignId('staking_id');
+            $table->foreignId('trivia_id')->nullable()->constrained('trivias');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stakings');
+        Schema::dropIfExists('trivia_stakings');
     }
 };
