@@ -389,7 +389,7 @@ class GameController extends BaseController
        
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = $points * $game->odd_multiplier * $pointStandardOdd ; 
+        $game->points_gained = $points * $game->odd_multiplier; // * $pointStandardOdd (should be applicable on when taking in involved) ; 
         $game->total_count = $points + $wrongs;
 
         $game->save();

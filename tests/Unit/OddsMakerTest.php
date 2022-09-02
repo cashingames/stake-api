@@ -13,6 +13,7 @@ use Database\Seeders\GameModeSeeder;
 use Database\Seeders\GameTypeSeeder;
 use Database\Seeders\AchievementSeeder;
 use Illuminate\Support\Facades\Artisan;
+use phpDocumentor\Reflection\Types\Null_;
 
 class OddsMakerTest extends TestCase
 {
@@ -27,6 +28,12 @@ class OddsMakerTest extends TestCase
         $this->user = User::first();
     }
 
+    public function test_odds_for_first_time_player(){
+        $user = User::factory()->create();
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($user, NULL);
+        $this->assertEquals(10, $oddEffect['oddsMultiplier']);
+    }
     public function test_odds_when_avg_score_less_than_4_in_normal_hours(){
         $currentHour = intval(date("H"));
 

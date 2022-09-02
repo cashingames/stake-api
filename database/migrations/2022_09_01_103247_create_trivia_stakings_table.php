@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('trivia_stakings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staking_id');
-            $table->foreignId('trivia_id')->nullable()->constrained('trivias');
+            $table->foreignId('trivia_id');
             $table->timestamps();
         });
     }
