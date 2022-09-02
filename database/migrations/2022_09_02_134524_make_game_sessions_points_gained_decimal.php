@@ -13,12 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('stakings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id');
-            $table->decimal('amount', 10, 2);
-            $table->tinyInteger('standard_odd')->default(1);
-            $table->timestamps();
+        Schema::table('game_sessions', function (Blueprint $table) {
+            $table->decimal('points_gained')->change();
         });
     }
 
@@ -29,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stakings');
+        Schema::table('game_sessions', function (Blueprint $table) {
+            $table->tinyInteger('points_gained')->change();
+        });
     }
 };
