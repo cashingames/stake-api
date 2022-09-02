@@ -50,7 +50,7 @@ class QuestionsHardeningService
     {
 
         // $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
-        $lastThreeGamesAverage = $user->gameSessions()->limit(3)->avg('correct_count');
+        $lastThreeGamesAverage = $user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
 
         return $lastThreeGamesAverage;
 
