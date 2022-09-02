@@ -11,11 +11,16 @@ class OddsComputer{
     use DateUtils;
 
     public function compute(User $user, $averageScoreOfRecentGames): array{
-        $averageScoreOfRecentGames = floor($averageScoreOfRecentGames);
+        $averageScoreOfRecentGames = is_numeric($averageScoreOfRecentGames) ? floor($averageScoreOfRecentGames) : $averageScoreOfRecentGames;
 
         $oddsMultiplier = 0;
         $oddsCondition = "";
-        if ($this->currentTimeIsInSpecialHours() && $averageScoreOfRecentGames < 4) {
+        
+        if(is_null($averageScoreOfRecentGames) && $this->isFirstEverGame($user)){
+            $oddsMultiplier = 10;
+            $oddsCondition = "first_ever_game";
+        }
+        elseif ($this->currentTimeIsInSpecialHours() && $averageScoreOfRecentGames < 4) {
             $oddsMultiplier = 1.5;
             $oddsCondition = "special_hour";
         }
@@ -60,5 +65,9 @@ class OddsComputer{
         }
 
         return Carbon::createFromDate($last_funding->created_at)->gt(Carbon::createFromDate($last_game->created_at));
+    }
+
+    public function isFirstEverGame(User $user){
+        return $user->gameSessionQuestions()->doesntExist();
     }
 }

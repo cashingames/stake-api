@@ -49,9 +49,12 @@ class QuestionsHardeningService
     public function getAverageOfLastThreeGames(User $user)
     {
 
-        $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
+        // $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
+        $lastThreeGamesAverage = $user->gameSessions()->limit(3)->avg('correct_count');
 
-        return  $sumOflastThreeGames / 3;
+        return $lastThreeGamesAverage;
+
+        // return  $sumOflastThreeGames / 3;
     }
 
     public function getUserAnsweredQuestions(User $user)
