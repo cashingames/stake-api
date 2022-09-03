@@ -13,8 +13,8 @@ class OddsComputer{
     public function compute(User $user, $averageScoreOfRecentGames): array{
         $averageScoreOfRecentGames = is_numeric($averageScoreOfRecentGames) ? floor($averageScoreOfRecentGames) : $averageScoreOfRecentGames;
 
-        $oddsMultiplier = 0;
-        $oddsCondition = "";
+        $oddsMultiplier = 1;
+        $oddsCondition = "no_matching_condition";
         
         if(is_null($averageScoreOfRecentGames) && $this->isFirstEverGame($user)){
             $oddsMultiplier = 10;
