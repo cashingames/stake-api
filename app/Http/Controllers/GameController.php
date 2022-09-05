@@ -194,11 +194,11 @@ class GameController extends BaseController
     public function startSingleGame(Request $request)
     {
         $request->validate([
-            'category' => ['required'],
-            'type' => ['required'],
-            'mode' => ['required'],
-            'trivia' => ['nullable'],
-            'staking_amount' => ['nullable']
+            'category' => ['required','numeric',],
+            'type' => ['required', 'numeric'],
+            'mode' => ['required', 'numeric'],
+            'trivia' => ['nullable', 'numeric'],
+            'staking_amount' =>['nullable', 'numeric', 'min:0']
         ]);
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
@@ -223,8 +223,7 @@ class GameController extends BaseController
         $gameSession->odd_condition = $odd['oddsCondition'];
 
         $stakingService = new StakingService($this->user);
-        $stakingId = 0;
-
+       
         if ($request->has('staking_amount')) {
 
             if ($this->user->wallet->balance < $request->staking_amount) {
@@ -232,6 +231,10 @@ class GameController extends BaseController
             }
             $stakingId = $stakingService->stakeAmount($request->staking_amount);
             $gameSession->staking_id  = $stakingId;
+
+            if ($request->has('trivia')) {
+                $stakingService->createTriviaStaking($stakingId, $request->trivia);
+            }
         }
 
         $questions = [];
@@ -253,9 +256,7 @@ class GameController extends BaseController
             }
             $gameSession->trivia_id = $request->trivia;
 
-            if ($request->has('staking_amount')) {
-                $stakingService->createTriviaStaking($stakingId, $request->trivia);
-            }
+           
         } else {
 
             $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
