@@ -100,4 +100,30 @@ class SendPushNotification{
 
         Log::info("Challenge invitation push notification sent to: " . $recipient->username . " from " . $user->username);
     }
+
+    public function sendSpecialHourOddsNotification($user){
+        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+        if (is_null($user)) {
+            return;
+        }
+
+        $this->pushService->setNotification(
+            [
+                'title' => "Special Hour: Play now and win more",
+                'body' => "Play a game now and increase your odds of winning by x1.5"
+            ]
+        )
+            ->setData(
+                [
+
+                    'title' => "Special Hour: Play now and win more",
+                    'body' => "Play a game now and increase your odds of winning by x1.5",
+                    'action_type' => "#",
+                    'action_id' => "#"
+
+                ]
+            )
+            ->setTo($device_token->device_token)
+            ->send();
+    }
 }

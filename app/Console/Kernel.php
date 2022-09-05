@@ -31,6 +31,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')
         ->dailyAt('00:03');
 
+        $schedule->command('odds:special-hour')->hourly()->when(function(){
+
+            $now = date("H") . ":00";
+            $specialHours = config('odds.special_hours');
+
+            return in_array($now, $specialHours);
+
+        })->timezone('Africa/Lagos');
+
         // $schedule->command('bonus:daily-expire')
         // ->everyTenMinutes();
         // $schedule->command('bonus:daily-activate')
