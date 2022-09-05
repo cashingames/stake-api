@@ -9,6 +9,11 @@ class TriviaStaking extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'trivia_id',
+        'staking_id',
+    ];
+
     public function staking()
     {
         return $this->belongsTo(Staking::class);

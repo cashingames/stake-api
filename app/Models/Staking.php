@@ -7,15 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Staking extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    public function user()
-    {
-      return $this->belongsTo(User::class);
-    }
+  protected $fillable = [
+    'user_id',
+    'amount',
+    'standard_odd'
+  ];
 
-    public function triviaStakings()
-    {
-      return $this->hasMany(TriviaStaking::class);
-    }
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
+
+  public function triviaStakings()
+  {
+    return $this->hasMany(TriviaStaking::class);
+  }
 }
