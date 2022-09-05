@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StandardOdd;
 use Illuminate\Http\Request;
 
 class GetStandardOddsController extends BaseController
@@ -14,6 +15,7 @@ class GetStandardOddsController extends BaseController
      */
     public function __invoke()
     {
-        return $this->sendResponse(config('odds.standard'), 'standard odds fetched');
+        $odds = StandardOdd::active()->orderBy('score', 'DESC')->get();
+        return $this->sendResponse($odds, 'standard odds fetched');
     }
 }
