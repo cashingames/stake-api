@@ -126,19 +126,24 @@ class LiveTriviaTest extends TestCase
         ]);
     }
 
-    // public function test_live_trivia_leaders_can_be_fetched()
-    // {
-    //     GameSession::factory()
-    //         ->count(20)
-    //         ->create();
+    public function test_that_trivia_staking_record_is_created_in_live_trivia_with_staking()
+    {
+        $this->user->wallet->update([
+            'balance' => 1000
+        ]);
 
-    //     $response = $this->get('/api/v3/trivia/leaders/' . $this->trivia->id);
+        $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "trivia" => $this->trivia->id,
+            "staking_amount" => 500
+        ]);
 
+        $this->assertDatabaseHas('trivia_stakings', [
+            'trivia_id' => $this->trivia->id,
+        ]);
+    }
 
-    //     $response->assertJson([
-    //         'data' => [
-    //             "leaders" => [],
-    //         ],
-    //     ]);
-    // }
+ 
 }

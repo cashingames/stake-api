@@ -205,4 +205,49 @@ class GameTest extends TestCase
         Mail::assertSent(ChallengeInvite::class);
         $response->assertOk();
     }
+
+    public function test_single_game_can_be_started_with_staking()
+    {
+        Question::factory()
+            ->count(50)
+            ->create();
+
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+        $this->user->wallet->update([
+            'balance' => 5000
+        ]);
+        
+        $response = $this->postjson(self::START_SINGLE_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 1000
+        ]);
+        $response->assertJson([
+            'message' => 'Game Started',
+        ]);
+    }
+
+    public function test_that_a_staking_single_game_does_not_start_if_wallet_balance_is_insufficient()
+    {
+
+        $response = $this->postjson(self::START_SINGLE_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 1000
+        ]);
+        $response->assertJson([
+            'message' => 'Insufficient wallet balance',
+        ]);
+    }
 }
