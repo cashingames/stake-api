@@ -46,6 +46,7 @@ class UserController extends BaseController
         $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();
+        $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
 
         return $this->sendResponse($result, 'User details');
     }

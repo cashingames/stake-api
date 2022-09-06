@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Actions\SendPushNotification;
 use App\Mail\RespondToChallengeInvite;
 use App\Http\ResponseHelpers\ChallengeDetailsResponse;
+use App\Notifications\ChallengeStatusUpdateNotification;
 
 class ChallengeInviteStatusController extends BaseController
 {
@@ -33,10 +34,11 @@ class ChallengeInviteStatusController extends BaseController
 
         Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-        // if (env('PUSH_ENABLED')){
-            $pushAction = new SendPushNotification();
-            $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
-        // }
+        
+        $pushAction = new SendPushNotification();
+        $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
+        
+        $player->notify(new ChallengeStatusUpdateNotification($updatedChallenge, $status));
 
         Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
 

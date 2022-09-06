@@ -7,6 +7,7 @@ use App\Models\Plan;
 use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
+use App\Notifications\WalletFundedNotification;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -115,7 +116,7 @@ class WalletController extends BaseController
     {
         $user->wallet->balance += ($amount) / 100;
 
-        WalletTransaction::create([
+        $transaction = WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
@@ -125,6 +126,7 @@ class WalletController extends BaseController
         ]);
         $user->wallet->save();
 
+        $user->notify(new WalletFundedNotification($transaction));
         Log::info('payment successful from paystack');
         return response("", 200);
     }
