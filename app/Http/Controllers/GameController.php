@@ -12,13 +12,17 @@ use App\Models\UserBoost;
 use App\Models\Achievement;
 use App\Models\GameSession;
 use App\Models\Question;
+use App\Models\Staking;
 use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\TriviaQuestion;
+use App\Models\TriviaStaking;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use App\Services\Odds\QuestionsHardeningService;
 use App\Services\OddsComputer;
+use App\Services\StakingService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -188,13 +192,21 @@ class GameController extends BaseController
     }
 
     public function startSingleGame(Request $request)
-    {   
+    {
         $request->validate([
-            'category' => ['required'],
-            'type' => ['required'],
-            'mode' => ['required'],
-            'trivia' => ['nullable']
+            'category' => ['required', 'numeric',],
+            'type' => ['required', 'numeric'],
+            'mode' => ['required', 'numeric'],
+            'trivia' => ['nullable', 'numeric'],
+            'staking_amount' => ['nullable', 'numeric', 'min:0']
         ]);
+
+        if ($request->has('staking_amount')) {
+
+            if ($this->user->wallet->balance < $request->staking_amount) {
+                return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
+            }
+        }
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
@@ -241,8 +253,8 @@ class GameController extends BaseController
             if ($plan == null) {
                 return $this->sendResponse('No available games', 'No available games');
             }
-            
-            $questions = $questionHardener->determineQuestions($this->user , $category);
+
+            $questions = $questionHardener->determineQuestions($this->user, $category);
 
             $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
             $userPlan->update(['used_count' => $userPlan->used_count + 1]);
@@ -255,6 +267,14 @@ class GameController extends BaseController
         }
 
         $gameSession->save();
+
+        if ($request->has('staking_amount')) {
+            $stakingService = new StakingService($this->user);
+
+            $stakingId = $stakingService->stakeAmount($request->staking_amount);
+
+            $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
+        }
 
         Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 
@@ -327,17 +347,17 @@ class GameController extends BaseController
 
     public function endSingleGame(Request $request)
     {
-    
+
         Log::info($request->all());
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if ($game == null) {
-            Log::info($this->user->username . " tries to end game with invalid token ". $request->token);
+            Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
 
         if ($game->state == "COMPLETED") {
-            Log::info($this->user->username . " trying to end game a second time with ".$request->token );
+            Log::info($this->user->username . " trying to end game a second time with " . $request->token);
             return $this->sendResponse($game, 'Game Ended');
         }
 
@@ -362,7 +382,7 @@ class GameController extends BaseController
             $chosenOptions = array_slice($request->chosenOptions, 0, $questionsCount);
 
             //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
-        }else{
+        } else {
             $chosenOptions = $request->chosenOptions;
         }
 
@@ -380,13 +400,12 @@ class GameController extends BaseController
 
         $pointStandardOdd = 0;
 
-        foreach(config('odds.standard') as $key => $value){
-            if($key == $points){
+        foreach (config('odds.standard') as $key => $value) {
+            if ($key == $points) {
                 $pointStandardOdd = $value;
-             
             }
         }
-       
+
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points * $game->odd_multiplier; // * $pointStandardOdd (should be applicable on when taking in involved) ; 

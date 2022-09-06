@@ -35,7 +35,8 @@ class SendPushNotification{
                 'title' => "Cashingames Invitation! : Play a Challenge Game!",
                 'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
                 'action_type' => PushNotificationType::Challenge,
-                'action_id' => $challenge->id
+                'action_id' => $challenge->id,
+                'unread_notifications_count' => $opponent->unreadNotifications()->count()
             
             ]
         )
@@ -61,7 +62,8 @@ class SendPushNotification{
                 'title' => "Challenge Status Update",
                 'body' => "Your opponent, {$opponent->username} has {$status} your invite",
                 'action_type' => PushNotificationType::Challenge,
-                'action_id' => $challenge->id
+                'action_id' => $challenge->id,
+                'unread_notifications_count' => $player->unreadNotifications()->count()
             ]
         )
         ->setTo($recipient->device_token)
@@ -91,7 +93,8 @@ class SendPushNotification{
                     'title' => "Challenge Completed!",
                     'body' => "Your opponent, {$user->username} has completed the challenge, check the scores now",
                     'action_type' => PushNotificationType::Challenge,
-                    'action_id' => $challenge->id
+                    'action_id' => $challenge->id,
+                    'unread_notifications_count' => $recipient->unreadNotifications()->count()
                 
                 ]
             )

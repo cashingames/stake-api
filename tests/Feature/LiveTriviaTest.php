@@ -126,19 +126,5 @@ class LiveTriviaTest extends TestCase
         ]);
     }
 
-    // public function test_live_trivia_leaders_can_be_fetched()
-    // {
-    //     GameSession::factory()
-    //         ->count(20)
-    //         ->create();
-
-    //     $response = $this->get('/api/v3/trivia/leaders/' . $this->trivia->id);
-
-
-    //     $response->assertJson([
-    //         'data' => [
-    //             "leaders" => [],
-    //         ],
-    //     ]);
-    // }
+ 
 }

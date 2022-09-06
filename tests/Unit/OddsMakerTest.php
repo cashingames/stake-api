@@ -66,12 +66,12 @@ class OddsMakerTest extends TestCase
         
         config(['odds.special_hours' => [
             $currentHour . ":00",
-            "0" . (intval($currentHour) + 1) . ":00"
+            (intval($currentHour) < 10 ? "0" : "") . (intval($currentHour) + 1) . ":00"
         ]]);
         
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($this->user, 3);
-        // dd($oddEffect, config('odds.special_hours'), $currentHour);
+        
         $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
         
     }
