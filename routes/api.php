@@ -85,7 +85,8 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStandardOddsController::class);
-        Route::put('/notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
     }
 );
 
