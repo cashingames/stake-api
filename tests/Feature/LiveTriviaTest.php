@@ -126,24 +126,5 @@ class LiveTriviaTest extends TestCase
         ]);
     }
 
-    public function test_that_trivia_staking_record_is_created_in_live_trivia_with_staking()
-    {
-        $this->user->wallet->update([
-            'balance' => 1000
-        ]);
-
-        $this->postjson('/api/v2/game/start/single-player', [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "trivia" => $this->trivia->id,
-            "staking_amount" => 500
-        ]);
-
-        $this->assertDatabaseHas('trivia_stakings', [
-            'trivia_id' => $this->trivia->id,
-        ]);
-    }
-
  
 }

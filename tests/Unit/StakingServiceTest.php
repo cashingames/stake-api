@@ -2,11 +2,15 @@
 
 namespace Tests\Unit;
 
+use App\Models\GameSession;
 use App\Models\Staking;
-use App\Models\Trivia;
-use App\Models\User;;
+use App\Models\User;
 
 use App\Services\StakingService;
+use Database\Seeders\CategorySeeder;
+use Database\Seeders\GameModeSeeder;
+use Database\Seeders\GameTypeSeeder;
+use Database\Seeders\PlanSeeder;
 use Database\Seeders\StakingSeeder;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
@@ -19,17 +23,15 @@ class StakingServiceTest extends TestCase
     use RefreshDatabase;
 
     public $stakingService;
-    public $user, $staking, $liveTrivia;
+    public $user, $staking;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(UserSeeder::class);
         $this->seed(StakingSeeder::class);
-        $this->seed(TriviaSeeder::class);
         $this->user = User::inRandomOrder()->first();
         $this->staking = Staking::inRandomOrder()->first();
-        $this->liveTrivia = Trivia::inRandomOrder()->first();
         $this->stakingService = new StakingService($this->user);
     }
 
@@ -44,13 +46,21 @@ class StakingServiceTest extends TestCase
         $this->assertIsInt($stakingId);
     }
 
-    public function test_that_a_trivia_staking_record_can_be_created()
-    {
-        $this->stakingService->createTriviaStaking($this->staking->id, $this->liveTrivia->id);
+    public function test_that_an_exhibition_staking_record_can_be_created()
+    {   
+        $this->seed(CategorySeeder::class);
+        $this->seed(PlanSeeder::class);
+        $this->seed(GameTypeSeeder::class);
+        $this->seed(GameModeSeeder::class);
+        GameSession::factory()->count(20)->create();
 
-        $this->assertDatabaseHas('trivia_stakings', [
+        $gameSession = GameSession::inRandomOrder()->first();
+
+        $this->stakingService->createExhibitionStaking($this->staking->id, $gameSession->id);
+
+        $this->assertDatabaseHas('exhibition_stakings', [
             'staking_id' => $this->staking->id,
-            'trivia_id' => $this->liveTrivia->id,
+            'game_session_id' => $gameSession->id,
         ]);
     }
 }

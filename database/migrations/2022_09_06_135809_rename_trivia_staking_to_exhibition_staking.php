@@ -13,9 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('game_sessions', function (Blueprint $table) {
-            $table->foreignId('staking_id')->nullable();
-        });
+        Schema::rename('trivia_stakings','exhibition_stakings');
     }
 
     /**
@@ -25,8 +23,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('game_sessions', function (Blueprint $table) {
-            $table->dropColumn(['staking_id']);
-        });
+        Schema::rename('exhibition_stakings','trivia_stakings');
     }
 };

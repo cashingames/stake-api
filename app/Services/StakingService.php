@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\ExhibitionStaking;
 use App\Models\Staking;
-use App\Models\TriviaStaking;
 use App\Models\User;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Log;
@@ -46,10 +46,10 @@ class StakingService
         return $staking->id;
     }
 
-    public function createTriviaStaking($stakingId, $triviaId)
+    public function createExhibitionStaking($stakingId, $gameSessionId)
     {
-        TriviaStaking::create([
-            'trivia_id' => $triviaId,
+        ExhibitionStaking::create([
+            'game_session_id' => $gameSessionId,
             'staking_id' => $stakingId
         ]);
     }
