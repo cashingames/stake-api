@@ -34,17 +34,17 @@ class OddsMakerTest extends TestCase
         $oddEffect = $oddsComputer->compute($user, NULL);
         $this->assertEquals(10, $oddEffect['oddsMultiplier']);
     }
-    // public function test_odds_when_avg_score_less_than_4_in_normal_hours(){
-    //     $currentHour = intval(date("H"));
+    public function test_odds_when_avg_score_less_than_4_in_normal_hours(){
+        $currentHour = intval(date("H"));
 
-    //     config(['odds.special_hours' => [
-    //         $currentHour . ":00",
-    //     ]]);
-    //     $avg_score = 3;
-    //     $oddsComputer = new OddsComputer();
-    //     $oddEffect = $oddsComputer->compute($this->user, $avg_score);
-    //     $this->assertEquals(1, $oddEffect['oddsMultiplier']);
-    // }
+        config(['odds.special_hours' => [
+            $currentHour . ":00",
+        ]]);
+        $avg_score = 3;
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $this->assertEquals(1, $oddEffect['oddsMultiplier']);
+    }
 
     public function test_odds_when_avg_score_between_5_and_7(){
         $avg_score = 6.5;
@@ -66,12 +66,12 @@ class OddsMakerTest extends TestCase
         
         config(['odds.special_hours' => [
             $currentHour . ":00",
-            (intval($currentHour) + 1) . ":00"
+            "0" . (intval($currentHour) + 1) . ":00"
         ]]);
         
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($this->user, 3);
-        
+        // dd($oddEffect, config('odds.special_hours'), $currentHour);
         $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
         
     }
