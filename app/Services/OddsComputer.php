@@ -28,7 +28,7 @@ class OddsComputer{
             $oddsMultiplier = 2;
             $oddsCondition = "first_game_after_funding_wallet";
         }
-        elseif ($averageScoreOfRecentGames < 4){
+        elseif ($averageScoreOfRecentGames < 4 && !$this->currentTimeIsInSpecialHours()){
             $oddsMultiplier = 1;
             $oddsCondition = "average_score_less_than_4";
         }
