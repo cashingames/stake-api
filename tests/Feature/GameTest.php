@@ -36,8 +36,8 @@ class GameTest extends TestCase
      */
     const COMMON_DATA_URL = '/api/v3/game/common';
     const CLAIM_ACHIEVEMENT_URL = '/api/v2/claim/achievement/';
-    const START_SINGLE_GAME_URL = '/api/v2/game/start/single-player';
-    const END_SINGLE_GAME_URL = '/api/v2/game/end/single-player';
+    const START_EXHIBITION_GAME_URL = '/api/v2/game/start/single-player';
+    const END_EXHIBITION_GAME_URL = '/api/v2/game/end/single-player';
     const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
 
     protected $user;
@@ -117,7 +117,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_single_game_can_be_started()
+    public function test_exhibition_game_can_be_started()
     {
         Question::factory()
             ->count(50)
@@ -134,7 +134,7 @@ class GameTest extends TestCase
             'expire_at' => Carbon::now()->endOfDay()
         ]);
 
-        $response = $this->postjson(self::START_SINGLE_GAME_URL, [
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2
@@ -144,13 +144,13 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_single_game_can_be_ended_without_boosts_and_options()
+    public function test_exhibition_game_can_be_ended_without_boosts_and_options()
     {
         GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state'=>'ONGOING']);
 
-        $response = $this->postjson(self::END_SINGLE_GAME_URL, [
+        $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => []
@@ -160,7 +160,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_single_game_can_be_ended_with_boosts_and_no_options()
+    public function test_exhibition_game_can_be_ended_with_boosts_and_no_options()
     {
         GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
         $game = $this->user->gameSessions()->first();
@@ -177,7 +177,7 @@ class GameTest extends TestCase
 
         $userBoost = $this->user->userBoosts();
 
-        $response = $this->postjson(self::END_SINGLE_GAME_URL, [
+        $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => [
@@ -204,5 +204,75 @@ class GameTest extends TestCase
 
         Mail::assertSent(ChallengeInvite::class);
         $response->assertOk();
+    }
+
+    public function test_exhibition_game_can_be_started_with_staking()
+    {
+        Question::factory()
+            ->count(50)
+            ->create();
+
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+        $this->user->wallet->update([
+            'balance' => 5000
+        ]);
+        
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 1000
+        ]);
+        $response->assertJson([
+            'message' => 'Game Started',
+        ]);
+    }
+
+    public function test_that_a_staking_exhibition_game_does_not_start_if_wallet_balance_is_insufficient()
+    {
+
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 1000
+        ]);
+        $response->assertJson([
+            'message' => 'Insufficient wallet balance',
+        ]);
+    }
+
+    public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
+    {
+        $this->user->wallet->update([
+            'balance' => 1000
+        ]);
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+        $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 500
+        ]);
+        $this->assertDatabaseCount('exhibition_stakings', 1);
+
     }
 }
