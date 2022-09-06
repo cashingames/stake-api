@@ -357,4 +357,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->gameSessions()->where('trivia_id', $triviaId)->exists();
     }
+
+    public function notifications()
+    {
+        return $this->morphMany(UserNotification::class, 'notifiable')->orderBy('created_at', 'desc');
+    }
 }

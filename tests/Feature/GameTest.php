@@ -21,10 +21,12 @@ use App\Models\UserBoost;
 use App\Models\UserPoint;
 use App\Models\Achievement;
 use App\Models\GameSession;
+use App\Notifications\ChallengeReceivedNotification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 
 class GameTest extends TestCase
 {
@@ -193,6 +195,8 @@ class GameTest extends TestCase
 
     public function test_challenge_invite_sent_successfully(){
         Mail::fake();
+        Notification::fake();
+
         $player = $this->user;
         $opponent = User::latest()->limit(2)->first();
         $category = $this->category;
@@ -203,6 +207,8 @@ class GameTest extends TestCase
         ]);
 
         Mail::assertSent(ChallengeInvite::class);
+        Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
+        
     }
 }
