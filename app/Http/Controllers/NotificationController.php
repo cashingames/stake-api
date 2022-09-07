@@ -24,6 +24,11 @@ class NotificationController extends BaseController
             UserNotification::whereId($notificationId)->update(['read_at' => now()]);
         }
 
-        return $this->sendResponse("Notification marked as read", 'Notification marked as read');
+        $unreadNotifications = $this->user->unreadNotifications()->count();
+        $result = [
+            'unreadNotificationsCount' => $unreadNotifications
+        ];
+
+        return $this->sendResponse($result, 'Notification marked as read');
     }
 }
