@@ -350,7 +350,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function bookBalance(){
-        return $this->transactions()->whereNull('settled_at')->get();
+        return $this->transactions()->whereNull('settled_at')->whereNotNull('viable_date')->sum('amount');
     }
 
     public function userChallenges()

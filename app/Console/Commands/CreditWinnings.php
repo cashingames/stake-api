@@ -34,7 +34,7 @@ class CreditWinnings extends Command
             ->where('viable_date', '>=', now())
             ->chunkById(500, function ($transactions) {
                 foreach ($transactions as $transaction) {
-                    $transaction->wallet()->update(['withdrawable_balance' => ($transaction->withdrawable_balance + $transaction->amount)]);
+                    $transaction->wallet()->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);
                 }
                 $transactions->each->update(['settled_at' => now()]);
             }, $column = 'id');
