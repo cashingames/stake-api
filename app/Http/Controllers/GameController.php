@@ -13,6 +13,7 @@ use App\Models\Achievement;
 use App\Models\GameSession;
 use App\Models\Question;
 use App\Models\Staking;
+use App\Models\StandardOdd;
 use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -398,16 +399,17 @@ class GameController extends BaseController
         }
 
         $pointStandardOdd = 0;
+        $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
 
-        foreach (config('odds.standard') as $key => $value) {
-            if ($key == $points) {
-                $pointStandardOdd = $value;
+        foreach ($standardOdds as $standardOdd) {
+            if ($standardOdd->score == $points) {
+                $pointStandardOdd = $standardOdd->odd;
             }
         }
-        //check if there was a staking for this game
+       
         $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
 
-        if(!is_null($staking)){
+        if (!is_null($staking)) {
             $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
 
             //create a transaction for the winning
@@ -420,11 +422,10 @@ class GameController extends BaseController
                 'reference' => Str::random(10),
                 'viable_date' => now()->addDays(config('trivia.staking.days_before_withdrawal'))
             ]);
-    
         }
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = $points * $game->odd_multiplier; // * $pointStandardOdd (should be applicable on when taking in involved) ; 
+        $game->points_gained = $points * $game->odd_multiplier; 
         $game->total_count = $points + $wrongs;
 
         $game->save();

@@ -216,7 +216,7 @@ class StoreTest extends TestCase
     {
         $this->seed(PlanSeeder::class);
         $this->user->wallet()->update([
-            'balance' => 2500,
+            'non_withdrawable_balance' => 2500,
         ]);
         $plan = Plan::where('is_free', false)->inRandomOrder()->first();
 

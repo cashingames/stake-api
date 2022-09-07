@@ -209,9 +209,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function exhibitionStakings()
     {   
-        
-
-        return $this->hasManyThrough(ExhibitionStaking::class, Staking::class);
+        return DB::table('stakings')->where('user_id', $this->id)
+        ->join('exhibition_stakings', function ($join) {
+            $join->on('exhibition_stakings.staking_id', '=', 'stakings.id');
+        });
     }
 
     public function points()
@@ -346,6 +347,10 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
             })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->where('user_boosts.boost_count', '>', 0)->get();
+    }
+
+    public function bookBalance(){
+        return $this->transactions()->whereNull('settled_at')->get();
     }
 
     public function userChallenges()
