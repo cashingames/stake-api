@@ -28,6 +28,9 @@ return [
     'enabled' => env('HAS_LIVE_TRIVIA',false),
     'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
+  'staking'=>[
+    'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3)
+  ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
   'payment_key' => env('PAYSTACK_KEY', null),

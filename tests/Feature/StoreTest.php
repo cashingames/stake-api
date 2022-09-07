@@ -137,7 +137,7 @@ class StoreTest extends TestCase
     public function test_boosts_can_be_bought_from_wallet()
     {
         $this->seed(BoostSeeder::class);
-        $this->user->wallet->update(['balance' => 1000]);
+        $this->user->wallet->update(['non_withdrawable_balance' => 1000]);
 
         $response = $this->post(self::BUY_BOOST_WALLET_URL . Boost::inRandomOrder()->first()->id);
         $response->assertJsonFragment(['message' => 'Boost Bought']);

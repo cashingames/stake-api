@@ -229,7 +229,7 @@ class GameTest extends TestCase
             'expire_at' => Carbon::now()->endOfDay()
         ]);
         $this->user->wallet->update([
-            'balance' => 5000
+            'non_withdrawable_balance' => 5000
         ]);
         
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
@@ -260,7 +260,7 @@ class GameTest extends TestCase
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
     {
         $this->user->wallet->update([
-            'balance' => 1000
+            'non_withdrawable_balance' => 1000
         ]);
         UserPlan::create([
             'plan_id' => $this->plan->id,

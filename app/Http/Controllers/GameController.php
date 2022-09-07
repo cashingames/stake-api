@@ -23,6 +23,7 @@ use App\Models\WalletTransaction;
 use App\Services\Odds\QuestionsHardeningService;
 use App\Services\OddsComputer;
 use App\Services\StakingService;
+use Carbon\Carbon as CarbonCarbon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -201,11 +202,9 @@ class GameController extends BaseController
             'staking_amount' => ['nullable', 'numeric', 'min:0']
         ]);
 
-        if ($request->has('staking_amount')) {
+        if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
-            if ($this->user->wallet->balance < $request->staking_amount) {
-                return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
-            }
+            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
         }
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
@@ -405,7 +404,24 @@ class GameController extends BaseController
                 $pointStandardOdd = $value;
             }
         }
+        //check if there was a staking for this game
+        $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
 
+        if(!is_null($staking)){
+            $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
+
+            //create a transaction for the winning
+            WalletTransaction::create([
+                'wallet_id' => $this->user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $amountWon,
+                'balance' => $this->user->wallet->withdrawable_balance,
+                'description' => 'STAKING WINNING OF ' . $amountWon,
+                'reference' => Str::random(10),
+                'viable_date' => now()->addDays(config('trivia.staking.days_before_withdrawal'))
+            ]);
+    
+        }
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points * $game->odd_multiplier; // * $pointStandardOdd (should be applicable on when taking in involved) ; 
