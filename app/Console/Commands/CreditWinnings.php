@@ -28,17 +28,15 @@ class CreditWinnings extends Command
      * @return int
      */
     public function handle()
-    {   
+    {
         WalletTransaction::whereNull('settled_at')
             ->whereNotNull('viable_date')
             ->where('viable_date', '>=', now())
             ->chunkById(500, function ($transactions) {
                 foreach ($transactions as $transaction) {
-                    $transaction->wallet()->update(['withdarwable_balance' => $transaction->amount ]);
+                    $transaction->wallet()->update(['withdrawable_balance' => ($transaction->withdrawable_balance + $transaction->amount)]);
                 }
                 $transactions->each->update(['settled_at' => now()]);
             }, $column = 'id');
-
-        return 0;
     }
 }
