@@ -11,7 +11,7 @@ class NotificationController extends BaseController
      * Fetch all notifications
      */
     public function index(Request $request){
-        $notifications = $this->user->unreadNotifications()->paginate(20);
+        $notifications = $this->user->notifications()->paginate(20);
         return $this->sendResponse($notifications, "Notifications fetched successfully");
     }
     /**
