@@ -41,4 +41,10 @@ class WalletTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeUnsettled($query){
+        
+        return $query->where('transaction_type', 'CREDIT')
+        ->whereNull('settled_at')->whereNotNull('viable_date');
+    }
 }

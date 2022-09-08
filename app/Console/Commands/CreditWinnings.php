@@ -29,9 +29,8 @@ class CreditWinnings extends Command
      */
     public function handle()
     {
-        WalletTransaction::whereNull('settled_at')
-            ->whereNotNull('viable_date')
-            ->where('viable_date', '>=', now())
+        WalletTransaction::unsettled()
+            ->where('viable_date', '<=', now())
             ->chunkById(500, function ($transactions) {
                 foreach ($transactions as $transaction) {
                     $transaction->wallet->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);
