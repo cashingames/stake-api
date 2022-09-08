@@ -20,7 +20,9 @@ use App\Models\UserPlan;
 use App\Models\UserBoost;
 use App\Models\UserPoint;
 use App\Models\Achievement;
+use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
+use App\Models\Staking;
 use App\Notifications\ChallengeReceivedNotification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -45,6 +47,7 @@ class GameTest extends TestCase
     protected $user;
     protected $category;
     protected $plan;
+    protected $staking;
 
     protected function setUp(): void
     {
@@ -280,5 +283,51 @@ class GameTest extends TestCase
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
 
+    }
+
+    public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
+    {   
+        Question::factory()
+        ->count(50)
+        ->create();
+
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+        $this->user->wallet->update([
+            'non_withdrawable_balance' => 5000
+        ]);
+
+        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state'=>'ONGOING']);
+
+        $staking = Staking::create([
+            'user_id' => $this->user->id,
+            'amount' => 1000
+        ]);
+
+        ExhibitionStaking::create([
+            'staking_id' => $staking->id,
+            'game_session_id' => $game->id
+        ]);
+    
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $this->assertDatabaseHas('wallet_transactions', [
+            'wallet_id' =>  $this->user->wallet->id,
+            'transaction_type' => 'CREDIT'
+        ]);
     }
 }

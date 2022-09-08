@@ -410,19 +410,24 @@ class GameController extends BaseController
         $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
 
         if (!is_null($staking)) {
+            
             $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
 
-            //create a transaction for the winning
+
             WalletTransaction::create([
                 'wallet_id' => $this->user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => $amountWon,
                 'balance' => $this->user->wallet->withdrawable_balance,
-                'description' => 'STAKING WINNING OF ' . $amountWon,
+                'description' => 'Staking winning of ' . $amountWon .' cash',
                 'reference' => Str::random(10),
-                'viable_date' => now()->addDays(config('trivia.staking.days_before_withdrawal'))
+                'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
             ]);
+
+            $this->user->exhibitionStakings()->where('game_session_id', $game->id)->update(['standard_odd' => $pointStandardOdd ]);
+            
         }
+        
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points * $game->odd_multiplier; 
