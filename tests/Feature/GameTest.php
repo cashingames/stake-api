@@ -87,7 +87,7 @@ class GameTest extends TestCase
                 'plans' => [],
                 'gameModes' => [],
                 'gameTypes' => [],
-                'minVersionCode' => []
+                'minVersionCode' => [],
             ]
         ]);
     }

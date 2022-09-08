@@ -21,6 +21,7 @@ class ProfileTest extends TestCase
      * @return void
      */
 
+    const PROFILE_DATA_URL = '/api/v3/user/profile';
     const CHANGE_PASSWORD_URL = '/api/v2/profile/me/password/change';
     protected $user;
 
@@ -33,6 +34,25 @@ class ProfileTest extends TestCase
         $this->user = User::first();
 
         $this->actingAs($this->user);
+    }
+
+    public function test_relevant_user_profile_can_be_retrieved_with_data()
+    {
+        $response = $this->get(self::PROFILE_DATA_URL);
+
+        $response->assertJson([
+            'data' => [
+                'username' => $this->user->username,
+                'email' =>  $this->user->email,
+                'lastName' =>  $this->user->profile->last_name,
+                'firstName' => $this->user->profile->first_name,
+                'phoneNumber' =>  $this->user->phone_number,
+                'points' =>  $this->user->points(),
+                'walletBalance' => $this->user->wallet->non_withdrawable_balance,
+                'bookBalance' => $this->user->bookBalance(),
+                'withdrawableBalance'=> $this->user->wallet->withdrawable_balance
+            ]
+        ]);
     }
 
     public function test_personal_details_can_be_edited()
