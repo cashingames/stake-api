@@ -114,13 +114,13 @@ class WalletController extends BaseController
 
     private function savePaymentTransaction($reference, $user, $amount)
     {
-        $user->wallet->balance += ($amount) / 100;
+        $user->wallet->non_withdrawable_balance += ($amount) / 100;
 
         $transaction = WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
-            'balance' => $user->wallet->balance,
+            'balance' => $user->wallet->non_withdrawable_balance,
             'description' => 'Fund Wallet',
             'reference' => $reference,
         ]);
@@ -208,11 +208,11 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
-        if ($wallet->balance < ($boost->currency_value)) {
+        if ($wallet->non_withdrawable_balance < ($boost->currency_value)) {
             return $this->sendError([], 'You do not have enough money in your wallet.');
         }
 
-        $wallet->balance -= $boost->currency_value;
+        $wallet->non_withdrawable_balance -= $boost->currency_value;
         $wallet->save();
 
 
@@ -220,7 +220,7 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
-            'balance' => $wallet->balance,
+            'balance' => $wallet->non_withdrawable_balance,
             'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
             'reference' => Str::random(10),
         ]);
@@ -238,7 +238,7 @@ class WalletController extends BaseController
             $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
         }
 
-        return $this->sendResponse($wallet->balance, 'Boost Bought');
+        return $this->sendResponse($wallet->non_withdrawable_balance, 'Boost Bought');
     }
 
 
@@ -255,18 +255,18 @@ class WalletController extends BaseController
             return $this->sendError('Plan does not exist', 'Plan does not exist');
         }
 
-        if ($plan->price > $this->user->wallet->balance) {
+        if ($plan->price > $this->user->wallet->non_withdrawable_balance) {
             return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
         }
 
-        $this->user->wallet->balance -= $plan->price;
+        $this->user->wallet->non_withdrawable_balance -= $plan->price;
         $this->user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
-            'balance' => $this->user->wallet->balance,
+            'balance' => $this->user->wallet->non_withdrawable_balance,
             'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'reference' => Str::random(10),
         ]);

@@ -135,7 +135,8 @@ class User extends Authenticatable implements JWTSubject
             });
     }
 
-    public function scopeMostRecent($query){
+    public function scopeMostRecent($query)
+    {
         return $query->orderByRaw('last_activity_time DESC');
     }
 
@@ -204,7 +205,15 @@ class User extends Authenticatable implements JWTSubject
 
     public function stakings()
     {
-      return $this->hasMany(Staking::class);
+        return $this->hasMany(Staking::class);
+    }
+
+    public function exhibitionStakings()
+    {
+        return DB::table('stakings')->where('user_id', $this->id)
+            ->join('exhibition_stakings', function ($join) {
+                $join->on('exhibition_stakings.staking_id', '=', 'stakings.id');
+            });
     }
 
     public function points()
@@ -339,6 +348,11 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
             })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->where('user_boosts.boost_count', '>', 0)->get();
+    }
+
+    public function bookBalance()
+    {
+        return $this->transactions()->unsettled()->sum('amount');
     }
 
     public function userChallenges()

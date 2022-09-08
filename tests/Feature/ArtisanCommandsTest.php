@@ -34,4 +34,14 @@ class ArtisanCommandsTest extends TestCase
     {
         $this->artisan('bonus:daily-expire')->assertExitCode(0);
     }
+
+    public function test_credit_winnings()
+    {
+        $this->artisan('winnings:credit')->assertExitCode(0);
+    }
+
+    public function test_trigger_special_hour()
+    {
+        $this->artisan('odds:special-hour')->assertExitCode(0);
+    }
 }

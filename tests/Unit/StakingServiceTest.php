@@ -38,7 +38,7 @@ class StakingServiceTest extends TestCase
     public function test_that_an_amount_can_be_staked()
     {
         $this->user->wallet->update([
-            'balance' => 5000
+            'non_withdrawable_balance' => 5000
         ]);
 
         $stakingId = $this->stakingService->stakeAmount(1000);

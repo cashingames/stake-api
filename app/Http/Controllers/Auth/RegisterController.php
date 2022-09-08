@@ -122,13 +122,13 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $user->wallet->balance += 50;
+            $user->wallet->non_withdrawable_balance += 50;
 
             WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => 50,
-                'balance' => $user->wallet->balance,
+                'balance' => $user->wallet->non_withdrawable_balance,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
             ]);

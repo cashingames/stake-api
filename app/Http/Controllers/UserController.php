@@ -35,7 +35,9 @@ class UserController extends BaseController
         $result->todaysPoints = $this->user->todaysPoints();
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
-        $result->walletBalance = $this->user->wallet->balance;
+        $result->walletBalance = $this->user->wallet->non_withdrawable_balance;
+        $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
+        $result->bookBalance = $this->user->bookBalance();
         $result->badge = $this->user->achievement;
         $result->winRate = $this->user->win_rate;
         $result->totalChallenges = $this->user->challenges_played;
