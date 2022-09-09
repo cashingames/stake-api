@@ -33,6 +33,7 @@ use App\Http\Controllers\GetChallengeLeaderboardController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\WithdrawWinningsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +91,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('odds/standard', GetStandardOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
+        Route::post('winnings/withdraw', WithdrawWinningsController::class);
     }
 );
 
