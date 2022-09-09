@@ -7,6 +7,7 @@ use App\Models\Plan;
 use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
+use App\Models\Profile;
 use App\Notifications\WalletFundedNotification;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -65,6 +66,11 @@ class WalletController extends BaseController
         if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
             return response("", 200);
         } else {
+            if ($event->event = "transfer.success") {
+                $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
+                $user = $profile->user;
+                return $this->saveWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
+            }
             $user = User::where('email', $event->data->customer->email)->first();
             return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
         }
@@ -128,6 +134,24 @@ class WalletController extends BaseController
 
         $user->notify(new WalletFundedNotification($transaction));
         Log::info('payment successful from paystack');
+        return response("", 200);
+    }
+
+    private function saveWithdrawalTransaction($reference, $user, $amount)
+    {
+        $user->wallet->withdrawable_balance -= ($amount) / 100;
+        $user->wallet->save();
+        
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => ($amount) / 100,
+            'balance' => $user->wallet->non_withdrawable_balance,
+            'description' => 'Winnings Withdrawal Made',
+            'reference' => $reference,
+        ]);
+
+        Log::info('withdrawal successful from paystack for ' . $user->username);
         return response("", 200);
     }
 
