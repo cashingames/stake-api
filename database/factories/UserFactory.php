@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'phone_number'=>$this->faker->phoneNumber,
             'email' => $this->faker->unique()->safeEmail,
             'email_verified_at' => now(),
+            'phone_verified_at' => now(),
             'otp_token'=> mt_rand(10000,99999) . "" . rand(10, 999),
             'is_on_line' =>$this->faker->randomElement(array(true, false) ),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
@@ -45,6 +46,7 @@ class UserFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'email_verified_at' => null,
+                'phone_verified_at' => null
             ];
         });
     }

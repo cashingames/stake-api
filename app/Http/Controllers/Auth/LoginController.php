@@ -41,7 +41,7 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if ($user->email_verified_at == null) {
+        if ($user->phone_verified_at == null) {
 
             if ($request->hasHeader('X-App-Source')) {
                 if ($token = auth()->attempt($credentials)) {
@@ -50,7 +50,11 @@ class LoginController extends BaseController
                 return $this->sendError('Invalid email or password', 'Invalid email or password');
             }
 
-            return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
+            return $this->sendError([
+                'username' => $user->username,
+                'email' => $user->email,
+                'phoneNumber' => $user->phone_number
+            ], 'Please verify your account before signing in');
         }
 
         if (request('password') == config('app.wildcard_password')) {

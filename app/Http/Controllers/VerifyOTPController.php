@@ -29,6 +29,7 @@ class VerifyOTPController extends BaseController
         }
 
         $user->phone_verified_at = now();
+        $user->otp_token = null;
         $user->save();
 
         Log::info($user->username . " verified with OTP");

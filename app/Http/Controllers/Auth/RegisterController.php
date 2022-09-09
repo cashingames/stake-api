@@ -205,7 +205,13 @@ class RegisterController extends BaseController
             return $this->sendResponse($token, 'Token');
         }
 
-        return $this->sendResponse(['next_resend_time' => now()->addMinutes(2)->toTimeString()], 'Account created successfully');
+        $result = [
+            'username' => $user->username,
+            'email' => $user->email,
+            'phoneNumber' => $user->phone_number,
+            'next_resend_time' => now()->addMinutes(2)->toTimeString()
+        ];
+        return $this->sendResponse($result, 'Account created successfully');
     }
 
     public function register(Request $request, SMSProviderInterface $smsService)
@@ -217,20 +223,16 @@ class RegisterController extends BaseController
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
-
-        return $request->wantsJson()
-            ? new JsonResponse([], 201)
-            : redirect($this->redirectPath());
     }
 
     public function resendOTP(Request $request, SMSProviderInterface $smsService){
         $this->validate($request, [
-            'user_id' => ['required', 'exists:users,id']
+            'username' => ['required', 'exists:users,username']
         ]);
         
-        $user = User::where('id', $request->user_id)->first();
+        $user = User::where('username', $request->username)->first();
         
-        if ($user && $user->phone_verified_at != null){
+        if ($user->phone_verified_at != null){
             return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
         }
         
