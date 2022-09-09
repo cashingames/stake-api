@@ -408,6 +408,7 @@ class GameController extends BaseController
         }
        
         $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
+        $amountWon = 0;
 
         if (!is_null($staking)) {
             
@@ -432,7 +433,7 @@ class GameController extends BaseController
         $game->correct_count = $points;
         $game->points_gained = $points * $game->odd_multiplier; 
         $game->total_count = $points + $wrongs;
-
+        $game->amount_won = $amountWon;
         $game->save();
 
         if ($points > 0) {
