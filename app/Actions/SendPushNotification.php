@@ -78,7 +78,7 @@ class SendPushNotification{
             $recipient = $challenge->users;
         }
         $device_token = FcmPushSubscription::where('user_id', $recipient->id)->latest()->first();
-        if (is_null($recipient)) {
+        if (is_null($device_token)) {
             return;
         }
         $this->pushService->setNotification(
@@ -106,7 +106,7 @@ class SendPushNotification{
 
     public function sendSpecialHourOddsNotification($user){
         $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-        if (is_null($user)) {
+        if (is_null($device_token)) {
             return;
         }
 
