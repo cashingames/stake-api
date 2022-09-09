@@ -59,6 +59,7 @@ class WithdrawWinningsController extends BaseController
         }
 
         $isTransferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, $debitAmount);
+        
         if($isTransferInitiated === 'pending'){
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
