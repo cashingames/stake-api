@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class VerifyOTPController extends BaseController
 {
@@ -30,6 +31,13 @@ class VerifyOTPController extends BaseController
         $user->phone_verified_at = now();
         $user->save();
 
-        return $this->sendResponse("Verification successful", 'Verification successful');
+        Log::info($user->username . " verified with OTP");
+        return $this->respondWithToken(auth()->login($user->first()));
+        // return $this->sendResponse("Verification successful", 'Verification successful');
+    }
+
+    protected function respondWithToken($token)
+    {
+        return $this->sendResponse($token, 'Verification successful');
     }
 }
