@@ -61,6 +61,10 @@ class WithdrawWinningsController extends BaseController
         $isTransferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, $debitAmount);
         
         if($isTransferInitiated === 'pending'){
+            /**
+             * Webhook implented in wallet controller handles 
+             * listening for successful transfer and 
+             * updating of user transaction */
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
     }
