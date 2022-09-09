@@ -29,11 +29,10 @@ class VerifyOTPController extends BaseController
         }
 
         $user->phone_verified_at = now();
-        $user->otp_token = null;
         $user->save();
 
         Log::info($user->username . " verified with OTP");
-        return $this->respondWithToken(auth()->login($user->first()));
+        return $this->respondWithToken(auth()->login($user));
         // return $this->sendResponse("Verification successful", 'Verification successful');
     }
 
