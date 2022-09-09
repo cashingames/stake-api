@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         //
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
+        Commands\CreditWinnings::class,
     ];
 
     /**
@@ -27,23 +28,20 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('bonus:daily-expire')
-        ->dailyAt('00:01');
+            ->dailyAt('00:01');
         $schedule->command('bonus:daily-activate')
-        ->dailyAt('00:03');
+            ->dailyAt('00:03');
 
-        $schedule->command('odds:special-hour')->hourly()->when(function(){
+        $schedule->command('odds:special-hour')->hourly()->when(function () {
 
             $now = date("H") . ":00";
             $specialHours = config('odds.special_hours');
 
             return in_array($now, $specialHours);
-
         })->timezone('Africa/Lagos');
 
-        // $schedule->command('bonus:daily-expire')
-        // ->everyTenMinutes();
-        // $schedule->command('bonus:daily-activate')
-        // ->everyFifteenMinutes();
+        $schedule->command('winnings:credit')
+            ->hourly();
     }
 
     /**
@@ -53,7 +51,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
