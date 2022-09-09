@@ -209,7 +209,7 @@ class RegisterController extends BaseController
             'username' => $user->username,
             'email' => $user->email,
             'phoneNumber' => $user->phone_number,
-            'next_resend_time' => now()->addMinutes(2)->toTimeString()
+            'next_resend_minutes' => 2
         ];
         return $this->sendResponse($result, 'Account created successfully');
     }
@@ -245,7 +245,7 @@ class RegisterController extends BaseController
             try {
                 $smsService->deliverOTP($user);
                 return $this->sendResponse([
-                    'next_resend_time' => now()->addMinute(2)->toTimeString()
+                    'next_resend_minutes' => 2
                 ], "OTP has been resent to phone number");
             } catch (\Throwable $th) {
                 //throw $th;
