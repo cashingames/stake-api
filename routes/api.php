@@ -1,37 +1,38 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\WalletController;
 use App\Http\Controllers\GameController;
-use App\Http\Controllers\MessagesController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ChallengeInviteStatusController;
-use App\Http\Controllers\EndChallengeGameController;
-use App\Http\Controllers\FrontEndLogsController;
-use App\Http\Controllers\GetChallengeDetailsController;
-use App\Http\Controllers\GetChallengeLeaderboardController;
-use App\Http\Controllers\GetFriendsController;
-use App\Http\Controllers\LeadersController;
-use App\Http\Controllers\LiveTriviaStatusController;
-use App\Http\Controllers\GetLiveTriviaLeaderboardController;
-use App\Http\Controllers\GetRecentLiveTriviaController;
-use App\Http\Controllers\GetStandardOddsController;
-use App\Http\Controllers\GetUserChallengeController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PlayGroundController;
-use App\Http\Controllers\RegisterPushDeviceTokenController;
-use App\Http\Controllers\SendChallengeInviteController;
-use App\Http\Controllers\SocialSignInController;
-use App\Http\Controllers\StartChallengeGameController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\TriviaController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\LeadersController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\VerifyOTPController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\GetFriendsController;
+use App\Http\Controllers\PlayGroundController;
+use App\Http\Controllers\FrontEndLogsController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SocialSignInController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\GetStandardOddsController;
+use App\Http\Controllers\EndChallengeGameController;
+use App\Http\Controllers\GetUserChallengeController;
+use App\Http\Controllers\LiveTriviaStatusController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\StartChallengeGameController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\GetChallengeDetailsController;
+use App\Http\Controllers\GetRecentLiveTriviaController;
+use App\Http\Controllers\SendChallengeInviteController;
+use App\Http\Controllers\ChallengeInviteStatusController;
+use App\Http\Controllers\GetChallengeLeaderboardController;
+use App\Http\Controllers\RegisterPushDeviceTokenController;
+use App\Http\Controllers\GetLiveTriviaLeaderboardController;
+use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +55,8 @@ Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail'
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
+Route::post('auth/register/verify-token', VerifyOTPController::class);
+Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP']);
 
 Route::middleware('api')->prefix('v3')->group(
     function () {

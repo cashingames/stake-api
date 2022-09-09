@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\ServiceProvider;
+
+use App\Services\SMS\TermiiService;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use App\Services\SMS\SMSProviderInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
         DB::listen(function ($query) {
             $query = $query->sql;
             // $query->time;
+        });
+
+        $this->app->bind(SMSProviderInterface::class, function($app){
+            $api_key = config('services.termii.api_key');
+            return new TermiiService($api_key);
         });
     }
 }
