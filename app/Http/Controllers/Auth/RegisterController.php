@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use App\Http\Controllers\BaseController;
-use App\Mail\VerifyEmail;
-use App\Models\Boost;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use App\Models\WalletTransaction;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Models\UserPoint;
-use App\Models\Profile;
-use App\Models\Wallet;
 use App\Models\User;
+use App\Models\Boost;
+use App\Models\Wallet;
+use App\Models\Profile;
+use App\Mail\VerifyEmail;
+use App\Models\UserPoint;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use App\Models\WalletTransaction;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Auth\Events\Registered;
+use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\Validator;
+use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Cache;
 
 class RegisterController extends BaseController
 {
@@ -48,7 +52,7 @@ class RegisterController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['register', 'verifyUsername']]);
+        $this->middleware('auth:api', ['except' => ['register', 'verifyUsername', 'resendOTP']]);
     }
 
     /**
@@ -177,13 +181,23 @@ class RegisterController extends BaseController
      * @param mixed $user
      * @return mixed
      */
-    protected function registered(Request $request, $user)
+    protected function registered(Request $request, SMSProviderInterface $smsService, $user)
     {
-     
-        Mail::send(new VerifyEmail($user));
+        if (config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'){
+            try {
+                $smsService->deliverOTP($user);    
+            } catch (\Throwable $th) {
+                //throw $th;
+                //send mail to our admin to notify of inability to deliver SMS via OTP
+                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+            }
+        }else{
+            Mail::send(new VerifyEmail($user));
 
-        Log::info("Email verification sent to " . $user->email);
-
+            Log::info("Email verification sent to " . $user->email);
+        }
+        
         if ($request->hasHeader('X-App-Source')) {
 
             $token = auth()->tokenById($user->id);
@@ -191,6 +205,51 @@ class RegisterController extends BaseController
             return $this->sendResponse($token, 'Token');
         }
 
-        return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
+        return $this->sendResponse(['next_resend_time' => now()->addMinutes(2)->toTimeString()], 'Account created successfully');
+    }
+
+    public function register(Request $request, SMSProviderInterface $smsService)
+    {
+        $this->validator($request->all())->validate();
+
+        $user = $this->create($request->all());
+        
+        if ($response = $this->registered($request, $smsService, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+            ? new JsonResponse([], 201)
+            : redirect($this->redirectPath());
+    }
+
+    public function resendOTP(Request $request, SMSProviderInterface $smsService){
+        $this->validate($request, [
+            'user_id' => ['required', 'exists:users,id']
+        ]);
+        
+        $user = User::where('id', $request->user_id)->first();
+        
+        if ($user && $user->phone_verified_at != null){
+            return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
+        }
+        
+        if (Cache::has($user->username . "_last_otp_time")){
+            //otp was still recently sent to this user, so no need resending
+            return $this->sendResponse([
+            ], "You can not send OTP at this time, please try later");
+            
+        }else{
+            try {
+                $smsService->deliverOTP($user);
+                return $this->sendResponse([
+                    'next_resend_time' => now()->addMinute(2)->toTimeString()
+                ], "OTP has been resent to phone number");
+            } catch (\Throwable $th) {
+                //throw $th;
+                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+            }
+        }
     }
 }

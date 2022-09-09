@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Mail\VerifyEmail;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use Database\Seeders\DatabaseSeeder;
 use UserSeeder;
 use BoostSeeder;
+use Tests\TestCase;
 use App\Models\User;
+use App\Mail\VerifyEmail;
+use Mockery\MockInterface;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterTest extends TestCase
 {
@@ -29,6 +32,7 @@ class RegisterTest extends TestCase
 
     protected $user;
     const REGISTER_URL = '/api/auth/register';
+    const RESEND_OTP_URL = '/api/auth/register/token/resend';
 
     protected function setUp(): void
     {
@@ -37,6 +41,7 @@ class RegisterTest extends TestCase
         $this->seed(BoostSeeder::class);
         $this->user = User::first();
         Mail::fake();
+        config(['services.termii.api_key' => 'termii_api_key']);
     }
 
 
@@ -131,6 +136,7 @@ class RegisterTest extends TestCase
     public function test_a_user_recieves_verification_email_on_registration()
     {
 
+        config(['auth.verification.means' => 'email']);
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
@@ -143,13 +149,36 @@ class RegisterTest extends TestCase
         ]);
 
         Mail::assertSent(VerifyEmail::class);
-        $response->assertJson([
-            'message' => 'Verification Email Sent',
+        $response->assertOk();
+    }
+
+    public function test_a_user_recieves_sms_otp_on_registration()
+    {
+        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+            $mock->shouldReceive('deliverOTP')->once();
+        });
+        config(['auth.verification.means' => 'phone', 'auth.verification.type' => 'otp']);
+        $response = $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'User',
+            'last_name' => 'Test',
+            'username' => 'user',
+            'phone_number' => '88838883838',
+            'email' => 'user@user.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
         ]);
+
+        $response->assertOk();
+        
     }
 
     public function test_a_user_can_register_from_web_without_needing_email_verification()
     {
+        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+            $mock->shouldReceive('deliverOTP')->once();
+        });
+
         $response = $this->withHeaders([
             'X-App-Source' => 'web',
         ])->postjson(self::REGISTER_URL, [
@@ -163,8 +192,6 @@ class RegisterTest extends TestCase
         ]);
 
 
-        $response->assertJson([
-            'message' => 'Token',
-        ]);
+        $response->assertOk();
     }
 }
