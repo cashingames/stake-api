@@ -53,6 +53,9 @@ class TermiiService implements SMSProviderInterface{
     }
 
     public function deliverOTP($user){
+        if ($user->otp_token == null){
+            $user->update(['otp_token' => mt_rand(10000, 99999)]);
+        }
         $smsData = [
             'to' => $user->phone_number,
             'channel' => 'dnd',
