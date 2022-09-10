@@ -57,7 +57,7 @@ class EndChallengeGameController extends  BaseController
 
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = $points * 5; //@TODO to be revised
+        $game->points_gained = $points; // stop multiplying by 5 * 5; //@TODO to be revised
         $game->total_count = $points + $wrongs;
         $game->save();
 
