@@ -408,7 +408,7 @@ class GameController extends BaseController
         }
        
         $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
-        $amountWon = 0;
+        $amountWon = null;
 
         if (!is_null($staking)) {
             
