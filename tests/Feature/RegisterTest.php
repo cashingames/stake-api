@@ -7,6 +7,7 @@ use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
 use App\Mail\VerifyEmail;
+use App\Services\FeatureFlag;
 use Mockery\MockInterface;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Mail;
@@ -154,6 +155,7 @@ class RegisterTest extends TestCase
 
     public function test_a_user_recieves_sms_otp_on_registration()
     {
+        FeatureFlag::enable('phone_verification');
         $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
         });
@@ -175,9 +177,9 @@ class RegisterTest extends TestCase
 
     public function test_a_user_can_register_from_web_without_needing_email_verification()
     {
-        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+        if(FeatureFlag::isEnabled('phone_verification')){$this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
-        });
+        });}
 
         $response = $this->withHeaders([
             'X-App-Source' => 'web',

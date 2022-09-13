@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\BaseController;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -182,8 +183,9 @@ class RegisterController extends BaseController
      * @return mixed
      */
     protected function registered(Request $request, SMSProviderInterface $smsService, $user)
-    {
-        if (config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'){
+    {   
+        // config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'
+        if (FeatureFlag::isEnabled('phone_verification')){
             try {
                 $smsService->deliverOTP($user);    
             } catch (\Throwable $th) {
@@ -196,14 +198,16 @@ class RegisterController extends BaseController
             Mail::send(new VerifyEmail($user));
 
             Log::info("Email verification sent to " . $user->email);
+            if ($request->hasHeader('X-App-Source')) {
+
+                $token = auth()->tokenById($user->id);
+
+                return $this->sendResponse($token, 'Token');
+            }
+            return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
         }
         
-        if ($request->hasHeader('X-App-Source')) {
-
-            $token = auth()->tokenById($user->id);
-
-            return $this->sendResponse($token, 'Token');
-        }
+        
 
         $result = [
             'username' => $user->username,
