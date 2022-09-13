@@ -23,7 +23,7 @@ class QuestionsHardeningService
             ->where('is_published', true);
 
         if ($gameCount < 3) {
-            $questions =  $query->where('level','medium')->orWhere('level','hard')->inRandomOrder()->take(20)->get();
+            $questions = $query->whereIn('level', ['medium', 'hard'])->inRandomOrder()->take(20)->get();
             return $questions;
         }
 
