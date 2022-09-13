@@ -21,6 +21,7 @@ use App\Models\TriviaQuestion;
 use App\Models\TriviaStaking;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
 use App\Services\Odds\QuestionsHardeningService;
 use App\Services\OddsComputer;
 use App\Services\StakingService;
@@ -212,10 +213,7 @@ class GameController extends BaseController
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
-        $oddMultiplierComputer = new OddsComputer();
         $questionHardener = new QuestionsHardeningService();
-
-        $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($this->user));
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -226,8 +224,16 @@ class GameController extends BaseController
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
-        $gameSession->odd_multiplier = $odd['oddsMultiplier'];
-        $gameSession->odd_condition = $odd['oddsCondition'];
+
+        if (FeatureFlag::isEnabled('odds')){
+            $oddMultiplierComputer = new OddsComputer();
+            
+
+            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($this->user));
+            $gameSession->odd_multiplier = $odd['oddsMultiplier'];
+            $gameSession->odd_condition = $odd['oddsCondition'];
+        }
+        
 
         $questions = [];
 
@@ -268,13 +274,16 @@ class GameController extends BaseController
 
         $gameSession->save();
 
-        if ($request->has('staking_amount')) {
-            $stakingService = new StakingService($this->user);
+        if (FeatureFlag::isEnabled('game_staking')){
+            if ($request->has('staking_amount')) {
+                $stakingService = new StakingService($this->user);
 
-            $stakingId = $stakingService->stakeAmount($request->staking_amount);
+                $stakingId = $stakingService->stakeAmount($request->staking_amount);
 
-            $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
+                $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
+            }
         }
+        
 
         Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 
@@ -398,44 +407,50 @@ class GameController extends BaseController
             }
         }
 
-        $pointStandardOdd = 0;
-        $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
+        if (FeatureFlag::isEnabled('odds')){
+            $pointStandardOdd = 0;
+            $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
 
-        foreach ($standardOdds as $standardOdd) {
-            if ($standardOdd->score == $points) {
-                $pointStandardOdd = $standardOdd->odd;
+            foreach ($standardOdds as $standardOdd) {
+                if ($standardOdd->score == $points) {
+                    $pointStandardOdd = $standardOdd->odd;
+                }
             }
         }
        
-        $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
-        $amountWon = 0;
+        
+        if (FeatureFlag::isEnabled('game_staking')){
+            $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
+            $amountWon = 0;
+            if (!is_null($staking)) {
 
-        if (!is_null($staking)) {
-            
-            $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
+                $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
 
 
-            WalletTransaction::create([
-                'wallet_id' => $this->user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $amountWon,
-                'balance' => $this->user->wallet->withdrawable_balance,
-                'description' => 'Staking winning of ' . $amountWon .' cash',
-                'reference' => Str::random(10),
-                'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
-            ]);
+                WalletTransaction::create([
+                    'wallet_id' => $this->user->wallet->id,
+                    'transaction_type' => 'CREDIT',
+                    'amount' => $amountWon,
+                    'balance' => $this->user->wallet->withdrawable_balance,
+                    'description' => 'Staking winning of ' . $amountWon . ' cash',
+                    'reference' => Str::random(10),
+                    'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+                ]);
 
-            $this->user->exhibitionStakings()->where('game_session_id', $game->id)->update(['standard_odd' => $pointStandardOdd ]);
-            
+                $this->user->exhibitionStakings()->where('game_session_id', $game->id)->update(['standard_odd' => $pointStandardOdd]);
+                $game->amount_won = $amountWon;
+            }
         }
+        
         
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = $points * $game->odd_multiplier; 
+        $game->points_gained = FeatureFlag::isEnabled('odds') ? $points * $game->odd_multiplier : $points; 
         $game->total_count = $points + $wrongs;
-        $game->amount_won = $amountWon;
+        
         $game->save();
-        $game->with_staking = $staking ? true : false;
+
+        FeatureFlag::isEnabled('game_staking') ? ($game->with_staking = $staking ? true : false) : "";
 
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");

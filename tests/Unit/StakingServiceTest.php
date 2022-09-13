@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\User;
-
+use App\Services\FeatureFlag;
 use App\Services\StakingService;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
@@ -33,6 +33,7 @@ class StakingServiceTest extends TestCase
         $this->user = User::inRandomOrder()->first();
         $this->staking = Staking::inRandomOrder()->first();
         $this->stakingService = new StakingService($this->user);
+        FeatureFlag::enable('game_staking');
     }
 
     public function test_that_an_amount_can_be_staked()

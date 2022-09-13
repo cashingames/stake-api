@@ -24,6 +24,7 @@ use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Notifications\ChallengeReceivedNotification;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -67,6 +68,7 @@ class GameTest extends TestCase
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->plan = Plan::inRandomOrder()->first();
         $this->actingAs($this->user);
+        FeatureFlag::enable('game_staking');
     }
 
     public function test_common_data_can_be_retrieved()
@@ -287,6 +289,7 @@ class GameTest extends TestCase
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
     {   
+        FeatureFlag::enable('odds');
         Question::factory()
         ->count(50)
         ->create();
