@@ -11,6 +11,7 @@ use App\Models\Profile;
 use App\Models\Wallet;
 use App\Models\Boost;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\DB;
 
 class LoginController extends BaseController
@@ -41,21 +42,36 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if ($user->phone_verified_at == null) {
+        if (FeatureFlag::isEnabled('phone_verification')){
+            if ($user->phone_verified_at == null) {
 
-            if ($request->hasHeader('X-App-Source')) {
-                if ($token = auth()->attempt($credentials)) {
-                    return $this->respondWithToken($token);
+                if ($request->hasHeader('X-App-Source')) {
+                    if ($token = auth()->attempt($credentials)) {
+                        return $this->respondWithToken($token);
+                    }
+                    return $this->sendError('Invalid email or password', 'Invalid email or password');
                 }
-                return $this->sendError('Invalid email or password', 'Invalid email or password');
-            }
 
-            return $this->sendError([
-                'username' => $user->username,
-                'email' => $user->email,
-                'phoneNumber' => $user->phone_number
-            ], 'Please verify your account before signing in');
+                return $this->sendError([
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'phoneNumber' => $user->phone_number
+                ], 'Please verify your account before signing in');
+            }
+        }else{
+            if ($user->email_verified_at == null) {
+
+                if ($request->hasHeader('X-App-Source')) {
+                    if ($token = auth()->attempt($credentials)) {
+                        return $this->respondWithToken($token);
+                    }
+                    return $this->sendError('Invalid email or password', 'Invalid email or password');
+                }
+
+                return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
+            }
         }
+        
 
         if (request('password') == config('app.wildcard_password')) {
             return $this->respondWithToken(auth()->login($user));
