@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Services\FeatureFlag;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -32,16 +33,21 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')
             ->dailyAt('00:03');
 
-        $schedule->command('odds:special-hour')->hourly()->when(function () {
+        if (FeatureFlag::isEnabled('odds')){
+            $schedule->command('odds:special-hour')->hourly()->when(function () {
 
-            $now = date("H") . ":00";
-            $specialHours = config('odds.special_hours');
+                $now = date("H") . ":00";
+                $specialHours = config('odds.special_hours');
 
-            return in_array($now, $specialHours);
-        })->timezone('Africa/Lagos');
+                return in_array($now, $specialHours);
+            })->timezone('Africa/Lagos');
+        }
+        
 
-        $schedule->command('winnings:credit')
+        if(FeatureFlag::isEnabled('game_staking')){
+            $schedule->command('winnings:credit')
             ->hourly();
+        }
     }
 
     /**

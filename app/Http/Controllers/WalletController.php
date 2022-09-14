@@ -133,7 +133,6 @@ class WalletController extends BaseController
         ]);
         $user->wallet->save();
 
-        $user->notify(new WalletFundedNotification($transaction));
         Log::info('payment successful from paystack');
         return response("", 200);
     }
