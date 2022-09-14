@@ -17,7 +17,7 @@ class OddsComputer{
         $oddsCondition = "no_matching_condition";
         
         if(is_null($averageScoreOfRecentGames) && $this->isFirstEverGame($user)){
-            $oddsMultiplier = 10;
+            $oddsMultiplier = 3;
             $oddsCondition = "first_ever_game";
         }
         elseif ($this->currentTimeIsInSpecialHours() && $averageScoreOfRecentGames < 4) {
@@ -68,6 +68,6 @@ class OddsComputer{
     }
 
     public function isFirstEverGame(User $user){
-        return $user->gameSessionQuestions()->doesntExist();
+        return $user->gameSessions()->count() <= 5 ;
     }
 }
