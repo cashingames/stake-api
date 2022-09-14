@@ -29,12 +29,12 @@ class QuestionHardenerTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->user = User::inRandomOrder()->first();
         $this->category = Category::inRandomOrder()->first();
-        $this->questionHardener = new QuestionsHardeningService();
+        $this->questionHardener = new QuestionsHardeningService($this->user, $this->category );
     }
 
     public function testQuestionHardenerDeterminerWorks()
     {
-        $questions = $this->questionHardener->determineQuestions($this->user, $this->category);
+        $questions = $this->questionHardener->determineQuestions();
 
         $this->assertIsObject(
             $questions
@@ -47,7 +47,7 @@ class QuestionHardenerTest extends TestCase
             ->count(500)
             ->create();
 
-        $questions = $this->questionHardener->determineQuestions($this->user, $this->category);
+        $questions = $this->questionHardener->determineQuestions();
         $questionCategories = [];
        
         foreach ($questions as $q) {

@@ -213,7 +213,7 @@ class GameController extends BaseController
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
-        $questionHardener = new QuestionsHardeningService();
+        $questionHardener = new QuestionsHardeningService($this->user, $category);
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -260,7 +260,7 @@ class GameController extends BaseController
                 return $this->sendResponse('No available games', 'No available games');
             }
 
-            $questions = $questionHardener->determineQuestions($this->user, $category);
+            $questions = $questionHardener->determineQuestions();
 
             $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
             $userPlan->update(['used_count' => $userPlan->used_count + 1]);

@@ -29,6 +29,7 @@ class LiveTriviaTest extends TestCase
     // use RefreshDatabase;
 
     protected $user, $trivia, $category;
+    const RECENT_LIVE_TRIVIA_URL = '/api/v3/live-trivia/recent';
 
     protected function setUp(): void
     {
@@ -126,5 +127,10 @@ class LiveTriviaTest extends TestCase
         ]);
     }
 
- 
+    public function test_recent_live_trivia_can_be_fetched()
+    {
+        $response = $this->get(self::RECENT_LIVE_TRIVIA_URL);
+
+        $response->assertStatus(200);
+    }
 }
