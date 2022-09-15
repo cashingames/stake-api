@@ -49,7 +49,7 @@ class LoginController extends BaseController
         if (!$token = auth()->attempt($credentials)) {
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
-        
+
         if (FeatureFlag::isEnabled('phone_verification')){
             if ($user->phone_verified_at == null) {
 
@@ -64,7 +64,7 @@ class LoginController extends BaseController
                     'username' => $user->username,
                     'email' => $user->email,
                     'phoneNumber' => $user->phone_number
-                ], 'Please verify your account before signing in');
+                ], 'Account not verified');
             }
         }else{
             if ($user->email_verified_at == null) {
