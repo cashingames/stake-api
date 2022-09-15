@@ -9,14 +9,11 @@ use App\Services\OddsComputer;
 use Tests\TestCase;
 use Database\Seeders\PlanSeeder;
 use Database\Seeders\UserSeeder;
-use Database\Seeders\BoostSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
 use Database\Seeders\GameTypeSeeder;
-use Database\Seeders\AchievementSeeder;
+use Database\Seeders\OddsConditionsAndRulesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
-use phpDocumentor\Reflection\Types\Null_;
 
 class OddsMakerTest extends TestCase
 {
@@ -33,6 +30,7 @@ class OddsMakerTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
+        $this->seed(OddsConditionsAndRulesSeeder::class);
 
         $this->user = User::first();
 
