@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\GameSession;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use App\Services\OddsComputer;
 use Tests\TestCase;
 use Database\Seeders\PlanSeeder;
@@ -37,8 +38,10 @@ class OddsMakerTest extends TestCase
 
         GameSession::factory()
             ->count(20)
-            ->create();
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+            ->create([
+                'user_id' => $this->user->id
+            ]);
+        // GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $this->latestThreeGames = $this->user->gameSessions()->latest()->limit(3)->get();
     }
 
@@ -49,7 +52,7 @@ class OddsMakerTest extends TestCase
         $oddEffect = $oddsComputer->compute($user, NULL);
         $this->assertEquals(3, $oddEffect['oddsMultiplier']);
     }
-    public function test_odds_when_avg_score_less_than_4_in_normal_hours()
+    public function test_odds_when_avg_score_less_than_5_in_normal_hours()
     {
         $currentHour = intval(date("H"));
 
@@ -59,13 +62,13 @@ class OddsMakerTest extends TestCase
 
 
         $this->latestThreeGames->map(function ($game) {
-            $game->update(['correct_count' => 2]);
+            $game->update(['correct_count' => 3]);
         });
 
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($this->user, $avg_score);
-        $this->assertEquals(1, $oddEffect['oddsMultiplier']);
+        $this->assertEquals(2.5, $oddEffect['oddsMultiplier']);
     }
 
     public function test_odds_when_avg_score_between_5_and_7()
@@ -77,7 +80,7 @@ class OddsMakerTest extends TestCase
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($this->user, $avg_score);
-        $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
+        $this->assertEquals(1, $oddEffect['oddsMultiplier']);
     }
 
     public function test_odds_when_avg_score_greater_than_7()
@@ -93,18 +96,37 @@ class OddsMakerTest extends TestCase
         $this->assertEquals(1, $oddEffect['oddsMultiplier']);
     }
 
-    // public function test_odds_when_current_time_is_special(){
-    //     $currentHour = date("H");
+    public function test_odds_after_immediate_wallet_funding(){
+        $this->latestThreeGames->map(function ($game) {
+            $game->update(['correct_count' => 6.5]);
+        });
 
-    //     config(['odds.special_hours' => [
-    //         $currentHour . ":00",
-    //         (intval($currentHour) < 10 ? "0" : "") . (intval($currentHour) + 1) . ":00"
-    //     ]]);
+        WalletTransaction::factory()->create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'description' => 'fund wallet',
+            'created_at' => now()->addHours(1),
+            'updated_at' => now()->addHours(1)
+        ]);
+        $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
 
-    //     $oddsComputer = new OddsComputer();
-    //     $oddEffect = $oddsComputer->compute($this->user, 3);
+    }
 
-    //     $this->assertEquals(1.5, $oddEffect['oddsMultiplier']);
+    public function test_odds_when_current_time_is_special(){
+        $currentHour = date("H");
+        
+        config(['odds.special_hours' => [
+            $currentHour . ":00",
+            (intval($currentHour) < 10 ? "0" : "") . (intval($currentHour) + 1) . ":00"
+        ]]);
 
-    // }
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($this->user, 3);
+
+        $this->assertEquals(4, $oddEffect['oddsMultiplier']);
+
+    }
 }
