@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Plan;
 use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use UserSeeder;
 use PlanSeeder;
 use App\Models\User;
+use App\Models\UserPlan;
+use Carbon\Carbon;
 
 class ProfileTest extends TestCase
 {
@@ -39,7 +42,6 @@ class ProfileTest extends TestCase
     public function test_relevant_user_profile_can_be_retrieved_with_data()
     {
         $response = $this->get(self::PROFILE_DATA_URL);
-
         $response->assertJson([
             'data' => [
                 'username' => $this->user->username,
@@ -50,7 +52,14 @@ class ProfileTest extends TestCase
                 'points' =>  $this->user->points(),
                 'walletBalance' => $this->user->wallet->non_withdrawable_balance,
                 'bookBalance' => $this->user->bookBalance(),
-                'withdrawableBalance'=> $this->user->wallet->withdrawable_balance
+                'withdrawableBalance'=> $this->user->wallet->withdrawable_balance,
+                'boosts' => [],
+                'achievements' => [],
+                'recentGames' => [],
+                'transactions' => [],
+                'pointsTransaction' => [], 
+                'hasActivePlan' => false,
+                'unreadNotificationsCount' => 0
             ]
         ]);
     }

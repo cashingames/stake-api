@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,
+            OddsConditionsAndRulesSeeder::class
             // TriviaSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
@@ -29,7 +30,7 @@ class DatabaseSeeder extends Seeder
             // ProfileSeeder::class,
             // QuestionSeeder::class
             // StakingSeeder::class
-
+           
         ]);
     }
 }
