@@ -117,15 +117,15 @@ class OddsMakerTest extends TestCase
 
     public function test_odds_when_current_time_is_special(){
         $currentHour = date("H");
-        
         config(['odds.special_hours' => [
             $currentHour . ":00",
-            (intval($currentHour) < 10 ? "0" : "") . (intval($currentHour) + 1) . ":00"
+            (intval($currentHour) < 9 ? "0" : "") . (intval($currentHour) + 1) . ":00"
         ]]);
-
+        
+        
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($this->user, 3);
-
+        
         $this->assertEquals(4, $oddEffect['oddsMultiplier']);
 
     }
