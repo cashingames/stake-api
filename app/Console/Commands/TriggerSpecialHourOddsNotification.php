@@ -32,7 +32,7 @@ class TriggerSpecialHourOddsNotification extends Command
     {
         User::has('gameSessions', '>=', 3)->chunk(500, function($users){
             foreach ($users as $user){
-                if ($user->gameSessions()->latest()->limit(3)->get()->avg('correct_count') < 4){
+                if ($user->gameSessions()->latest()->limit(3)->get()->avg('correct_count') < 5){
                     (new SendPushNotification())->sendSpecialHourOddsNotification($user);
                 }
             }

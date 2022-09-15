@@ -33,6 +33,7 @@ use App\Http\Controllers\GetChallengeLeaderboardController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\WithdrawWinningsController;
 
 /*
@@ -64,6 +65,7 @@ Route::middleware('api')->prefix('v3')->group(
         Route::post('paystack/transaction/webhook', [WalletController::class, "paymentEventProcessor"]);
         Route::post('paystack/reconcile/payments', [WalletController::class, "paymentsTransactionsReconciler"]);
         Route::get('first-time-bonus/fetch', [MessagesController::class, 'fetchFirstTimeBonus']);
+        Route::get('feature-flags', [FeatureFlagController::class, 'index']);
     }
 );
 
