@@ -11,14 +11,21 @@ use Exception;
  */
 
 class QuestionsHardeningService
-{
+{   
+    private $user , $category;
 
-    public function determineQuestions(User $user, Category $category,)
+    public function __construct(User $user , Category $category)
+    {
+        $this->user = $user;
+        $this->category = $category;
+    }
+
+    public function determineQuestions()
     {
         //check user game sessions count
-        $gameCount = $user->gameSessions()->count();
+        $gameCount = $this->user->gameSessions()->count();
 
-        $query = $category
+        $query = $this->category
             ->questions()
             ->where('is_published', true);
 
@@ -27,8 +34,8 @@ class QuestionsHardeningService
             return $questions;
         }
 
-        $averageOfRecentThreeGames = $this->getAverageOfLastThreeGames($user);
-        $recentQuestions = $this->getUserAnsweredQuestions($user);
+        $averageOfRecentThreeGames = $this->getAverageOfLastThreeGames($this->user);
+        $recentQuestions = $this->getUserAnsweredQuestions($this->user);
 
         if ($averageOfRecentThreeGames >= 7) {
             $questions = $query->where('level','hard')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get();
@@ -46,20 +53,20 @@ class QuestionsHardeningService
         }
     }
 
-    public function getAverageOfLastThreeGames(User $user)
+    public function getAverageOfLastThreeGames()
     {
 
         // $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
-        $lastThreeGamesAverage = $user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
+        $lastThreeGamesAverage = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
 
         return $lastThreeGamesAverage;
 
         // return  $sumOflastThreeGames / 3;
     }
 
-    public function getUserAnsweredQuestions(User $user)
+    public function getUserAnsweredQuestions()
     {
-        $answeredQuestions = $user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
+        $answeredQuestions = $this->user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
         return $answeredQuestions;
     }
 }

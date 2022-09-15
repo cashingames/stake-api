@@ -53,45 +53,6 @@ class UserController extends BaseController
         return $this->sendResponse($result, 'User details');
     }
 
-
-    public function quizzes()
-    {
-        $user = auth()->user();
-        $quizzes = UserQuiz::where('user_id', $user->id)->get();
-
-        return $this->sendResponse($quizzes, "User Quizzes");
-    }
-
-
-
-    public function friendQuizzes()
-    {
-        $user = auth()->user();
-        $quizzes = [];
-        $friends = Profile::where('referrer', $user->profile->referral_code)->get();
-
-        foreach ($friends as $friend) {
-            $quizzes[] = UserQuiz::where('user_id', $friend->id)->get();
-        }
-        return $this->sendResponse($quizzes, "Friends Quizzes");
-    }
-
-    public function setOnline()
-    {
-        $lastLoggedRecord = OnlineTimeline::where('user_id', $this->user->id)->first();
-
-        if ($lastLoggedRecord !== null) {
-            $lastLoggedRecord->update(['updated_at' => Carbon::now()]);
-            return $this->sendResponse('Online status updated', "Online status updated");
-        }
-
-        OnlineTimeline::create([
-            'user_id' => $this->user->id,
-            'referrer' => $this->user->profile->referrer
-        ]);
-        return $this->sendResponse('Online status updated', "Online status updated");
-    }
-
     private function composeUserPlans()
     {
         //get all the active plans the user has

@@ -15,7 +15,7 @@ class Trivia extends Model
     protected $table = 'trivias';
 
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published'];
-    protected $appends = ['is_active', 'has_played', 'start_timespan'];
+    protected $appends = ['is_active', 'start_timespan'];
     protected $casts = ['is_published' => 'boolean'];
 
     public function category()
@@ -44,17 +44,6 @@ class Trivia extends Model
             return false;
         }
         return false;
-    }
-
-    public function getHasPlayedAttribute()
-    {
-        $gameSession = $this->gameSessions()->where('user_id', auth()->user()->id)->first();
-
-        if ($gameSession === null) {
-            return false;
-        }
-
-        return true;
     }
 
     public function getStartTimeSpanAttribute()
