@@ -42,6 +42,14 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
+        if (request('password') == config('app.wildcard_password')) {
+            return $this->respondWithToken(auth()->login($user));
+        }
+
+        if (!$token = auth()->attempt($credentials)) {
+            return $this->sendError('Invalid email or password', 'Invalid email or password');
+        }
+        
         if (FeatureFlag::isEnabled('phone_verification')){
             if ($user->phone_verified_at == null) {
 
@@ -73,13 +81,7 @@ class LoginController extends BaseController
         }
         
 
-        if (request('password') == config('app.wildcard_password')) {
-            return $this->respondWithToken(auth()->login($user));
-        }
-
-        if (!$token = auth()->attempt($credentials)) {
-            return $this->sendError('Invalid email or password', 'Invalid email or password');
-        }
+        
         return $this->respondWithToken($token);
     }
 
