@@ -418,8 +418,8 @@ class GameController extends BaseController
             }
         }
        
-        
-        if (FeatureFlag::isEnabled('exhibition_game_staking') or FeatureFlag::isEnabled('trivia_game_staking')){
+        $staking = false;
+        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
             $amountWon = 0;
             if (!is_null($staking)) {
@@ -450,8 +450,10 @@ class GameController extends BaseController
         
         $game->save();
 
-        FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking') ? ($game->with_staking = $staking ? true : false) : "";
-
+        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+            $game->with_staking = $staking ? true : false;
+        }
+        
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
