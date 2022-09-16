@@ -94,6 +94,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
+        Route::post('game/can-stake-in-game', [GameController::class, 'canPlayWithStaking']);
     }
 );
 

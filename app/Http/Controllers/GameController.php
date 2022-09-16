@@ -194,6 +194,21 @@ class GameController extends BaseController
         );
     }
 
+    public function canPlayWithStaking(Request $request){
+        $request->validate([
+            'category' => ['required', 'numeric',],
+            'type' => ['required', 'numeric'],
+            'mode' => ['required', 'numeric'],
+            'trivia' => ['nullable', 'numeric'],
+            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_staking_amount'), "min:" . config('odds.minimum_staking_amount')]
+        ]);
+
+        if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
+
+            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
+        }
+        return $this->sendResponse("Can play game with staking", "Can play game with staking");
+    }
     public function startSingleGame(Request $request)
     {
         $request->validate([
