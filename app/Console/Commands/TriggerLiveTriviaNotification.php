@@ -14,14 +14,14 @@ class TriggerLiveTriviaNotification extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'live-trivia:notify';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Trigger live trivia notifications to users';
 
     /**
      * Execute the console command.
