@@ -33,7 +33,8 @@ class StakingServiceTest extends TestCase
         $this->user = User::inRandomOrder()->first();
         $this->staking = Staking::inRandomOrder()->first();
         $this->stakingService = new StakingService($this->user);
-        FeatureFlag::enable('game_staking');
+        FeatureFlag::isEnabled('exhibition_game_staking');
+        FeatureFlag::isEnabled('trivia_game_staking');
     }
 
     public function test_that_an_amount_can_be_staked()

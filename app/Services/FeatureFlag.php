@@ -38,6 +38,25 @@ class FeatureFlag{
         return config("features.{$feature}.enabled");
     }
 
+    public static function isAnyEnabled(array $features_list){
+        self::initialize();
+        foreach ($features_list as $key => $feature) {
+            if (self::isEnabled($feature)){
+                return true;
+            }
+        }
+    }
+
+    public static function isAllEnabled(array $features_list){
+        self::initialize();
+        foreach ($features_list as $key => $feature) {
+            if (!self::isEnabled($feature)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static function enable($feature){
         self::initialize();
         self::exists($feature);

@@ -9,7 +9,11 @@ return [
         'enabled' => env('FEATURE_FLAG_PHONE_VERIFICATION_ENABLED', false),
         'activate_on' => null
     ],
-    'game_staking' => [
+    'exhibition_game_staking' => [
+        'enabled' => env('FEATURE_FLAG_GAME_STAKING_ENABLED', false),
+        'activate_on' => null
+    ],
+    'trivia_game_staking' => [
         'enabled' => env('FEATURE_FLAG_GAME_STAKING_ENABLED', false),
         'activate_on' => null
     ],

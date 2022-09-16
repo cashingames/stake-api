@@ -68,7 +68,8 @@ class GameTest extends TestCase
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->plan = Plan::inRandomOrder()->first();
         $this->actingAs($this->user);
-        FeatureFlag::enable('game_staking');
+        FeatureFlag::isEnabled('exhibition_game_staking');
+        FeatureFlag::isEnabled('trivia_game_staking');
     }
 
     public function test_common_data_can_be_retrieved()
@@ -264,6 +265,7 @@ class GameTest extends TestCase
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
     {
+        FeatureFlag::enable('exhibition_game_staking');
         $this->user->wallet->update([
             'non_withdrawable_balance' => 1000
         ]);
@@ -290,6 +292,7 @@ class GameTest extends TestCase
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
     {   
         FeatureFlag::enable('odds');
+        FeatureFlag::enable('exhibition_game_staking');
         Question::factory()
         ->count(50)
         ->create();

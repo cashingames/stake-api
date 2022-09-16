@@ -274,7 +274,7 @@ class GameController extends BaseController
 
         $gameSession->save();
 
-        if (FeatureFlag::isEnabled('game_staking')){
+        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
             if ($request->has('staking_amount')) {
                 $stakingService = new StakingService($this->user);
 
@@ -419,7 +419,7 @@ class GameController extends BaseController
         }
        
         
-        if (FeatureFlag::isEnabled('game_staking')){
+        if (FeatureFlag::isEnabled('exhibition_game_staking') or FeatureFlag::isEnabled('trivia_game_staking')){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
             $amountWon = 0;
             if (!is_null($staking)) {
@@ -450,7 +450,7 @@ class GameController extends BaseController
         
         $game->save();
 
-        FeatureFlag::isEnabled('game_staking') ? ($game->with_staking = $staking ? true : false) : "";
+        FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking') ? ($game->with_staking = $staking ? true : false) : "";
 
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");

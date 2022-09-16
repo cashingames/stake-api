@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
         }
         
 
-        if(FeatureFlag::isEnabled('game_staking')){
+        if(FeatureFlag::isEnabled('exhibition_game_staking') or FeatureFlag::isEnabled('trivia_game_staking')){
             $schedule->command('winnings:credit')
             ->hourly();
         }
