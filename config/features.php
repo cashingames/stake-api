@@ -10,11 +10,11 @@ return [
         'activate_on' => null
     ],
     'exhibition_game_staking' => [
-        'enabled' => env('FEATURE_FLAG_GAME_STAKING_ENABLED', false),
+        'enabled' => env('FEATURE_FLAG_EXHIBITION_GAME_STAKING_ENABLED', false),
         'activate_on' => null
     ],
     'trivia_game_staking' => [
-        'enabled' => env('FEATURE_FLAG_GAME_STAKING_ENABLED', false),
+        'enabled' => env('FEATURE_FLAG_TRIVIA_GAME_STAKING_ENABLED', false),
         'activate_on' => null
     ],
     'notification_history' => [
