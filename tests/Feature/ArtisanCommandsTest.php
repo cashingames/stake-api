@@ -44,4 +44,9 @@ class ArtisanCommandsTest extends TestCase
     {
         $this->artisan('odds:special-hour')->assertExitCode(0);
     }
+
+    public function test_trigger_live_trivia_notification()
+    {
+        $this->artisan('live-trivia:notify')->assertExitCode(0);
+    }
 }

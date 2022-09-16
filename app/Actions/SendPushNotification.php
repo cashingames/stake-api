@@ -152,7 +152,7 @@ class SendPushNotification
             return;
         }
 
-        if ($this->toNigeriaTimeZoneFromUtc(now()) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)) {
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)) {
             $this->pushService->setNotification(
                 [
                     'title' => "Live Trivia Starts Now !",
@@ -173,7 +173,7 @@ class SendPushNotification
                 ->send();
         }
 
-        if ($this->toNigeriaTimeZoneFromUtc(now()) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subMinutes(30)) {
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subMinutes(30)) {
             $this->pushService->setNotification(
                 [
                     'title' => "Live Trivia Starts in 30 minutes!",
@@ -194,7 +194,7 @@ class SendPushNotification
                 ->send();
         }
 
-        if ($this->toNigeriaTimeZoneFromUtc(now()) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subHour()) {
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subHour()) {
             $this->pushService->setNotification(
                 [
                     'title' => "Live Trivia Starts in one hour!",
