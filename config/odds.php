@@ -20,5 +20,7 @@ return [
         '18:00',
         '21:00',
         '0:00',
-    ]
+    ],
+    'minimum_staking_amount' => env('MINIMUM_STAKING_AMOUNT', 100),
+    'maximum_staking_amount' => env('MAXIMUM_STAKING_AMOUNT', 1000)
 ];

@@ -201,7 +201,7 @@ class GameController extends BaseController
             'type' => ['required', 'numeric'],
             'mode' => ['required', 'numeric'],
             'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', 'min:0']
+            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_staking_amount') , "min:". config('odds.minimum_staking_amount')]
         ]);
 
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
@@ -225,7 +225,7 @@ class GameController extends BaseController
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
-        if (FeatureFlag::isEnabled('odds')){
+        if (FeatureFlag::isEnabled('odds') && !$request->has('staking_amount')){
             $oddMultiplierComputer = new OddsComputer();
             
 
@@ -418,13 +418,13 @@ class GameController extends BaseController
             }
         }
        
-        $staking = false;
+        $staking = null;
         if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
             $amountWon = 0;
             if (!is_null($staking)) {
 
-                $amountWon = $staking->amount *  $pointStandardOdd * $game->odd_multiplier;
+                $amountWon = $staking->amount *  $pointStandardOdd; // * $game->odd_multiplier;
 
 
                 WalletTransaction::create([
@@ -445,7 +445,15 @@ class GameController extends BaseController
         
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        $game->points_gained = FeatureFlag::isEnabled('odds') ? $points * $game->odd_multiplier : $points; 
+        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+            $game->points_gained = $points;
+        }
+        if (FeatureFlag::isEnabled('odds') && $staking == null){
+            $game->points_gained = $points * $game->odd_multiplier;
+        }else{
+            $game->points_gained = $points;
+        }
+        // $game->points_gained = FeatureFlag::isEnabled('odds') ? $points * $game->odd_multiplier : $points; 
         $game->total_count = $points + $wrongs;
         
         $game->save();
