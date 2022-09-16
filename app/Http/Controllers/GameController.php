@@ -195,14 +195,15 @@ class GameController extends BaseController
     }
 
     public function canPlayWithStaking(Request $request){
-        $request->validate([
-            'category' => ['required', 'numeric',],
-            'type' => ['required', 'numeric'],
-            'mode' => ['required', 'numeric'],
-            'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_staking_amount'), "min:" . config('odds.minimum_staking_amount')]
-        ]);
 
+        if ($request->has('staking_amount')){
+            if ($request->staking_amount > config('odds.maximum_staking_amount')){
+                return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_staking_amount'), "MAXIMUM_STAKE_AMOUNT");
+            }
+            if ($request->staking_amount < config('odds.minimum_staking_amount')){
+                return $this->sendError("The minimum amount you can stake is "> config('odds.minimum_staking_amount'), "MINIMUM_STAKE_AMOUNT");
+            }
+        }
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
             return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
