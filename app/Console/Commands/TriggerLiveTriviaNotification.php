@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Actions\SendPushNotification;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class TriggerLiveTriviaNotification extends Command
 {
@@ -13,14 +14,14 @@ class TriggerLiveTriviaNotification extends Command
      *
      * @var string
      */
-    protected $signature = 'live-trivia:notify';
+    protected $signature = 'command:name';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Trigger push notifications to users for live trivia';
+    protected $description = 'Command description';
 
     /**
      * Execute the console command.
@@ -29,8 +30,11 @@ class TriggerLiveTriviaNotification extends Command
      */
     public function handle()
     {
-        User::all()->map(function ($user) {
-            (new SendPushNotification())->sendliveTriviaNotification($user);
+        User::chunk(500, function($users){
+            foreach ($users as $user){
+                (new SendPushNotification())->sendliveTriviaNotification($user);
+            }
+            Log::info("Attempting to send live trivia notification to 500 users");
         });
     }
 }
