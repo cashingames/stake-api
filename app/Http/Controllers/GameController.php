@@ -201,8 +201,10 @@ class GameController extends BaseController
                 return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_staking_amount'), "MAXIMUM_STAKE_AMOUNT");
             }
             if ($request->staking_amount < config('odds.minimum_staking_amount')){
-                return $this->sendError("The minimum amount you can stake is "> config('odds.minimum_staking_amount'), "MINIMUM_STAKE_AMOUNT");
+                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_staking_amount'), "MINIMUM_STAKE_AMOUNT");
             }
+        }else{
+
         }
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
