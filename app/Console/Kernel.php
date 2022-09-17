@@ -32,7 +32,8 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:01');
         $schedule->command('bonus:daily-activate')
             ->dailyAt('00:03');
-
+        $schedule->command('live-trivia:notify')->everyMinute();
+        
         if (FeatureFlag::isEnabled('odds')){
             $schedule->command('odds:special-hour')->hourly()->when(function () {
 

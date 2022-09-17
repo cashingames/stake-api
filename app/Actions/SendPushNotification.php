@@ -4,23 +4,29 @@ namespace App\Actions;
 
 use App\Enums\PushNotificationType;
 use App\Models\FcmPushSubscription;
+use App\Models\LiveTrivia;
 use App\Services\Firebase\CloudMessagingService;
+use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Facades\Log;
 
-class SendPushNotification{
+class SendPushNotification
+{
 
+    use DateUtils;
     /**
      * @var App\Services\Firebase\CloudMessaging
      */
     public $pushService;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->pushService = new CloudMessagingService(config('services.firebase.server_key'));
     }
 
-    public function sendChallengeInviteNotification($sender, $opponent, $challenge){
+    public function sendChallengeInviteNotification($sender, $opponent, $challenge)
+    {
         $recipient = FcmPushSubscription::where('user_id', $opponent->id)->latest()->first();
-        if (is_null($recipient)){
+        if (is_null($recipient)) {
             return;
         }
         $this->pushService->setNotification(
@@ -29,25 +35,26 @@ class SendPushNotification{
                 'body' => "Your friend, {$sender->username} has just sent you a challenge invite"
             ]
         )
-        ->setData(
-            [
-                
-                'title' => "Cashingames Invitation! : Play a Challenge Game!",
-                'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
-                'action_type' => PushNotificationType::Challenge,
-                'action_id' => $challenge->id,
-                'unread_notifications_count' => $opponent->unreadNotifications()->count()
-            
-            ]
-        )
-        ->setTo($recipient->device_token)
-        ->send();
+            ->setData(
+                [
+
+                    'title' => "Cashingames Invitation! : Play a Challenge Game!",
+                    'body' => "Your friend, {$sender->username} has just sent you a challenge invite",
+                    'action_type' => PushNotificationType::Challenge,
+                    'action_id' => $challenge->id,
+                    'unread_notifications_count' => $opponent->unreadNotifications()->count()
+
+                ]
+            )
+            ->setTo($recipient->device_token)
+            ->send();
         Log::info("Challenge invitation push notification sent to: " . $opponent->username . " from " . $sender->username);
     }
 
-    public function sendChallengeStatusChangeNotification($player, $opponent, $challenge, $status){
+    public function sendChallengeStatusChangeNotification($player, $opponent, $challenge, $status)
+    {
         $recipient = FcmPushSubscription::where('user_id', $player->id)->latest()->first();
-        if (is_null($recipient)){
+        if (is_null($recipient)) {
             return;
         }
 
@@ -57,24 +64,25 @@ class SendPushNotification{
                 'body' => "Your opponent, {$opponent->username} has {$status} your invite"
             ]
         )
-        ->setData(
-            [
-                'title' => "Challenge Status Update",
-                'body' => "Your opponent, {$opponent->username} has {$status} your invite",
-                'action_type' => PushNotificationType::Challenge,
-                'action_id' => $challenge->id,
-                'unread_notifications_count' => $player->unreadNotifications()->count()
-            ]
-        )
-        ->setTo($recipient->device_token)
-        ->send();
+            ->setData(
+                [
+                    'title' => "Challenge Status Update",
+                    'body' => "Your opponent, {$opponent->username} has {$status} your invite",
+                    'action_type' => PushNotificationType::Challenge,
+                    'action_id' => $challenge->id,
+                    'unread_notifications_count' => $player->unreadNotifications()->count()
+                ]
+            )
+            ->setTo($recipient->device_token)
+            ->send();
         Log::info("Challenge status update push notification sent to: " . $player->username . " from " . $opponent->username);
     }
-    public function sendChallengeCompletedNotification($user, $challenge){
-        
-        if ($user->id == $challenge->user_id){
-            $recipient = $challenge->opponent;    
-        }else{
+    public function sendChallengeCompletedNotification($user, $challenge)
+    {
+
+        if ($user->id == $challenge->user_id) {
+            $recipient = $challenge->opponent;
+        } else {
             $recipient = $challenge->users;
         }
         $device_token = FcmPushSubscription::where('user_id', $recipient->id)->latest()->first();
@@ -89,13 +97,13 @@ class SendPushNotification{
         )
             ->setData(
                 [
-                    
+
                     'title' => "Challenge Completed!",
                     'body' => "Your opponent, {$user->username} has completed the challenge, check the scores now",
                     'action_type' => PushNotificationType::Challenge,
                     'action_id' => $challenge->id,
                     'unread_notifications_count' => $recipient->unreadNotifications()->count()
-                
+
                 ]
             )
             ->setTo($device_token->device_token)
@@ -104,7 +112,8 @@ class SendPushNotification{
         Log::info("Challenge invitation push notification sent to: " . $recipient->username . " from " . $user->username);
     }
 
-    public function sendSpecialHourOddsNotification($user){
+    public function sendSpecialHourOddsNotification($user)
+    {
         $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
         if (is_null($device_token)) {
             return;
@@ -128,5 +137,82 @@ class SendPushNotification{
             )
             ->setTo($device_token->device_token)
             ->send();
+    }
+
+    public function sendliveTriviaNotification($user)
+    {
+        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+        $activeLiveTrivia = LiveTrivia::active()->first();
+        
+        if (is_null($activeLiveTrivia)) {
+            return;
+        }
+
+        if (is_null($device_token)) {
+            return;
+        }
+
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)) {
+            $this->pushService->setNotification(
+                [
+                    'title' => "Live Trivia Starts Now !",
+                    'body' => "Play {$activeLiveTrivia->name} now and stand a chance to win cash!"
+                ]
+            )
+                ->setData(
+                    [
+
+                        'title' => "Live Trivia Starts Now !",
+                        'body' => "Play {$activeLiveTrivia->name} now and stand a chance to win cash!",
+                        'action_type' => "#",
+                        'action_id' => "#"
+
+                    ]
+                )
+                ->setTo($device_token->device_token)
+                ->send();
+        }
+
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subMinutes(30)) {
+            $this->pushService->setNotification(
+                [
+                    'title' => "Live Trivia Starts in 30 minutes!",
+                    'body' => "Play {$activeLiveTrivia->name} in 30 minutes and stand a chance to win cash!"
+                ]
+            )
+                ->setData(
+                    [
+
+                        'title' => "Live Trivia Starts in 30 minutes!",
+                        'body' => "Play {$activeLiveTrivia->name} in 30 minutes and stand a chance to win cash!",
+                        'action_type' => "#",
+                        'action_id' => "#"
+
+                    ]
+                )
+                ->setTo($device_token->device_token)
+                ->send();
+        }
+
+        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subHour()) {
+            $this->pushService->setNotification(
+                [
+                    'title' => "Live Trivia Starts in one hour!",
+                    'body' => "Play {$activeLiveTrivia->name} in 1 hour and stand a chance to win cash!"
+                ]
+            )
+                ->setData(
+                    [
+
+                        'title' => "Live Trivia Starts in 1 hour!",
+                        'body' => "Play {$activeLiveTrivia->name} in 1 hour and stand a chance to win cash!",
+                        'action_type' => "#",
+                        'action_id' => "#"
+
+                    ]
+                )
+                ->setTo($device_token->device_token)
+                ->send();
+        }
     }
 }
