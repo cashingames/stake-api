@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Enums\FeatureFlags;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\User;
@@ -33,8 +34,8 @@ class StakingServiceTest extends TestCase
         $this->user = User::inRandomOrder()->first();
         $this->staking = Staking::inRandomOrder()->first();
         $this->stakingService = new StakingService($this->user);
-        FeatureFlag::isEnabled('exhibition_game_staking');
-        FeatureFlag::isEnabled('trivia_game_staking');
+        FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
     }
 
     public function test_that_an_amount_can_be_staked()

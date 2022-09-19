@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Enums\FeatureFlags;
 use App\Services\FeatureFlag;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -34,7 +35,7 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:03');
         $schedule->command('live-trivia:notify')->everyMinute();
         
-        if (FeatureFlag::isEnabled('odds')){
+        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
             $schedule->command('odds:special-hour')->hourly()->when(function () {
 
                 $now = date("H") . ":00";
@@ -45,7 +46,7 @@ class Kernel extends ConsoleKernel
         }
         
 
-        if(FeatureFlag::isEnabled('exhibition_game_staking') or FeatureFlag::isEnabled('trivia_game_staking')){
+        if(FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $schedule->command('winnings:credit')
             ->hourly();
         }

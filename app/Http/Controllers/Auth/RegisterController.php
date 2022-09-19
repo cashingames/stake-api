@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
 use App\Models\Wallet;
@@ -185,7 +186,7 @@ class RegisterController extends BaseController
     protected function registered(Request $request, SMSProviderInterface $smsService, $user)
     {   
         // config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'
-        if (FeatureFlag::isEnabled('phone_verification')){
+        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
             try {
                 $smsService->deliverOTP($user);    
             } catch (\Throwable $th) {

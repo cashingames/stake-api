@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\FeatureFlags;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 use App\Models\User;
@@ -50,7 +51,7 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if (FeatureFlag::isEnabled('phone_verification')){
+        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
             if ($user->phone_verified_at == null) {
 
                 if ($request->hasHeader('X-App-Source')) {

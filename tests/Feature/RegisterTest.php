@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\FeatureFlags;
 use UserSeeder;
 use BoostSeeder;
 use Tests\TestCase;
@@ -155,7 +156,7 @@ class RegisterTest extends TestCase
 
     public function test_a_user_recieves_sms_otp_on_registration()
     {
-        FeatureFlag::enable('phone_verification');
+        FeatureFlag::enable(FeatureFlags::PHONE_VERIFICATION);
         $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
         });
@@ -177,7 +178,7 @@ class RegisterTest extends TestCase
 
     public function test_a_user_can_register_from_web_without_needing_email_verification()
     {
-        if(FeatureFlag::isEnabled('phone_verification')){$this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+        if(FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){$this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
         });}
 

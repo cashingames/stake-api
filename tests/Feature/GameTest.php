@@ -13,6 +13,7 @@ use App\Models\Plan;
 use App\Models\User;
 use App\Models\Boost;
 use AchievementSeeder;
+use App\Enums\FeatureFlags;
 use App\Mail\ChallengeInvite;
 use App\Models\Category;
 use App\Models\Question;
@@ -68,8 +69,8 @@ class GameTest extends TestCase
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->plan = Plan::inRandomOrder()->first();
         $this->actingAs($this->user);
-        FeatureFlag::isEnabled('exhibition_game_staking');
-        FeatureFlag::isEnabled('trivia_game_staking');
+        FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
     }
 
     public function test_common_data_can_be_retrieved()
@@ -265,7 +266,7 @@ class GameTest extends TestCase
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
     {
-        FeatureFlag::enable('exhibition_game_staking');
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $this->user->wallet->update([
             'non_withdrawable_balance' => 1000
         ]);
@@ -292,7 +293,7 @@ class GameTest extends TestCase
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
     {   
         FeatureFlag::enable('odds');
-        FeatureFlag::enable('exhibition_game_staking');
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         Question::factory()
         ->count(50)
         ->create();

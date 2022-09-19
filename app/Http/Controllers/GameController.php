@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FeatureFlags;
 use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Plan;
@@ -243,7 +244,7 @@ class GameController extends BaseController
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
-        if (FeatureFlag::isEnabled('odds') && !$request->has('staking_amount')){
+        if (FeatureFlag::isEnabled(FeatureFlags::ODDS) && !$request->has('staking_amount')){
             $oddMultiplierComputer = new OddsComputer();
             
 
@@ -292,7 +293,7 @@ class GameController extends BaseController
 
         $gameSession->save();
 
-        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             if ($request->has('staking_amount')) {
                 $stakingService = new StakingService($this->user);
 
@@ -425,7 +426,7 @@ class GameController extends BaseController
             }
         }
 
-        if (FeatureFlag::isEnabled('odds')){
+        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
             $pointStandardOdd = 0;
             $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
 
@@ -437,7 +438,7 @@ class GameController extends BaseController
         }
        
         $staking = null;
-        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
             $amountWon = 0;
             if (!is_null($staking)) {
@@ -463,7 +464,7 @@ class GameController extends BaseController
         
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $game->points_gained = $points;
         }
         if (FeatureFlag::isEnabled('odds') && $staking == null){
@@ -476,7 +477,7 @@ class GameController extends BaseController
         
         $game->save();
 
-        if (FeatureFlag::isEnabled('exhibition_game_staking') OR FeatureFlag::isEnabled('trivia_game_staking')){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $game->with_staking = $staking ? true : false;
         }
         
