@@ -33,6 +33,7 @@ class ForgotPasswordController extends BaseController
 
         $user = User::where('email', $data['email'])->first();
         if (!$user) {
+            return $this->sendResponse(true, 'Email sent');
             return $this->sendError('Please enter your registered email address', 'Please enter your registered email address');
         }
 

@@ -187,8 +187,9 @@ class RegisterController extends BaseController
     {   
         // config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
+            Mail::send(new VerifyEmail($user));
             try {
-                $smsService->deliverOTP($user);    
+                $smsService->deliverOTP($user);
             } catch (\Throwable $th) {
                 //throw $th;
                 //send mail to our admin to notify of inability to deliver SMS via OTP
