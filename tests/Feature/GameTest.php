@@ -92,6 +92,8 @@ class GameTest extends TestCase
                 'gameModes' => [],
                 'gameTypes' => [],
                 'minVersionCode' => [],
+                'minimumStakeAmount' => [],
+                'maximumStakeAmount' => []
             ]
         ]);
     }

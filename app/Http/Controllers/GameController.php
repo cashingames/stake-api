@@ -130,6 +130,8 @@ class GameController extends BaseController
         $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
         $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
         $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
+        $result->maximumStakeAmount = config('odds.maximum_staking_amount');
+        $result->minimumStakeAmount = config('odds.minimum_staking_amount');
 
         return $this->sendResponse($result, "Common data");
     }
