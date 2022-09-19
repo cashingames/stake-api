@@ -20,5 +20,9 @@ return [
     'notification_history' => [
         'enabled' => env('FEATURE_FLAG_NOTIFICATION_HISTORY_ENABLED', false),
         'activate_on' => '2022-09-13'
+    ],
+    'achievement_badges' => [
+        'enabled' => env('FEATURE_FLAG_ACHIEVEMENT_BADGES', false),
+        'activate_on' => null
     ]
 ];
