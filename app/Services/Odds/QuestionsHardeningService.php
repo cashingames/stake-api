@@ -53,15 +53,20 @@ class QuestionsHardeningService
         }
     }
 
-    public function getAverageOfLastThreeGames()
+    public function getAverageOfLastThreeGames($mode=null)
     {
 
-        // $sumOflastThreeGames = $user->gameSessions()->latest()->take(3)->sum('points_gained');
-        $lastThreeGamesAverage = $this->user->gameSessions()->completed()->latest()->limit(3)->get()->avg('correct_count');
+        $lastThreeGamesAverage = $this->user->gameSessions()
+            ->when($mode === "trivia", function($query){
+                $query->whereNotNull("trivia_id");
+            })
+            ->completed()
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->avg('correct_count');
 
         return $lastThreeGamesAverage;
-
-        // return  $sumOflastThreeGames / 3;
     }
 
     public function getUserAnsweredQuestions()

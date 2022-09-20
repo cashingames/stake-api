@@ -250,7 +250,7 @@ class GameController extends BaseController
             $oddMultiplierComputer = new OddsComputer();
             
 
-            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($this->user));
+            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null));
             $gameSession->odd_multiplier = $odd['oddsMultiplier'];
             $gameSession->odd_condition = $odd['oddsCondition'];
         }
@@ -428,17 +428,6 @@ class GameController extends BaseController
             }
         }
 
-        // if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
-        //     $pointStandardOdd = 0;
-        //     $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
-
-        //     foreach ($standardOdds as $standardOdd) {
-        //         if ($standardOdd->score == $points) {
-        //             $pointStandardOdd = $standardOdd->odd;
-        //         }
-        //     }
-        // }
-       
         $staking = null;
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
