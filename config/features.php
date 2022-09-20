@@ -24,5 +24,9 @@ return [
     'achievement_badges' => [
         'enabled' => env('FEATURE_FLAG_ACHIEVEMENT_BADGES_ENABLED', false),
         'activate_on' => null
+    ],
+    'special_hour_notification' => [
+        'enabled' => env('FEATURE_FLAG_SPECIAL_HOUR_NOTIFICATION_ENABLED', false),
+        'activate_on' => null
     ]
 ];

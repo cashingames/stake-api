@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:03');
         $schedule->command('live-trivia:notify')->everyMinute();
         
-        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
+        if (FeatureFlag::isEnabled(FeatureFlags::SPECIAL_HOUR_NOTIFICATION)){
             $schedule->command('odds:special-hour')->hourly()->when(function () {
 
                 $now = date("H") . ":00";

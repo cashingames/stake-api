@@ -9,4 +9,5 @@ class FeatureFlags{
     const TRIVIA_GAME_STAKING = "trivia_game_staking";
     const NOTIFICATION_HISTORY = "notification_history";
     const ACHIEVEMENT_BADGES = "achievement_badges";
+    const SPECIAL_HOUR_NOTIFICATION = "special_hour_notification";
 }

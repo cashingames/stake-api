@@ -43,4 +43,8 @@ class GameSession extends Model
     {
         return $this->belongsTo(LiveTrivia::class, 'trivia_id');
     }
+
+    public function scopeCompleted($query){
+        return $query->where('state', 'COMPLETED');
+    }
 }
