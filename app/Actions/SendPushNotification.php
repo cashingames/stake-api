@@ -139,80 +139,31 @@ class SendPushNotification
             ->send();
     }
 
-    public function sendliveTriviaNotification($user)
+    public function sendliveTriviaNotification($user, $time)
     {
         $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-        $activeLiveTrivia = LiveTrivia::active()->first();
-        
-        if (is_null($activeLiveTrivia)) {
-            return;
-        }
 
         if (is_null($device_token)) {
             return;
         }
 
-        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)) {
-            $this->pushService->setNotification(
+        $this->pushService->setNotification(
+            [
+                'title' => "Live Trivia Alert ! :  $time to play!",
+                'body' => "Play this live trivia and stand a chance to win cash!"
+            ]
+        )
+            ->setData(
                 [
-                    'title' => "Live Trivia Starts Now !",
-                    'body' => "Play {$activeLiveTrivia->name} now and stand a chance to win cash!"
+
+                    'title' => "Live Trivia Alert ! :  $time to play!",
+                    'body' => "Play this live trivia and stand a chance to win cash!",
+                    'action_type' => "#",
+                    'action_id' => "#"
+
                 ]
             )
-                ->setData(
-                    [
-
-                        'title' => "Live Trivia Starts Now !",
-                        'body' => "Play {$activeLiveTrivia->name} now and stand a chance to win cash!",
-                        'action_type' => "#",
-                        'action_id' => "#"
-
-                    ]
-                )
-                ->setTo($device_token->device_token)
-                ->send();
-        }
-
-        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subMinutes(30)) {
-            $this->pushService->setNotification(
-                [
-                    'title' => "Live Trivia Starts in 30 minutes!",
-                    'body' => "Play {$activeLiveTrivia->name} in 30 minutes and stand a chance to win cash!"
-                ]
-            )
-                ->setData(
-                    [
-
-                        'title' => "Live Trivia Starts in 30 minutes!",
-                        'body' => "Play {$activeLiveTrivia->name} in 30 minutes and stand a chance to win cash!",
-                        'action_type' => "#",
-                        'action_id' => "#"
-
-                    ]
-                )
-                ->setTo($device_token->device_token)
-                ->send();
-        }
-
-        if ($this->toNigeriaTimeZoneFromUtc(now('UTC')) == $this->toNigeriaTimeZoneFromUtc($activeLiveTrivia->start_time)->subHour()) {
-            $this->pushService->setNotification(
-                [
-                    'title' => "Live Trivia Starts in one hour!",
-                    'body' => "Play {$activeLiveTrivia->name} in 1 hour and stand a chance to win cash!"
-                ]
-            )
-                ->setData(
-                    [
-
-                        'title' => "Live Trivia Starts in 1 hour!",
-                        'body' => "Play {$activeLiveTrivia->name} in 1 hour and stand a chance to win cash!",
-                        'action_type' => "#",
-                        'action_id' => "#"
-
-                    ]
-                )
-                ->setTo($device_token->device_token)
-                ->send();
-        }
+            ->setTo($device_token->device_token)
+            ->send();
     }
 }
