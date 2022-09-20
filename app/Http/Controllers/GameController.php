@@ -445,7 +445,7 @@ class GameController extends BaseController
             $amountWon = 0;
             if (!is_null($staking)) {
                 $pointStandardOdd = 0;
-                $pointStandardOdd = StandardOdd::where('score', $points)->active()->orderBy('score', 'DESC')->first()->odd ?? 1;
+                $pointStandardOdd = StandardOdd::where('score', $points)->active()->first()->odd ?? 1;
 
                 
                 $amountWon = $staking->amount *  $pointStandardOdd;
