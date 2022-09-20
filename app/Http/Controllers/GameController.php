@@ -428,24 +428,27 @@ class GameController extends BaseController
             }
         }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
-            $pointStandardOdd = 0;
-            $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
+        // if (FeatureFlag::isEnabled(FeatureFlags::ODDS)){
+        //     $pointStandardOdd = 0;
+        //     $standardOdds = StandardOdd::active()->orderBy('score', 'DESC')->get();
 
-            foreach ($standardOdds as $standardOdd) {
-                if ($standardOdd->score == $points) {
-                    $pointStandardOdd = $standardOdd->odd;
-                }
-            }
-        }
+        //     foreach ($standardOdds as $standardOdd) {
+        //         if ($standardOdd->score == $points) {
+        //             $pointStandardOdd = $standardOdd->odd;
+        //         }
+        //     }
+        // }
        
         $staking = null;
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
             $amountWon = 0;
             if (!is_null($staking)) {
+                $pointStandardOdd = 0;
+                $pointStandardOdd = StandardOdd::where('score', $points)->active()->orderBy('score', 'DESC')->first()->odd ?? 1;
 
-                $amountWon = $staking->amount *  $pointStandardOdd; // * $game->odd_multiplier;
+                
+                $amountWon = $staking->amount *  $pointStandardOdd;
 
 
                 WalletTransaction::create([
@@ -480,6 +483,7 @@ class GameController extends BaseController
         $game->save();
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
+            $game->amount_staked = $staking ? $staking->amount : null;
             $game->with_staking = $staking ? true : false;
         }
         
