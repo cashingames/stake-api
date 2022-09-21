@@ -205,7 +205,7 @@ class RegisterController extends BaseController
 
                 return $this->sendResponse($token, 'Token');
             }
-            return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
+            // return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
         }
         
         
