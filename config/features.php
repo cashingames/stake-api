@@ -32,5 +32,9 @@ return [
     'email_verification' => [
         'enabled' => env('FEATURE_FLAG_EMAIL_VERIFICATION_ENABLED', false),
         'activate_on' => null
-    ]
+    ],
+    'live_trivia_start_time_notification' => [
+        'enabled' => env('FEATURE_FLAG_LIVE_TRIVIA_START_TIME_NOTIFICATION_ENABLED', false),
+        'activate_on' => null
+    ],
 ];
