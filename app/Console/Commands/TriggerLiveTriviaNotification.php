@@ -44,7 +44,7 @@ class TriggerLiveTriviaNotification extends Command
         if ($liveTriviaStartTime->diffInHours($currentTime) == 1){
             User::chunk(500, function($users){
                 foreach ($users as $user){
-                    (new SendPushNotification())->sendliveTriviaNotification($user, "1 hour");
+                    (new SendPushNotification())->sendliveTriviaNotification($user, "in 1 hour");
                 }
                 Log::info("Attempting to send live trivia notification to 500 users");
             });
@@ -52,16 +52,16 @@ class TriggerLiveTriviaNotification extends Command
         if ($liveTriviaStartTime->diffInMinutes($currentTime) == 30){
             User::chunk(500, function($users){
                 foreach ($users as $user){
-                    (new SendPushNotification())->sendliveTriviaNotification($user, "30 minutes");
+                    (new SendPushNotification())->sendliveTriviaNotification($user, "in 30 minutes");
                 }
                 Log::info("Attempting to send live trivia notification to 500 users");
             });
         }
         
-        if ($liveTriviaStartTime->diffInMinutes($currentTime) == 1){
+        if ($liveTriviaStartTime->diffInMinutes($currentTime) == 0){
             User::chunk(500, function($users){
                 foreach ($users as $user){
-                    (new SendPushNotification())->sendliveTriviaNotification($user, "1 minute");
+                    (new SendPushNotification())->sendliveTriviaNotification($user, "now");
                 }
                 Log::info("Attempting to send live trivia notification to 500 users");
             });

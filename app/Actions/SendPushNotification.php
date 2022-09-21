@@ -149,14 +149,14 @@ class SendPushNotification
 
         $this->pushService->setNotification(
             [
-                'title' => "Live Trivia Alert ! :  $time to play!",
+                'title' => "Live Trivia Alert ! : Play $time !",
                 'body' => "Play this live trivia and stand a chance to win cash!"
             ]
         )
             ->setData(
                 [
 
-                    'title' => "Live Trivia Alert ! :  $time to play!",
+                    'title' => "Live Trivia Alert ! : Play $time !",
                     'body' => "Play this live trivia and stand a chance to win cash!",
                     'action_type' => "#",
                     'action_id' => "#"
