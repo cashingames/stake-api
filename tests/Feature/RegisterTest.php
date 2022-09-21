@@ -138,7 +138,7 @@ class RegisterTest extends TestCase
     public function test_a_user_recieves_verification_email_on_registration()
     {
 
-        config(['auth.verification.means' => 'email']);
+        config(['features.email_verification.enabled' => true]);
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
@@ -160,7 +160,7 @@ class RegisterTest extends TestCase
         $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
         });
-        config(['auth.verification.means' => 'phone', 'auth.verification.type' => 'otp']);
+        config(['features.phone_verification.enabled' => true]);
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',

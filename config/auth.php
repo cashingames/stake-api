@@ -112,9 +112,4 @@ return [
     */
 
     'password_timeout' => 10800,
-    'verification' => [
-        'means' => 'phone', // means could also be email
-        'type' => 'otp' //type could be 'link'
-    ]
-
 ];

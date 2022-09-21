@@ -28,5 +28,9 @@ return [
     'special_hour_notification' => [
         'enabled' => env('FEATURE_FLAG_SPECIAL_HOUR_NOTIFICATION_ENABLED', false),
         'activate_on' => null
+    ],
+    'email_verification' => [
+        'enabled' => env('FEATURE_FLAG_EMAIL_VERIFICATION_ENABLED', false),
+        'activate_on' => null
     ]
 ];

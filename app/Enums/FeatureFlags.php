@@ -10,4 +10,5 @@ class FeatureFlags{
     const NOTIFICATION_HISTORY = "notification_history";
     const ACHIEVEMENT_BADGES = "achievement_badges";
     const SPECIAL_HOUR_NOTIFICATION = "special_hour_notification";
+    const EMAIL_VERIFICATION = "email_verification";
 }

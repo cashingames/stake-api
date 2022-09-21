@@ -185,9 +185,7 @@ class RegisterController extends BaseController
      */
     protected function registered(Request $request, SMSProviderInterface $smsService, $user)
     {   
-        // config('auth.verification.means') == 'phone' && config('auth.verification.type') == 'otp'
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
-            Mail::send(new VerifyEmail($user));
             try {
                 $smsService->deliverOTP($user);
             } catch (\Throwable $th) {
@@ -196,7 +194,8 @@ class RegisterController extends BaseController
                 Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
                 return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
             }
-        }else{
+        }
+        if(FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)){
             Mail::send(new VerifyEmail($user));
 
             Log::info("Email verification sent to " . $user->email);
