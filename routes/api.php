@@ -66,6 +66,8 @@ Route::middleware('api')->prefix('v3')->group(
         Route::post('paystack/reconcile/payments', [WalletController::class, "paymentsTransactionsReconciler"]);
         Route::get('first-time-bonus/fetch', [MessagesController::class, 'fetchFirstTimeBonus']);
         Route::get('feature-flags', [FeatureFlagController::class, 'index']);
+        Route::post('client/feedback', [MessagesController::class, 'feedback']);
+        Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
     }
 );
 
@@ -79,8 +81,8 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::get('live-trivia/status', LiveTriviaStatusController::class); 
-        Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class); 
+        Route::get('live-trivia/status', LiveTriviaStatusController::class);
+        Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class);
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
         Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
         Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class);
@@ -95,6 +97,23 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
         Route::post('game/can-stake-in-game', [GameController::class, 'canPlayWithStaking']);
+        Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
+        Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
+        Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);
+        Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
+        Route::get('wallet/me', [WalletController::class, 'me']);
+        Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
+        Route::get('wallet/me/transactions/earnings', [WalletController::class, 'earnings']);
+        Route::get('wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"]);
+        Route::get('wallet/banks', [WalletController::class, 'getBanks']);
+        Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
+        Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
+        Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
+        Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
+        Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
+        Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
+        Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
+        Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
     }
 );
 
@@ -103,14 +122,10 @@ Route::prefix('v2')->group(function () {
     Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
 
     Route::middleware(['auth:api', 'last_active'])->group(function () {
-        Route::get('user/me', [UserController::class, 'me']);
-        Route::post('me/set/online', [UserController::class, 'setOnline']);
-
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);
         Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
-        Route::get('profile/me', [UserController::class, 'me']);
 
         Route::get('wallet/me', [WalletController::class, 'me']);
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
@@ -120,32 +135,10 @@ Route::prefix('v2')->group(function () {
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
-
-
-        Route::get('wallet/get/withdrawals', [WalletController::class, 'getWithdrawals']);
-        Route::get('me/points', [UserController::class, 'getPoints']);
-        Route::get('me/points/log/history', [UserController::class, 'getPointsLog']);
-        Route::get('me/boosts', [UserController::class, 'getboosts']);
-        Route::get('me/quizzes', [UserController::class, 'quizzes']);
-
-        Route::get('game/boosts', [GameController::class, 'boosts']);
-        Route::get('achievements', [GameController::class, 'achievements']);
+       
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
-        Route::post('me/achievement', [UserController::class, 'userAchievement']);
-
-        Route::get('game/modes', [GameController::class, 'modes']);
-        Route::get('game/types', [GameController::class, 'gameTypes']);
-        Route::get('game/types/random', [GameController::class, 'shuffleGameTypes']);
-        Route::get('game/categories', [CategoryController::class, 'get']);
-        Route::get('game/categories/{gameTypeId}', [CategoryController::class, 'getGameTypeCategories']);
-        Route::get('game/sub-categories/{catId}/{gameTypeId}', [CategoryController::class, 'subCategories']);
-        Route::get('category/times-played/{catId}', [CategoryController::class, 'timesPlayed']);
-
-        Route::get('me/friends', [UserController::class, 'friends']);
-
         Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
-        Route::post('game/boost/consume/{boostId}', [GameController::class, 'consumeBoost']);
 
         //updated leaders endpoint
         Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
