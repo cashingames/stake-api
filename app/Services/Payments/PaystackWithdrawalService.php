@@ -87,6 +87,7 @@ class PaystackWithdrawalService
             throw $ex;
         }
         $data = \json_decode((string) $response->getBody());
+        Log::info("feedback from paystack: " . json_encode($data));
         return($data->data->status);
     }
 
