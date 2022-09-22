@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChallengeGameSession;
 use App\Actions\SendPushNotification;
+use App\Notifications\ChallengeStatusUpdateNotification;
 
 class EndChallengeGameController extends  BaseController
 {
@@ -70,11 +71,17 @@ class EndChallengeGameController extends  BaseController
             ]);
         }
 
-        // if (env('PUSH_ENABLED')) {
-            $pushAction = new SendPushNotification();
-            $pushAction->sendChallengeCompletedNotification($this->user, $game->challenge);
-        // }
+        
+        $pushAction = new SendPushNotification();
+        $pushAction->sendChallengeCompletedNotification($this->user, $game->challenge);
 
+        if ($this->user->id == $game->challenge->user_id) {
+            $recipient = $game->challenge->opponent;
+        } else {
+            $recipient = $game->challenge->users;
+        }
+        $recipient->notify(new ChallengeStatusUpdateNotification($game->challenge, 'COMPLETED'));
+        
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
 

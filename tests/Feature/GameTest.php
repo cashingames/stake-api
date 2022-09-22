@@ -45,6 +45,7 @@ class GameTest extends TestCase
     const START_EXHIBITION_GAME_URL = '/api/v2/game/start/single-player';
     const END_EXHIBITION_GAME_URL = '/api/v2/game/end/single-player';
     const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
+    const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
 
     protected $user;
     protected $category;
