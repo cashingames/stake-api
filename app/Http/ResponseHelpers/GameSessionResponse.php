@@ -30,7 +30,7 @@ class GameSessionResponse{
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             if ($staking = ExhibitionStaking::where('game_session_id', $gameSession->id)->first()) {
                 $response->with_staking = true;
-                $response->amount_staked = $staking->amount;
+                $response->amount_staked = $staking->staking->amount;
             }    
         }
         
