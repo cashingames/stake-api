@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:03');
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
-            $schedule->command('live-trivia:notify')->everyThirtyMinutes();
+            $schedule->command('live-trivia:notify')->everyMinute();
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::SPECIAL_HOUR_NOTIFICATION)) {

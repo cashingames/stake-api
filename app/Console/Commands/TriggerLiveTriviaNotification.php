@@ -31,7 +31,9 @@ class TriggerLiveTriviaNotification extends Command
      * @return int
      */
     public function handle()
-    {   
+    {
+        $this->info("called at " . now());
+        Log::info("called at " . now());
         $activeLiveTrivia = LiveTrivia::active()->first();
       
         if (is_null($activeLiveTrivia)){
@@ -41,7 +43,9 @@ class TriggerLiveTriviaNotification extends Command
         $currentTime = now();
         $liveTriviaStartTime = Carbon::parse($activeLiveTrivia->start_time);
 
-        if ($liveTriviaStartTime->diffInHours($currentTime) == 1){
+        if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 60){
+            $this->info("1 hour away");
+            Log::info("1 hour away at " . $liveTriviaStartTime);
             User::chunk(500, function($users){
                 foreach ($users as $user){
                     (new SendPushNotification())->sendliveTriviaNotification($user, "in 1 hour");
@@ -49,7 +53,9 @@ class TriggerLiveTriviaNotification extends Command
                 Log::info("Attempting to send live trivia notification to 500 users");
             });
         }
-        if ($liveTriviaStartTime->diffInMinutes($currentTime) == 30){
+        if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 30){
+            $this->info("30 minutes away");
+            Log::info("30 minutes away at " . $liveTriviaStartTime);
             User::chunk(500, function($users){
                 foreach ($users as $user){
                     (new SendPushNotification())->sendliveTriviaNotification($user, "in 30 minutes");
@@ -58,7 +64,9 @@ class TriggerLiveTriviaNotification extends Command
             });
         }
         
-        if ($liveTriviaStartTime->diffInMinutes($currentTime) == 0){
+        if ($currentTime->diffInMinutes($liveTriviaStartTime) == 0){
+            $this->info("Right on time");
+            Log::info("Right on time " . $liveTriviaStartTime);
             User::chunk(500, function($users){
                 foreach ($users as $user){
                     (new SendPushNotification())->sendliveTriviaNotification($user, "now");
