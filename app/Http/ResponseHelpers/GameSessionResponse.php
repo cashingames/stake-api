@@ -22,6 +22,7 @@ class GameSessionResponse{
         $response->correct_count = $gameSession->correct_count;
         $response->wrong_count = $gameSession->wrong_count;
         $response->total_count = $gameSession->total_count;
+        $response->points_gained = $gameSession->points_gained;
         $response->state = $gameSession->state;
         $response->trivia_id = $gameSession->trivia_id;
         $response->amount_won = $gameSession->amount_won;
