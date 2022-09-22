@@ -14,19 +14,19 @@ class WithdrawWinningsController extends BaseController
 
     public function __invoke(Request $request)
     {
-        $data = $request->validate([
-            'amount' => ['required', 'numeric', 'min:0'],
-        ]);
+        // $data = $request->validate([
+        //     'amount' => ['required', 'numeric', 'min:0'],
+        // ]);
 
         if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        $debitAmount = $data['amount'];
+        $debitAmount = $this->user->wallet->withdrawable_balance;// $data['amount'];
 
-        if ($this->user->wallet->withdrawable_balance < $debitAmount) {
-            return $this->sendError(false, 'Insufficient Balance');
-        }
+        // if ($this->user->wallet->withdrawable_balance < $debitAmount) {
+        //     return $this->sendError(false, 'Insufficient Balance');
+        // }
         
         $paystackWithdrawal = new PaystackWithdrawalService(config('trivia.payment_key'));
 
