@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\FeatureFlags;
+use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Plan;
@@ -493,7 +494,8 @@ class GameController extends BaseController
         // if (GameSession::where('category_id')->first() == null) {
         //     $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
         // }
-
+        
+        return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
         return $this->sendResponse($game, 'Game Ended');
     }
 }
