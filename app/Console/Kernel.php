@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command("php artisan queue:work --tries=1 --stop-when-empty")->everyMinute();
+        $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
 
         $schedule->command('bonus:daily-expire')
             ->dailyAt('00:01');
