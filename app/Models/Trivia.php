@@ -82,6 +82,6 @@ class Trivia extends Model
         $query
             ->whereNull('deleted_at')
             ->where('is_published', true)
-            ->orderBy('start_time', 'ASC');
+            ->orderBy('start_time', 'DESC');
     }
 }
