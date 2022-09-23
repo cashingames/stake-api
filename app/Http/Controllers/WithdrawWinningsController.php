@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WalletTransaction;
 use App\Services\Payments\PaystackWithdrawalService;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -57,17 +58,30 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Recipient code could not be generated');
         }
 
-        $isTransferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
+        $transferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
 
+        $this->user->wallet->withdrawable_balance -= $debitAmount;
+        $this->user->wallet->save();
         
-        if($isTransferInitiated === 'pending'){
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => $debitAmount,
+            'balance' => $this->user->wallet->withdrawable_balance,
+            'description' => 'Winnings Withdrawal Made',
+            'reference' => $transferInitiated->data->reference,
+        ]);
+
+        Log::info('withdrawal transaction created ' . $this->user->username);
+        
+        if($transferInitiated->status === 'pending'){
             /**
              * Webhook implemented in wallet controller handles 
              * listening for successful transfer and 
              * updating of user transaction */
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
-        if ($isTransferInitiated === "success"){
+        if ($transferInitiated->status === "success"){
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
     }
