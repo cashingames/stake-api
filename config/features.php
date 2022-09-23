@@ -37,4 +37,8 @@ return [
         'enabled' => env('FEATURE_FLAG_LIVE_TRIVIA_START_TIME_NOTIFICATION_ENABLED', false),
         'activate_on' => null
     ],
+    'withdrawable_wallet' => [
+        'enabled' => env('FEATURE_FLAG_WITHDRAWABLE_WALLET_ENABLED', true),
+        'activate_on' => null
+    ]
 ];

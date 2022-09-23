@@ -12,4 +12,5 @@ class FeatureFlags{
     const SPECIAL_HOUR_NOTIFICATION = "special_hour_notification";
     const EMAIL_VERIFICATION = "email_verification";
     const LIVE_TRIVIA_START_TIME_NOTIFICATION = "live_trivia_start_time_notification";
+    const WITHDRAWABLE_WALLET = "withdrawable_wallet";
 }
