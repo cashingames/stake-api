@@ -22,11 +22,12 @@ class ChallengeGameService{
      * 
      * @param int $categoryId
      */
-    public function createChallenge($creator, $opponents, $categoryId){
+    public function createChallenge(User $creator, $opponents, $categoryId){
         if (is_numeric($opponents)){
             $opponents = [$opponents];
         }
         $createdChallenges = [];
+        
         foreach ($opponents as $opponentId) {
             $challenge = Challenge::create([
                 'status' => 'PENDING',
@@ -38,13 +39,16 @@ class ChallengeGameService{
             $opponent = User::find($opponentId);
 
             //database notification
-            $opponent->notify(new ChallengeReceivedNotification($challenge, $this->user));
+            $opponent->notify(new ChallengeReceivedNotification($challenge, $creator));
             //email notification
-            Mail::send(new ChallengeInvite($opponent, $challenge->id));
+            Mail::send(new ChallengeInvite($opponent, $challenge));
             //push notification
-            $pushAction = new SendPushNotification();
-            $pushAction->sendChallengeInviteNotification($creator, $opponent, $challenge);
 
+            dispatch(function() use($creator, $opponent, $challenge){
+                $pushAction = new SendPushNotification();
+                $pushAction->sendChallengeInviteNotification($creator, $opponent, $challenge);
+            });
+            
             Log::info("Challenge id : $challenge->id  invite from " . $creator->username . " sent to {$opponent->username}");
             array_push($createdChallenges, $challenge);
         }

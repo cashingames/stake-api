@@ -7,6 +7,7 @@ use App\Mail\ChallengeInvite;
 use App\Models\Challenge;
 use App\Models\User;
 use App\Notifications\ChallengeReceivedNotification;
+use App\Services\ChallengeGameService;
 use App\Services\Firebase\CloudMessagingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,7 @@ class SendChallengeInviteController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, ChallengeGameService $challengeGameService)
     {   
 
         if (!$request->has('opponentId') || !$request->has('categoryId') ) {
@@ -29,23 +30,26 @@ class SendChallengeInviteController extends BaseController
 
         }
 
-        $challenge = Challenge::create([
-            'status' => 'PENDING',
-            'user_id' => $this->user->id,
-            'category_id' => $request->categoryId,
-            'opponent_id' => $request->opponentId
-        ]);
+        
+        $challengeGameService->createChallenge($this->user, $request->opponentId, $request->categoryId);
 
-        $opponent = User::find($request->opponentId);
-        Mail::send(new ChallengeInvite($opponent, $challenge->id));
+        // $challenge = Challenge::create([
+        //     'status' => 'PENDING',
+        //     'user_id' => $this->user->id,
+        //     'category_id' => $request->categoryId,
+        //     'opponent_id' => $request->opponentId
+        // ]);
+
+        // $opponent = User::find($request->opponentId);
+        // Mail::send(new ChallengeInvite($opponent, $challenge->id));
 
         
-        $pushAction = new SendPushNotification();
-        $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
+        // $pushAction = new SendPushNotification();
+        // $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
         
-        $opponent->notify(new ChallengeReceivedNotification($challenge, $this->user));
+        // $opponent->notify(new ChallengeReceivedNotification($challenge, $this->user));
 
-        Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
+        // Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
         
         return $this->sendResponse('Invite Sent', 'Invite Sent');
       

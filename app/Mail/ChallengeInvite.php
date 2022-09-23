@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Challenge;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -9,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use Carbon\Carbon;
 
-class ChallengeInvite extends Mailable
+class ChallengeInvite extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -20,13 +21,13 @@ class ChallengeInvite extends Mailable
      */
 
     public $opponent;
-    public $challengeId;
+    public $challenge;
 
-    public function __construct($opponent, $challengeId)
+    public function __construct($opponent, $challenge)
     {   
         
         $this->opponent = $opponent;
-        $this->challengeId = $challengeId;
+        $this->challenge = $challenge;
     }
 
     /**
@@ -36,15 +37,16 @@ class ChallengeInvite extends Mailable
      */
     public function build()
     {
+        
         return $this->to($this->opponent->email)
             ->from('noreply@cashingames.com')
             ->subject('Cashingames Invitation! : Play a Challenge Game!')
             ->view('emails.users.challengeInvite')
             ->with([
                 'opponent' => $this->opponent->username,
-                'user' => auth()->user()->username,
+                'user' => $this->challenge->users->username,
                 'year' => Carbon::now()->year,
-                'challengeId'=>$this->challengeId
+                'challengeId'=>$this->challenge->id
             ]);
     }
 }

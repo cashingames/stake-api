@@ -216,7 +216,12 @@ class GameTest extends TestCase
             'categoryId' => $category->id
         ]);
 
-        Mail::assertSent(ChallengeInvite::class);
+        $this->assertDatabaseHas('challenges', [
+            'category_id' => $category->id,
+            'user_id' => $player->id,
+            'opponent_id' => $opponent->id
+        ]);
+        Mail::assertQueued(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
         
