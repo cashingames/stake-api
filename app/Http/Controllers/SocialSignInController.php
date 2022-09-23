@@ -104,7 +104,7 @@ class SocialSignInController extends BaseController
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => 50,
-                'balance' => $user->wallet->balance,
+                'balance' => $user->wallet->non_withdrawable_balance,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
             ]);
