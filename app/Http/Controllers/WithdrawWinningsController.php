@@ -69,7 +69,7 @@ class WithdrawWinningsController extends BaseController
             'amount' => $debitAmount,
             'balance' => $this->user->wallet->withdrawable_balance,
             'description' => 'Winnings Withdrawal Made',
-            'reference' => $transferInitiated->data->reference,
+            'reference' => $transferInitiated->reference,
         ]);
 
         Log::info('withdrawal transaction created ' . $this->user->username);
