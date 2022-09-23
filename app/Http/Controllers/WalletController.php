@@ -67,7 +67,7 @@ class WalletController extends BaseController
             return response("", 200);
         } else {
             if ($event->event == "transfer.success") {
-                // Log::info("Response from paystack on transfer success: " . json_encode($event));
+                Log::info("Response from paystack on transfer success: " . json_encode($event));
                 $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
                 $user = $profile->user;
                 return $this->saveWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
