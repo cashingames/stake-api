@@ -139,14 +139,8 @@ class SendPushNotification
             ->send();
     }
 
-    public function sendliveTriviaNotification($user, $time)
+    public function sendliveTriviaNotification($device, $time)
     {
-        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-
-        if (is_null($device_token)) {
-            return;
-        }
-
         $this->pushService->setNotification(
             [
                 'title' => "Live Trivia Alert ! : Play $time !",
@@ -163,7 +157,7 @@ class SendPushNotification
 
                 ]
             )
-            ->setTo($device_token->device_token)
+            ->setTo($device->device_token)
             ->send();
     }
 }
