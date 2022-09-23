@@ -76,4 +76,12 @@ class Trivia extends Model
             ->where('start_time', '>=', Carbon::now('Africa/Lagos'))
             ->orderBy('start_time', 'ASC');
     }
+
+    public function scopeRecent($query): void
+    {
+        $query
+            ->whereNull('deleted_at')
+            ->where('is_published', true)
+            ->orderBy('start_time', 'ASC');
+    }
 }
