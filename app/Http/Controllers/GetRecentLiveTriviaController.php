@@ -17,9 +17,8 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
+        $recentLiveTrivia = Trivia::recent()->limit(10)->get();
     
-        $recentLiveTrivia = Trivia::whereNull('deleted_at')->where('is_published', true)->latest()->limit(10)->get();
-
         $response = [];
        
         foreach($recentLiveTrivia as $liveTrivia){
