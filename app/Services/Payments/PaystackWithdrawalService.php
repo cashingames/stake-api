@@ -2,6 +2,7 @@
 
 namespace App\Services\Payments;
 
+use App\Models\WalletTransaction;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +89,21 @@ class PaystackWithdrawalService
         }
         $data = \json_decode((string) $response->getBody());
         Log::info("feedback from paystack: " . json_encode($data));
+
+        $this->user->wallet->withdrawable_balance -= ($amount/100);
+        $this->user->wallet->save();
+        
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => ($amount/100),
+            'balance' => $this->user->wallet->withdrawable_balance,
+            'description' => 'Winnings Withdrawal Made',
+            'reference' => $data->data->data->reference,
+        ]);
+
+        Log::info('withdrawal transaction created ' . $this->user->username);
+
         return($data->data->status);
     }
 

@@ -68,9 +68,13 @@ class WalletController extends BaseController
         } else {
             if ($event->event == "transfer.success") {
                 Log::info("Response from paystack on transfer success: " . json_encode($event));
+                return response("", 200);
+            }
+            if ($event->event == "transfer.failed" || $event->event == "transfer.reversed" ) {
+                Log::info("Response from paystack on transfer failed or reversed: " . json_encode($event));
                 $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
                 $user = $profile->user;
-                return $this->saveWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
+                return $this->reverseWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
             }
             $user = User::where('email', $event->data->customer->email)->first();
             return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
@@ -137,21 +141,21 @@ class WalletController extends BaseController
         return response("", 200);
     }
 
-    private function saveWithdrawalTransaction($reference, $user, $amount)
+    private function reverseWithdrawalTransaction($reference, $user, $amount)
     {
-        $user->wallet->withdrawable_balance -= ($amount) / 100;
+        $user->wallet->withdrawable_balance += ($amount) / 100;
         $user->wallet->save();
         
         WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'DEBIT',
+            'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
-            'balance' => $user->wallet->non_withdrawable_balance,
-            'description' => 'Winnings Withdrawal Made',
+            'balance' => $user->wallet->withdrawable_balance,
+            'description' => 'Winnings Withdrawal Reversed',
             'reference' => $reference,
         ]);
 
-        Log::info('withdrawal successful from paystack for ' . $user->username);
+        Log::info('withdrawal reversed for ' . $user->username);
         return response("", 200);
     }
 
