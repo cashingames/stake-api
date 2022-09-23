@@ -91,6 +91,7 @@ class PaystackWithdrawalService
         Log::info("feedback from paystack: " . json_encode($data));
 
         return($data->data);
+        
     }
 
     public function getBanks()
