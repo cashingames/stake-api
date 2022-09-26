@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 
-class VerifyEmail extends Mailable
+class VerifyEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -31,7 +31,7 @@ class FeedbackTest extends TestCase
             "message_body" => "Lorem Ipsum dorem bla bla bla"
         ]);
 
-        Mail::assertSent(Feedback::class);
+        Mail::assertQueued(Feedback::class);
 
         $response->assertStatus(200);
     }

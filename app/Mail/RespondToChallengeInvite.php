@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use Carbon\Carbon;
 
-class RespondToChallengeInvite extends Mailable
+class RespondToChallengeInvite extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -38,12 +38,13 @@ class RespondToChallengeInvite extends Mailable
      */
     public function build()
     {
+        $challenge = Challenge::find($this->challengeId);
         return $this->to($this->player->email)
             ->from('noreply@cashingames.com')
             ->subject('Your Challenge Response !')
             ->view('emails.users.respondToChallengeInvite')
             ->with([
-                'opponent' => auth()->user()->username,
+                'opponent' => $challenge->opponent->username,
                 'user' => $this->player->username,
                 'year' => Carbon::now()->year,
                 'challengeId'=>$this->challengeId,
