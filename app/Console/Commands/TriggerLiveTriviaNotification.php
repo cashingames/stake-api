@@ -32,7 +32,7 @@ class TriggerLiveTriviaNotification extends Command
      */
     public function handle()
     {
-        $this->info("called at " . now());
+        
         Log::info("called at " . now());
         $activeLiveTrivia = LiveTrivia::active()->first();
 
@@ -44,7 +44,7 @@ class TriggerLiveTriviaNotification extends Command
         $liveTriviaStartTime = Carbon::parse($activeLiveTrivia->start_time);
 
         if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 60) {
-            $this->info("1 hour away");
+            
             Log::info("1 hour away at " . $liveTriviaStartTime);
 
             DB::table('fcm_push_subscriptions')->distinct()->chunk(500, function ($devices) {
@@ -55,7 +55,7 @@ class TriggerLiveTriviaNotification extends Command
             });
         }
         if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 30) {
-            $this->info("30 minutes away");
+            
             Log::info("30 minutes away at " . $liveTriviaStartTime);
 
             DB::table('fcm_push_subscriptions')->distinct()->chunk(500, function ($devices) {
@@ -67,10 +67,10 @@ class TriggerLiveTriviaNotification extends Command
         }
 
         if ($currentTime->diffInMinutes($liveTriviaStartTime) == 0) {
-            $this->info("Right on time");
+            
             Log::info("Right on time " . $liveTriviaStartTime);
             
-            DB::table('fcm_push_subscriptions')->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     (new SendPushNotification())->sendliveTriviaNotification($device, "now");
                 }

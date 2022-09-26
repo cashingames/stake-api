@@ -23,8 +23,11 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        $debitAmount = $this->user->wallet->withdrawable_balance;// $data['amount'];
+        $debitAmount = $this->user->wallet->withdrawable_balance; // $data['amount'];
 
+        if ($debitAmount <= 0) {
+            return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
+        }
         // if ($this->user->wallet->withdrawable_balance < $debitAmount) {
         //     return $this->sendError(false, 'Insufficient Balance');
         // }
@@ -57,6 +60,8 @@ class WithdrawWinningsController extends BaseController
         if (is_null($recipientCode)) {
             return $this->sendError(false, 'Recipient code could not be generated');
         }
+
+        Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
 
         $transferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
 
