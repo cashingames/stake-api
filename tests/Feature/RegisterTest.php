@@ -150,7 +150,7 @@ class RegisterTest extends TestCase
 
         ]);
 
-        Mail::assertSent(VerifyEmail::class);
+        Mail::assertQueued(VerifyEmail::class);
         $response->assertOk();
     }
 
