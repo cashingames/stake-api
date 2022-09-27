@@ -22,3 +22,9 @@ This will assist in keeping track of updates that need to be made in order place
 - `amount` column renamed to `amount_staked`
 - `amount_won` column added (data from `amount_won` column on game_sessions table should be migrated here)
 
+### Exhibitions staking
+- `odds_applied` column added (to store odds of the exhibition game session)
+
+### Trivia staking
+- `trivia_stakings` table added (to separate trivia stakings from exhibitions stakings)
+

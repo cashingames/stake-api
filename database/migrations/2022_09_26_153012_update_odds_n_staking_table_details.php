@@ -28,6 +28,10 @@ return new class extends Migration
             $table->renameColumn('amount', 'amount_staked');
             $table->decimal('amount_won', 15, 2)->default(0);
         });
+
+        Schema::table('exhibition_stakings', function(Blueprint $table){
+            $table->decimal('odds_applied')->after('game_session_id')->default(1);
+        });
     }
 
     /**
@@ -52,6 +56,10 @@ return new class extends Migration
         Schema::table('stakings', function (Blueprint $table) {
             $table->renameColumn('amount_staked', 'amount');
             $table->dropColumn(['amount_won']);
+        });
+
+        Schema::table('exhibition_stakings', function (Blueprint $table) {
+            $table->dropColumn(['odds_applied']);
         });
     }
 };
