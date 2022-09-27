@@ -63,7 +63,12 @@ class WithdrawWinningsController extends BaseController
 
         Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
 
-        $transferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
+        try {
+            $transferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
+        }
 
         $this->user->wallet->withdrawable_balance -= $debitAmount;
         $this->user->wallet->save();
