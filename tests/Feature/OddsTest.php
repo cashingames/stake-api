@@ -29,10 +29,10 @@ class OddsTest extends TestCase
     }
     public function test_that_standard_odds_can_be_fetched()
     {
-        $response = $this->get('/api/v3/odds/standard');
+        $response = $this->get('/api/v3/odds/staking');
 
         $response->assertJson([
-            'message' => 'standard odds fetched',
+            'message' => 'staking odds fetched',
         ]);
     }
 }

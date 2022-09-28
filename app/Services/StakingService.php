@@ -38,7 +38,7 @@ class StakingService
 
         $staking = Staking::create([
             'user_id' => $this->user->id,
-            'amount' => $stakingAmount,
+            'amount_staked' => $stakingAmount,
             'standard_odd' => 1
         ]);
 
@@ -48,10 +48,12 @@ class StakingService
 
     public function createExhibitionStaking($stakingId, $gameSessionId)
     {
-        ExhibitionStaking::create([
+        $record = ExhibitionStaking::create([
             'game_session_id' => $gameSessionId,
             'staking_id' => $stakingId
         ]);
+
+        return $record;
     }
 
 }

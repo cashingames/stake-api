@@ -17,6 +17,7 @@ This will assist in keeping track of updates that need to be made in order place
 ### staking odds table
 - `standard_odds` table renamed to `staking_odds`
 - `module` column added to staking_odds table (representing kind of game e.g exhibition, trivia)
+- `odds/standard` endpoint changed to `odds/staking` [Frontend client update required]
 
 ### stakings table
 - `amount` column renamed to `amount_staked`

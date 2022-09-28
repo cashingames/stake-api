@@ -326,7 +326,7 @@ class GameTest extends TestCase
 
         $staking = Staking::create([
             'user_id' => $this->user->id,
-            'amount' => 1000
+            'amount_staked' => 1000
         ]);
 
         ExhibitionStaking::create([
@@ -338,11 +338,18 @@ class GameTest extends TestCase
             "token" => $game->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => []
-        ]);
+        ])->dump();
 
         $this->assertDatabaseHas('wallet_transactions', [
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
+
+        // $this->assertDatabaseHas('exhibition_stakings', [
+        //     'staking_id' => $staking->id,
+        //     'game_session_id' => $game->id,
+        //     'standard_odd' => '',
+        //     'amount_won' => ''
+        // ]);
     }
 }

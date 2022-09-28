@@ -12,6 +12,7 @@ class ExhibitionStaking extends Model
     protected $fillable = [
         'game_session_id',
         'staking_id',
+        'odds_applied'
     ];
 
     public function staking()

@@ -15,8 +15,11 @@ return new class extends Migration
     {
         Schema::rename("odds_conditions_and_rules", "odds_rules");
         Schema::table('odds_rules', function(Blueprint $table){
-            $table->enum('odds_operation', ['+', '-', '*']);
+            // $table->string('odds_operation', ['+', '-', '*']);        
             $table->renameColumn('condition', 'display_name');
+        });
+        Schema::table('odds_rules', function(Blueprint $table){
+            $table->string('odds_operation', 2)->default('*')->comment("allowed values +, -, *");
         });
 
         Schema::rename('standard_odds', 'staking_odds');
@@ -43,8 +46,8 @@ return new class extends Migration
     {
         
         Schema::table('odds_rules', function(Blueprint $table){
-            $table->dropColumn('odds_operation');
-            $table->renameColumn('display_name', 'condition');
+            $table->dropColumn(['odds_operation', 'odds_symbol']);
+            // $table->renameColumn('display_name', 'condition');
         });
         Schema::rename("odds_rules", "odds_conditions_and_rules");
 

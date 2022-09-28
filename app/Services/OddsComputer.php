@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\OddsRule;
 use App\Models\User;
 use App\Traits\Utils\DateUtils;
 use Carbon\Carbon;
@@ -19,40 +20,40 @@ class OddsComputer{
         
         if($this->isNewPlayer($user)){
 
-            $newUserRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'GAME_COUNT_LESS_THAN_5')->first();    
+            $newUserRulesAndConditions = OddsRule::where('rule', 'GAME_COUNT_LESS_THAN_5')->first();    
             $oddsMultiplier = $newUserRulesAndConditions->odds_benefit;
-            $oddsCondition = $newUserRulesAndConditions->condition;
+            $oddsCondition = $newUserRulesAndConditions->display_name;
         }
         elseif ($averageScoreOfRecentGames <= 4){
 
-            $lowScoreRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'AVERAGE_SCORE_LESS_THAN_5')->first();    
+            $lowScoreRulesAndConditions = OddsRule::where('rule', 'AVERAGE_SCORE_LESS_THAN_5')->first();    
             $oddsMultiplier = $lowScoreRulesAndConditions->odds_benefit;
-            $oddsCondition = $lowScoreRulesAndConditions->condition;
+            $oddsCondition = $lowScoreRulesAndConditions->display_name;
         }
         elseif ($averageScoreOfRecentGames >= 5 && $averageScoreOfRecentGames <= 7){
 
-            $moderateScoreRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'AVERAGE_SCORE_BETWEEN_5_AND_7')->first();    
+            $moderateScoreRulesAndConditions = OddsRule::where('rule', 'AVERAGE_SCORE_BETWEEN_5_AND_7')->first();    
             $oddsMultiplier = $moderateScoreRulesAndConditions->odds_benefit;
-            $oddsCondition = $moderateScoreRulesAndConditions->condition;
+            $oddsCondition = $moderateScoreRulesAndConditions->display_name;
         }
         elseif($averageScoreOfRecentGames > 7){
 
-            $highScoreRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'AVERAGE_SCORE_GREATER_THAN_7')->first();    
+            $highScoreRulesAndConditions = OddsRule::where('rule', 'AVERAGE_SCORE_GREATER_THAN_7')->first();    
             $oddsMultiplier = $highScoreRulesAndConditions->odds_benefit;
-            $oddsCondition = $highScoreRulesAndConditions->condition;
+            $oddsCondition = $highScoreRulesAndConditions->display_name;
         }
 
         if ($this->currentTimeIsInSpecialHours() && $averageScoreOfRecentGames <= 4) {
 
-            $specialHourRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'AT_SPECIAL_HOUR')->first();    
+            $specialHourRulesAndConditions = OddsRule::where('rule', 'AT_SPECIAL_HOUR')->first();    
             $oddsMultiplier += $specialHourRulesAndConditions->odds_benefit;
-            $oddsCondition .= "_and_".$specialHourRulesAndConditions->condition;   
+            $oddsCondition .= "_and_".$specialHourRulesAndConditions->display_name;   
         }
         if ($this->isFirstGameAfterFunding($user)){
 
-            $fundingWalletRulesAndConditions = DB::table('odds_conditions_and_rules')->where('rule', 'FIRST_TIME_GAME_AFTER_FUNDING')->first();    
+            $fundingWalletRulesAndConditions = OddsRule::where('rule', 'FIRST_TIME_GAME_AFTER_FUNDING')->first();    
             $oddsMultiplier += $fundingWalletRulesAndConditions->odds_benefit;
-            $oddsCondition .= "_and_".$fundingWalletRulesAndConditions->condition;
+            $oddsCondition .= "_and_".$fundingWalletRulesAndConditions->display_name;
         }
         return [
             'oddsMultiplier' => $oddsMultiplier,

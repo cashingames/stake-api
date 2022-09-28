@@ -18,7 +18,7 @@ use App\Http\Controllers\FrontEndLogsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SocialSignInController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\GetStandardOddsController;
+use App\Http\Controllers\GetStakingOddsController;
 use App\Http\Controllers\EndChallengeGameController;
 use App\Http\Controllers\GetUserChallengeController;
 use App\Http\Controllers\LiveTriviaStatusController;
@@ -92,7 +92,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
-        Route::get('odds/standard', GetStandardOddsController::class);
+        Route::get('odds/staking', GetStakingOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);

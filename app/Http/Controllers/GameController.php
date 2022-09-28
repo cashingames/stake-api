@@ -15,7 +15,7 @@ use App\Models\Achievement;
 use App\Models\GameSession;
 use App\Models\Question;
 use App\Models\Staking;
-use App\Models\StandardOdd;
+use App\Models\StakingOdd;
 use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -435,10 +435,10 @@ class GameController extends BaseController
             $amountWon = 0;
             if (!is_null($staking)) {
                 $pointStandardOdd = 0;
-                $pointStandardOdd = StandardOdd::where('score', $points)->active()->first()->odd ?? 1;
+                $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
                 
-                $amountWon = $staking->amount *  $pointStandardOdd;
+                $amountWon = $staking->amount_staked *  $pointStandardOdd;
 
 
                 WalletTransaction::create([
@@ -473,7 +473,7 @@ class GameController extends BaseController
         $game->save();
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
-            $game->amount_staked = $staking ? $staking->amount : null;
+            $game->amount_staked = $staking ? $staking->amount_staked : null;
             $game->with_staking = $staking ? true : false;
         }
         

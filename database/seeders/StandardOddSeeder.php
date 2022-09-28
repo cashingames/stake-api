@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class StandardOddSeeder extends Seeder
+class StakingOddSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,7 +17,7 @@ class StandardOddSeeder extends Seeder
     {
         $odds = config('odds.standard');
         foreach ($odds as $key => $value) {
-            DB::table('standard_odds')->insert([
+            DB::table('staking_odds')->insert([
                 'score' => $key,
                 'odd' => $value
             ]);
