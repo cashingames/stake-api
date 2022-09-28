@@ -12,6 +12,7 @@ use App\Models\UserPlan;
 use App\Models\GameType;
 use App\Models\UserBoost;
 use App\Models\Achievement;
+use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
 use App\Models\Question;
 use App\Models\Staking;
@@ -431,12 +432,13 @@ class GameController extends BaseController
 
         $staking = null;
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
-            $staking = $this->user->exhibitionStakings()->where('game_session_id', $game->id)->first();
+            $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
+            
+            $staking = $exhibitionStaking->staking;
             $amountWon = 0;
             if (!is_null($staking)) {
-                $pointStandardOdd = 0;
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-
+                
                 
                 $amountWon = $staking->amount_staked *  $pointStandardOdd;
 
@@ -451,8 +453,9 @@ class GameController extends BaseController
                     'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
                 ]);
 
-                $this->user->exhibitionStakings()->where('game_session_id', $game->id)->update(['standard_odd' => $pointStandardOdd]);
-                $game->amount_won = $amountWon;
+                $staking->update(['amount_won' => $amountWon]);
+                ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
+                // $game->amount_won = $amountWon;
             }
         }
         

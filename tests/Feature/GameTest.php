@@ -23,9 +23,12 @@ use App\Models\UserPoint;
 use App\Models\Achievement;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
+use App\Models\Option;
 use App\Models\Staking;
+use App\Models\StakingOdd;
 use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
+use Database\Seeders\StakingOddSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -63,6 +66,7 @@ class GameTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
+        $this->seed(StakingOddSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -229,8 +233,9 @@ class GameTest extends TestCase
 
     public function test_exhibition_game_can_be_started_with_staking()
     {
-        Question::factory()
-            ->count(50)
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(25)
             ->create();
 
         UserPlan::create([
@@ -302,10 +307,15 @@ class GameTest extends TestCase
     {   
         FeatureFlag::enable('odds');
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
-        Question::factory()
-        ->count(50)
-        ->create();
-
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(10)
+            ->create();
+        $chosenOptions = [];
+        foreach ($questions as $question){
+            $chosenOptions[] = $question->options()->inRandomOrder()->first();
+        }
+        
         UserPlan::create([
             'plan_id' => $this->plan->id,
             'user_id' => $this->user->id,
@@ -336,7 +346,7 @@ class GameTest extends TestCase
     
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
-            "chosenOptions" => [],
+            "chosenOptions" => $chosenOptions,
             "consumedBoosts" => []
         ])->dump();
 
@@ -344,12 +354,22 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
+        $correctOptionsCount = collect($chosenOptions)->filter(function($value, $key){
+            return base64_decode($value->is_correct) == 1;
+        })->count();
 
-        // $this->assertDatabaseHas('exhibition_stakings', [
-        //     'staking_id' => $staking->id,
-        //     'game_session_id' => $game->id,
-        //     'standard_odd' => '',
-        //     'amount_won' => ''
-        // ]);
+        $expectedOdd = StakingOdd::where('score', $correctOptionsCount)->first()->odd;
+        
+        $this->assertDatabaseHas('exhibition_stakings', [
+            'staking_id' => $staking->id,
+            'game_session_id' => $game->id,
+            'odds_applied' => $expectedOdd,
+        ]);
+
+        $this->assertDatabaseHas('stakings', [
+            'id' => $staking->id,
+            'amount_staked' => $staking->amount_staked,
+            'amount_won' => $staking->amount_staked * $expectedOdd
+        ]);
     }
 }

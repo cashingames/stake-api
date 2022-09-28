@@ -25,12 +25,14 @@ class GameSessionResponse{
         $response->points_gained = $gameSession->points_gained;
         $response->state = $gameSession->state;
         $response->trivia_id = $gameSession->trivia_id;
-        $response->amount_won = $gameSession->amount_won;
+        
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            if ($staking = ExhibitionStaking::where('game_session_id', $gameSession->id)->first()) {
+            if ($exhibitionStaking = ExhibitionStaking::where('game_session_id', $gameSession->id)->first()) {
                 $response->with_staking = true;
-                $response->amount_staked = $staking->staking->amount_staked;
+                $response->amount_staked = $exhibitionStaking->staking->amount_staked;
+                $response->amount_won = $exhibitionStaking->staking->amount_won;
+                $response->staking_odd = $exhibitionStaking->odds_applied;
             }    
         }
         
