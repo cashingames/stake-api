@@ -47,7 +47,7 @@ class TriggerLiveTriviaNotification extends Command
             
             Log::info("1 hour away at " . $liveTriviaStartTime);
 
-            DB::table('fcm_push_subscriptions')->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     (new SendPushNotification())->sendliveTriviaNotification($device, "in 1 hour");
                 }
@@ -58,7 +58,7 @@ class TriggerLiveTriviaNotification extends Command
             
             Log::info("30 minutes away at " . $liveTriviaStartTime);
 
-            DB::table('fcm_push_subscriptions')->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     (new SendPushNotification())->sendliveTriviaNotification($device, "in 30 minutes");
                 }

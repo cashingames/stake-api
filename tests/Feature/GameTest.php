@@ -348,7 +348,7 @@ class GameTest extends TestCase
             "token" => $game->session_token,
             "chosenOptions" => $chosenOptions,
             "consumedBoosts" => []
-        ])->dump();
+        ]);
 
         $this->assertDatabaseHas('wallet_transactions', [
             'wallet_id' =>  $this->user->wallet->id,

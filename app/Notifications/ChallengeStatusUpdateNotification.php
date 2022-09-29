@@ -61,7 +61,7 @@ class ChallengeStatusUpdateNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => "Your opponent, {$this->challenge->opponent->username} has {$this->newStatus} your invite",
+            'title' => "Your opponent, {$this->challenge->opponent->username} has {$this->newStatus} your challenge",
             'action_type' => PushNotificationType::Challenge,
             'action_id' => $this->challenge->id
         ];
