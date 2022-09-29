@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StandardOdd;
+use App\Models\StakingOdd;
 use Illuminate\Http\Request;
 
-class GetStandardOddsController extends BaseController
+class GetStakingOddsController extends BaseController
 {
     /**
      * Handle the incoming request.
@@ -15,7 +15,7 @@ class GetStandardOddsController extends BaseController
      */
     public function __invoke()
     {
-        $odds = StandardOdd::active()->orderBy('score', 'DESC')->get();
-        return $this->sendResponse($odds, 'standard odds fetched');
+        $odds = StakingOdd::active()->orderBy('score', 'DESC')->get();
+        return $this->sendResponse($odds, 'staking odds fetched');
     }
 }

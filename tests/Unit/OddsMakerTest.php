@@ -51,7 +51,7 @@ class OddsMakerTest extends TestCase
         $oddsComputer = new OddsComputer();
         $oddEffect = $oddsComputer->compute($user, NULL);
         $expectation = 3;
-        echo "Current hour: {$this->currentHour}\n";
+        
         $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
         if (in_array($currentHour, $this->specialHours)){
             $expectation += 1.5;

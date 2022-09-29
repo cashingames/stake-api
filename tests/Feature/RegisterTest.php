@@ -142,7 +142,7 @@ class RegisterTest extends TestCase
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
-            'username' => 'user',
+            'username' => 'user_email',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
@@ -164,7 +164,7 @@ class RegisterTest extends TestCase
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
-            'username' => 'user',
+            'username' => 'user_otp',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
