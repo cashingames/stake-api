@@ -47,4 +47,8 @@ class GameSession extends Model
     public function scopeCompleted($query){
         return $query->where('state', 'COMPLETED');
     }
+
+    public function odds(){
+        return $this->hasMany(GameSessionOdd::class, 'game_session_id', 'id');
+    }
 }

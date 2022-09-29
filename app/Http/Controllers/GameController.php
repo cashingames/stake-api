@@ -14,6 +14,7 @@ use App\Models\UserBoost;
 use App\Models\Achievement;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
+use App\Models\GameSessionOdd;
 use App\Models\Question;
 use App\Models\Staking;
 use App\Models\StakingOdd;
@@ -253,6 +254,7 @@ class GameController extends BaseController
             
 
             $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null));
+
             $gameSession->odd_multiplier = $odd['oddsMultiplier'];
             $gameSession->odd_condition = $odd['oddsCondition'];
         }
