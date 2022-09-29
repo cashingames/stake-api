@@ -92,7 +92,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
-        Route::get('odds/staking', GetStakingOddsController::class);
+        Route::get('odds/standard', GetStakingOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
