@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ChallengeStaking;
 use App\Models\ExhibitionStaking;
 use App\Models\Staking;
 use App\Models\User;
@@ -50,6 +51,15 @@ class StakingService
     {
         $record = ExhibitionStaking::create([
             'game_session_id' => $gameSessionId,
+            'staking_id' => $stakingId
+        ]);
+
+        return $record;
+    }
+
+    public function createChallengeStaking($stakingId, $challengeId){
+        $record = ChallengeStaking::create([
+            'challenge_id' => $challengeId,
             'staking_id' => $stakingId
         ]);
 

@@ -40,10 +40,11 @@ class ChallengeGameService{
 
             //database notification
             $opponent->notify(new ChallengeReceivedNotification($challenge, $creator));
+            
             //email notification
             Mail::send(new ChallengeInvite($opponent, $challenge));
+            
             //push notification
-
             dispatch(function() use($creator, $opponent, $challenge){
                 $pushAction = new SendPushNotification();
                 $pushAction->sendChallengeInviteNotification($creator, $opponent, $challenge);

@@ -40,5 +40,9 @@ return [
     'withdrawable_wallet' => [
         'enabled' => env('FEATURE_FLAG_WITHDRAWABLE_WALLET_ENABLED', true),
         'activate_on' => null
+    ],
+    'challenge_game_staking' => [
+        'enabled' => env('FEATURE_FLAG_CHALLENGE_GAME_STAKING_ENABLED', true),
+        'activate_on' => null
     ]
 ];
