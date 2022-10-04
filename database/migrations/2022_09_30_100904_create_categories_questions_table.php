@@ -13,16 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('game_session_odds', function (Blueprint $table) {
+        Schema::create('categories_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('game_session_id');
-            $table->foreignId('odds_rule_id')->constrained('odds_rules');
-            $table->decimal('odds_benefit', 10, 2)->default(0)->comment("added so as to maintain historical value because odds_benefit from odds_rules table can change");
-
+            $table->foreignId('category_id');
+            $table->foreignId('question_id');
             $table->timestamps();
-           
         });
-        
     }
 
     /**
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('game_session_odds');
+        Schema::dropIfExists('categories_questions');
     }
 };

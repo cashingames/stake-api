@@ -23,20 +23,20 @@ class QuestionSeeder extends Seeder
     public function run()
     {
         // if (env('APP_ENV') == 'testing' ||  env('APP_ENV') == 'local') {
-        //     Question::factory()
-        //         ->hasOptions(4)
-        //         ->count(50)
-        //         ->create();
+            Question::factory()
+                ->hasOptions(4)
+                ->count(150)
+                ->create();
         // } else {
-        $inputFileName = base_path('SOEMTHING' . '.xlsx');
-        $reader = IOFactory::createReader('Xlsx');
-        $reader->setReadDataOnly(TRUE);
-        $spreadsheet = $reader->load($inputFileName);
+        // $inputFileName = base_path('SOEMTHING' . '.xlsx');
+        // $reader = IOFactory::createReader('Xlsx');
+        // $reader->setReadDataOnly(TRUE);
+        // $spreadsheet = $reader->load($inputFileName);
 
-        foreach ($spreadsheet->getAllSheets() as $currentSheet) {
+        // foreach ($spreadsheet->getAllSheets() as $currentSheet) {
 
-            $this->readWorkSheet($currentSheet);
-        }
+        //     $this->readWorkSheet($currentSheet);
+        // }
         // }
     }
 
