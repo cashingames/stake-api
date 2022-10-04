@@ -8,9 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\SendPushNotification;
+use App\Enums\FeatureFlags;
 use App\Mail\RespondToChallengeInvite;
 use App\Http\ResponseHelpers\ChallengeDetailsResponse;
 use App\Notifications\ChallengeStatusUpdateNotification;
+use App\Services\FeatureFlag;
+use App\Services\StakingService;
 
 class ChallengeInviteStatusController extends BaseController
 {
@@ -26,6 +29,19 @@ class ChallengeInviteStatusController extends BaseController
             return $this->sendError('Challenge info not found', 'Challenge info not found');
         }
         $status = $request->status == 1 ? "ACCEPTED" : "DECLINED";
+
+        if (FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)){
+            $challenge = Challenge::findOrFail($request->challenge_id);
+            if (count($challenge->stakings) > 0){
+                if ($this->user->wallet->non_withdrawable_balance < $challenge->stakings()->first()->staking->amount_staked){
+                    return $this->sendError('Insufficient wallet balance', 'You do not have enough balance to accept this challenge');
+                }
+                $staking = $challenge->stakings()->first()->staking;
+                $stakingService = new StakingService($this->user);
+                $stakingId = $stakingService->stakeAmount($staking->amount_staked);
+                $stakingService->createChallengeStaking($stakingId, $challenge->id);
+            }
+        }
         $updatedChallenge = Challenge::changeChallengeStatus($status, $request->challenge_id);
 
         $player = User::find($updatedChallenge->user_id);

@@ -13,11 +13,13 @@ class ChallengeStaking extends Model
 
     protected $guarded = [];
 
+    protected $with = ['staking'];
+
     public function staking(){
         return $this->belongsTo(Staking::class);
     }
 
-    public function challengeGameSession(){
-        return $this->belongsTo(ChallengeGameSession::class, 'challenge_game_session_id');
+    public function challenge(){
+        return $this->belongsTo(Challenge::class, 'challenge_id');
     }
 }

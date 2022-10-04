@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Notifications\ChallengeReceivedNotification;
+use App\Services\StakingService;
 
 class ChallengeGameTest extends TestCase
 {
@@ -31,6 +32,7 @@ class ChallengeGameTest extends TestCase
      */
     const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
     const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
+    const CHALLENGE_RESPONSE_URL = "/api/v3/challenge/invite/respond";
 
     protected $user;
     protected $category;
@@ -106,5 +108,50 @@ class ChallengeGameTest extends TestCase
         Mail::assertQueued(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         
+    }
+
+    public function test_can_accept_challenge_with_staking(){
+        FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
+        
+        $this->user->wallet()->update([
+            'non_withdrawable_balance' => 2500,
+        ]);
+
+        $opponent = $this->user;
+        $creator = User::where('id', '<>', $opponent->id)->first();
+        $category = $this->category;
+
+        $amountToStake = 1500;
+
+        $challenge = Challenge::create([
+            'user_id' => $creator->id,
+            'opponent_id' => $opponent->id,
+            'category_id' => $category->id,
+            'status' => 'PENDING'
+        ]);
+
+        $stakingService = new StakingService($creator);
+        $stakingId = $stakingService->stakeAmount($amountToStake);
+        $stakingService->createChallengeStaking($stakingId, $challenge->id);
+
+        $acceptanceResponse = $this->postJson(self::CHALLENGE_RESPONSE_URL, [
+            'status' => true,
+            'challenge_id' => $challenge->id
+        ]);
+
+        $acceptanceResponse->assertOk();
+
+        $this->assertDatabaseHas('stakings', [
+            'amount_staked' => $amountToStake,
+            'user_id' => $opponent->id
+        ]);
+
+        $staking = Staking::where('user_id', $opponent->id)->first();
+
+        $this->assertDatabaseHas('challenge_stakings', [
+            'challenge_id' => $challenge->id,
+            'staking_id' => $staking->id
+        ]);
+
     }
 }

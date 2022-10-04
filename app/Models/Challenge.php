@@ -70,4 +70,8 @@ class Challenge extends Model
             return $data;
         }
     }
+
+    public function stakings(){
+        return $this->hasMany(ChallengeStaking::class, 'challenge_id');
+    }
 }
