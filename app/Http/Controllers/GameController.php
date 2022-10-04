@@ -436,7 +436,7 @@ class GameController extends BaseController
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
             
-            $staking = $exhibitionStaking->staking;
+            $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
             if (!is_null($staking)) {
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
@@ -464,15 +464,15 @@ class GameController extends BaseController
         
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
-            $game->points_gained = $points;
-        }
+        // if ((FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) && $staking != null){
+        //     $game->points_gained = $points;
+        // }
         if (FeatureFlag::isEnabled('odds') && $staking == null){
             $game->points_gained = $points * $game->odd_multiplier;
         }else{
             $game->points_gained = $points;
         }
-        // $game->points_gained = FeatureFlag::isEnabled('odds') ? $points * $game->odd_multiplier : $points; 
+        
         $game->total_count = $points + $wrongs;
         
         $game->save();

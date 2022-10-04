@@ -162,6 +162,7 @@ class GameTest extends TestCase
 
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
     {
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state'=>'ONGOING']);
