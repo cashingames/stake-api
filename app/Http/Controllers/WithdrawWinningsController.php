@@ -28,10 +28,14 @@ class WithdrawWinningsController extends BaseController
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
         }
-        // if ($this->user->wallet->withdrawable_balance < $debitAmount) {
-        //     return $this->sendError(false, 'Insufficient Balance');
-        // }
-        
+        if ($debitAmount < config('trivia.staking.min_withdrawal_amount') ) {
+            return $this->sendError(false, 'You can not withdraw less than NGN'.config('trivia.staking.min_withdrawal_amount' ));
+        }
+        if ($debitAmount > config('trivia.staking.max_withdrawal_amount') ) {
+            $debitAmount = config('trivia.staking.max_withdrawal_amount');
+            // dd( $debitAmount);
+        }
+       
         $paystackWithdrawal = new PaystackWithdrawalService(config('trivia.payment_key'));
 
         
@@ -92,6 +96,9 @@ class WithdrawWinningsController extends BaseController
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
         if ($transferInitiated->status === "success"){
+            if ($debitAmount == config('trivia.staking.max_withdrawal_amount')){
+                return $this->sendResponse(true, "NGN".config('trivia.staking.max_withdrawal_amount')." is being successfully processed to your bank account you can withdraw the rest in 24hrs");
+            }
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
     }

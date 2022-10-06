@@ -29,7 +29,9 @@ return [
     'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
   'staking'=>[
-    'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3)
+    'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3),
+    'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
+    'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000)
   ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
