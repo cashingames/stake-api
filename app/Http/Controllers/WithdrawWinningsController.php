@@ -97,7 +97,7 @@ class WithdrawWinningsController extends BaseController
         }
         if ($transferInitiated->status === "success"){
             if ($debitAmount == config('trivia.staking.max_withdrawal_amount')){
-                return $this->sendResponse(true, "NGN".config('trivia.staking.max_withdrawal_amount')." is being successfully processed to your bank account you can withdraw the rest in 24hrs");
+                return $this->sendResponse(true, "NGN".config('trivia.staking.max_withdrawal_amount')." is being successfully processed to your bank account.");
             }
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
