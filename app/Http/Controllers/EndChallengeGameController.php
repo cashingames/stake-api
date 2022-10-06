@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChallengeGameSession;
 use App\Actions\SendPushNotification;
+use App\Notifications\ChallengeCompletedNotification;
 use App\Notifications\ChallengeStatusUpdateNotification;
 
 class EndChallengeGameController extends  BaseController
@@ -80,7 +81,7 @@ class EndChallengeGameController extends  BaseController
         } else {
             $recipient = $game->challenge->users;
         }
-        $recipient->notify(new ChallengeStatusUpdateNotification($game->challenge, 'COMPLETED'));
+        $recipient->notify(new ChallengeCompletedNotification($game->challenge, $this->user));
         
         return $this->sendResponse($game, 'Challenge Game Ended');
     }

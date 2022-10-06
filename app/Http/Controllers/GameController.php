@@ -58,19 +58,31 @@ class GameController extends BaseController
         $categories = Cache::rememberForever('categories', fn () => Category::all());
 
 
+        // $gameInfo = DB::select("
+        //                 SELECT 
+        //                     gt.name game_type_name, gt.id game_type_id, 
+        //                     c.category_id category_id, c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+        //                     (SELECT name from categories WHERE categories.id = c.category_id) category_name,
+        //                     (SELECT count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
+        //                 FROM questions q
+        //                 JOIN categories c ON c.id = q.category_id
+        //                 JOIN game_types gt ON gt.id = q.game_type_id 
+        //                 WHERE q.deleted_at IS NULL AND q.is_published = true
+        //                 GROUP by q.category_id, q.game_type_id
+        //                 HAVING count(q.id) > 0
+        //             ");
+
         $gameInfo = DB::select("
-                        SELECT 
-                            gt.name game_type_name, gt.id game_type_id, 
-                            c.category_id category_id, c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
-                            (SELECT name from categories WHERE categories.id = c.category_id) category_name,
-                            (SELECT count(id) from game_sessions gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) played
-                        FROM questions q
-                        JOIN categories c ON c.id = q.category_id
-                        JOIN game_types gt ON gt.id = q.game_type_id 
-                        WHERE q.deleted_at IS NULL AND q.is_published = true
-                        GROUP by q.category_id, q.game_type_id
-                        HAVING count(q.id) > 0
-                    ");
+        SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id, 
+        c.id as subcategory_id, c.name subcategory_name, count(q.id) questons, 
+        (SELECT name from categories WHERE categories.id = c.category_id) category_name, 
+        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played 
+        FROM questions q 
+        JOIN categories_questions cq ON cq.question_id = q.id 
+        JOIN categories AS c ON c.id = cq.category_id 
+        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL AND q.is_published = true 
+        GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
+        ");
 
         $gameInfo = collect($gameInfo);
         $toReturnTypes = [];
@@ -436,7 +448,7 @@ class GameController extends BaseController
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
             
-            $staking = $exhibitionStaking->staking;
+            $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
             if (!is_null($staking)) {
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
@@ -464,15 +476,15 @@ class GameController extends BaseController
         
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
-            $game->points_gained = $points;
-        }
+        // if ((FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) && $staking != null){
+        //     $game->points_gained = $points;
+        // }
         if (FeatureFlag::isEnabled('odds') && $staking == null){
             $game->points_gained = $points * $game->odd_multiplier;
         }else{
             $game->points_gained = $points;
         }
-        // $game->points_gained = FeatureFlag::isEnabled('odds') ? $points * $game->odd_multiplier : $points; 
+        
         $game->total_count = $points + $wrongs;
         
         $game->save();

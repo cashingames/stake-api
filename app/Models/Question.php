@@ -30,9 +30,9 @@ class Question extends Model
     return $this->hasMany(Option::class)->inRandomOrder();
   }
 
-  public function category()
+  public function categories()
   {
-    return $this->belongsTo(Category::class);
+    return $this->belongsToMany(Category::class, 'categories_questions')->withTimestamps();
   }
 
   public function games()

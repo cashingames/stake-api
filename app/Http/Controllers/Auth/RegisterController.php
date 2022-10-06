@@ -192,7 +192,7 @@ class RegisterController extends BaseController
                 //throw $th;
                 //send mail to our admin to notify of inability to deliver SMS via OTP
                 Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+                // return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
             }
         }
         if(FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)){

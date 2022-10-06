@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
             BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,
-            OddsConditionsAndRulesSeeder::class
+            OddsConditionsAndRulesSeeder::class,
             // TriviaSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
             // WalletSeeder::class,
             // ProfileSeeder::class,
-            // QuestionSeeder::class
+            QuestionSeeder::class
             // StakingSeeder::class
            
         ]);

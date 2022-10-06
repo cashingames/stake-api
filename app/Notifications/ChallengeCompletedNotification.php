@@ -2,29 +2,31 @@
 
 namespace App\Notifications;
 
+use App\Models\User;
+use App\Models\Challenge;
 use Illuminate\Bus\Queueable;
 use App\Enums\PushNotificationType;
-use App\Models\Challenge;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ChallengeStatusUpdateNotification extends Notification implements ShouldQueue
+class ChallengeCompletedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $challenge;
 
-    protected $newStatus;
+    protected $currentPlayer;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Challenge $challenge, $newStatus)
+    public function __construct(Challenge $challenge, $currentPlayer)
     {
         $this->challenge = $challenge;
-        $this->newStatus = $newStatus;
+        $this->currentPlayer = $currentPlayer;
     }
 
     /**
@@ -61,7 +63,7 @@ class ChallengeStatusUpdateNotification extends Notification implements ShouldQu
     public function toArray($notifiable)
     {
         return [
-            'title' => "Your opponent, {$this->challenge->opponent->username} has {$this->newStatus} your challenge invitation",
+            'title' => "Your opponent, {$this->currentPlayer->username} has completed the challenge",
             'action_type' => PushNotificationType::Challenge,
             'action_id' => $this->challenge->id
         ];
