@@ -187,7 +187,7 @@ class RegisterController extends BaseController
     {   
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
             try {
-                $smsService->deliverOTP($user);
+                    $smsService->deliverOTP($user);
             } catch (\Throwable $th) {
                 //throw $th;
                 //send mail to our admin to notify of inability to deliver SMS via OTP

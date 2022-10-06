@@ -36,4 +36,5 @@ return [
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
+  'challenge_staking_platform_charge_percent' => env('CHALLENGE_STAKING_PLATFORM_CHARGE_PERCENT', 0)
 ];
