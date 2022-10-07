@@ -29,12 +29,15 @@ return [
     'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
   'staking'=>[
-    'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3)
+    'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3),
+    'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
+    'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000)
   ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
-  'challenge_staking_platform_charge_percent' => env('CHALLENGE_STAKING_PLATFORM_CHARGE_PERCENT', 0)
+  'challenge_staking_platform_charge_percent' => env('CHALLENGE_STAKING_PLATFORM_CHARGE_PERCENT', 0),
+  'duration_hours_before_challenge_staking_expiry' => env('DURATION_HOURS_BEFORE_CHALLENGE_STAKING_EXPIRY', 48)
 ];

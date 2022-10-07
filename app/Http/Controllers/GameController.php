@@ -147,6 +147,7 @@ class GameController extends BaseController
         $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
         $result->maximumStakeAmount = config('odds.maximum_staking_amount');
         $result->minimumStakeAmount = config('odds.minimum_staking_amount');
+        $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry');
 
         return $this->sendResponse($result, "Common data");
     }

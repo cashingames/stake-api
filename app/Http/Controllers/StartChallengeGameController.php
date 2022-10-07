@@ -115,7 +115,7 @@ class StartChallengeGameController extends  BaseController
             ];
         }
         $questions = $category->questions()
-            ->whereIn('id', $qstArray)
+            ->whereIn('question_id', $qstArray)
             ->get();
         // ->orderByRaw(DB::raw("FIELD(id, $unsortIds)"))
         DB::table('challenge_questions')->insert($data);
