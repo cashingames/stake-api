@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Challenge;
+use Illuminate\Support\Str;
 use App\Mail\ChallengeInvite;
+use App\Models\ChallengeStaking;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\SendPushNotification;
@@ -54,5 +58,42 @@ class ChallengeGameService{
             array_push($createdChallenges, $challenge);
         }
         return $createdChallenges;
+    }
+
+    public function creditStakeWinner(Challenge $challenge){
+        if ($challenge->stakings()->count() < 1){
+            // this challenge is not a staking one
+            return false;
+        }
+        if ($challenge->challengeGameSessions()->where('state', 'COMPLETED')->count() < 2){
+            // both users have not completed this game
+            return false;
+        }
+
+        $gameSessions = $challenge->challengeGameSessions()->orderBy('correct_count', 'desc')->limit(2)->get();
+
+        if ($gameSessions[0]->correct_count == $gameSessions[1]->correct_count){
+            // game ended in a draw, credit both participants back
+            return true;
+        }
+
+        $winningUser = User::find($gameSessions[0]->user_id);
+        $challengeStaking = ChallengeStaking::where('user_id', $gameSessions[0]->user_id)
+            ->where('challenge_id', $challenge->id)
+            ->first();
+        $amountWon = $challengeStaking->staking()->first()->amount_staked * 2;
+        
+        WalletTransaction::create([
+            'wallet_id' => $winningUser->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => $amountWon,
+            'balance' => $winningUser->wallet->withdrawable_balance,
+            'description' => 'Staking winning of ' . $amountWon . ' on challenge',
+            'reference' => Str::random(10),
+            'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+        ]);
+        $challengeStaking->staking()->update(['amount_won' => $amountWon]);
+
+        return $challenge;
     }
 }

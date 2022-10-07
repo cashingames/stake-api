@@ -60,7 +60,8 @@ class StakingService
     public function createChallengeStaking($stakingId, $challengeId){
         $record = ChallengeStaking::create([
             'challenge_id' => $challengeId,
-            'staking_id' => $stakingId
+            'staking_id' => $stakingId,
+            'user_id' => Staking::find($stakingId)->user_id
         ]);
 
         return $record;

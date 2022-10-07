@@ -26,7 +26,7 @@ class UserFactory extends Factory
 
             'username' => $this->faker->username,
             'phone_number'=>$this->faker->phoneNumber,
-            'email' => $this->faker->unique()->safeEmail,
+            'email' => $this->faker->unique()->safeEmail . "" . rand(10, 999),
             'email_verified_at' => now(),
             'phone_verified_at' => now(),
             'otp_token'=> mt_rand(10000,99999) . "" . rand(10, 999),

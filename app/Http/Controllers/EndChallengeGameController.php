@@ -11,6 +11,7 @@ use App\Models\ChallengeGameSession;
 use App\Actions\SendPushNotification;
 use App\Notifications\ChallengeCompletedNotification;
 use App\Notifications\ChallengeStatusUpdateNotification;
+use App\Services\ChallengeGameService;
 
 class EndChallengeGameController extends  BaseController
 {
@@ -20,7 +21,7 @@ class EndChallengeGameController extends  BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, SendPushNotification $sendPushNotification)
     {
         Log::info($request->all());
 
@@ -73,8 +74,7 @@ class EndChallengeGameController extends  BaseController
         }
 
         
-        $pushAction = new SendPushNotification();
-        $pushAction->sendChallengeCompletedNotification($this->user, $game->challenge);
+        $sendPushNotification->sendChallengeCompletedNotification($this->user, $game->challenge);
 
         if ($this->user->id == $game->challenge->user_id) {
             $recipient = $game->challenge->opponent;
@@ -82,6 +82,9 @@ class EndChallengeGameController extends  BaseController
             $recipient = $game->challenge->users;
         }
         $recipient->notify(new ChallengeCompletedNotification($game->challenge, $this->user));
+        
+        $challengeGameService = new ChallengeGameService();
+        $challengeGameService->creditStakeWinner($game->challenge);
         
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
