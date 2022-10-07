@@ -2,6 +2,7 @@
 
 namespace App\Http\ResponseHelpers;
 
+use App\Models\ChallengeStaking;
 use \Illuminate\Http\JsonResponse;
 use App\Traits\Utils\AvatarUtils;
 
@@ -40,6 +41,14 @@ class ChallengeDetailsResponse
         $presenter->status = $data->challengeDetails->status;
         $presenter->gameModeId = $data->gameModeId;
         $presenter->gameModeName = $data->gameModeName;
+
+        $stakes = ChallengeStaking::where('challenge_id', $data->challengeDetails->id)->oldest()->get();
+        if (count($stakes) > 0){
+            $presenter->withStaking = true;
+            $presenter->stakingAmount = $stakes->first()->staking->amount_staked;
+            $presenter->finalStakingWinAmount = $stakes->first()->staking->amount_staked * 2;
+        }
+        
 
         return response()->json($presenter);
     }
