@@ -45,6 +45,7 @@ class FeatureFlag{
                 return true;
             }
         }
+        return false;
     }
 
     public static function isAllEnabled(array $features_list){

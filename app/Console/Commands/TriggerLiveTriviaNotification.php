@@ -86,5 +86,6 @@ class TriggerLiveTriviaNotification extends Command
                 // Log::info("Attempting to send live trivia notification to 500 devices at start");
             });
         }
+        return 0;
     }
 }

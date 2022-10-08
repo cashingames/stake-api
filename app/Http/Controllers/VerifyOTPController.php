@@ -18,7 +18,7 @@ class VerifyOTPController extends BaseController
     {
         $data = $request->validate([
             // 'email' => ['required', 'string'],
-            'token' => ['required', 'string'],
+            'token' => ['required', 'alpha_num'],
             'phone_number' => ['required', 'string', 'size:11']
         ]);
 
@@ -29,6 +29,7 @@ class VerifyOTPController extends BaseController
         }
 
         $user->phone_verified_at = now();
+        $user->otp_token = null;
         $user->save();
 
         Log::info($user->username . " verified with OTP");

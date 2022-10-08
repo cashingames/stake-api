@@ -6,6 +6,9 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use App\Services\SMS\SMSProviderInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 class TermiiService implements SMSProviderInterface{
 
     protected $baseUrl = "https://api.ng.termii.com";

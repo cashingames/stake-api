@@ -37,5 +37,6 @@ class CreditWinnings extends Command
                 }
                 $transactions->each->update(['settled_at' => now()]);
             }, $column = 'id');
+        return 0;
     }
 }
