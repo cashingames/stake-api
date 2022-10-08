@@ -31,4 +31,8 @@ class FeatureFlagTest extends TestCase
         FeatureFlag::disable('notification_history');
         $this->assertTrue(config(['features.notification_history.enabled']) == false);
     }
+
+    public function test_can_fetch_feature_flags(){
+        $response = $this->getJson("/api/v3/feature-flags")->assertOk();
+    }
 }

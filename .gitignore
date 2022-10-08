@@ -19,3 +19,4 @@ yarn-error.log
 /database/database_testing.sqlite
 *FCMPushNotificationTest.php
 /reports
+/tests/reports
