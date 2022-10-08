@@ -273,4 +273,80 @@ class ChallengeGameTest extends TestCase
             'transaction_type' => 'CREDIT'
         ]);
     }
+
+    public function test_stake_is_shared_when_game_ends_in_draw(){
+        FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
+        $creator = $this->user;
+        $opponent = User::where('id', '<>', $this->user->id)->first();
+        $category = $this->category;
+
+        $creator->wallet()->update([
+            'non_withdrawable_balance' => 2500,
+        ]);
+        $opponent->wallet()->update([
+            'non_withdrawable_balance' => 2500,
+        ]);
+
+
+        $amountToStake = 2000;
+
+        $challengeInvitationResponse = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
+            'opponentId' => $opponent->id,
+            'categoryId' => $category->id,
+            'staking_amount' => $amountToStake
+        ]);
+
+        $challenge = Challenge::where('user_id', $creator->id)->where('opponent_id', $opponent->id)->first();
+
+
+        $acceptanceResponse = $this->actingAs($opponent)->postJson(self::CHALLENGE_RESPONSE_URL, [
+            'status' => true,
+            'challenge_id' => $challenge->id
+        ]);
+
+
+        $playerOneGameSession = ChallengeGameSession::create([
+            'challenge_id' => $challenge->id,
+            'user_id' => $this->user->id,
+            'game_type_id' => 2,
+            'category_id' => $category->id,
+            'wrong_count' => 3,
+            'correct_count' => 6,
+            'state' => 'COMPLETED',
+            'session_token' => Str::random()
+        ]);
+
+        $playerTwoGameSession = ChallengeGameSession::create([
+            'challenge_id' => $challenge->id,
+            'user_id' => $opponent->id,
+            'game_type_id' => 2,
+            'category_id' => $category->id,
+            'wrong_count' => 3,
+            'correct_count' => 6,
+            'state' => 'COMPLETED',
+            'session_token' => Str::random()
+        ]);
+
+        $challengeGameService = new ChallengeGameService();
+        $challengeGameService->creditStakeWinner($challenge);
+
+        $this->assertDatabaseHas('stakings', [
+            'user_id' => $opponent->id,
+            'amount_won' => $amountToStake
+        ]);
+
+        $this->assertDatabaseHas('stakings', [
+            'user_id' => $creator->id,
+            'amount_won' => $amountToStake
+        ]);
+
+        $this->assertDatabaseHas('wallet_transactions', [
+            'wallet_id' => $opponent->wallet->id,
+            'transaction_type' => 'CREDIT'
+        ]);
+        $this->assertDatabaseHas('wallet_transactions', [
+            'wallet_id' => $creator->wallet->id,
+            'transaction_type' => 'CREDIT'
+        ]);
+    }
 }

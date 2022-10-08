@@ -74,6 +74,23 @@ class ChallengeGameService{
 
         if ($gameSessions[0]->correct_count == $gameSessions[1]->correct_count){
             // game ended in a draw, credit both participants back
+            $challengeStakings = ChallengeStaking::where('challenge_id', $challenge->id)->get();
+            
+            foreach ($challengeStakings as $key => $cS) {
+                $amountWon = $cS->staking->amount_staked;
+                
+                $cS->staking()->update(['amount_won' => $amountWon]);
+                
+                WalletTransaction::create([
+                    'wallet_id' => User::find($cS->user_id)->wallet->id,
+                    'transaction_type' => 'CREDIT',
+                    'amount' => $amountWon,
+                    'balance' => User::find($cS->user_id)->wallet->withdrawable_balance,
+                    'description' => 'Staking winning of ' . $amountWon . ' on challenge',
+                    'reference' => Str::random(10),
+                    'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+                ]);
+            }
             return true;
         }
 
