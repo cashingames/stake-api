@@ -8,7 +8,6 @@ use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
 use App\Models\Profile;
-use App\Notifications\WalletFundedNotification;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

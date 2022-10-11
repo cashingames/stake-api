@@ -65,6 +65,7 @@ class ChallengeGameTest extends TestCase
         
     }
 
+    
     public function test_challenge_invite_sent_with_staking_successfully()
     {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
@@ -117,6 +118,38 @@ class ChallengeGameTest extends TestCase
         
     }
 
+    public function test_can_not_accept_staking_challenge_with_insufficient_balance(){
+        FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
+        $opponent = $this->user;
+        $creator = User::where('id', '<>', $opponent->id)->first();
+        $category = $this->category;
+
+        $amountToStake = 1500;
+
+        $challenge = Challenge::create([
+            'user_id' => $creator->id,
+            'opponent_id' => $opponent->id,
+            'category_id' => $category->id,
+            'status' => 'PENDING'
+        ]);
+
+        $stakingService = new StakingService($creator);
+        $stakingId = $stakingService->stakeAmount($amountToStake);
+        $stakingService->createChallengeStaking($stakingId, $challenge->id);
+        $acceptanceResponse = $this->postJson(self::CHALLENGE_RESPONSE_URL, [
+            'status' => true,
+            'challenge_id' => $challenge->id
+        ])->assertStatus(400);
+        $acceptanceResponse->assertJson([
+            "message" => "You do not have enough balance to accept this challenge"
+        ]);
+    }
+
+    public function test_can_not_accept_invalid_challenge(){
+        $acceptanceResponse = $this->postJson(self::CHALLENGE_RESPONSE_URL, [
+            'status' => true,
+        ])->assertStatus(400);
+    }
     public function test_can_accept_challenge_with_staking(){
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
         

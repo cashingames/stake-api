@@ -32,6 +32,44 @@ class FeatureFlagTest extends TestCase
         $this->assertTrue(config(['features.notification_history.enabled']) == false);
     }
 
+    public function test_can_check_if_at_least_one_of_many_flags_enabled(){
+        
+        $flags = array_keys(FeatureFlag::$features);
+        
+        foreach ($flags as $key => $value) {
+            FeatureFlag::disable($value);
+        }
+
+        FeatureFlag::enable($flags[0]);
+
+        $this->assertTrue(FeatureFlag::isAnyEnabled($flags));
+    }
+
+    public function test_check_for_at_least_one_enabled_flag_returns_false_when_all_are_disabled(){
+        $flags = array_keys(FeatureFlag::$features);
+
+        foreach ($flags as $key => $value) {
+            FeatureFlag::disable($value);
+        }
+
+        $this->assertFalse(FeatureFlag::isAnyEnabled($flags));
+    }
+
+    public function test_that_all_given_flags_must_be_enabled(){
+        $flags = array_keys(FeatureFlag::$features);
+
+        foreach ($flags as $key => $value) {
+            FeatureFlag::enable($value);
+        }
+
+        $this->assertTrue(FeatureFlag::isAllEnabled($flags));
+
+        FeatureFlag::disable($flags[0]);
+
+        $this->assertFalse(FeatureFlag::isAllEnabled($flags));
+
+    }
+
     public function test_can_fetch_feature_flags(){
         $response = $this->getJson("/api/v3/feature-flags")->assertOk();
     }

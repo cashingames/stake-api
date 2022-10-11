@@ -23,7 +23,7 @@ class ChallengeCompletedNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Challenge $challenge, $currentPlayer)
+    public function __construct(Challenge $challenge, User $currentPlayer)
     {
         $this->challenge = $challenge;
         $this->currentPlayer = $currentPlayer;
@@ -38,20 +38,6 @@ class ChallengeCompletedNotification extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return ['database'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
     }
 
     /**

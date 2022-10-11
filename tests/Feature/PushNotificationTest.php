@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Services\Firebase\CloudMessagingService;
+use GuzzleHttp\Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PushNotificationTest extends TestCase
@@ -37,4 +39,20 @@ class PushNotificationTest extends TestCase
             'user_id' => $this->user->id
         ]);
     }
+
+    // public function test_push_notification_gets_sent(){
+    //     $spy = $this->spy(Client::class);
+
+    //     $service = new CloudMessagingService("AAAAeT24s6U:APA91bH0-qhTOXle2_63EswIf-zQQ5wI139AwEkjrwt-fYzw8T2ENApizI2AMToDOIsh-xAAvVzD6ydhYwrn5aqp4Z7J91fmJas3ydBf0GPODNNqXKeIx6bSGor-hUE1tkT_oREeuMtE");
+    //     $service->setTo("recipient");
+    //     $service->setNotification([
+    //         'title' => 'App notification',
+    //         'body' => 'body'
+    //     ])->setData([
+    //         'title' => 'App notification',
+    //         'body' => 'body content'
+    //     ])->send();
+        
+    //     $spy->shouldHaveReceived('request');
+    // }
 }

@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 
 /**
  * Interact with Firebase Cloud Messaging (FCM)
+ * @codeCoverageIgnore
  */
 class CloudMessagingService{
 
@@ -48,9 +49,19 @@ class CloudMessagingService{
 
     private $response;
 
+    private $httpClient;
+
     public function __construct(string $serverKey)
     {
         $this->serverKey = $serverKey;
+
+        $this->httpClient = new Client([
+            'headers' => [
+                'Authorization' => 'key=' . $this->serverKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ]
+        ]);
     }
 
     /**
@@ -88,6 +99,10 @@ class CloudMessagingService{
         return $this;
     }
 
+    public function getNotification(){
+        return $this->notification;
+    }
+
     /**
      * Set custom data payload
      * 
@@ -99,6 +114,10 @@ class CloudMessagingService{
         return $this;
     }
 
+    public function getData(){
+        return $this->data;
+    }
+
     /**
      * Set recipient of notification
      * 
@@ -108,6 +127,14 @@ class CloudMessagingService{
     public function setTo(string $to){
         $this->to = $to;
         return $this;
+    }
+
+    /**
+     * Get Recipient
+     * @return string
+     */
+    public function getTo(){
+        return $this->to;
     }
 
     /**
@@ -126,16 +153,16 @@ class CloudMessagingService{
         if (isset($data) && array_key_exists('data', $data)){
             $this->setData($data['data']);
         }
-        $client = new Client([
-            'headers' => [
-                'Authorization' => 'key=' . $this->serverKey,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ]
-        ]);
+        // $client = new Client([
+        //     'headers' => [
+        //         'Authorization' => 'key=' . $this->serverKey,
+        //         'Content-Type' => 'application/json',
+        //         'Accept' => 'application/json'
+        //     ]
+        // ]);
 
         try {
-            $response = $client->request("POST", $this->endpoint, [
+            $response = $this->httpClient->request("POST", $this->endpoint, [
                 'json' => [
                     'notification' => $this->notification,
                     'data' => $this->data,
@@ -150,7 +177,7 @@ class CloudMessagingService{
         }
     }
     
-    private function setResponse($response){
+    protected function setResponse($response){
         $this->response = $response;
     }
 
