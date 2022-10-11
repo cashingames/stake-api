@@ -31,7 +31,9 @@ return [
   'staking'=>[
     'days_before_withdrawal' => env('DAYS_BEFORE_WITHDRAWAL', 3),
     'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
-    'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000)
+    'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000),
+    'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
+    'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
   ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
