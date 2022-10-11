@@ -9,11 +9,11 @@ class Category extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['name', 'description', 'created_at','updated_at'];
+  protected $fillable = ['name', 'description', 'created_at', 'updated_at'];
 
   public function questions()
   {
-      return $this->belongsToMany(Question::class, 'categories_questions')->withTimestamps();
+    return $this->belongsToMany(Question::class, 'categories_questions')->withTimestamps();
   }
 
   public function gameSessions()
@@ -34,5 +34,15 @@ class Category extends Model
   public function trivias()
   {
     return $this->hasMany(Trivia::class);
+  }
+
+  public function scopeParentCategories($query)
+  {
+    return $query->where('category_id', 0);
+  }
+
+  public function scopeSubcategories($query)
+  {
+    return $query->where('category_id', '!=', 0);
   }
 }

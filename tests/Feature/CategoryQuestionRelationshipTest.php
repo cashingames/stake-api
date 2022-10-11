@@ -32,8 +32,8 @@ class CategoryQuestionRelationshipTest extends TestCase
         $this->seed(GameModeSeeder::class);
         $this->seed(QuestionSeeder::class);
        
-        $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
-        $this->categories = Category::where('category_id', '!=', 0)->inRandomOrder()->limit(3)->get();
+        $this->category = Category::subcategories()->inRandomOrder()->first();
+        $this->categories = Category::subcategories()->inRandomOrder()->limit(3)->get();
         $this->questions = Question::inRandomOrder()->limit(5)->get();
         $this->question = Question::inRandomOrder()->first();
     }
