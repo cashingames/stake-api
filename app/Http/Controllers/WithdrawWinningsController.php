@@ -31,7 +31,7 @@ class WithdrawWinningsController extends BaseController
 
         $totalAmountWithdrawn = $this->user->transactions()->withdrawals()->whereBetween('wallet_transactions.created_at', [now()->subDays(config('trivia.staking.total_withdrawal_days_limit')), now()])->sum('amount');
 
-        if ($totalAmountWithdrawn > config('trivia.staking.total_withdrawal_limit')) {
+        if ($totalAmountWithdrawn >= config('trivia.staking.total_withdrawal_limit')) {
             return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
         }
 
