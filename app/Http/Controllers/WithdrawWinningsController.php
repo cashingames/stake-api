@@ -13,7 +13,7 @@ class WithdrawWinningsController extends BaseController
 {
     //
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, PaystackWithdrawalService $withdrawalService)
     {
         // $data = $request->validate([
         //     'amount' => ['required', 'numeric', 'min:0'],
@@ -43,16 +43,13 @@ class WithdrawWinningsController extends BaseController
             // dd( $debitAmount);
         }
 
-        $paystackWithdrawal = new PaystackWithdrawalService(config('trivia.payment_key'));
-
-
         $banks = Cache::get('banks');
 
         if (is_null($banks)) {
-            $banks = $paystackWithdrawal->getBanks();
+            $banks = $withdrawalService->getBanks();
         }
 
-
+        
         $bankCode = '';
 
         foreach ($banks->data as $bank) {
@@ -61,12 +58,12 @@ class WithdrawWinningsController extends BaseController
             }
         }
 
-        $isValidAccount = $paystackWithdrawal->verifyAccount($bankCode);
+        $isValidAccount = $withdrawalService->verifyAccount($bankCode);
 
         if (!$isValidAccount) {
             return $this->sendError(false, 'Account is not valid');
         }
-        $recipientCode = $paystackWithdrawal->createTransferRecipient($bankCode);
+        $recipientCode = $withdrawalService->createTransferRecipient($bankCode);
 
         if (is_null($recipientCode)) {
             return $this->sendError(false, 'Recipient code could not be generated');
@@ -75,7 +72,7 @@ class WithdrawWinningsController extends BaseController
         Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
 
         try {
-            $transferInitiated = $paystackWithdrawal->initiateTransfer($recipientCode, ($debitAmount * 100));
+            $transferInitiated = $withdrawalService->initiateTransfer($recipientCode, ($debitAmount * 100));
         } catch (\Throwable $th) {
             //throw $th;
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
@@ -103,9 +100,9 @@ class WithdrawWinningsController extends BaseController
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
         if ($transferInitiated->status === "success") {
-            if ($debitAmount == config('trivia.staking.max_withdrawal_amount')) {
-                return $this->sendResponse(true, "NGN" . config('trivia.staking.max_withdrawal_amount') . " is being successfully processed to your bank account.");
-            }
+            // if ($debitAmount == config('trivia.staking.max_withdrawal_amount')) {
+            //     return $this->sendResponse(true, "NGN" . config('trivia.staking.max_withdrawal_amount') . " is being successfully processed to your bank account.");
+            // }
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
     }

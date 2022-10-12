@@ -18,6 +18,7 @@
         </include>
         <exclude>
             <file>./app/Providers/BroadcastServiceProvider.php</file>
+            <file>./app/Console/Kernel.php</file>
         </exclude>
     </coverage>
     <php>

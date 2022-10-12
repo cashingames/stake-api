@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Payments\PaystackWithdrawalService;
 use Illuminate\Support\Facades\DB;
 
 use App\Services\SMS\TermiiService;
@@ -36,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SMSProviderInterface::class, function($app){
             $api_key = config('services.termii.api_key');
             return new TermiiService($api_key);
+        });
+
+        $this->app->bind(PaystackWithdrawalService::class, function($app){
+            return new PaystackWithdrawalService(config('trivia.payment_key'));
         });
     }
 }
