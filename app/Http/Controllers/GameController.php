@@ -148,6 +148,8 @@ class GameController extends BaseController
         $result->maximumStakeAmount = config('odds.maximum_staking_amount');
         $result->minimumStakeAmount = config('odds.minimum_staking_amount');
         $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
+        $result->totalWithdrawalAmountLimit = config('trivia.staking.total_withdrawal_limit');
+        $result->totalWithdrawalDays = config('trivia.staking.total_withdrawal_days_limit');
 
         return $this->sendResponse($result, "Common data");
     }

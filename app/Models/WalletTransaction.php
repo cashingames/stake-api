@@ -47,4 +47,9 @@ class WalletTransaction extends Model
         return $query->where('transaction_type', 'CREDIT')
         ->whereNull('settled_at')->whereNotNull('viable_date');
     }
+
+    public function scopeWithdrawals($query){
+        return $query->where('transaction_type', 'DEBIT')
+        ->where('description','Winnings Withdrawal Made');
+    }
 }
