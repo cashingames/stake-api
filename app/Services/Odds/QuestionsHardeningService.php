@@ -38,12 +38,12 @@ class QuestionsHardeningService
         $recentQuestions = $this->getUserAnsweredQuestions($this->user);
 
         if ($averageOfRecentThreeGames >= 7) {
-            $questions = $query->where('level','hard')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get();
+            $questions = $query->where('level','hard')->whereNotIn('questions.id', $recentQuestions)->inRandomOrder()->take(20)->get();
             return $questions;
         }
 
         if ($averageOfRecentThreeGames > 5 && $averageOfRecentThreeGames < 7) {
-            $questions = $query->where('level','medium')->whereNotIn('id', $recentQuestions)->inRandomOrder()->take(20)->get();
+            $questions = $query->where('level','medium')->whereNotIn('questions.id', $recentQuestions)->inRandomOrder()->take(20)->get();
             return $questions;
         }
         
