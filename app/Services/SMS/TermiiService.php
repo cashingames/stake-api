@@ -47,7 +47,6 @@ class TermiiService implements SMSProviderInterface{
      */
     public function send(array $data){
         $data['api_key'] = $this->getApiKey();
-        $data['to'] = $this->internationalizePhoneNumber($data['to']);
         !isset($data['channel']) ? $data['channel'] = "dnd" : $data['channel'];
         !isset($data['type']) ? $data['type'] = "plain": $data['type'];
 
@@ -60,7 +59,7 @@ class TermiiService implements SMSProviderInterface{
             $user->update(['otp_token' => mt_rand(10000, 99999)]);
         }
         $smsData = [
-            'to' => $user->phone_number,
+            'to' => $user->country_code.(substr($user->phone_number, -10)),
             'channel' => 'dnd',
             'type' => 'plain',
             'from' => "N-Alert",
@@ -75,16 +74,5 @@ class TermiiService implements SMSProviderInterface{
             throw $th;
             // return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
         }
-    }
-
-    private function internationalizePhoneNumber($phoneNumber, $country="ng"){
-        $countries = [
-            'ng' => '234'
-        ];
-        if (!in_array($country, $countries)){
-            $country = "ng";
-        }
-        $lastTenDigits = substr($phoneNumber, -10);
-        return $countries[$country] . "" . $lastTenDigits;
     }
 }

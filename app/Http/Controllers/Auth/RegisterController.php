@@ -69,10 +69,11 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phone_number' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users'],
+            'country_code' => ['required', 'string','max:10'],
+            'phone_number' => ['nullable', 'string', 'min:4', 'max:12', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
             // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
         ]);
     }
@@ -95,6 +96,7 @@ class RegisterController extends BaseController
                 'password' => bcrypt($data['password']),
                 'otp_token' => mt_rand(10000, 99999),
                 'is_on_line' => true,
+                'country_code' => $data['country_code']
             ]);
 
         //create the profile
@@ -213,7 +215,7 @@ class RegisterController extends BaseController
         $result = [
             'username' => $user->username,
             'email' => $user->email,
-            'phoneNumber' => $user->phone_number,
+            'phoneNumber' =>$user->country_code.(substr($user->phone_number, -10)),
             'next_resend_minutes' => 2
         ];
         return $this->sendResponse($result, 'Account created successfully');
