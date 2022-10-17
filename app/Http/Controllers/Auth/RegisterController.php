@@ -69,7 +69,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'country_code' => ['required', 'string','max:10'],
+            'country_code' => ['required', 'string','max:4'],
             'phone_number' => ['nullable', 'string', 'min:4', 'max:12', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -88,10 +88,12 @@ class RegisterController extends BaseController
     {
 
         //create the user
+        
         $user =
             User::create([
                 'username' => $data['username'],
-                'phone_number' => $data['phone_number'],
+                'phone_number' =>  str_starts_with($data['phone_number'], '0')?  
+                                    ltrim($data['phone_number'], $data['phone_number'][0]): $data['phone_number'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'otp_token' => mt_rand(10000, 99999),
@@ -215,7 +217,7 @@ class RegisterController extends BaseController
         $result = [
             'username' => $user->username,
             'email' => $user->email,
-            'phoneNumber' =>$user->country_code.(substr($user->phone_number, -10)),
+            'phoneNumber' =>$user->full_phone_number,
             'next_resend_minutes' => 2
         ];
         return $this->sendResponse($result, 'Account created successfully');
