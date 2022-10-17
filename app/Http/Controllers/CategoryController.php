@@ -11,29 +11,26 @@ use Illuminate\Http\Request;
 class CategoryController extends BaseController
 {
 
-    // public function timesPlayed($catId)
-    // {
-    //     $category = Category::find($catId);
-    //     if ($category === null) {
-    //         return $this->sendError("Invalid Category", " Invalid Category");
-    //     }
+    public function saveCategoryIcon(Request $request)
+    {   
+        $request->validate([
+            'categoryName' => 'required|string|max:20',
+            'icon'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+        ]);
 
-    //     $hasSubCategory = Category::where('category_id', $category->id)->get();
+        $category = Category::where('name', $request->categoryName)->first();
 
-    //     if (count($hasSubCategory) == 0) {
-    //         $countAsUser = GameSession::where('category_id', $category->id)->where('user_id', $this->user->id)->count();
-    //         $countAsOpponent = GameSession::where('category_id', $category->id)->where('opponent_id', $this->user->id)->count();
+        if ($request->hasFile('icon')) {
+            $image = $request->file('icon');
+            $name = str_replace(' ', '_', $request->categoryName) . "." . $image->guessExtension();
+            $destinationPath = public_path('icons');
+            $category->icon = 'icons/' . $name;
+            $image->move($destinationPath, $name);
+            
+            $category->save();
 
-    //         return $this->sendResponse($countAsUser + $countAsOpponent, " times played");
-    //     }
+            return $this->sendResponse("Icon saved", "Icon saved");
+        }
+    }
 
-    //     $subPlayedCount = [];
-    //     foreach ($hasSubCategory as $sub) {
-    //         $countAsUser = GameSession::where('category_id', $sub->id)->where('user_id', $this->user->id)->count();
-    //         $countAsOpponent = GameSession::where('category_id', $sub->id)->where('opponent_id', $this->user->id)->count();
-
-    //         $subPlayedCount[] = $countAsUser + $countAsOpponent;
-    //     }
-    //     return $this->sendResponse(array_sum($subPlayedCount), " times played");
-    // }
 }
