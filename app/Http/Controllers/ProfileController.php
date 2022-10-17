@@ -27,10 +27,10 @@ class ProfileController extends BaseController
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-        if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) { 
-            $this->user->phone_number = $data['phoneNumber'];
-            $this->user->save();
-        }
+        // if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) { 
+        //     $this->user->phone_number = $data['phoneNumber'];
+        //     $this->user->save();
+        // }
         $profile = $this->user->profile;
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
@@ -44,7 +44,7 @@ class ProfileController extends BaseController
         }
         $profile->save();
 
-        return $this->sendResponse($this->user, "Profile Updated.");
+        return $this->sendResponse($this->user, "Profile Updated. To change your phone number, please contact support.");
     }
 
     public function editBank(Request $request)

@@ -81,6 +81,24 @@ class ProfileTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_phone_number_cannot_be_edited()
+    {
+
+        $response = $this->postjson('/api/v2/profile/me/edit-personal', [
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'username' => 'JayDee',
+            'phoneNumber' => '09098989898',
+            'email' => 'johndoe@email.com',
+            'password' => 'password111',
+            'gender' => 'male',
+            'dateOfBirth' => '23-09-1998'
+        ]);
+
+        $this->assertNotEquals('09098989898', $this->user->phone_number);
+    }
+
+
     public function test_bank_details_can_be_edited()
     {
 

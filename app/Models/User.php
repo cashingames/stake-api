@@ -28,6 +28,7 @@ class User extends Authenticatable implements JWTSubject
         'phone_number',
         'password',
         'otp_token',
+        'country_code',
         'source',
         'email_verified_at',
         'last_activity_time'
@@ -54,7 +55,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate'
+        'challenges_played', 'win_rate','full_phone_number'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -133,6 +134,11 @@ class User extends Authenticatable implements JWTSubject
                     ->orWhere('expire_at', '>', now())
                     ->orWhere('expire_at', NULL);
             });
+    }
+
+    public function getFullPhoneNumberAttribute()
+    {
+        return $this->country_code.$this->phone_number;
     }
 
     public function scopeMostRecent($query)

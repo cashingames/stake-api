@@ -55,6 +55,7 @@ class RegisterTest extends TestCase
             'first_name' => '',
             'last_name' => '',
             'username' => '',
+            'country_code' =>'',
             'phone_number' => '',
             'email' => '',
             'password' => '',
@@ -66,7 +67,7 @@ class RegisterTest extends TestCase
     }
 
     /** @test */
-    public function phone_number_cannot_be_less_than_11_digits()
+    public function country_code_is_required_for_phone_numbers()
     {
 
         $response = $this->postjson(self::REGISTER_URL, [
@@ -80,7 +81,9 @@ class RegisterTest extends TestCase
 
         ]);
 
-        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'The country code field is required.',
+        ]);
     }
 
     /** @test */
@@ -91,6 +94,7 @@ class RegisterTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'username' => 'username',
+            'country_code' => '234',
             'phone_number' => '12345678909',
             'email' => 'user.com',
             'password' => 'password',
@@ -143,6 +147,7 @@ class RegisterTest extends TestCase
             'first_name' => 'User',
             'last_name' => 'Test',
             'username' => 'user_email',
+            'country_code' => '234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
@@ -165,6 +170,7 @@ class RegisterTest extends TestCase
             'first_name' => 'User',
             'last_name' => 'Test',
             'username' => 'user_otp',
+            'country_code' => '234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
@@ -188,6 +194,7 @@ class RegisterTest extends TestCase
             'first_name' => 'Jane',
             'last_name' => 'Doe',
             'username' => 'janeDoe',
+            'country_code' => '234',
             'phone_number' => '08012345678',
             'email' => 'jane@doe.com',
             'password' => 'password',
