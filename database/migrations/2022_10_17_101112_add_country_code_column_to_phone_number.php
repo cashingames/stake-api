@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('country_code')->before('phone_number')->default('234');
+            $table->string('country_code')->before('phone_number')->default('+234');
          });
     }
 

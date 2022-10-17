@@ -19,10 +19,10 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'phoneNumber' => [
-                'required','min:11','max:11',
-                Rule::unique('users','phone_number')->ignore($this->user->id),
-            ],
+            // 'phoneNumber' => [
+            //     'required','min:11','max:11',
+            //     Rule::unique('users','phone_number')->ignore($this->user->id),
+            // ],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
@@ -44,7 +44,7 @@ class ProfileController extends BaseController
         }
         $profile->save();
 
-        return $this->sendResponse($this->user, "Profile Updated. To change your phone number, please contact support.");
+        return $this->sendResponse($this->user, "Profile Updated.");
     }
 
     public function editBank(Request $request)

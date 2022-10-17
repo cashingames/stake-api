@@ -23,6 +23,7 @@ class UserController extends BaseController
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;
         $result->fullName = $this->user->profile->full_name;
+        $result->countryCode = $this->user->country_code;
         $result->phoneNumber = $this->user->phone_number;
         $result->bankName = $this->user->profile->bank_name;
         $result->accountName = $this->user->profile->account_name;
