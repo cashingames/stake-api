@@ -15,7 +15,7 @@ class CategoryController extends BaseController
     {   
         $request->validate([
             'categoryName' => 'required|string|max:20',
-            'icon'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+            'icon'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:1024'//1mb max
         ]);
 
         $category = Category::where('name', $request->categoryName)->first();
