@@ -217,7 +217,7 @@ class RegisterController extends BaseController
         $result = [
             'username' => $user->username,
             'email' => $user->email,
-            'phoneNumber' =>$user->full_phone_number,
+            'phone_number' =>$user->phone_number,
             'next_resend_minutes' => 2
         ];
         return $this->sendResponse($result, 'Account created successfully');

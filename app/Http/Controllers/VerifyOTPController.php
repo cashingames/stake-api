@@ -19,7 +19,7 @@ class VerifyOTPController extends BaseController
         $data = $request->validate([
             // 'email' => ['required', 'string'],
             'token' => ['required', 'alpha_num'],
-            'phone_number' => ['required', 'string', 'size:11']
+            'phone_number' => ['required', 'string', 'max:15']
         ]);
 
         $user = User::where('phone_number', $data['phone_number'])->where('otp_token', $data['token'])->first();
