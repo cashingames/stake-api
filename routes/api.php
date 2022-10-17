@@ -68,6 +68,7 @@ Route::middleware('api')->prefix('v3')->group(
         Route::get('feature-flags', [FeatureFlagController::class, 'index']);
         Route::post('client/feedback', [MessagesController::class, 'feedback']);
         Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
+        Route::post('category/icon/save', [CategoryController::class, 'saveCategoryIcon']);
     }
 );
 
