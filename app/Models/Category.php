@@ -9,7 +9,7 @@ class Category extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['name', 'description', 'created_at', 'updated_at'];
+  protected $fillable = ['name', 'description', 'created_at', 'updated_at','is_enabled'];
 
   public function questions()
   {

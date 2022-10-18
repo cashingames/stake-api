@@ -80,7 +80,7 @@ class GameController extends BaseController
         FROM questions q 
         JOIN categories_questions cq ON cq.question_id = q.id 
         JOIN categories AS c ON c.id = cq.category_id 
-        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL AND q.is_published = true 
+        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL AND q.is_published = true AND c.is_enabled = true
         GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
         ");
 
