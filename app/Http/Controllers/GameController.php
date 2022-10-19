@@ -316,7 +316,7 @@ class GameController extends BaseController
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
             if ($request->has('staking_amount')) {
-                $stakingService = new StakingService($this->user);
+                $stakingService = new StakingService($this->user, 'exhibition');
 
                 $stakingId = $stakingService->stakeAmount($request->staking_amount);
 
@@ -457,7 +457,7 @@ class GameController extends BaseController
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
                 
                 
-                $amountWon = $staking->amount_staked *  $pointStandardOdd;
+                $amountWon = $staking->amount_staked *  $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking; 
 
 
                 WalletTransaction::create([
@@ -471,7 +471,7 @@ class GameController extends BaseController
                 ]);
 
                 $staking->update(['amount_won' => $amountWon]);
-                ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
+                ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
                 // $game->amount_won = $amountWon;
             }
         }

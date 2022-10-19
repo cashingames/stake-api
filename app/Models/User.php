@@ -300,6 +300,18 @@ class User extends Authenticatable implements JWTSubject
         return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
     }
 
+    public function getAverageOfLastThreeGames()
+    {
+        $lastThreeGamesAverage = $this->gameSessions()
+            ->completed()
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->avg('correct_count');
+
+        return $lastThreeGamesAverage;
+    }
+
     public function getWinRateAttribute()
     {
         $gameWins = GameSession::where('correct_count', '>=', 5)->count();

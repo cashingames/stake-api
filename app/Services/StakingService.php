@@ -16,11 +16,12 @@ use Illuminate\Support\Str;
 
 class StakingService
 {
-    private $user;
+    private $user, $mode;
 
-    public function __construct(User $user)
+    public function __construct(User $user, $mode=null)
     {
         $this->user = $user;
+        $this->mode = $mode;
     }
 
     public function stakeAmount($stakingAmount)
@@ -37,10 +38,18 @@ class StakingService
             'reference' => Str::random(10),
         ]);
 
+        $odd = 1;
+
+        if($this->mode == 'exhibition'){
+            $oddMultiplierComputer = new StakingOddsComputer();
+            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfLastThreeGames());
+            $odd = $oddMultiplier['oddsMultiplier'];
+        }
+       
         $staking = Staking::create([
             'user_id' => $this->user->id,
             'amount_staked' => $stakingAmount,
-            'standard_odd' => 1
+            'odd_applied_during_staking' => $odd
         ]);
 
         Log::info($stakingAmount . ' staking made for ' . $this->user->username);

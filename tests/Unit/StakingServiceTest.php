@@ -12,6 +12,7 @@ use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
 use Database\Seeders\GameTypeSeeder;
 use Database\Seeders\PlanSeeder;
+use Database\Seeders\StakingOddsRulesSeeder;
 use Database\Seeders\StakingSeeder;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
@@ -30,6 +31,7 @@ class StakingServiceTest extends TestCase
     {
         parent::setUp();
         $this->seed(UserSeeder::class);
+        $this->seed( StakingOddsRulesSeeder::class);
         $this->seed(StakingSeeder::class);
         $this->user = User::inRandomOrder()->first();
         $this->staking = Staking::inRandomOrder()->first();
