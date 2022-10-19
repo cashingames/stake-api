@@ -37,7 +37,7 @@ class ChallengeInviteStatusController extends BaseController
                     return $this->sendError('Insufficient wallet balance', 'You do not have enough balance to accept this challenge');
                 }
                 $staking = $challenge->stakings()->first()->staking;
-                $stakingService = new StakingService($this->user);
+                $stakingService = new StakingService($this->user, 'challenge');
                 $stakingId = $stakingService->stakeAmount($staking->amount_staked);
                 $stakingService->createChallengeStaking($stakingId, $challenge->id);
             }

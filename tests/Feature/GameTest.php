@@ -29,6 +29,7 @@ use App\Models\StakingOdd;
 use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
+use Database\Seeders\StakingOddsRulesSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -67,6 +68,7 @@ class GameTest extends TestCase
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
         $this->seed(StakingOddSeeder::class);
+        $this->seed( StakingOddsRulesSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();

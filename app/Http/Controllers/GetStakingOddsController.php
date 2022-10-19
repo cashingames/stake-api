@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StakingOdd;
+use App\Services\StakingOddsComputer;
 use Illuminate\Http\Request;
 
 class GetStakingOddsController extends BaseController
@@ -15,7 +16,16 @@ class GetStakingOddsController extends BaseController
      */
     public function __invoke()
     {
-        $odds = StakingOdd::active()->orderBy('score', 'DESC')->get();
-        return $this->sendResponse($odds, 'staking odds fetched');
+        $stakingOdds = StakingOdd::active()->orderBy('score', 'DESC')->get();
+        $allStakingOddsWithOddsMultiplierApplied = [];
+        $oddMultiplierComputer = new StakingOddsComputer();
+        $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfLastThreeGames());
+
+        foreach($stakingOdds as $odd){
+            $odd->update(['odd' => ($odd->odd * $oddMultiplier['oddsMultiplier'])]);
+            $allStakingOddsWithOddsMultiplierApplied[]=$odd;
+        }
+
+        return $this->sendResponse($allStakingOddsWithOddsMultiplierApplied, 'staking odds fetched');
     }
 }

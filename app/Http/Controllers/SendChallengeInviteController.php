@@ -48,7 +48,7 @@ class SendChallengeInviteController extends BaseController
 
         if ($request->has('staking_amount') && FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)){
             foreach($challenges as $challenge){
-                $staking = new StakingService($this->user);
+                $staking = new StakingService($this->user, 'challenge');
                 $stakingId = $staking->stakeAmount($request->staking_amount);
                 $staking->createChallengeStaking($stakingId, $challenge->id);
             }

@@ -12,7 +12,7 @@ class Staking extends Model
   protected $fillable = [
     'user_id',
     'amount_staked',
-    'standard_odd',
+    'odd_applied_during_staking',
     'amount_won'
   ];
 

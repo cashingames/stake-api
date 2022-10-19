@@ -22,7 +22,7 @@ class StakingFactory extends Factory
         return [
           'user_id' => $this->faker->randomElement(array(1, 2, 3, 4, 5)),
           'amount_staked' => $this->faker->randomElement(array(100, 200, 500, 1000)),
-          'standard_odd' => 1
+          'odd_applied_during_staking' => 1
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\StakingOddsRulesSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -23,6 +24,7 @@ class OddsTest extends TestCase
         parent::setUp();
 
         $this->seed(UserSeeder::class);
+        $this->seed( StakingOddsRulesSeeder::class);
         $this->user = User::first();
 
         $this->actingAs($this->user);
