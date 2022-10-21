@@ -11,11 +11,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Carbon\Carbon;
 use App\Traits\Utils\DateUtils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
     use DateUtils;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
