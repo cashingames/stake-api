@@ -57,7 +57,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate','full_phone_number'
+        'challenges_played', 'win_rate', 'full_phone_number'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -140,7 +140,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getFullPhoneNumberAttribute()
     {
-        return $this->country_code.$this->phone_number;
+        return $this->country_code . $this->phone_number;
     }
 
     public function scopeMostRecent($query)
@@ -377,15 +377,25 @@ class User extends Authenticatable implements JWTSubject
 
     public function userChallenges()
     {
-        return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges 
-        INNER JOIN categories on categories.id = challenges.category_id
-        INNER JOIN users u on u.id = challenges.user_id
-        INNER JOIN users o on o.id = challenges.opponent_id
-        WHERE u.id = ? or o.id = ?
-        ORDER BY challenges.created_at DESC
-        LIMIT 10
-        
-        ', [$this->id, $this->id]);
+        // return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges 
+        // INNER JOIN categories on categories.id = challenges.category_id
+        // INNER JOIN users u on u.id = challenges.user_id
+        // INNER JOIN users o on o.id = challenges.opponent_id
+        // WHERE u.id = ? or o.id = ?
+        // ORDER BY challenges.created_at DESC
+        // LIMIT 10
+
+        // ', [$this->id, $this->id]);
+
+        return DB::table('challenges')
+            ->join('categories', 'categories.id', '=', 'challenges.category_id')
+            ->join('users as u', 'u.id', '=', 'challenges.user_id')
+            ->join('users as o', 'o.id', '=', 'challenges.opponent_id')
+            ->select('challenges.id', 'u.username', 'o.username as opponentUsername', 'categories.name', 'challenges.status', 'challenges.created_at')
+            ->where('u.id', $this->id)
+            ->orWhere('o.id', $this->id)
+            ->orderBy('challenges.created_at', 'DESC')
+            ->paginate(20);
     }
     public function hasPlayedTrivia($triviaId)
     {
