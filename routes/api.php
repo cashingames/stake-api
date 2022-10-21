@@ -60,6 +60,7 @@ Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class)
 Route::post('auth/register/verify-token', VerifyOTPController::class);
 Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP']);
 
+
 Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::post('paystack/transaction/webhook', [WalletController::class, "paymentEventProcessor"]);
@@ -115,6 +116,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
         Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
+        Route::post('account/delete', [UserController::class, 'deleteAccount']);
     }
 );
 
