@@ -215,17 +215,17 @@ class GameController extends BaseController
         );
     }
 
-    public function canPlayWithStaking(Request $request){
+    public function canPlayWithStaking(Request $request)
+    {
 
-        if ($request->has('staking_amount')){
-            if ($request->staking_amount > config('odds.maximum_staking_amount')){
+        if ($request->has('staking_amount')) {
+            if ($request->staking_amount > config('odds.maximum_staking_amount')) {
                 return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_staking_amount'));
             }
-            if ($request->staking_amount < config('odds.minimum_staking_amount')){
+            if ($request->staking_amount < config('odds.minimum_staking_amount')) {
                 return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_staking_amount'));
             }
-        }else{
-
+        } else {
         }
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
@@ -240,7 +240,7 @@ class GameController extends BaseController
             'type' => ['required', 'numeric'],
             'mode' => ['required', 'numeric'],
             'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_staking_amount') , "min:". config('odds.minimum_staking_amount')]
+            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_staking_amount'), "min:" . config('odds.minimum_staking_amount')]
         ]);
 
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
@@ -264,16 +264,16 @@ class GameController extends BaseController
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
-        if (FeatureFlag::isEnabled(FeatureFlags::ODDS) && !$request->has('staking_amount')){
+        if (FeatureFlag::isEnabled(FeatureFlags::ODDS) && !$request->has('staking_amount')) {
             $oddMultiplierComputer = new OddsComputer();
-            
+
 
             $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null));
 
             $gameSession->odd_multiplier = $odd['oddsMultiplier'];
             $gameSession->odd_condition = $odd['oddsCondition'];
         }
-        
+
 
         $questions = [];
 
@@ -314,7 +314,7 @@ class GameController extends BaseController
 
         $gameSession->save();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             if ($request->has('staking_amount')) {
                 $stakingService = new StakingService($this->user, 'exhibition');
 
@@ -323,7 +323,7 @@ class GameController extends BaseController
                 $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
             }
         }
-        
+
 
         Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 
@@ -448,17 +448,19 @@ class GameController extends BaseController
         }
 
         $staking = null;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
-            
+
             $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
             if (!is_null($staking)) {
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-                
-                
-                $amountWon = $staking->amount_staked *  $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking; 
 
+                if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+                    $amountWon = $staking->amount_staked *  $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
+                } else {
+                    $amountWon = $staking->amount_staked *  $pointStandardOdd;
+                }
 
                 WalletTransaction::create([
                     'wallet_id' => $this->user->wallet->id,
@@ -471,32 +473,38 @@ class GameController extends BaseController
                 ]);
 
                 $staking->update(['amount_won' => $amountWon]);
-                ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
+
+                if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+                    ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
+                } else {
+                    ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
+                }
+
                 // $game->amount_won = $amountWon;
             }
         }
-        
-        
+
+
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         // if ((FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) && $staking != null){
         //     $game->points_gained = $points;
         // }
-        if (FeatureFlag::isEnabled('odds') && $staking == null){
+        if (FeatureFlag::isEnabled('odds') && $staking == null) {
             $game->points_gained = $points * $game->odd_multiplier;
-        }else{
+        } else {
             $game->points_gained = $points;
         }
-        
+
         $game->total_count = $points + $wrongs;
-        
+
         $game->save();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)){
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $game->amount_staked = $staking ? $staking->amount_staked : null;
             $game->with_staking = $staking ? true : false;
         }
-        
+
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
@@ -514,7 +522,7 @@ class GameController extends BaseController
         // if (GameSession::where('category_id')->first() == null) {
         //     $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
         // }
-        
+
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
         return $this->sendResponse($game, 'Game Ended');
     }
