@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\SendPushNotification;
 use App\Models\Challenge;
 use App\Models\User;
 use App\Models\WalletTransaction;
@@ -49,9 +50,9 @@ class RefundExpiredChallengeStakingAmount extends Command
                             'description' => 'Reversal of Staked Cash',
                             'reference' => Str::random(10),
                         ]);
-                        // dispatch(function() use(User ){
-                        //     (new SendPushNotification())->sendliveTriviaNotification($device, "in 1 hour");
-                        // });
+                        
+                        (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge->id);
+                       
                     }
                 }
             });
