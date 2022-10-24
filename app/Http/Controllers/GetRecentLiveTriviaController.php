@@ -17,7 +17,7 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
-        $recentLiveTrivia = Trivia::recent()->limit(10)->get();
+        $recentLiveTrivia = Trivia::recent()->paginate(10);
     
         $response = [];
        
