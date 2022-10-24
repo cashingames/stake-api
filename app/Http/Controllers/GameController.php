@@ -448,7 +448,7 @@ class GameController extends BaseController
         }
 
         $staking = null;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
 
             $staking = $exhibitionStaking->staking ?? null;
