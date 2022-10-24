@@ -14,4 +14,5 @@ class FeatureFlags{
     const LIVE_TRIVIA_START_TIME_NOTIFICATION = "live_trivia_start_time_notification";
     const WITHDRAWABLE_WALLET = "withdrawable_wallet";
     const CHALLENGE_GAME_STAKING = "challenge_game_staking";
+    const STAKING_WITH_ODDS = "staking_with_odds";
 }

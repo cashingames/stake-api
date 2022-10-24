@@ -75,7 +75,7 @@ class FeatureFlag{
         if (array_key_exists($feature, self::$features)){
             return true;
         }
-        throw new UnknownFeatureException("Unknow feature `{$feature}` specified", 1);
+        throw new UnknownFeatureException("Unknown feature `{$feature}` specified", 1);
     }
 
 }
