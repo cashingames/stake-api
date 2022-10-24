@@ -160,4 +160,31 @@ class SendPushNotification
             ->setTo($device->device_token)
             ->send();
     }
+
+    public function sendChallengeStakingRefundNotification($player, $challenge)
+    {
+        $recipient = FcmPushSubscription::where('user_id', $player->id)->latest()->first();
+        if (is_null($recipient)) {
+            return;
+        }
+
+        $this->pushService->setNotification(
+            [
+                'title' => "Cashingames Challenge Staking Refund",
+                'body' => "Your challenge staking has been refunded because your opponent failed to respond"
+            ]
+        )
+            ->setData(
+                [
+                    'title' => "Challenge Staking Refund",
+                    'body' => "Your challenge staking has been refunded because your opponent failed to respond",
+                    'action_type' => PushNotificationType::Challenge,
+                    'action_id' => $challenge->id,
+                    'unread_notifications_count' => $player->unreadNotifications()->count()
+                ]
+            )
+            ->setTo($recipient->device_token)
+            ->send();
+        Log::info("Challenge staking refund push notification sent to: " . $player->username );
+    }
 }
