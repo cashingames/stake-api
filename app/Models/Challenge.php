@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use stdClass;
 
 class Challenge extends Model
@@ -46,19 +47,19 @@ class Challenge extends Model
     }
 
     public static function challengeDetails(int $id)
-    {   
+    {
         $challenge = Challenge::find($id);
-        if($challenge !== null){
+        if ($challenge !== null) {
             $gameMode = GameMode::where('name', 'CHALLENGE')->first();
 
             $player = User::find($challenge->user_id);
             $playerUsername = $player->username;
             $playerAvater = $player->profile->avatar;
-    
+
             $opponent = User::find($challenge->opponent_id);
             $opponentUsername = $opponent->username;
             $opponentAvatar = $opponent->profile->avatar;
-    
+
             $data = new stdClass;
             $data->challengeDetails = $challenge;
             $data->gameModeId = $gameMode->id;
@@ -71,7 +72,17 @@ class Challenge extends Model
         }
     }
 
-    public function stakings(){
+    public function stakings()
+    {
         return $this->hasMany(ChallengeStaking::class, 'challenge_id');
     }
+
+    public function scopeExpired($query): void
+    {
+        $query
+            ->where('created_at', '<=', Carbon::now()->subHours(config('trivia.duration_hours_before_challenge_staking_expiry')))
+            ->where('status', 'PENDING')
+            ->orderBy('created_at', 'DESC');
+    }
+
 }

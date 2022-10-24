@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
         Commands\CreditWinnings::class,
+        Commands\RefundExpiredChallengeStakingAmount::class,
     ];
 
     /**
@@ -49,7 +50,7 @@ class Kernel extends ConsoleKernel
                 return in_array($now, $specialHours);
             })->timezone('Africa/Lagos');
         }
-
+        $schedule->command('challenge:staking-refund')->everyMinute();
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $schedule->command('winnings:credit')

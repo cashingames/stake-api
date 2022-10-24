@@ -25,4 +25,9 @@ class Staking extends Model
   {
     return $this->hasMany(ExhibitionStaking::class);
   }
+
+  public function challengeStakings()
+  {
+    return $this->hasMany(ChallengeStaking::class);
+  }
 }
