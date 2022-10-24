@@ -500,7 +500,7 @@ class GameController extends BaseController
 
         $game->save();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $game->amount_staked = $staking ? $staking->amount_staked : null;
             $game->with_staking = $staking ? true : false;
         }
