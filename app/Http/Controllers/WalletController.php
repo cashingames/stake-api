@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Models\WalletTransaction;
 use App\Models\Plan;
 use App\Models\UserPoint;
@@ -30,10 +31,10 @@ class WalletController extends BaseController
     public function transactions()
     {
         $transactions = $this->user->transactions()
-            ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
-            ->get();
+            ->select('wallet_transactions.id as id','transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->paginate(10);
 
-        return $this->sendResponse($transactions, 'Wallet transactions information');
+        return (new WalletTransactionsResponse())->transform($transactions);
     }
 
     //this will be modified to appropriately return user earnings after a tournament
@@ -42,7 +43,9 @@ class WalletController extends BaseController
     {
         $data = [
             'earnings' => $this->user->transactions()
-                ->where('transaction_type', 'Fund Recieved')
+                ->where('transaction_type', 'CREDIT')
+                ->where('description', '!=', 'Fund Wallet')
+                ->where('description', '!=', 'Sign Up Bonus')
                 ->orderBy('created_at', 'desc')->get()
         ];
         return $this->sendResponse($data, 'Earnings information');
@@ -69,7 +72,7 @@ class WalletController extends BaseController
                 Log::info("Response from paystack on transfer success: " . json_encode($event));
                 return response("", 200);
             }
-            if ($event->event == "transfer.failed" || $event->event == "transfer.reversed" ) {
+            if ($event->event == "transfer.failed" || $event->event == "transfer.reversed") {
                 Log::info("Response from paystack on transfer failed or reversed: " . json_encode($event));
                 $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
                 $user = $profile->user;
@@ -144,7 +147,7 @@ class WalletController extends BaseController
     {
         $user->wallet->withdrawable_balance += ($amount) / 100;
         $user->wallet->save();
-        
+
         WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
             'transaction_type' => 'CREDIT',
