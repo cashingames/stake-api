@@ -32,6 +32,7 @@ class WalletController extends BaseController
     {
         $transactions = $this->user->transactions()
             ->select('wallet_transactions.id as id','transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
         return (new WalletTransactionsResponse())->transform($transactions);

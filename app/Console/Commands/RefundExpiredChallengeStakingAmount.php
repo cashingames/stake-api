@@ -38,23 +38,24 @@ class RefundExpiredChallengeStakingAmount extends Command
                     $challengeStakingRecord = $challenge->stakings()->oldest()->first();
 
                     if (!is_null($challengeStakingRecord)) {
-                        $challengeStakingRecord->user->wallet->update([
-                            'non_withdrawable_balance' => ($challengeStakingRecord->user->wallet->non_withdrawable_balance + $challengeStakingRecord->staking->amount_staked)
-                        ]);
-                        $challengeStakingRecord->user->wallet->save();
-                        WalletTransaction::create([
-                            'wallet_id' => $challengeStakingRecord->user->wallet->id,
-                            'transaction_type' => 'CREDIT',
-                            'amount' => $challengeStakingRecord->staking->amount_staked,
-                            'balance' => $challengeStakingRecord->user->wallet->non_withdrawable_balance,
-                            'description' => 'Reversal of Staked Cash',
-                            'reference' => Str::random(10),
-                        ]);
-                        
-                        (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge);
-                       
+                        if (!is_null($challengeStakingRecord->user)) {
+                            $challengeStakingRecord->user->wallet->update([
+                                'non_withdrawable_balance' => ($challengeStakingRecord->user->wallet->non_withdrawable_balance + $challengeStakingRecord->staking->amount_staked)
+                            ]);
+                            $challengeStakingRecord->user->wallet->save();
+                            WalletTransaction::create([
+                                'wallet_id' => $challengeStakingRecord->user->wallet->id,
+                                'transaction_type' => 'CREDIT',
+                                'amount' => $challengeStakingRecord->staking->amount_staked,
+                                'balance' => $challengeStakingRecord->user->wallet->non_withdrawable_balance,
+                                'description' => 'Reversal of Staked Cash',
+                                'reference' => Str::random(10),
+                            ]);
+
+                            (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge);
+                        }
                     }
-                    $challenge->update(['expired_at'=>now()]);
+                    $challenge->update(['expired_at' => now()]);
                 }
             });
     }
