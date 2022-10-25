@@ -11,7 +11,7 @@ class Challenge extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category_id', 'user_id', 'opponent_id', 'status'];
+    protected $fillable = ['category_id', 'user_id', 'opponent_id', 'status','expired_at'];
 
     public function users()
     {
@@ -81,7 +81,16 @@ class Challenge extends Model
     {
         $query
             ->where('created_at', '<=', Carbon::now()->subHours(config('trivia.duration_hours_before_challenge_staking_expiry')))
+            ->whereNotNull('expired_at')
+            ->orderBy('created_at', 'DESC');
+    }
+
+    public function scopeToBeExpired($query): void
+    {
+        $query
+            ->where('created_at', '<=', Carbon::now()->subHours(config('trivia.duration_hours_before_challenge_staking_expiry')))
             ->where('status', 'PENDING')
+            ->whereNull('expired_at')
             ->orderBy('created_at', 'DESC');
     }
 

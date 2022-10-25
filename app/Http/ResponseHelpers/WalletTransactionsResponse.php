@@ -17,10 +17,10 @@ class WalletTransactionsResponse
     public function transform($transactions): Object
     {
 
-        $presenter = new stdClass;
-        $presenter->success = true;
-        $presenter->data = [];
-        $presenter->message = "Wallet transactions information";
+        $presenter = [];
+        // $presenter->success = true;
+        // $presenter->data = [];
+        // $presenter->message = "Wallet transactions information";
 
         foreach ($transactions as $t) {
 
@@ -31,7 +31,7 @@ class WalletTransactionsResponse
             $transaction->description = $t->description;
             $transaction->transactionDate = $t->transactionDate;
 
-            $presenter->data[] = $transaction;
+            $presenter[] = $transaction;
         }
         return response()->json($presenter);
     }

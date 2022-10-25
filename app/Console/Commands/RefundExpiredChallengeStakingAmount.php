@@ -32,7 +32,7 @@ class RefundExpiredChallengeStakingAmount extends Command
      */
     public function handle()
     {
-        Challenge::expired()
+        Challenge::toBeExpired()
             ->chunk(500, function ($challenges) {
                 foreach ($challenges as $challenge) {
                     $challengeStakingRecord = $challenge->stakings()->oldest()->first();
@@ -51,9 +51,10 @@ class RefundExpiredChallengeStakingAmount extends Command
                             'reference' => Str::random(10),
                         ]);
                         
-                        (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge->id);
+                        (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge);
                        
                     }
+                    $challenge->update(['expired_at'=>now()]);
                 }
             });
     }
