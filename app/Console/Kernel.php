@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
                 return in_array($now, $specialHours);
             })->timezone('Africa/Lagos');
         }
-        $schedule->command('challenge:staking-refund')->everyMinute();
+        $schedule->command('challenge:staking-refund')->hourly();
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $schedule->command('winnings:credit')

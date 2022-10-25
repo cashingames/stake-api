@@ -57,7 +57,7 @@ class ProfileTest extends TestCase
                 'boosts' => [],
                 'achievements' => [],
                 'recentGames' => [],
-                'transactions' => [],
+                // 'transactions' => [],
                 'pointsTransaction' => [], 
                 'hasActivePlan' => false,
                 'unreadNotificationsCount' => 0
