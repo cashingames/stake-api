@@ -395,7 +395,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('u.id', $this->id)
             ->orWhere('o.id', $this->id)
             ->orderBy('challenges.created_at', 'DESC')
-            ->paginate(20);
+            ->paginate(10);
     }
     public function hasPlayedTrivia($triviaId)
     {

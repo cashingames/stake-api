@@ -25,13 +25,13 @@ class GetFriendsController extends BaseController
 
     function getOnlineUsers()
     {
-        return User::mostRecent()->with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->limit(20)->get();
+        return User::mostRecent()->with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->paginate(20);
     }
 
     function searchForFriends($search)
     {
         return User::mostRecent()->with('profile:user_id,avatar')->where('phone_number', 'like', '%' . $search . '%')
             ->orWhere('username', 'like', '%' . $search . '%')
-            ->get();
+            ->paginate(20);
     }
 }
