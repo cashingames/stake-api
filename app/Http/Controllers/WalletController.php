@@ -37,8 +37,6 @@ class WalletController extends BaseController
         return (new WalletTransactionsResponse())->transform($transactions);
     }
 
-    //this will be modified to appropriately return user earnings after a tournament
-    //since wallet has been modified, and tournament mode is yet to be developed, A user has no earnings yet
     public function earnings()
     {
         $data = [
