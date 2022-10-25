@@ -8,7 +8,7 @@ use stdClass;
 
 class WalletTransactionsResponse
 {   
-    public int $id;
+    public int $transactionId;
     public WalletTransactionType $type;
     public $amount;
     public string $description;
@@ -25,7 +25,7 @@ class WalletTransactionsResponse
         foreach ($transactions as $t) {
 
             $transaction = new WalletTransactionsResponse;
-            $transaction->id = $t->id;
+            $transaction->transactionId = $t->id;
             $transaction->type = $this->getTransactionType($t->type);
             $transaction->amount = $t->amount;
             $transaction->description = $t->description;

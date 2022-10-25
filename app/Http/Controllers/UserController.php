@@ -47,7 +47,7 @@ class UserController extends BaseController
         $result->boosts = $this->user->userBoosts();
         $result->achievements = $this->user->userAchievements();
         $result->recentGames = $this->user->recentGames();
-        $result->transactions = $this->user->userTransactions(); //remove to wallet endpint
+        //$result->transactions = $this->user->userTransactions(); //remove to wallet endpint
         $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();
