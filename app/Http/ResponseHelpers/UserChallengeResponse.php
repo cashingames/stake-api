@@ -8,7 +8,7 @@ use App\Models\ChallengeGameSession;
 use App\Traits\Utils\DateUtils;
 use Hamcrest\Core\IsNull;
 use \Illuminate\Http\JsonResponse;
-
+use Illuminate\Support\Carbon;
 
 class UserChallengeResponse
 {
@@ -26,7 +26,7 @@ class UserChallengeResponse
     {
         $response = [];
         foreach ($challenges as $data) {
-            
+
             $presenter = new UserChallengeResponse;
             $presenter->subcategory = $data->name;
             $presenter->playerUsername = $data->username;
@@ -42,36 +42,44 @@ class UserChallengeResponse
     }
 
     // get flag based on current user
-    private function getParticipantFlag($challengeId){
+    private function getParticipantFlag($challengeId)
+    {
         $sessions = ChallengeGameSession::where('challenge_id', $challengeId)->limit(2)->get();
         if (count($sessions) !== 2) {
             return false;
         }
         $user = auth()->user();
-        
+
         $currentUserScore = $sessions->firstWhere('user_id', $user->id)->points_gained; //('points_gained')->all();
         $opponentUserScore = $sessions->firstWhere('user_id', '!=', $user->id)->points_gained; //->get('points_gained')->all();
-        
-        
-        if ($currentUserScore > $opponentUserScore){
+
+
+        if ($currentUserScore > $opponentUserScore) {
             return "WON";
         }
-        if ($currentUserScore < $opponentUserScore){
+        if ($currentUserScore < $opponentUserScore) {
             return "LOST";
         }
         return "DRAW";
     }
     private function getStatus($challengeId): ChallengeStatus
     {
+        $challenge = Challenge::find($challengeId);
         $getChallengeGameSession = ChallengeGameSession::where('challenge_id', $challengeId);
         $declinedChallenge = Challenge::where('id', $challengeId)->where('status', 'DECLINED')->first();
         if (!is_null($declinedChallenge)) {
             return ChallengeStatus::Declined;
         } else if ($getChallengeGameSession->count() <= 0 && is_null($declinedChallenge)) {
+            if (!is_null($challenge) && $challenge->created_at <= Carbon::now()->subHours(config('trivia.duration_hours_before_challenge_staking_expiry'))) {
+                return ChallengeStatus::Expired;
+            }
             return  ChallengeStatus::Pending;
         } else if ($getChallengeGameSession->where('state', 'COMPLETED')->count() >= 2) {
             return ChallengeStatus::Closed;
         } else {
+            if (!is_null($challenge) && $challenge->created_at <= Carbon::now()->subHours(config('trivia.duration_hours_before_challenge_staking_expiry'))) {
+                return ChallengeStatus::Expired;
+            }
             return ChallengeStatus::Ongoing;
         }
     }
