@@ -23,7 +23,7 @@ class GetStakingOddsController extends BaseController
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
             $allStakingOddsWithOddsMultiplierApplied = [];
             $oddMultiplierComputer = new StakingOddsComputer();
-            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfLastThreeGames());
+            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfRecentGames());
 
             foreach ($stakingOdds as $odd) {
                 $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);
