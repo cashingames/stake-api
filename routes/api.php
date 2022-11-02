@@ -33,6 +33,7 @@ use App\Http\Controllers\GetChallengeLeaderboardController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\ChallengeGlobalLeadersController;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\WithdrawWinningsController;
 
@@ -91,6 +92,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('challenge/start/game', StartChallengeGameController::class);
         Route::post('challenge/end/game', EndChallengeGameController::class);
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
+        Route::get('challenge/leaders/global', ChallengeGlobalLeadersController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
         Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
