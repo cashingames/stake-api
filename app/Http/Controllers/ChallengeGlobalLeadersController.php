@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\ResponseHelpers\ChallengeGlobalLeadersResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ChallengeGlobalLeadersController extends BaseController
 {
-    public function __invoke(Request $request, $limit)
+    public function __invoke(Request $request)
     {
         $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->subDays(7));
+        
         $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
         $limit = 3;
 
@@ -22,20 +24,29 @@ class ChallengeGlobalLeadersController extends BaseController
         if ($request->has(['limit'])) {
             $limit = $request->limit;
         }
-        $sql = 'SELECT c.points, p.avatar, p.first_name , p.last_name, c.username
-            FROM (
-                SELECT SUM(points_gained) AS points, user_id, username FROM challenge_game_sessions cs
-                INNER JOIN users ON users.id = cs.user_id WHERE cs.created_at >= ? AND cs.created_at < ?  GROUP BY user_id
-                ORDER BY points DESC
-                LIMIT ?
-            ) c
-            INNER JOIN profiles p ON g.user_id = p.user_id
-            ORDER BY c.points DESC';
+        $sql = "select winner, count(winner) as wins, CASE WHEN (winner = user_id) THEN challengerAvatar ELSE 
+                (CASE WHEN (winner = opponent_id) THEN opponentAvatar END) END as avatar,
+                CASE WHEN (winner = user_id) THEN challengerUsername ELSE 
+                (CASE WHEN (winner = opponent_id) THEN opponentUsername END) END as username
+                from (select c.id, c.user_id, c.opponent_id, cgsC.points_gained challengerScore, cgsO.points_gained opponentScore, 
+                CASE WHEN (cgsC.points_gained - cgsO.points_gained) > 0 THEN c.user_id ELSE 
+                    (CASE WHEN (cgsC.points_gained - cgsO.points_gained) = 0 THEN null ELSE c.opponent_id END) END as winner, cp.avatar as challengerAvatar, op.avatar as opponentAvatar,
+                    cu.username as challengerUsername, co.username as opponentUsername
+                from challenges c
+                inner join profiles cp ON c.user_id = cp.user_id 
+                inner join profiles op ON c.opponent_id = op.user_id 
+                inner join users cu ON c.user_id = cu.id 
+                inner join users co ON c.opponent_id = co.id 
+                inner join challenge_game_sessions cgsC on c.user_id = cgsC.user_id and c.id = cgsC.challenge_id
+                inner join challenge_game_sessions cgsO on c.opponent_id = cgsO.user_id and c.id = cgsO.challenge_id
+    
+                where c.status = 'ACCEPTED' AND c.created_at >= ? AND c.created_at < ?) leaderboard
+                where winner is not null
+                group by leaderboard.winner
+                order by count(winner) desc limit ?";
 
+        $leaders = DB::select($sql, [$_startDate, $_endDate, $limit]);
 
-        $leaders = DB::select($sql, [$this->toUtcFromNigeriaTimeZone($_startDate),  $this->toUtcFromNigeriaTimeZone($_endDate), $limit]);
-
-
-        return $this->sendResponse($leaders, "Challenge Leaders");
+        return (new ChallengeGlobalLeadersResponse())->transform($leaders);
     }
 }
