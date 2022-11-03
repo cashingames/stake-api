@@ -45,11 +45,11 @@ class OddsMakerTest extends TestCase
         $this->currentHour = date("H");
     }
 
-    public function test_odds_for_first_time_player()
+    public function test_odds_for_exhibition_first_time_player_()
     {
         $user = User::factory()->create();
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($user, NULL);
+        $oddEffect = $oddsComputer->compute($user, NULL, false);
         $expectation = 3;
         
         $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
@@ -59,6 +59,22 @@ class OddsMakerTest extends TestCase
         // dd($expectation, $oddEffect);
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
+
+    public function test_odds_for_live_trivia_first_time_player_()
+    {
+        $user = User::factory()->create();
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($user, NULL, true);
+        $expectation = 3;
+        
+        $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
+        if (in_array($currentHour, $this->specialHours)){
+            $expectation += 1.5;
+        }
+        // dd($expectation, $oddEffect);
+        $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
+    }
+
     public function test_odds_when_avg_score_less_than_5_in_normal_hours()
     {
         $currentHour = intval(date("H"));
@@ -74,7 +90,7 @@ class OddsMakerTest extends TestCase
 
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score,false);
         $expectation = 2.5;
         if (in_array($this->currentHour, $this->specialHours)) {
             $expectation += 1.5;
@@ -90,7 +106,7 @@ class OddsMakerTest extends TestCase
 
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score,false);
         $expectation = 1;
         if (in_array($this->currentHour, $this->specialHours)) {
             $expectation += 1.5;
@@ -107,7 +123,7 @@ class OddsMakerTest extends TestCase
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
 
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score, false);
         $expectation = 1;
         if (in_array($this->currentHour, $this->specialHours)) {
             $expectation += 1.5;
@@ -129,7 +145,7 @@ class OddsMakerTest extends TestCase
         ]);
         $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user, $avg_score);
+        $oddEffect = $oddsComputer->compute($this->user, $avg_score, false);
         $expectation = 1.5;
         if (in_array($this->currentHour, $this->specialHours)) {
             $expectation += 0.5;
@@ -147,7 +163,7 @@ class OddsMakerTest extends TestCase
         
         
         $oddsComputer = new OddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user, 3);
+        $oddEffect = $oddsComputer->compute($this->user, 3, false);
 
         $expectation = 4;
         

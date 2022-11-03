@@ -12,13 +12,20 @@ class OddsComputer{
 
     use DateUtils;
 
-    public function compute(User $user, $averageScoreOfRecentGames): array{
+    public function compute(User $user, $averageScoreOfRecentGames, $isTrivia): array{
         $averageScoreOfRecentGames = is_numeric($averageScoreOfRecentGames) ? floor($averageScoreOfRecentGames) : $averageScoreOfRecentGames;
 
         $oddsMultiplier = 1;
         $oddsCondition = "no_matching_condition";
-        
-        if($this->isNewPlayer($user)){
+        $isNewPlayer = false;
+
+        if(!$isTrivia){
+            $isNewPlayer = $this->isNewPlayer($user);
+        }else{
+            $isNewPlayer = $this->isNewLiveTriviaPlayer($user);
+        }
+
+        if($isNewPlayer){
 
             $newUserRulesAndConditions = OddsRule::where('rule', 'GAME_COUNT_LESS_THAN_5')->first();    
             $oddsMultiplier = $newUserRulesAndConditions->odds_benefit;
@@ -84,4 +91,9 @@ class OddsComputer{
     public function isNewPlayer(User $user){
         return $user->gameSessions()->count() <= 5 ;
     }
+
+    public function isNewLiveTriviaPlayer(User $user){
+        return $user->gameSessions()->whereNotNull('trivia_id')->count() <= 5 ;
+    }
+   
 }

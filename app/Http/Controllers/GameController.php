@@ -268,7 +268,7 @@ class GameController extends BaseController
             $oddMultiplierComputer = new OddsComputer();
 
 
-            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null));
+            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null), $request->has('trivia') ? true : false);
 
             $gameSession->odd_multiplier = $odd['oddsMultiplier'];
             $gameSession->odd_condition = $odd['oddsCondition'];

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             OddsConditionsAndRulesSeeder::class,
             StakingOddsRulesSeeder::class,
+            //ChallengeSeeder::class,
             // TriviaSeeder::class,
             // NotificationSeeder::class,
             // WalletTransactionSeeder::class,
