@@ -67,24 +67,24 @@ class RegisterTest extends TestCase
     }
 
     /** @test */
-    public function country_code_is_required_for_phone_numbers()
-    {
+    // public function country_code_is_required_for_phone_numbers()
+    // {
 
-        $response = $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'User',
-            'last_name' => 'Test',
-            'username' => 'user',
-            'phone_number' => '8883888383',
-            'email' => 'user@user.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
+    //     $response = $this->postjson(self::REGISTER_URL, [
+    //         'first_name' => 'User',
+    //         'last_name' => 'Test',
+    //         'username' => 'user',
+    //         'phone_number' => '8883888383',
+    //         'email' => 'user@user.com',
+    //         'password' => 'password',
+    //         'password_confirmation' => 'password'
 
-        ]);
+    //     ]);
 
-        $response->assertJson([
-            'message' => 'The country code field is required.',
-        ]);
-    }
+    //     $response->assertJson([
+    //         'message' => 'The country code field is required.',
+    //     ]);
+    // }
 
     /** @test */
     public function email_field_must_accept_a_valid_email_format()

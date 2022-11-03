@@ -69,7 +69,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'country_code' => ['required', 'string','max:4'],
+            // 'country_code' => ['required', 'string','max:4'],
             'phone_number' => ['nullable', 'string', 'min:4', 'max:12', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -98,7 +98,8 @@ class RegisterController extends BaseController
                 'password' => bcrypt($data['password']),
                 'otp_token' => mt_rand(10000, 99999),
                 'is_on_line' => true,
-                'country_code' => $data['country_code']
+                // 'country_code' => $data['country_code'] 
+                'country_code' => "+234" // Hardcoded temporarily
             ]);
 
         //create the profile
