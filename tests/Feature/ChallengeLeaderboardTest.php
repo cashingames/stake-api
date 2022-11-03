@@ -80,10 +80,10 @@ class ChallengeLeaderboardTest extends TestCase
         ]);
     }
 
-    public function test_global_challenge_leaders_can_be_gotten()
-    {
-        $response = $this->post("/api/v3/challenge/leaders/global");
-        $response->assertStatus(200);
+    // public function test_global_challenge_leaders_can_be_gotten()
+    // {
+    //     $response = $this->post("/api/v3/challenge/leaders/global");
+    //     $response->assertStatus(200);
         
-    }
+    // }
 }
