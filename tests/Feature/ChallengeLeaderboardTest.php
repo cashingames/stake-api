@@ -67,23 +67,23 @@ class ChallengeLeaderboardTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_a_challenge_leaderboard_can_be_fetched()
-    {
-        $this->userChallengeGameSession->update([
-            'points_gained' => 8,
-        ]);
-
-        $response = $this->get("/api/v3/challenge/" . $this->challenge->id . "/leaderboard");
-        $response->assertJson([
-            "challengerUsername" => $this->user->username,
-            "opponentUsername" => $this->opponent->username,
-        ]);
-    }
-
-    // public function test_global_challenge_leaders_can_be_gotten()
+    // public function test_a_challenge_leaderboard_can_be_fetched()
     // {
-    //     $response = $this->post("/api/v3/challenge/leaders/global");
-    //     $response->assertStatus(200);
-        
+    //     $this->userChallengeGameSession->update([
+    //         'points_gained' => 8,
+    //     ]);
+
+    //     $response = $this->get("/api/v3/challenge/" . $this->challenge->id . "/leaderboard");
+    //     $response->assertJson([
+    //         "challengerUsername" => $this->user->username,
+    //         "opponentUsername" => $this->opponent->username,
+    //     ]);
     // }
+
+    public function test_global_challenge_leaders_can_be_gotten()
+    {
+        $response = $this->post("/api/v3/challenge/leaders/global");
+        $response->assertStatus(200);
+        
+    }
 }
