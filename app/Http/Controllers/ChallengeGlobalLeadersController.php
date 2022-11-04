@@ -6,13 +6,14 @@ use App\Http\ResponseHelpers\ChallengeGlobalLeadersResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class ChallengeGlobalLeadersController extends BaseController
 {
     public function __invoke(Request $request)
     {
         $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->subDays(7));
-        
+
         $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
         $limit = 3;
 
@@ -44,9 +45,12 @@ class ChallengeGlobalLeadersController extends BaseController
                 where winner is not null
                 group by leaderboard.winner
                 order by count(winner) desc limit ?";
-
-        $leaders = DB::select($sql, [$_startDate, $_endDate, $limit]);
-
-        return (new ChallengeGlobalLeadersResponse())->transform($leaders);
+        
+        Cache::remember('challenge-leaders', 3, function () use ($sql, $_startDate, $_endDate, $limit) {
+            return DB::select($sql, [$_startDate, $_endDate, $limit]);
+        });
+        
+        return (new ChallengeGlobalLeadersResponse())->transform(Cache::get('challenge-leaders'));
+           
     }
 }
