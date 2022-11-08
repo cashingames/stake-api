@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\SendPushNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use App\Models\UserPlan;
 use App\Models\User;
 use App\Models\Plan;
+use Illuminate\Support\Facades\DB;
 
 class GiveDailyBonusGames extends Command
 {
@@ -56,6 +58,12 @@ class GiveDailyBonusGames extends Command
                 'updated_at' => Carbon::now(),
                 'expire_at' => Carbon::now()->endOfDay()
             ]);
+        });
+        DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+            foreach ($devices as $device) {
+                (new SendPushNotification())->sendDailyBonusGamesNotification($device);
+               
+            }
         });
     }
 }

@@ -36,7 +36,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:01');
         $schedule->command('bonus:daily-activate')
             ->dailyAt('00:03');
-
+            
+        $schedule->command('boosts:send-notification')->tuesdays()->at('12:00')->timezone('Africa/Lagos');
+        $schedule->command('boosts:send-notification')->thursdays()->at('12:00')->timezone('Africa/Lagos');
+        $schedule->command('boosts:send-notification')->saturdays()->at('12:00')->timezone('Africa/Lagos');
+        
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
             $schedule->command('live-trivia:notify')->everyMinute();
         }

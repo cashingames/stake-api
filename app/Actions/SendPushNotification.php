@@ -187,4 +187,54 @@ class SendPushNotification
             ->send();
         Log::info("Challenge staking refund push notification sent to: " . $player->username );
     }
+
+    public function sendDailyBonusGamesNotification($device)
+    {
+        $this->pushService->setNotification(
+            [
+                'title' => "You have been awarded free games!",
+                'body' => "Play now and stand a chance to win cash!"
+            ]
+        )
+            ->setData(
+                [
+
+                    'title' => "You have been awarded free games!",
+                    'body' => "Play now and stand a chance to win cash!",
+                    'action_type' => "#",
+                    'action_id' => "#"
+
+                ]
+            )
+            ->setTo($device->device_token)
+            ->send();
+    }
+
+    public function sendBoostsReminderNotification($user)
+    {
+        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+        if (is_null($device_token)) {
+            return;
+        }
+
+        $this->pushService->setNotification(
+            [
+                'title' => "Your boosts are your super powers!",
+                'body' => "Use boosts to stand a better chance at winning!"
+            ]
+        )
+            ->setData(
+                [
+
+                    'title' => "Your boosts are your super powers!",
+                    'body' => "Use boosts to stand a better chance at winning!",
+                    'action_type' => "#",
+                    'action_id' => "#"
+
+                ]
+            )
+            ->setTo($device_token->device_token)
+            ->send();
+    }
+
 }
