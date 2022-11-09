@@ -15,4 +15,5 @@ class FeatureFlags{
     const WITHDRAWABLE_WALLET = "withdrawable_wallet";
     const CHALLENGE_GAME_STAKING = "challenge_game_staking";
     const STAKING_WITH_ODDS = "staking_with_odds";
+    const IN_APP_ACTIVITIES_PUSH_NOTIFICATION = "in_app_activities_push_notification";
 }

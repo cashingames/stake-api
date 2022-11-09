@@ -48,5 +48,9 @@ return [
     'staking_with_odds' => [
         'enabled' => env('FEATURE_FLAG_STAKING_WITH_ODDS_ENABLED', true),
         'activate_on' => null
+    ],
+    'in_app_activities_push_notification' => [
+        'enabled' => env('FEATURE_FLAG_IN_APP_ACTIVITIES_PUSH_NOTIFICATION_ENABLED', true),
+        'activate_on' => null
     ]
 ];
