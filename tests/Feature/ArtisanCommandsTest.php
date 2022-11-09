@@ -49,4 +49,13 @@ class ArtisanCommandsTest extends TestCase
     {
         $this->artisan('live-trivia:notify')->assertExitCode(0);
     }
+
+    public function test_boost_reminder_notifications()
+    {
+        $this->artisan('boosts:send-notification')->assertExitCode(0);
+    }
+    public function test_inapp_acivity_notifications()
+    {
+        $this->artisan('updates:send-notification')->assertExitCode(0);
+    }
 }
