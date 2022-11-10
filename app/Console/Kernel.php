@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->between('12:00', '14:00')
             ->days([0, 3]);
-            
+
         $schedule->command('challenge:staking-refund')->hourly();
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            $schedule->command('updates:send-notification')->everyThirtyMinutes();
+            $schedule->command('updates:send-notification')->hourly();
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::SPECIAL_HOUR_NOTIFICATION)) {
@@ -64,8 +64,7 @@ class Kernel extends ConsoleKernel
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            $schedule->command('winnings:credit')
-                ->hourly();
+            $schedule->command('winnings:credit')->hourly();
         }
     }
 

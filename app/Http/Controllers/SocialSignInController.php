@@ -28,7 +28,7 @@ class SocialSignInController extends BaseController
             $data = [
                 'token' => $token,
                 'isFirstTime' => false,
-    
+
             ];
             return $this->sendResponse($data, 'Returning user token');
         }
@@ -41,7 +41,7 @@ class SocialSignInController extends BaseController
 
         ];
 
-        return $this->sendResponse($data, 'username, phone number, password needed');
+        return $this->sendResponse($data, 'username, phone number needed');
     }
 
 
@@ -51,19 +51,23 @@ class SocialSignInController extends BaseController
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'phoneNumber' => ['nullable', 'string', 'min:11', 'max:11', 'unique:users,phone_number'],
+            'country_code' => ['nullable', 'string', 'max:4'],
+            'phone_number' => ['required', 'numeric', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // 'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username']
         ]);
 
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
-            'phone_number' => $data['phoneNumber'],
-            'password' => bcrypt($data['password']),
+            'country_code' => isset($data['country_code']) ? $data['country_code'] : '+234',
+            'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
+                ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
+            'password' => bcrypt(Str::random(8)),
             'is_on_line' => true,
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
+            'phone_verified_at' => now()
         ]);
 
         //create the profile
@@ -123,7 +127,7 @@ class SocialSignInController extends BaseController
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
-        }   
+        }
         //credit referrer with points
         if (
             config('trivia.bonus.enabled') &&
