@@ -1,14 +1,38 @@
 [
     {
-        "Message": "A cashingamer just cashed out! Place a staking now and stand a chance of winning cash!"
+        "Message": "Joe just cashed out! Stake cash now and stand a chance to earn cash."
     },
     {
-        "Message": "Did you know? Your boosts give you superpowers during a game? Try them out now!"
+        "Message": "Low scores? Buy boosts now to increase your chances of winning big!"
     },
     {
-        "Message": "Have you funded your wallet yet? Fund now to be able to buy games and play more!"
+        "Message": "Tinny just leveled up! Play more games to climb up the leaderboard."
     },
     {
-        "Message": "A cashingamer just made a climb on the leaderboard! Keep playing games to climb up the leaderboard!"
+        "Message": "The higher your stake, the higher the amount you can cash out! Try it out now."
+    },
+    {
+        "Message": "Have you funded your wallet today? You can buy boosts and play more games when you fund."
+    },
+    {
+        "Message": "Test your knowledge and earn cash when you stake. It's a win-win!"
+    },
+    {
+        "Message": "How much will you earn today? We can only know that when you play games and stake."
+    },
+    {
+        "Message": "Make smart money moves! Stake, play, earn!"
+    },
+    {
+        "Message": "Be a smart investor. Fund, stake, play and earn."
+    },
+    {
+        "Message": "Have you withdrawn your winnings?  None yet? You can earn today! Stake and play to win big!"
+    },
+    {
+        "Message": "Did you know? Real withdrawable cash is made when you stake and play a game!"
+    },
+    {
+        "Message": "Play and Earn cash! That's what we are about here."
     }
 ]
