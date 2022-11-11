@@ -237,4 +237,31 @@ class SendPushNotification
             ->send();
     }
 
+    public function sendInAppActivityNotification($user, $message)
+    {
+        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+        if (is_null($device_token)) {
+            return;
+        }
+
+        $this->pushService->setNotification(
+            [
+                'title' => "Hi there!",
+                'body' => $message
+            ]
+        )
+            ->setData(
+                [
+
+                    'title' => "Hi there!",
+                    'body' => $message,
+                    'action_id' => '#',
+                    'unread_notifications_count' => $user->unreadNotifications()->count()
+
+                ]
+            )
+            ->setTo($device_token->device_token)
+            ->send();
+    }
+
 }
