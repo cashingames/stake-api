@@ -8,7 +8,6 @@ use App\Enums\PushNotificationType;
 use App\Models\User;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Str;
 
 class InAppActivityNotification extends Notification implements ShouldQueue
 {
@@ -47,7 +46,7 @@ class InAppActivityNotification extends Notification implements ShouldQueue
         return [
             'title' => $this->message,
             'action_type' => PushNotificationType::ActivityUpdate,
-            'action_id' => Str::random(4)
+            'action_id' => rand ( 1000 , 9999 ),
         ];
     }
 }
