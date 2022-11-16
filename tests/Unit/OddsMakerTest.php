@@ -170,4 +170,19 @@ class OddsMakerTest extends TestCase
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
 
     }
+
+    public function test_live_trivia_odds_does_not_include_special_hour(){
+        $currentHour = date("H");
+        config(['odds.special_hours' => [
+            $currentHour . ":00",
+            (intval($currentHour) < 9 ? "0" : "") . (intval($currentHour) + 1) . ":00"
+        ]]);
+        
+        
+        $oddsComputer = new OddsComputer();
+        $oddEffect = $oddsComputer->compute($this->user, 3, true);
+            
+        $this->assertNotEquals('special_hour', $oddEffect['oddsMultiplier']);
+
+    }
 }
