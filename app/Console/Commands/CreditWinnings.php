@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\WalletTransaction;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class CreditWinnings extends Command
 {
@@ -30,7 +31,7 @@ class CreditWinnings extends Command
     public function handle()
     {
         WalletTransaction::unsettled()
-            ->where('viable_date', '<=', now())
+            ->where('viable_date', '<=', Carbon::now()->subHours(config('trivia.staking.hours_before_withdrawal')))
             ->chunkById(500, function ($transactions) {
                 foreach ($transactions as $transaction) {
                     $transaction->wallet->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);

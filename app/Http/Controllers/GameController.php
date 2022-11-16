@@ -469,7 +469,7 @@ class GameController extends BaseController
                     'balance' => $this->user->wallet->withdrawable_balance,
                     'description' => 'Staking winning of ' . $amountWon . ' cash',
                     'reference' => Str::random(10),
-                    'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+                    'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
                 ]);
 
                 $staking->update(['amount_won' => $amountWon]);
