@@ -295,21 +295,22 @@ class GameController extends BaseController
             $gameSession->trivia_id = $request->trivia;
         } else {
 
-            $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
-            if ($plan == null) {
-                return $this->sendResponse('No available games', 'No available games');
-            }
+            if (!$request->has('staking_amount')) {
+                $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
+                if ($plan == null) {
+                    return $this->sendResponse('No available games', 'No available games');
+                }
 
+                $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
+                $userPlan->update(['used_count' => $userPlan->used_count + 1]);
+
+                if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
+                    $userPlan->update(['is_active' => false]);
+                }
+
+                $gameSession->plan_id = $plan->id;
+            }
             $questions = $questionHardener->determineQuestions();
-
-            $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-            $userPlan->update(['used_count' => $userPlan->used_count + 1]);
-
-            if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
-                $userPlan->update(['is_active' => false]);
-            }
-
-            $gameSession->plan_id = $plan->id;
         }
 
         $gameSession->save();
@@ -448,7 +449,7 @@ class GameController extends BaseController
         }
 
         $staking = null;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
 
             $staking = $exhibitionStaking->staking ?? null;
@@ -500,7 +501,7 @@ class GameController extends BaseController
 
         $game->save();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $game->amount_staked = $staking ? $staking->amount_staked : null;
             $game->with_staking = $staking ? true : false;
         }
