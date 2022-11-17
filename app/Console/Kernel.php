@@ -38,12 +38,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')
             ->dailyAt('00:03');
 
-        $schedule->command('boosts:send-notification')
-            ->hourly()
-            ->between('12:00', '14:00')
-            ->days([0, 3]);
-
         $schedule->command('challenge:staking-refund')->hourly();
+
+        if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
+            $schedule->command('boosts:send-notification')
+                ->hourly()
+                ->between('12:00', '14:00')
+                ->days([0, 3]);
+        }
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
             $schedule->command('live-trivia:notify')->everyMinute();

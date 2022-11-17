@@ -3,11 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Actions\SendPushNotification;
+use App\Enums\FeatureFlags;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use App\Models\UserPlan;
 use App\Models\User;
 use App\Models\Plan;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\DB;
 
 class GiveDailyBonusGames extends Command
@@ -59,11 +61,12 @@ class GiveDailyBonusGames extends Command
                 'expire_at' => Carbon::now()->endOfDay()
             ]);
         });
-        DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
-            foreach ($devices as $device) {
-                (new SendPushNotification())->sendDailyBonusGamesNotification($device);
-               
-            }
-        });
+        if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+                foreach ($devices as $device) {
+                    (new SendPushNotification())->sendDailyBonusGamesNotification($device);
+                }
+            });
+        }
     }
 }
