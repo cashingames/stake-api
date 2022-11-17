@@ -266,6 +266,8 @@ class GameTest extends TestCase
         ]);
     }
 
+    
+
     public function test_that_a_staking_exhibition_game_does_not_start_if_wallet_balance_is_insufficient()
     {
 
@@ -304,6 +306,38 @@ class GameTest extends TestCase
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
 
+    }
+    public function test_exhibition_game_with_staking_does_not_require_game_lives()
+    {
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(25)
+            ->create();
+
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => $this->plan->game_count,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+
+        $this->user->wallet->update([
+            'non_withdrawable_balance' => 5000
+        ]);
+        
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 1000
+        ]);
+        $response->assertJson([
+            'message' => 'Game Started',
+        ]);
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()

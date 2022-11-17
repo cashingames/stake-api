@@ -67,11 +67,6 @@ class OddsMakerTest extends TestCase
         $oddEffect = $oddsComputer->compute($user, NULL, true);
         $expectation = 3;
         
-        $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
-        if (in_array($currentHour, $this->specialHours)){
-            $expectation += 1.5;
-        }
-        // dd($expectation, $oddEffect);
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
 
