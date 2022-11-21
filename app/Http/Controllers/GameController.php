@@ -223,11 +223,11 @@ class GameController extends BaseController
     {
 
         if ($request->has('staking_amount')) {
-            if ($request->staking_amount > config('odds.maximum_staking_amount')) {
-                return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_staking_amount'));
+            if ($request->staking_amount > config('odds.maximum_exhibition_staking_amount')) {
+                return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'));
             }
-            if ($request->staking_amount < config('odds.minimum_staking_amount')) {
-                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_staking_amount'));
+            if ($request->staking_amount < config('odds.minimum_exhibition_staking_amount')) {
+                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'));
             }
         } else {
         }
