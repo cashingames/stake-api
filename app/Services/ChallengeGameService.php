@@ -88,7 +88,7 @@ class ChallengeGameService{
                     'balance' => User::find($cS->user_id)->wallet->withdrawable_balance,
                     'description' => 'Staking winning of ' . $amountWon . ' on challenge',
                     'reference' => Str::random(10),
-                    'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+                    'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
                 ]);
             }
             return true;
@@ -107,7 +107,7 @@ class ChallengeGameService{
             'balance' => $winningUser->wallet->withdrawable_balance,
             'description' => 'Staking winning of ' . $amountWon . ' on challenge',
             'reference' => Str::random(10),
-            'viable_date' => Carbon::now()->addDays(config('trivia.staking.days_before_withdrawal'))
+            'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
         ]);
         $challengeStaking->staking()->update(['amount_won' => $amountWon]);
 
