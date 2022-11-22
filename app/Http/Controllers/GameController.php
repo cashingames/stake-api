@@ -145,8 +145,12 @@ class GameController extends BaseController
         $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
         $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
         $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
-        $result->maximumStakeAmount = config('odds.maximum_staking_amount');
-        $result->minimumStakeAmount = config('odds.minimum_staking_amount');
+        $result->maximumExhibitionStakeAmount = config('odds.maximum_exhibition_staking_amount');
+        $result->minimumExhibitionStakeAmount = config('odds.minimum_exhibition_staking_amount');
+        $result->maximumChallengeStakeAmount = config('odds.maximum_challenge_staking_amount');
+        $result->minimumChallengeStakeAmount = config('odds.minimum_challenge_staking_amount');
+        $result->maximumLiveTriviaStakeAmount = config('odds.maximum_live_trivia_staking_amount');
+        $result->minimumLiveTriviaStakeAmount = config('odds.minimum_live_trivia_staking_amount');
         $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
         $result->totalWithdrawalAmountLimit = config('trivia.staking.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.staking.total_withdrawal_days_limit');
@@ -219,11 +223,11 @@ class GameController extends BaseController
     {
 
         if ($request->has('staking_amount')) {
-            // if ($request->staking_amount > config('odds.maximum_staking_amount')) {
-            //     return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_staking_amount'));
-            // }
-            if ($request->staking_amount < config('odds.minimum_staking_amount')) {
-                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_staking_amount'));
+            if ($request->staking_amount > config('odds.maximum_exhibition_staking_amount')) {
+                return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'));
+            }
+            if ($request->staking_amount < config('odds.minimum_exhibition_staking_amount')) {
+                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'));
             }
         } else {
         }

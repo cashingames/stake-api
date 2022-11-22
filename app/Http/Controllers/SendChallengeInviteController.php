@@ -25,35 +25,38 @@ class SendChallengeInviteController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request, ChallengeGameService $challengeGameService)
-    {   
+    {
 
-        if (!$request->has('opponentId') || !$request->has('categoryId') ) {
-            
+        if (!$request->has('opponentId') || !$request->has('categoryId')) {
+
             return $this->sendError('Friend or category not found', 'Friend or category not found');
-
         }
 
         if ($request->has('staking_amount') && is_numeric($request->staking_amount)) {
-            if (is_array($request->opponentId) && $this->user->wallet->non_withdrawable_balance < ($request->staking_amount * count($request->opponentId))){
+            if (is_array($request->opponentId) && $this->user->wallet->non_withdrawable_balance < ($request->staking_amount * count($request->opponentId))) {
                 return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance to stake against all opponents');
             }
-            if ($this->user->wallet->non_withdrawable_balance < $request->staking_amount){
+            if ($this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
                 return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
-            }        
+            }
+
+            if ($request->staking_amount < config('odds.minimum_challenge_staking_amount')) {
+                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_challenge_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_challenge_staking_amount'));
+            }
         }
 
 
-        
+
         $challenges = $challengeGameService->createChallenge($this->user, $request->opponentId, $request->categoryId);
 
-        if ($request->has('staking_amount') && FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)){
-            foreach($challenges as $challenge){
+        if ($request->has('staking_amount') && FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)) {
+            foreach ($challenges as $challenge) {
                 $staking = new StakingService($this->user, 'challenge');
                 $stakingId = $staking->stakeAmount($request->staking_amount);
                 $staking->createChallengeStaking($stakingId, $challenge->id);
             }
         }
-        
+
         // $challenge = Challenge::create([
         //     'status' => 'PENDING',
         //     'user_id' => $this->user->id,
@@ -64,16 +67,14 @@ class SendChallengeInviteController extends BaseController
         // $opponent = User::find($request->opponentId);
         // Mail::send(new ChallengeInvite($opponent, $challenge->id));
 
-        
+
         // $pushAction = new SendPushNotification();
         // $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
-        
+
         // $opponent->notify(new ChallengeReceivedNotification($challenge, $this->user));
 
         // Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
-        
-        return $this->sendResponse('Invite Sent', 'Invite Sent');
-      
-    }
 
+        return $this->sendResponse('Invite Sent', 'Invite Sent');
+    }
 }

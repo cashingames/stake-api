@@ -21,6 +21,10 @@ return [
         '21:00',
         '0:00',
     ],
-    'minimum_staking_amount' => env('MINIMUM_STAKING_AMOUNT', 100),
-    'maximum_staking_amount' => env('MAXIMUM_STAKING_AMOUNT', 1000)
+    'minimum_exhibition_staking_amount' => env('MINIMUM_EXHIBITION_STAKING_AMOUNT', 100),
+    'maximum_exhibition_staking_amount' => env('MAXIMUM_EXHIBITION_STAKING_AMOUNT', 1000),
+    'minimum_challenge_staking_amount' => env('MINIMUM_CHALLENGE_STAKING_AMOUNT', 100),
+    'maximum_challenge_staking_amount' => env('MAXIMUM_CHALLENGE_STAKING_AMOUNT', 1000000),
+    'minimum_live_trivia_staking_amount' => env('MINIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 100),
+    'maximum_live_trivia_staking_amount' => env('MAXIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 1000)
 ];
