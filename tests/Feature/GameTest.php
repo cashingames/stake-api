@@ -78,6 +78,7 @@ class GameTest extends TestCase
         $this->actingAs($this->user);
         FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
+        config(['odds.maximum_exhibition_staking_amount' => 1000]);
     }
 
     public function test_common_data_can_be_retrieved()
@@ -240,8 +241,6 @@ class GameTest extends TestCase
 
     public function test_exhibition_game_can_be_started_with_staking()
     {   
-        config(['odds.maximum_exhibition_staking_amount' => 1000]);
-
         $questions = Question::factory()
             ->hasOptions(4)
             ->count(25)
@@ -265,7 +264,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 1000
+            "staking_amount" => 500
         ]);
         $response->assertJson([
             'message' => 'Game Started',
@@ -281,7 +280,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 1000
+            "staking_amount" => 500
         ]);
         $response->assertJson([
             'message' => 'Insufficient wallet balance',
@@ -289,7 +288,8 @@ class GameTest extends TestCase
     }
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
-    {
+    {   
+
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $this->user->wallet->update([
             'non_withdrawable_balance' => 1000
@@ -339,7 +339,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 1000
+            "staking_amount" => 500
         ]);
         $response->assertJson([
             'message' => 'Game Started',
