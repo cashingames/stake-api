@@ -99,8 +99,12 @@ class GameTest extends TestCase
                 'gameModes' => [],
                 'gameTypes' => [],
                 'minVersionCode' => [],
-                'minimumStakeAmount' => [],
-                'maximumStakeAmount' => []
+                'minimumExhibitionStakeAmount' => [],
+                'maximumExhibitionStakeAmount' => [],
+                'minimumChallengeStakeAmount' => [],
+                'maximumChallengeStakeAmount' => [],
+                'minimumLiveTriviaStakeAmount' => [],
+                'maximumLiveTriviaStakeAmount' => [],
             ]
         ]);
     }
@@ -235,7 +239,9 @@ class GameTest extends TestCase
     }
 
     public function test_exhibition_game_can_be_started_with_staking()
-    {
+    {   
+        config(['odds.maximum_exhibition_staking_amount' => 1000]);
+
         $questions = Question::factory()
             ->hasOptions(4)
             ->count(25)
