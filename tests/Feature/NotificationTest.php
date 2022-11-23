@@ -43,7 +43,7 @@ class NotificationTest extends TestCase
             ]
             ]);
 
-        $response = $this->putJson("/api/v3/notifications/read/{$notification->id}/");
+        $response = $this->postJson("/api/v3/notifications/read/{$notification->id}/");
         $response->assertOk();
         $response->assertJson([
             'message' => 'Notification marked as read'
@@ -69,7 +69,7 @@ class NotificationTest extends TestCase
             $counter = $i;
         }
         
-        $response = $this->putJson("/api/v3/notifications/read/all");
+        $response = $this->postJson("/api/v3/notifications/read/all");
         $response->assertOk();
         $response->assertJson([
             'message' => 'Notification marked as read'
