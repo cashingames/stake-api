@@ -98,7 +98,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStakingOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
-        Route::put('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
+        Route::post('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
         Route::post('game/can-stake-in-game', [GameController::class, 'canPlayWithStaking']);
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
