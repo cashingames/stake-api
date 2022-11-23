@@ -19,7 +19,9 @@ class NotificationController extends BaseController
      */
     public function readNotification($notificationId){
         if ($notificationId == "all"){
-            $this->user->unreadNotifications()->update(['read_at' => now()]);
+            foreach ($this->user->unreadNotifications as $notification) {
+                $notification->update(['read_at' => now()]);
+            }
         }else{
             UserNotification::whereId($notificationId)->update(['read_at' => now()]);
         }
