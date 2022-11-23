@@ -267,16 +267,13 @@ class GameController extends BaseController
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
-        if (FeatureFlag::isEnabled(FeatureFlags::ODDS) && !$request->has('staking_amount')) {
+        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)) {
             $oddMultiplierComputer = new OddsComputer();
-
-
             $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null), $request->has('trivia') ? true : false);
 
             $gameSession->odd_multiplier = $odd['oddsMultiplier'];
             $gameSession->odd_condition = $odd['oddsCondition'];
         }
-
 
         $questions = [];
 
@@ -327,7 +324,6 @@ class GameController extends BaseController
                 $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
             }
         }
-
 
         Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 

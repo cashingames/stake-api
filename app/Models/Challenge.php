@@ -68,6 +68,7 @@ class Challenge extends Model
             $data->playerAvatar = $playerAvater;
             $data->opponentUsername = $opponentUsername;
             $data->opponentAvatar = $opponentAvatar;
+            $data->isExpired = !is_null($challenge->expired_at) ? true : false;
             return $data;
         }
     }

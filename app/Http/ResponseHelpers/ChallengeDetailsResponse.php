@@ -41,6 +41,7 @@ class ChallengeDetailsResponse
         $presenter->status = $data->challengeDetails->status;
         $presenter->gameModeId = $data->gameModeId;
         $presenter->gameModeName = $data->gameModeName;
+        $presenter->isExpired = $data->isExpired;
 
         $stakes = ChallengeStaking::where('challenge_id', $data->challengeDetails->id)->oldest()->get();
         if (count($stakes) > 0){

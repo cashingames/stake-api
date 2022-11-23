@@ -12,7 +12,7 @@ class ChallengeGlobalLeadersController extends BaseController
 {
     public function __invoke(Request $request)
     {
-        $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->subDays(7));
+        $_startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
 
         $_endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
         $limit = 3;
