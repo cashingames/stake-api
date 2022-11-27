@@ -29,11 +29,11 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
         }
 
-        $totalAmountWithdrawn = $this->user->transactions()->withdrawals()->whereBetween('wallet_transactions.created_at', [now()->subDays(config('trivia.staking.total_withdrawal_days_limit')), now()])->sum('amount');
+        // $totalAmountWithdrawn = $this->user->transactions()->withdrawals()->whereBetween('wallet_transactions.created_at', [now()->subDays(config('trivia.staking.total_withdrawal_days_limit')), now()])->sum('amount');
 
-        if ($totalAmountWithdrawn >= config('trivia.staking.total_withdrawal_limit')) {
-            return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
-        }
+        // if ($totalAmountWithdrawn >= config('trivia.staking.total_withdrawal_limit')) {
+        //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
+        // }
 
         if ($debitAmount < config('trivia.staking.min_withdrawal_amount')) {
             return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.staking.min_withdrawal_amount'));

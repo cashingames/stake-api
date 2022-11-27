@@ -52,29 +52,29 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
-    public function test_that_a_user_cannot_withdraw_more_than_maximum_withdrawal_limit_in_configurable_number_of_days(){
+    // public function test_that_a_user_cannot_withdraw_more_than_maximum_withdrawal_limit_in_configurable_number_of_days(){
 
-        Config::set('trivia.staking.total_withdrawal_limit', 10000);
-        Config::set('trivia.staking.total_withdrawal_days_limit', 7);
+    //     Config::set('trivia.staking.total_withdrawal_limit', 10000);
+    //     Config::set('trivia.staking.total_withdrawal_days_limit', 7);
         
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => 15000,
-            'balance' => $this->user->wallet->withdrawable_balance,
-            'description' => 'Winnings Withdrawal Made',
-            'reference' => Str::random(10),
-            'created_at' => now()->subDays(3)
-        ]);
+    //     WalletTransaction::create([
+    //         'wallet_id' => $this->user->wallet->id,
+    //         'transaction_type' => 'DEBIT',
+    //         'amount' => 15000,
+    //         'balance' => $this->user->wallet->withdrawable_balance,
+    //         'description' => 'Winnings Withdrawal Made',
+    //         'reference' => Str::random(10),
+    //         'created_at' => now()->subDays(3)
+    //     ]);
 
-        $this->user->wallet->withdrawable_balance = 20000;
-        $this->user->wallet->save();
+    //     $this->user->wallet->withdrawable_balance = 20000;
+    //     $this->user->wallet->save();
         
-        $response = $this->post(self::WITHDRAWAL_URL);
-        $response->assertJson([
-            'message' => 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days',
-        ]);
-    }
+    //     $response = $this->post(self::WITHDRAWAL_URL);
+    //     $response->assertJson([
+    //         'message' => 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days',
+    //     ]);
+    // }
 
     public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount(){
         Config::set('trivia.staking.min_withdrawal_amount', 500);
