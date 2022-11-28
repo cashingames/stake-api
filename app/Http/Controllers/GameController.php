@@ -236,6 +236,7 @@ class GameController extends BaseController
         }
         return $this->sendResponse("Can play game with staking", "Can play game with staking");
     }
+
     public function startSingleGame(Request $request)
     {
         $request->validate([
@@ -246,6 +247,8 @@ class GameController extends BaseController
             'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_exhibition_staking_amount'), "min:" . config('odds.minimum_exhibition_staking_amount')]
         ]);
 
+
+
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
             return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
@@ -255,8 +258,7 @@ class GameController extends BaseController
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
-        $questionHardener = new QuestionsHardeningService($this->user, $category);
-
+      
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
@@ -267,7 +269,10 @@ class GameController extends BaseController
         $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
         $gameSession->state = "ONGOING";
 
+        $questionHardener = new QuestionsHardeningService($this->user, $category);
+
         if (FeatureFlag::isEnabled(FeatureFlags::ODDS)) {
+
             $oddMultiplierComputer = new OddsComputer();
             $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null), $request->has('trivia') ? true : false);
 
@@ -295,6 +300,10 @@ class GameController extends BaseController
             $gameSession->trivia_id = $request->trivia;
         } else {
 
+            if (count($questionHardener->determineQuestions()) < 20) {
+                return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
+            }
+            
             if (!$request->has('staking_amount')) {
                 $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
                 if ($plan == null) {

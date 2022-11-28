@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
 class GameTest extends TestCase
@@ -68,7 +69,7 @@ class GameTest extends TestCase
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
         $this->seed(StakingOddSeeder::class);
-        $this->seed( StakingOddsRulesSeeder::class);
+        $this->seed(StakingOddsRulesSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -126,7 +127,6 @@ class GameTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertTrue($this->user->last_activity_time !== null);
-        
     }
 
     public function test_achievement_cannot_be_claimed_if_points_are_not_enough()
@@ -142,9 +142,22 @@ class GameTest extends TestCase
 
     public function test_exhibition_game_can_be_started()
     {
-        Question::factory()
-            ->count(50)
+        $questions = Question::factory()
+            ->count(250)
             ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         UserPlan::create([
             'plan_id' => $this->plan->id,
@@ -170,9 +183,9 @@ class GameTest extends TestCase
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
     {
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
-        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
-        $game->update(['state'=>'ONGOING']);
+        $game->update(['state' => 'ONGOING']);
 
         $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
@@ -186,9 +199,9 @@ class GameTest extends TestCase
 
     public function test_exhibition_game_can_be_ended_with_boosts_and_no_options()
     {
-        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
-        $game->update(['state'=>'ONGOING']);
+        $game->update(['state' => 'ONGOING']);
 
         $boost = Boost::inRandomOrder()->first();
 
@@ -215,7 +228,8 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_challenge_invite_sent_successfully(){
+    public function test_challenge_invite_sent_successfully()
+    {
         Mail::fake();
         Notification::fake();
 
@@ -236,15 +250,27 @@ class GameTest extends TestCase
         Mail::assertQueued(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
-        
     }
 
     public function test_exhibition_game_can_be_started_with_staking()
-    {   
+    {
         $questions = Question::factory()
             ->hasOptions(4)
-            ->count(25)
+            ->count(250)
             ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         UserPlan::create([
             'plan_id' => $this->plan->id,
@@ -259,7 +285,7 @@ class GameTest extends TestCase
         $this->user->wallet->update([
             'non_withdrawable_balance' => 5000
         ]);
-        
+
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
@@ -271,7 +297,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    
+
 
     public function test_that_a_staking_exhibition_game_does_not_start_if_wallet_balance_is_insufficient()
     {
@@ -288,7 +314,23 @@ class GameTest extends TestCase
     }
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
-    {   
+    {
+        $questions = Question::factory()
+            ->count(250)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $this->user->wallet->update([
@@ -311,14 +353,26 @@ class GameTest extends TestCase
             "staking_amount" => 500
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
-
     }
     public function test_exhibition_game_with_staking_does_not_require_game_lives()
     {
         $questions = Question::factory()
             ->hasOptions(4)
-            ->count(25)
+            ->count(250)
             ->create();
+            
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         UserPlan::create([
             'plan_id' => $this->plan->id,
@@ -334,7 +388,7 @@ class GameTest extends TestCase
         $this->user->wallet->update([
             'non_withdrawable_balance' => 5000
         ]);
-        
+
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
@@ -347,7 +401,7 @@ class GameTest extends TestCase
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
-    {   
+    {
         FeatureFlag::enable('odds');
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $questions = Question::factory()
@@ -355,10 +409,10 @@ class GameTest extends TestCase
             ->count(10)
             ->create();
         $chosenOptions = [];
-        foreach ($questions as $question){
+        foreach ($questions as $question) {
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
-        
+
         UserPlan::create([
             'plan_id' => $this->plan->id,
             'user_id' => $this->user->id,
@@ -373,9 +427,9 @@ class GameTest extends TestCase
             'non_withdrawable_balance' => 5000
         ]);
 
-        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
-        $game->update(['state'=>'ONGOING']);
+        $game->update(['state' => 'ONGOING']);
 
         $staking = Staking::create([
             'user_id' => $this->user->id,
@@ -386,7 +440,7 @@ class GameTest extends TestCase
             'staking_id' => $staking->id,
             'game_session_id' => $game->id
         ]);
-    
+
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => $chosenOptions,
@@ -397,12 +451,12 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function($value, $key){
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
         $expectedOdd = StakingOdd::where('score', $correctOptionsCount)->first()->odd;
-        
+
         $this->assertDatabaseHas('exhibition_stakings', [
             'staking_id' => $staking->id,
             'game_session_id' => $game->id,
@@ -417,7 +471,7 @@ class GameTest extends TestCase
     }
 
     public function test_exhibition_staking_with_odd_awards_required_amount_with_odd()
-    {   
+    {
         FeatureFlag::enable('odds');
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);
@@ -427,10 +481,10 @@ class GameTest extends TestCase
             ->count(10)
             ->create();
         $chosenOptions = [];
-        foreach ($questions as $question){
+        foreach ($questions as $question) {
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
-        
+
         UserPlan::create([
             'plan_id' => $this->plan->id,
             'user_id' => $this->user->id,
@@ -445,9 +499,9 @@ class GameTest extends TestCase
             'non_withdrawable_balance' => 5000
         ]);
 
-        GameSession::where('user_id','!=',$this->user->id)->update(['user_id'=>$this->user->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
-        $game->update(['state'=>'ONGOING']);
+        $game->update(['state' => 'ONGOING']);
 
         $staking = Staking::create([
             'user_id' => $this->user->id,
@@ -459,7 +513,7 @@ class GameTest extends TestCase
             'staking_id' => $staking->id,
             'game_session_id' => $game->id
         ]);
-    
+
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => $chosenOptions,
@@ -470,7 +524,7 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function($value, $key){
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
@@ -487,6 +541,22 @@ class GameTest extends TestCase
             'id' => $staking->id,
             'amount_staked' => $staking->amount_staked,
             'amount_won' => $staking->amount_staked * $expectedOdd *  $stakingOddApplied
+        ]);
+    }
+
+    public function test_exhibition_game_cannot_be_started_if_questions_are_not_enough()
+    {
+        // Question::factory()
+        //     ->count(50)
+        //     ->create();
+
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2
+        ]);
+        $response->assertJson([
+            'message' => 'Category not available for now, try again later',
         ]);
     }
 }

@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Trivia;
 use App\Models\GameSession;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class LiveTriviaTest extends TestCase
@@ -73,9 +74,22 @@ class LiveTriviaTest extends TestCase
 
     public function test_live_trivia_can_be_started()
     {
-        Question::factory()
-            ->count(50)
+        $questions = Question::factory()
+            ->count(250)
             ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         $response = $this->postjson('/api/v2/game/start/single-player', [
             "category" => $this->category->id,
@@ -92,10 +106,23 @@ class LiveTriviaTest extends TestCase
 
     public function test_live_trivia_cannot_be_played_more_than_once_by_the_same_user()
     {
-        Question::factory()
-            ->count(50)
+        $questions = Question::factory()
+            ->count(250)
             ->create();
 
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+        
         GameSession::create([
             'category_id' => 101,
             'trivia_id' => $this->trivia->id,
