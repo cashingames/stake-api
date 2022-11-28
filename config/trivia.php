@@ -35,6 +35,10 @@ return [
     'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
     'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
   ],
+  'wallet_funding'=>[
+    'min_amount' => env('MINIMUM_WALLET_FUNDABLE_AMOUNT',100),
+    'max_amount' => env('MAXIMUM_WALLET_FUNDABLE_AMOUNT',100000)
+  ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
   'payment_key' => env('PAYSTACK_KEY', null),

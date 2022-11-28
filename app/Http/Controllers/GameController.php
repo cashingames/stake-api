@@ -151,6 +151,8 @@ class GameController extends BaseController
         $result->minimumChallengeStakeAmount = config('odds.minimum_challenge_staking_amount');
         $result->maximumLiveTriviaStakeAmount = config('odds.maximum_live_trivia_staking_amount');
         $result->minimumLiveTriviaStakeAmount = config('odds.minimum_live_trivia_staking_amount');
+        $result->minimumWalletFundableAmount = config('trivia.wallet_funding.min_amount');
+        $result->maximumWalletFundableAmount = config('trivia.wallet_funding.max_amount');
         $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
         $result->totalWithdrawalAmountLimit = config('trivia.staking.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.staking.total_withdrawal_days_limit');
