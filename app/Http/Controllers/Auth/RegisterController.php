@@ -86,7 +86,7 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
-       
+
         //create the user
 
         $user =
@@ -229,7 +229,13 @@ class RegisterController extends BaseController
 
         if (str_starts_with($request->phone_number, '0')) {
             if (!is_null(User::where('phone_number', ltrim($request->phone_number, $request->phone_number[0]))->first())) {
-                return $this->sendError("The phone number has been taken, contact support", "The phone number has been taken, contact support");
+                
+                $message = [
+                    'message' => ['The phone number has been taken, contact support'],
+
+                ];
+                return $this->sendError($message, 'failed');
+               
             }
         }
 
