@@ -69,7 +69,7 @@ class RegisterController extends BaseController
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'country_code' => ['required', 'string','max:4'],
+            'country_code' => ['required', 'string', 'max:4'],
             'phone_number' => ['nullable', 'numeric', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -86,19 +86,19 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
-
+       
         //create the user
-        
+
         $user =
             User::create([
                 'username' => $data['username'],
-                'phone_number' =>  str_starts_with($data['phone_number'], '0')?  
-                                    ltrim($data['phone_number'], $data['phone_number'][0]): $data['phone_number'],
+                'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
+                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'otp_token' => mt_rand(10000, 99999),
                 'is_on_line' => true,
-                'country_code' => $data['country_code'] 
+                'country_code' => $data['country_code']
             ]);
 
         //create the profile
@@ -188,10 +188,10 @@ class RegisterController extends BaseController
      * @return mixed
      */
     protected function registered(Request $request, SMSProviderInterface $smsService, $user)
-    {   
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
+    {
+        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
             try {
-                    $smsService->deliverOTP($user);
+                $smsService->deliverOTP($user);
             } catch (\Throwable $th) {
                 //throw $th;
                 //send mail to our admin to notify of inability to deliver SMS via OTP
@@ -199,7 +199,7 @@ class RegisterController extends BaseController
                 // return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
             }
         }
-        if(FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)){
+        if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
             Mail::send(new VerifyEmail($user));
 
             Log::info("Email verification sent to " . $user->email);
@@ -211,13 +211,13 @@ class RegisterController extends BaseController
             }
             // return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
         }
-        
-        
+
+
 
         $result = [
             'username' => $user->username,
             'email' => $user->email,
-            'phone_number' =>$user->phone_number,
+            'phone_number' => $user->phone_number,
             'next_resend_minutes' => 2
         ];
         return $this->sendResponse($result, 'Account created successfully');
@@ -227,30 +227,35 @@ class RegisterController extends BaseController
     {
         $this->validator($request->all())->validate();
 
+        if (str_starts_with($request->phone_number, '0')) {
+            if (!is_null(User::where('phone_number', ltrim($request->phone_number, $request->phone_number[0]))->first())) {
+                return $this->sendError("The phone number has been taken, contact support", "The phone number has been taken, contact support");
+            }
+        }
+
         $user = $this->create($request->all());
-        
+
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
     }
 
-    public function resendOTP(Request $request, SMSProviderInterface $smsService){
+    public function resendOTP(Request $request, SMSProviderInterface $smsService)
+    {
         $this->validate($request, [
             'username' => ['required', 'exists:users,username']
         ]);
-        
+
         $user = User::where('username', $request->username)->first();
-        
-        if ($user->phone_verified_at != null){
+
+        if ($user->phone_verified_at != null) {
             return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
         }
-        
-        if (Cache::has($user->username . "_last_otp_time")){
+
+        if (Cache::has($user->username . "_last_otp_time")) {
             //otp was still recently sent to this user, so no need resending
-            return $this->sendResponse([
-            ], "You can not send OTP at this time, please try later");
-            
-        }else{
+            return $this->sendResponse([], "You can not send OTP at this time, please try later");
+        } else {
             try {
                 $smsService->deliverOTP($user);
                 return $this->sendResponse([
