@@ -55,7 +55,7 @@ class RegisterTest extends TestCase
             'first_name' => '',
             'last_name' => '',
             'username' => '',
-            'country_code' =>'',
+            'country_code' => '',
             'phone_number' => '',
             'email' => '',
             'password' => '',
@@ -139,6 +139,28 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
     }
 
+    /** @test */
+    public function a_phone_number_variant_is_considered_a_duplicate_phone_number()
+    {
+        $this->user->update(['phone_number' => 704995878]);
+
+        $response = $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'jaydoe',
+            'country_code' => '+234',
+            'phone_number' => '0'.$this->user->phone_number,
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $response->assertJson([
+            'message' => 'The phone number has been taken, contact support',
+        ]);
+    }
+
     public function test_a_user_recieves_verification_email_on_registration()
     {
 
@@ -147,7 +169,7 @@ class RegisterTest extends TestCase
             'first_name' => 'User',
             'last_name' => 'Test',
             'username' => 'user_email',
-            'country_code' => '234',
+            'country_code' => '+234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
@@ -170,7 +192,7 @@ class RegisterTest extends TestCase
             'first_name' => 'User',
             'last_name' => 'Test',
             'username' => 'user_otp',
-            'country_code' => '234',
+            'country_code' => '+234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
             'password' => 'password',
@@ -179,14 +201,15 @@ class RegisterTest extends TestCase
         ]);
 
         $response->assertOk();
-        
     }
 
     public function test_a_user_can_register_from_web_without_needing_email_verification()
     {
-        if(FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){$this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-            $mock->shouldReceive('deliverOTP')->once();
-        });}
+        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
+            $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+                $mock->shouldReceive('deliverOTP')->once();
+            });
+        }
 
         $response = $this->withHeaders([
             'X-App-Source' => 'web',
@@ -194,7 +217,7 @@ class RegisterTest extends TestCase
             'first_name' => 'Jane',
             'last_name' => 'Doe',
             'username' => 'janeDoe',
-            'country_code' => '234',
+            'country_code' => '+234',
             'phone_number' => '08012345678',
             'email' => 'jane@doe.com',
             'password' => 'password',
