@@ -156,6 +156,8 @@ class RegisterTest extends TestCase
 
         ]);
 
+        
+
         $response->assertJson([
             'message' => 'The phone number has been taken, contact support',
         ]);
