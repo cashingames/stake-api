@@ -234,7 +234,7 @@ class RegisterController extends BaseController
                     'message' => ['The phone number has been taken, contact support'],
 
                 ];
-                return $this->sendError($message, 'failed');
+                return $this->sendError($message, 'The phone number has been taken, contact support');
                
             }
         }
