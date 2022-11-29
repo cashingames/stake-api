@@ -99,6 +99,6 @@ class OddsComputer
 
     public function isNewLiveTriviaPlayer(User $user)
     {
-        return $user->gameSessions()->whereNotNull('trivia_id')->count() < 5;
+        return $user->gameSessions()->whereNotNull('trivia_id')->count() < 2;
     }
 }
