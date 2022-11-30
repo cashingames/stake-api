@@ -96,7 +96,7 @@ class RegisterController extends BaseController
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
-                'otp_token' => mt_rand(10000, 99999),
+                'otp_token' => null,
                 'is_on_line' => true,
                 'country_code' => $data['country_code']
             ]);
