@@ -2,6 +2,7 @@
 
 namespace App\Services\SMS;
 
+use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use App\Services\SMS\SMSProviderInterface;
@@ -54,9 +55,20 @@ class TermiiService implements SMSProviderInterface{
         return json_decode($response->getBody());
     }
 
+    private function generateOtp(){
+        $otp = mt_rand(10000, 99999);
+
+        if(User::where('otp_token',  $otp )->exists()){
+            $otp = mt_rand(10000, 99999);
+        };
+        return $otp;
+    }
+
     public function deliverOTP($user){
+        $otp_token = $this->generateOtp();
+        
         if ($user->otp_token == null){
-            $user->update(['otp_token' => mt_rand(10000, 99999)]);
+            $user->update(['otp_token' => $otp_token]);
         }
         $smsData = [
             'to' => $user->country_code.(substr($user->phone_number, -10)),
