@@ -5,6 +5,7 @@ namespace App\Http\ResponseHelpers;
 use App\Enums\LiveTriviaPlayerStatus;
 use App\Enums\LiveTriviaStatus;
 use App\Models\LiveTrivia;
+use App\Models\LiveTriviaUserPayment;
 use App\Models\UserPoint;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,9 @@ class LiveTriviaStatusResponse
     public int $categoryId;
     public string $title;
     public string $prize;
+    public $entryFee;
+    public $isFreeLiveTrivia;
+    public $entryFreePaid;
     public int $duration;
     public int $questionsCount;
     public int $pointsRequired;
@@ -45,6 +49,7 @@ class LiveTriviaStatusResponse
         $response->duration = $model->game_duration;
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
+        $response->entryFee = $model->entry_fee;
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -55,6 +60,8 @@ class LiveTriviaStatusResponse
         $response->statusDisplayText = $this->getStatusDisplayText($response->status);
         $response->startDateDisplayText = $this->getStartDateDisplayText($model->start_time);
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
+        $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
+        $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
         return response()->json($response);
     }
 
@@ -70,6 +77,7 @@ class LiveTriviaStatusResponse
         $response->duration = $model->game_duration;
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
+        $response->entryFee = $model->entry_fee;
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -80,9 +88,11 @@ class LiveTriviaStatusResponse
         $response->statusDisplayText = $this->getStatusDisplayText($response->status);
         $response->startDateDisplayText = $this->getStartDateDisplayText($model->start_time);
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
+        $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
+        $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
         return $response;
     }
-    
+
     private function getPlayerStatus($model, $pointsAcquiredBefore): LiveTriviaPlayerStatus
     {
         $user = auth()->user();
@@ -96,6 +106,16 @@ class LiveTriviaStatusResponse
         }
 
         return LiveTriviaPlayerStatus::CanPlay;
+    }
+
+    private function getUserEntryFeeEligibilityStatus($id)
+    {
+        $hasPaid = LiveTriviaUserPayment::where('trivia_id', $id)->where('user_id', auth()->user()->id)->exists();
+
+        if ($hasPaid) {
+            return true;
+        }
+        return false;
     }
 
     private function getStatus($model): LiveTriviaStatus
@@ -125,16 +145,16 @@ class LiveTriviaStatusResponse
         if ($status == LiveTriviaStatus::Waiting) {
             $result = "";
         }
-        if($status == LiveTriviaStatus::Ongoing) {
+        if ($status == LiveTriviaStatus::Ongoing) {
             if ($playerStatus == LiveTriviaPlayerStatus::LowPoints) {
                 $result = "Play now";
             } else if ($playerStatus == LiveTriviaPlayerStatus::Played) {
                 $result = "Leaderboard";
             } else if ($playerStatus == LiveTriviaPlayerStatus::CanPlay) {
                 $result = "Play now";
-            }   
+            }
         }
-        if($status == LiveTriviaStatus::Expired || $status == LiveTriviaStatus::Closed){
+        if ($status == LiveTriviaStatus::Expired || $status == LiveTriviaStatus::Closed) {
             $result = "Leaderboard";
         }
 

@@ -35,6 +35,7 @@ use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\ChallengeGlobalLeadersController;
 use App\Http\Controllers\FeatureFlagController;
+use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
 
 /*
@@ -85,6 +86,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class);
+        Route::post('live-trivia/entrance/pay', LiveTriviaEntrancePaymentController::class);
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class);
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
         Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
