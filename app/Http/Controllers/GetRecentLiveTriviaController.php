@@ -22,6 +22,7 @@ class GetRecentLiveTriviaController extends Controller
         $response = [];
        
         foreach($recentLiveTrivia as $liveTrivia){
+            // dd($liveTrivia);
             $response[]= (new LiveTriviaStatusResponse())->transformAndReturnObject($liveTrivia);
         }
         return $response;
