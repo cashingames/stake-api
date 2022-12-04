@@ -18,6 +18,7 @@ class WithdrawWinningsController extends BaseController
         // $data = $request->validate([
         //     'amount' => ['required', 'numeric', 'min:0'],
         // ]);
+        return $this->sendError(false, 'Withdrawal is not available at the moment');
 
         if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
             return $this->sendError(false, 'Please update your profile with your bank details');
