@@ -31,7 +31,7 @@ class CreditWinnings extends Command
     public function handle()
     {
         WalletTransaction::unsettled()
-            ->where('viable_date', '<=', Carbon::now())
+            ->where('viable_date', '<=', Carbon::now()->subHours(config('trivia.staking.hours_before_withdrawal')))
             ->chunkById(500, function ($transactions) {
                 foreach ($transactions as $transaction) {
                     $transaction->wallet->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);
