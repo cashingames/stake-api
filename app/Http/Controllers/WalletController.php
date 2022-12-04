@@ -57,8 +57,12 @@ class WalletController extends BaseController
         return $this->sendResponse(true, 'Payment was successful');
     }
 
-    public function paymentEventProcessor()
-    {
+    public function paymentEventProcessor(Request $request)
+    {   
+        if (!in_array($request->getClientIp(), ['52.31.139.75', '52.49.173.169', '52.214.14.220'])) {
+            return response("", 200);
+        }
+
         $input = @file_get_contents("php://input");
         $event = json_decode($input);
 
