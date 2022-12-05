@@ -22,28 +22,33 @@ class ResetPasswordController extends BaseController
 
     // use ResetsPasswords;
 
-    public function reset(Request $request){
-       
+    public function reset(Request $request)
+    {
+
         $data = $request->validate([
-                'password' => ['required', 'string', 'min:8', 'confirmed'], 
-                'email' => ['email', 'required'] ,
-                'code' => ['string','required']              
-            ]);
-            
-        $validRecord = DB::table('password_resets')->where('email', $data['email'])->where('token', $data['code'])->first();
-                
-        if ($validRecord == null){
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'email' => ['email', 'required'],
+            'code' => ['string', 'required']
+        ]);
+
+
+        $user = User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            return $this->sendResponse("email or token is incorrect", 'email or token is incorrect');
+        }
+
+        $validRecord = DB::table('password_resets')->where('email', $data['email'])->where('token', $data['code']);
+
+        if ($validRecord->first() == null) {
             return $this->sendError("email or token is incorrect", "email or token is incorrect");
         }
 
-        $user = User::where('email', $data['email'])->first();
-            
         $user->password = bcrypt($data['password']);
         $user->save();
-            
+
+        $validRecord->delete();
+
         return $this->sendResponse($user, "Password reset successful.");
-          
-
     }
-
 }
