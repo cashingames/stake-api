@@ -32,7 +32,7 @@ class CreditWinnings extends Command
     {
         WalletTransaction::unsettled()
             ->where('viable_date', '<=', Carbon::now())
-            ->chunkById(500, function ($transactions) {
+            ->chunkById(10, function ($transactions) {
                 foreach ($transactions as $transaction) {
                     $transaction->wallet->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);
                 }
