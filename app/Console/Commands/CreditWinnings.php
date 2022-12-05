@@ -34,7 +34,12 @@ class CreditWinnings extends Command
             ->where('viable_date', '<=', Carbon::now())
             ->chunkById(10, function ($transactions) {
                 foreach ($transactions as $transaction) {
-                    $transaction->wallet->update(['withdrawable_balance' => ($transaction->wallet->withdrawable_balance + $transaction->amount)]);
+                    $wallet = $transaction->wallet;
+                    if($wallet){
+                        $wallet->update([
+                            'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
+                        ]);
+                    }
                 }
                 $transactions->each->update(['settled_at' => now()]);
             }, $column = 'id');
