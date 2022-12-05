@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\BaseController;
+use App\Rules\UniquePhoneNumberRule;
 use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
@@ -70,7 +71,7 @@ class RegisterController extends BaseController
             'last_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'country_code' => ['required', 'string', 'max:4'],
-            'phone_number' => ['nullable', 'numeric', 'unique:users'],
+            'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule], 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
@@ -226,18 +227,6 @@ class RegisterController extends BaseController
     public function register(Request $request, SMSProviderInterface $smsService)
     {
         $this->validator($request->all())->validate();
-
-        if (str_starts_with($request->phone_number, '0')) {
-            if (!is_null(User::where('phone_number', ltrim($request->phone_number, $request->phone_number[0]))->first())) {
-                
-                $message = [
-                    'message' => ['The phone number has been taken, contact support'],
-
-                ];
-                return $this->sendError($message, 'The phone number has been taken, contact support');
-               
-            }
-        }
 
         $user = $this->create($request->all());
 
