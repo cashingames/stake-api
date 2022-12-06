@@ -17,6 +17,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Yabacon\Paystack\Event as PaystackEvent;
+use Yabacon\Paystack;
+use Yabacon\Paystack\Exception\ApiException as PaystackException;
 
 class WalletController extends BaseController
 {
@@ -51,11 +53,27 @@ class WalletController extends BaseController
         return $this->sendResponse($data, 'Earnings information');
     }
 
-    public function verifyTransaction(string $reference)
-    {
-        Log::info("payment successful from app verification $this->user->username");
-
-        return $this->sendResponse(true, 'Payment was successful');
+    private function verifyTransaction(string $reference)
+    {   
+        // initiate the Library's Paystack Object
+        $paystack = new Paystack(config('trivia.payment_key'));
+        try
+        {
+          // verify using the library
+          $tranx = $paystack->transaction->verify([
+            'reference'=>$reference, // unique to transactions
+          ]);
+        } catch(PaystackException $e){
+        
+          Log::info("transaction could ot be verified ",$e->getResponseObject());
+          throw($e->getMessage());
+        }
+    
+        if ('success' === $tranx->data->status) {
+         return true;
+        }
+        return false ;
+      
     }
 
     public function paymentEventProcessor(Request $request)
