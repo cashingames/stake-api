@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Yabacon\Paystack\Event as PaystackEvent;
 
 class WalletController extends BaseController
 {
@@ -31,7 +32,7 @@ class WalletController extends BaseController
     public function transactions()
     {
         $transactions = $this->user->transactions()
-            ->select('wallet_transactions.id as id','transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
@@ -58,33 +59,76 @@ class WalletController extends BaseController
     }
 
     public function paymentEventProcessor(Request $request)
-    {   
+    {
         if (!in_array($request->getClientIp(), ['52.31.139.75', '52.49.173.169', '52.214.14.220'])) {
             return response("", 200);
         }
-        Log::info("lient ip ". $request->getClientIp());
 
-        $input = @file_get_contents("php://input");
-        $event = json_decode($input);
+        //1. If payment is made to cashingames, it should credit the users wallet
+        //2. If  money is transfered out of cashingames, it should debit the users wallet 
+        $event = PaystackEvent::capture();
 
-        Log::info("event from paystack ");
+        Log::info("event from paystack ", $event->raw);
 
-        if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
+        $my_keys = [
+            'key' => config('trivia.payment_key'),
+        ];
+
+        $owner = $event->discoverOwner($my_keys);
+
+        if (!$owner) {
+            // None of the keys matched the event's signature
+
+            Log::info("paystack call made with invalid key");
+
             return response("", 200);
-        } else {
-            if ($event->event == "transfer.success") {
-                Log::info("Response from paystack on transfer success: " . json_encode($event));
-                return response("", 200);
-            }
-            if ($event->event == "transfer.failed" || $event->event == "transfer.reversed") {
-                Log::info("Response from paystack on transfer failed or reversed: " . json_encode($event));
-                $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
-                $user = $profile->user;
-                return $this->reverseWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
-            }
-            $user = User::where('email', $event->data->customer->email)->first();
-            return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
         }
+
+        switch($event->obj->event){
+
+            // charge.success
+            case 'charge.success':
+                if('success' === $event->obj->data->status){
+                    // TIP: you may still verify the transaction
+                    // via an API call before giving value.
+                    
+                    //@todo create verify transaction function
+                    $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                }
+                break;
+            case 'transfer.reversed' || 'transfer.failed':
+                if('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status ){
+                    // TIP: you may still verify the transaction
+                    // via an API call before giving value.
+                        
+                    $this->reverseWithdrawalTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                }
+                break;
+        }
+
+        // Log::info("lient ip ". $request->getClientIp());
+
+        // $input = @file_get_contents("php://input");
+        // $event = json_decode($input);
+
+        // Log::info("event from paystack ");
+
+        // if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
+        //     return response("", 200);
+        // } else {
+        //     if ($event->event == "transfer.success") {
+        //         Log::info("Response from paystack on transfer success: " . json_encode($event));
+        //         return response("", 200);
+        //     }
+        //     if ($event->event == "transfer.failed" || $event->event == "transfer.reversed") {
+        //         Log::info("Response from paystack on transfer failed or reversed: " . json_encode($event));
+        //         $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
+        //         $user = $profile->user;
+        //         return $this->reverseWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
+        //     }
+        //     $user = User::where('email', $event->data->customer->email)->first();
+        //     return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
+        // }
     }
 
     public function paymentsTransactionsReconciler(Request $request)
@@ -129,8 +173,11 @@ class WalletController extends BaseController
         return $this->sendResponse(true, 'Transactions reconciled');
     }
 
-    private function savePaymentTransaction($reference, $user, $amount)
-    {
+    private function savePaymentTransaction($reference, $email, $amount)
+    {   
+        $user = User::where('email',$email)->first();
+
+        //@todo , change to a laravel transaction
         $user->wallet->non_withdrawable_balance += ($amount) / 100;
 
         $transaction = WalletTransaction::create([
@@ -147,8 +194,11 @@ class WalletController extends BaseController
         return response("", 200);
     }
 
-    private function reverseWithdrawalTransaction($reference, $user, $amount)
-    {
+    private function reverseWithdrawalTransaction($reference, $email, $amount)
+    {   
+        $user = User::where('email',$email)->first();
+
+         //@todo , change to a laravel transaction
         $user->wallet->withdrawable_balance += ($amount) / 100;
         $user->wallet->save();
 

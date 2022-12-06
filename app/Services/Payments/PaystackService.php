@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class PaystackWithdrawalService
+class PaystackService
 {
 
     /**
