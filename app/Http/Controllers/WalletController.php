@@ -54,26 +54,24 @@ class WalletController extends BaseController
     }
 
     private function verifyTransaction(string $reference)
-    {   
+    {
         // initiate the Library's Paystack Object
         $paystack = new Paystack(config('trivia.payment_key'));
-        try
-        {
-          // verify using the library
-          $tranx = $paystack->transaction->verify([
-            'reference'=>$reference, // unique to transactions
-          ]);
-        } catch(PaystackException $e){
-        
-          Log::info("transaction could ot be verified ",$e->getResponseObject());
-          throw($e->getMessage());
+        try {
+            // verify using the library
+            $tranx = $paystack->transaction->verify([
+                'reference' => $reference, // unique to transactions
+            ]);
+        } catch (PaystackException $e) {
+
+            Log::info("transaction could ot be verified ", $e->getResponseObject());
+            throw ($e->getMessage());
         }
-    
+
         if ('success' === $tranx->data->status) {
-         return true;
+            return true;
         }
-        return false ;
-      
+        return false;
     }
 
     public function paymentEventProcessor(Request $request)
@@ -82,8 +80,6 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        //1. If payment is made to cashingames, it should credit the users wallet
-        //2. If  money is transfered out of cashingames, it should debit the users wallet 
         $event = PaystackEvent::capture();
 
         Log::info("event from paystack ", $event->raw);
@@ -95,58 +91,33 @@ class WalletController extends BaseController
         $owner = $event->discoverOwner($my_keys);
 
         if (!$owner) {
-            // None of the keys matched the event's signature
 
             Log::info("paystack call made with invalid key");
 
             return response("", 200);
         }
 
-        switch($event->obj->event){
+        switch ($event->obj->event) {
 
-            // charge.success
             case 'charge.success':
-                if('success' === $event->obj->data->status){
-                    // TIP: you may still verify the transaction
-                    // via an API call before giving value.
-                    
-                    //@todo create verify transaction function
-                    $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                if ('success' === $event->obj->data->status) {
+
+                    $isValidTransaction = $this->verifyTransaction($event->obj->data->reference);
+
+                    if ($isValidTransaction) {
+                        $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                    }
                 }
                 break;
             case 'transfer.reversed' || 'transfer.failed':
-                if('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status ){
-                    // TIP: you may still verify the transaction
-                    // via an API call before giving value.
-                        
-                    $this->reverseWithdrawalTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                if ('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status) {
+                    $isValidTransaction = $this->verifyTransaction($event->obj->data->reference);
+                    if ($isValidTransaction) {
+                        $this->reverseWithdrawalTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                    }
                 }
                 break;
         }
-
-        // Log::info("lient ip ". $request->getClientIp());
-
-        // $input = @file_get_contents("php://input");
-        // $event = json_decode($input);
-
-        // Log::info("event from paystack ");
-
-        // if ($event->data->status !== "success" || $transaction = WalletTransaction::where('reference', $event->data->reference)->first()) {
-        //     return response("", 200);
-        // } else {
-        //     if ($event->event == "transfer.success") {
-        //         Log::info("Response from paystack on transfer success: " . json_encode($event));
-        //         return response("", 200);
-        //     }
-        //     if ($event->event == "transfer.failed" || $event->event == "transfer.reversed") {
-        //         Log::info("Response from paystack on transfer failed or reversed: " . json_encode($event));
-        //         $profile = Profile::where('account_number', $event->data->recipient->details->account_number)->first();
-        //         $user = $profile->user;
-        //         return $this->reverseWithdrawalTransaction($event->data->reference, $user, $event->data->amount);
-        //     }
-        //     $user = User::where('email', $event->data->customer->email)->first();
-        //     return $this->savePaymentTransaction($event->data->reference, $user, $event->data->amount);
-        // }
     }
 
     public function paymentsTransactionsReconciler(Request $request)
@@ -192,42 +163,45 @@ class WalletController extends BaseController
     }
 
     private function savePaymentTransaction($reference, $email, $amount)
-    {   
-        $user = User::where('email',$email)->first();
+    {
+        $user = User::where('email', $email)->first();
 
-        //@todo , change to a laravel transaction
-        $user->wallet->non_withdrawable_balance += ($amount) / 100;
+        DB::transaction(function () use ($user, $amount, $reference) {
+            $user->wallet->non_withdrawable_balance += ($amount) / 100;
 
-        $transaction = WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($amount) / 100,
-            'balance' => $user->wallet->non_withdrawable_balance,
-            'description' => 'Fund Wallet',
-            'reference' => $reference,
-        ]);
-        $user->wallet->save();
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => ($amount) / 100,
+                'balance' => $user->wallet->non_withdrawable_balance,
+                'description' => 'Fund Wallet',
+                'reference' => $reference,
+            ]);
+            $user->wallet->save();
+        });
+
 
         Log::info('payment successful from paystack');
         return response("", 200);
     }
 
     private function reverseWithdrawalTransaction($reference, $email, $amount)
-    {   
-        $user = User::where('email',$email)->first();
+    {
+        $user = User::where('email', $email)->first();
 
-         //@todo , change to a laravel transaction
-        $user->wallet->withdrawable_balance += ($amount) / 100;
-        $user->wallet->save();
+        DB::transaction(function () use ($user, $amount, $reference) {
+            $user->wallet->withdrawable_balance += ($amount) / 100;
 
-        WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($amount) / 100,
-            'balance' => $user->wallet->withdrawable_balance,
-            'description' => 'Winnings Withdrawal Reversed',
-            'reference' => $reference,
-        ]);
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => ($amount) / 100,
+                'balance' => $user->wallet->withdrawable_balance,
+                'description' => 'Winnings Withdrawal Reversed',
+                'reference' => $reference,
+            ]);
+            $user->wallet->save();
+        });
 
         Log::info('withdrawal reversed for ' . $user->username);
         return response("", 200);

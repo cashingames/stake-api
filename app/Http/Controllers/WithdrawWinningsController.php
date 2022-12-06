@@ -7,6 +7,7 @@ use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WithdrawWinningsController extends BaseController
@@ -48,7 +49,7 @@ class WithdrawWinningsController extends BaseController
             $banks = $withdrawalService->getBanks();
         }
 
-        
+
         $bankCode = '';
 
         foreach ($banks->data as $bank) {
@@ -77,20 +78,19 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-      //@todo , change to a laravel transaction
-      $this->user->wallet->withdrawable_balance -= $debitAmount;
-      
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $debitAmount,
-            'balance' => $this->user->wallet->withdrawable_balance,
-            'description' => 'Winnings Withdrawal Made',
-            'reference' => $transferInitiated->reference,
-        ]);
+        DB::transaction(function () use ($transferInitiated, $debitAmount) {
+            $this->user->wallet->withdrawable_balance -= $debitAmount;
 
-       
-        $this->user->wallet->save();
+            WalletTransaction::create([
+                'wallet_id' => $this->user->wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $debitAmount,
+                'balance' => $this->user->wallet->withdrawable_balance,
+                'description' => 'Winnings Withdrawal Made',
+                'reference' => $transferInitiated->reference,
+            ]);
+            $this->user->wallet->save();
+        });
 
         Log::info('withdrawal transaction created ' . $this->user->username);
 
