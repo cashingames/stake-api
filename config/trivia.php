@@ -30,8 +30,6 @@ return [
   ],
   'staking'=>[
     'hours_before_withdrawal' => env('HOURS_BEFORE_WITHDRAWAL', 3),
-    'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
-    'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000),
     'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
     'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
   ],
@@ -45,5 +43,7 @@ return [
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
   'challenge_staking_platform_charge_percent' => env('CHALLENGE_STAKING_PLATFORM_CHARGE_PERCENT', 0),
-  'duration_hours_before_challenge_staking_expiry' => env('DURATION_HOURS_BEFORE_CHALLENGE_STAKING_EXPIRY', 48)
+  'duration_hours_before_challenge_staking_expiry' => env('DURATION_HOURS_BEFORE_CHALLENGE_STAKING_EXPIRY', 48),
+  'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
+  'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000)
 ];

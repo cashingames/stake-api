@@ -33,13 +33,11 @@ class WithdrawWinningsController extends BaseController
         //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
         // }
 
-        //remove amount limit config from staking
-
-        if ($debitAmount < config('trivia.staking.min_withdrawal_amount')) {
-            return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.staking.min_withdrawal_amount'));
+        if ($debitAmount < config('trivia.min_withdrawal_amount')) {
+            return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount'));
         }
-        if ($debitAmount > config('trivia.staking.max_withdrawal_amount')) {
-            $debitAmount = config('trivia.staking.max_withdrawal_amount');
+        if ($debitAmount > config('trivia.max_withdrawal_amount')) {
+            $debitAmount = config('trivia.max_withdrawal_amount');
             // dd( $debitAmount);
         }
 

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Payments\PaystackWithdrawalService;
+use App\Services\Payments\PaystackService;
 use Exception;
 
 class WithdrawalTest extends TestCase
@@ -103,7 +103,7 @@ class WithdrawalTest extends TestCase
 
     public function test_that_user_can_withdraw_successfully(){
         $banksMock = $this->banksMock;
-        $this->mock(PaystackWithdrawalService::class, function (MockInterface $mock) use($banksMock){
+        $this->mock(PaystackService::class, function (MockInterface $mock) use($banksMock){
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
@@ -126,7 +126,7 @@ class WithdrawalTest extends TestCase
 
     public function test_pending_response_from_payment_gateway(){
         $banksMock = $this->banksMock;
-        $this->mock(PaystackWithdrawalService::class, function (MockInterface $mock) use ($banksMock) {
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
@@ -149,7 +149,7 @@ class WithdrawalTest extends TestCase
 
     public function test_that_money_is_not_send_to_unverified_bank_account(){
         
-        $this->mock(PaystackWithdrawalService::class, function (MockInterface $mock){
+        $this->mock(PaystackService::class, function (MockInterface $mock){
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $this->banksMock
             );
@@ -167,7 +167,7 @@ class WithdrawalTest extends TestCase
     }
 
     public function test_error_handled_when_withdrawal_initiation_goes_wrong_at_provider(){
-        $this->mock(PaystackWithdrawalService::class, function (MockInterface $mock) {
+        $this->mock(PaystackService::class, function (MockInterface $mock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $this->banksMock
             );
