@@ -9,7 +9,7 @@ class LiveTriviaLeaderboardResponse
 {
     use AvatarUtils;
 
-    public int $points;
+    public float $points;
     public string $username;
     public int $userId;
     public int $duration;
