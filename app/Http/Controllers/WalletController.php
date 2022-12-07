@@ -53,25 +53,11 @@ class WalletController extends BaseController
         return $this->sendResponse($data, 'Earnings information');
     }
 
-    private function verifyTransaction(string $reference)
+    public function verifyTransaction(string $reference)
     {
-        // initiate the Library's Paystack Object
-        $paystack = new Paystack(config('trivia.payment_key'));
-        try {
-            // verify using the library
-            $tranx = $paystack->transaction->verify([
-                'reference' => $reference, // unique to transactions
-            ]);
-        } catch (PaystackException $e) {
+        Log::info("payment successful from app verification $this->user->username");
 
-            Log::info("transaction could ot be verified ", $e->getResponseObject());
-            throw ($e->getMessage());
-        }
-
-        if ('success' === $tranx->data->status) {
-            return true;
-        }
-        return false;
+        return $this->sendResponse(true, 'Payment was successful');
     }
 
     public function paymentEventProcessor(Request $request)
@@ -79,7 +65,7 @@ class WalletController extends BaseController
         if (!in_array($request->getClientIp(), ['52.31.139.75', '52.49.173.169', '52.214.14.220'])) {
             return response("", 200);
         }
-
+        
         $event = PaystackEvent::capture();
 
         Log::info("event from paystack ", $event->raw);
@@ -102,7 +88,7 @@ class WalletController extends BaseController
             case 'charge.success':
                 if ('success' === $event->obj->data->status) {
 
-                    $isValidTransaction = $this->verifyTransaction($event->obj->data->reference);
+                    $isValidTransaction = $this->_verifyPaystackTransaction($event->obj->data->reference);
 
                     if ($isValidTransaction) {
                         $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
@@ -111,13 +97,34 @@ class WalletController extends BaseController
                 break;
             case 'transfer.reversed' || 'transfer.failed':
                 if ('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status) {
-                    $isValidTransaction = $this->verifyTransaction($event->obj->data->reference);
+                    $isValidTransaction = $this->_verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
                         $this->reverseWithdrawalTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
                     }
                 }
                 break;
         }
+    }
+
+    private function _verifyPaystackTransaction(string $reference)
+    {
+        // initiate the Library's Paystack Object
+        $paystack = new Paystack(config('trivia.payment_key'));
+        try {
+            // verify using the library
+            $tranx = $paystack->transaction->verify([
+                'reference' => $reference, // unique to transactions
+            ]);
+        } catch (PaystackException $e) {
+
+            Log::info("transaction could ot be verified ", $e->getResponseObject());
+            throw ($e->getMessage());
+        }
+
+        if ('success' === $tranx->data->status) {
+            return true;
+        }
+        return false;
     }
 
     public function paymentsTransactionsReconciler(Request $request)

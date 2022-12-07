@@ -154,8 +154,9 @@ class GameController extends BaseController
         $result->minimumWalletFundableAmount = config('trivia.wallet_funding.min_amount');
         $result->maximumWalletFundableAmount = config('trivia.wallet_funding.max_amount');
         $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
-        $result->totalWithdrawalAmountLimit = config('trivia.staking.total_withdrawal_limit');
-        $result->totalWithdrawalDays = config('trivia.staking.total_withdrawal_days_limit');
+        $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
+        $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
+        $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
 
         return $this->sendResponse($result, "Common data");
     }
@@ -480,7 +481,7 @@ class GameController extends BaseController
                     'balance' => $this->user->wallet->withdrawable_balance,
                     'description' => 'Staking winning of ' . $amountWon . ' cash',
                     'reference' => Str::random(10),
-                    'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
+                    'viable_date' => Carbon::now()->addHours(config('trivia.hours_before_withdrawal'))
                 ]);
 
                 $staking->update(['amount_won' => $amountWon]);

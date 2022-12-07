@@ -28,11 +28,8 @@ return [
     'enabled' => env('HAS_LIVE_TRIVIA',false),
     'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
-  'staking'=>[
-    'hours_before_withdrawal' => env('HOURS_BEFORE_WITHDRAWAL', 3),
-    'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
-    'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
-  ],
+ 
+  
   'wallet_funding'=>[
     'min_amount' => env('MINIMUM_WALLET_FUNDABLE_AMOUNT',100),
     'max_amount' => env('MAXIMUM_WALLET_FUNDABLE_AMOUNT',100000)
@@ -45,5 +42,9 @@ return [
   'challenge_staking_platform_charge_percent' => env('CHALLENGE_STAKING_PLATFORM_CHARGE_PERCENT', 0),
   'duration_hours_before_challenge_staking_expiry' => env('DURATION_HOURS_BEFORE_CHALLENGE_STAKING_EXPIRY', 48),
   'min_withdrawal_amount' => env('MINIMUM_WITHDRAWAL_AMOUNT', 500),
-  'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000)
+  'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000),
+  'hours_before_withdrawal' => env('HOURS_BEFORE_WITHDRAWAL', 3),
+  'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
+  'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
+
 ];

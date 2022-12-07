@@ -21,7 +21,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        $debitAmount = $this->user->wallet->withdrawable_balance; // $data['amount'];
+        $debitAmount = $this->user->wallet->withdrawable_balance;
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -29,8 +29,8 @@ class WithdrawWinningsController extends BaseController
 
         // $totalAmountWithdrawn = $this->user->transactions()->withdrawals()->whereBetween('wallet_transactions.created_at', [now()->subDays(config('trivia.staking.total_withdrawal_days_limit')), now()])->sum('amount');
 
-        // if ($totalAmountWithdrawn >= config('trivia.staking.total_withdrawal_limit')) {
-        //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
+        // if ($totalAmountWithdrawn >= config('trivia.total_withdrawal_limit')) {
+        //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
         // }
 
         if ($debitAmount < config('trivia.min_withdrawal_amount')) {
@@ -100,8 +100,8 @@ class WithdrawWinningsController extends BaseController
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
         if ($transferInitiated->status === "success") {
-            // if ($debitAmount == config('trivia.staking.max_withdrawal_amount')) {
-            //     return $this->sendResponse(true, "NGN" . config('trivia.staking.max_withdrawal_amount') . " is being successfully processed to your bank account.");
+            // if ($debitAmount == config('trivia.max_withdrawal_amount')) {
+            //     return $this->sendResponse(true, "NGN" . config('trivia.max_withdrawal_amount') . " is being successfully processed to your bank account.");
             // }
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
