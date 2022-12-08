@@ -158,11 +158,10 @@ class WalletController extends BaseController
 
         foreach ($result->data as $data) {
             $existingReference = WalletTransaction::where('reference', $data->reference)->first();
-            $user = User::where('email', $data->customer->email)->first();
 
             if ($existingReference === null) {
                 Log::info("successful transaction reference: $data->reference with no record found, inserting... ");
-                $this->savePaymentTransaction($data->reference, $user, $data->amount);
+                $this->savePaymentTransaction($data->reference, $data->customer->email, $data->amount);
             }
         }
         Log::info("Records reconciled ");

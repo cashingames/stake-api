@@ -6,6 +6,7 @@ use App\Models\Boost;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Rules\UniquePhoneNumberRule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,7 @@ class SocialSignInController extends BaseController
             'lastName' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'country_code' => ['nullable', 'string', 'max:4'],
-            'phone_number' => ['required', 'numeric', 'unique:users'],
+            'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule], 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             // 'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username']
