@@ -3,27 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\WalletTransaction;
-use App\Services\Payments\PaystackWithdrawalService;
+use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WithdrawWinningsController extends BaseController
 {
     //
 
-    public function __invoke(Request $request, PaystackWithdrawalService $withdrawalService)
+    public function __invoke(Request $request, PaystackService $withdrawalService)
     {
-        // $data = $request->validate([
-        //     'amount' => ['required', 'numeric', 'min:0'],
-        // ]);
 
         if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        $debitAmount = $this->user->wallet->withdrawable_balance; // $data['amount'];
+        $debitAmount = $this->user->wallet->withdrawable_balance;
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -31,15 +29,15 @@ class WithdrawWinningsController extends BaseController
 
         // $totalAmountWithdrawn = $this->user->transactions()->withdrawals()->whereBetween('wallet_transactions.created_at', [now()->subDays(config('trivia.staking.total_withdrawal_days_limit')), now()])->sum('amount');
 
-        // if ($totalAmountWithdrawn >= config('trivia.staking.total_withdrawal_limit')) {
-        //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.staking.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
+        // if ($totalAmountWithdrawn >= config('trivia.total_withdrawal_limit')) {
+        //     return $this->sendError(false, 'you cannot withdaw more than NGN' . config('trivia.total_withdrawal_limit') . ' in ' . config('trivia.staking.total_withdrawal_days_limit') . ' days');
         // }
 
-        if ($debitAmount < config('trivia.staking.min_withdrawal_amount')) {
-            return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.staking.min_withdrawal_amount'));
+        if ($debitAmount < config('trivia.min_withdrawal_amount')) {
+            return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount'));
         }
-        if ($debitAmount > config('trivia.staking.max_withdrawal_amount')) {
-            $debitAmount = config('trivia.staking.max_withdrawal_amount');
+        if ($debitAmount > config('trivia.max_withdrawal_amount')) {
+            $debitAmount = config('trivia.max_withdrawal_amount');
             // dd( $debitAmount);
         }
 
@@ -49,7 +47,7 @@ class WithdrawWinningsController extends BaseController
             $banks = $withdrawalService->getBanks();
         }
 
-        
+
         $bankCode = '';
 
         foreach ($banks->data as $bank) {
@@ -78,17 +76,19 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-        $this->user->wallet->withdrawable_balance -= $debitAmount;
-        $this->user->wallet->save();
+        DB::transaction(function () use ($transferInitiated, $debitAmount) {
+            $this->user->wallet->withdrawable_balance -= $debitAmount;
 
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $debitAmount,
-            'balance' => $this->user->wallet->withdrawable_balance,
-            'description' => 'Winnings Withdrawal Made',
-            'reference' => $transferInitiated->reference,
-        ]);
+            WalletTransaction::create([
+                'wallet_id' => $this->user->wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $debitAmount,
+                'balance' => $this->user->wallet->withdrawable_balance,
+                'description' => 'Winnings Withdrawal Made',
+                'reference' => $transferInitiated->reference,
+            ]);
+            $this->user->wallet->save();
+        });
 
         Log::info('withdrawal transaction created ' . $this->user->username);
 
@@ -100,8 +100,8 @@ class WithdrawWinningsController extends BaseController
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
         if ($transferInitiated->status === "success") {
-            // if ($debitAmount == config('trivia.staking.max_withdrawal_amount')) {
-            //     return $this->sendResponse(true, "NGN" . config('trivia.staking.max_withdrawal_amount') . " is being successfully processed to your bank account.");
+            // if ($debitAmount == config('trivia.max_withdrawal_amount')) {
+            //     return $this->sendResponse(true, "NGN" . config('trivia.max_withdrawal_amount') . " is being successfully processed to your bank account.");
             // }
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }

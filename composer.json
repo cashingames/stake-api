@@ -19,7 +19,8 @@
         "laravel/ui": "^3.3",
         "php-open-source-saver/jwt-auth": "^1.4",
         "phpoffice/phpspreadsheet": "^1.18",
-        "sentry/sentry-laravel": "^3.1"
+        "sentry/sentry-laravel": "^3.1",
+        "yabacon/paystack-php": "^2.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",

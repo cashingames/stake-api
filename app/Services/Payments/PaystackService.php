@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class PaystackWithdrawalService
+class PaystackService
 {
 
     /**
@@ -16,9 +16,9 @@ class PaystackWithdrawalService
     private $paystackKey, $client, $user;
 
 
-    public function __construct(string $paystackKey)
+    public function __construct()
     {
-        $this->paystackKey = $paystackKey;
+        $this->paystackKey = config('trivia.payment_key');
         $this->client = new Client([
             'headers' => [
                 'Authorization' => 'Bearer ' .  $this->paystackKey,
