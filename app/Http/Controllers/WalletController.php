@@ -65,10 +65,11 @@ class WalletController extends BaseController
         if (!in_array($request->getClientIp(), ['52.31.139.75', '52.49.173.169', '52.214.14.220'])) {
             return response("", 200);
         }
-        
+
         $event = PaystackEvent::capture();
 
-        Log::info("event from paystack ", $event->raw);
+        Log::info("in paystaaack");
+        // Log::info("event from paystack ", $event->raw);
 
         $my_keys = [
             'key' => config('trivia.payment_key'),
@@ -87,10 +88,11 @@ class WalletController extends BaseController
 
             case 'charge.success':
                 if ('success' === $event->obj->data->status) {
-
+                    Log::info("successfull charge");
                     $isValidTransaction = $this->_verifyPaystackTransaction($event->obj->data->reference);
 
                     if ($isValidTransaction) {
+                        Log::info("savuing funding transaction");
                         $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
                     }
                 }
@@ -116,7 +118,6 @@ class WalletController extends BaseController
                 'reference' => $reference, // unique to transactions
             ]);
         } catch (PaystackException $e) {
-
             Log::info("transaction could ot be verified ", $e->getResponseObject());
             throw ($e->getMessage());
         }
@@ -172,19 +173,19 @@ class WalletController extends BaseController
     {
         $user = User::where('email', $email)->first();
 
-        DB::transaction(function () use ($user, $amount, $reference) {
-            $user->wallet->non_withdrawable_balance += ($amount) / 100;
 
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => ($amount) / 100,
-                'balance' => $user->wallet->non_withdrawable_balance,
-                'description' => 'Fund Wallet',
-                'reference' => $reference,
-            ]);
-            $user->wallet->save();
-        });
+        $user->wallet->non_withdrawable_balance += ($amount) / 100;
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($amount) / 100,
+            'balance' => $user->wallet->non_withdrawable_balance,
+            'description' => 'Fund Wallet',
+            'reference' => $reference,
+        ]);
+        $user->wallet->save();
+
 
 
         Log::info('payment successful from paystack');
@@ -195,19 +196,19 @@ class WalletController extends BaseController
     {
         $user = User::where('email', $email)->first();
 
-        DB::transaction(function () use ($user, $amount, $reference) {
-            $user->wallet->withdrawable_balance += ($amount) / 100;
 
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => ($amount) / 100,
-                'balance' => $user->wallet->withdrawable_balance,
-                'description' => 'Winnings Withdrawal Reversed',
-                'reference' => $reference,
-            ]);
-            $user->wallet->save();
-        });
+        $user->wallet->withdrawable_balance += ($amount) / 100;
+
+        WalletTransaction::create([
+            'wallet_id' => $user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => ($amount) / 100,
+            'balance' => $user->wallet->withdrawable_balance,
+            'description' => 'Winnings Withdrawal Reversed',
+            'reference' => $reference,
+        ]);
+        $user->wallet->save();
+
 
         Log::info('withdrawal reversed for ' . $user->username);
         return response("", 200);
