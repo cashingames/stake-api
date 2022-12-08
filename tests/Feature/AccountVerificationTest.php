@@ -26,7 +26,7 @@ class AccountVerificationTest extends TestCase
 
     public function test_user_can_be_verified_with_valid_otp(){
         $user = User::factory()->create([
-            'phone_number' => '08012345678'
+            'phone_number' => '8012345678'
         ]);
         $response = $this->postJson("/api/auth/register/verify-token", [
             'phone_number' => $user->phone_number,
