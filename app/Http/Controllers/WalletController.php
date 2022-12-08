@@ -170,7 +170,11 @@ class WalletController extends BaseController
     }
 
     private function savePaymentTransaction($reference, $email, $amount)
-    {
+    {   
+        if(!is_null(WalletTransaction::where('reference', $reference)->first())){
+            return response("", 200);
+        }
+
         $user = User::where('email', $email)->first();
 
 
@@ -185,8 +189,6 @@ class WalletController extends BaseController
             'reference' => $reference,
         ]);
         $user->wallet->save();
-
-
 
         Log::info('payment successful from paystack');
         return response("", 200);
