@@ -22,14 +22,14 @@ class VerifyOTPController extends BaseController
             'phone_number' => ['required', 'string', 'max:15']
         ]);
 
-        $user = null;
-
+        $phone = $data['phone_number'];
+       
         if (str_starts_with($data['phone_number'], '0')) {
-            $user = User::where('phone_number', ltrim($data['phone_number'], $data['phone_number'][0]))->where('otp_token', $data['token'])->first();
-        }else{
-            $user = User::where('phone_number', $data['phone_number'])->where('otp_token', $data['token'])->first();
+            $phone = ltrim($data['phone_number'], $data['phone_number'][0]);
         }
 
+        $user = User::where('phone_number',  $phone)->where('otp_token', $data['token'])->first();
+       
         if ($user == null) {
             return $this->sendError('Invalid verification code', 'Invalid verification code');
         }
