@@ -27,8 +27,8 @@ class UniquePhoneNumberRule implements Rule
 
     public function passes($attribute, $value)
     {
-        if (str_starts_with($value, '0')) {
-            return is_null(User::where('phone_number', ltrim($value, $value[0]))->first());
+        if (str_starts_with(strval($value), '0')) {
+            return is_null(User::where('phone_number', ltrim(strval($value), $value[0]))->first());
         }
         return is_null(User::where('phone_number', $value)->first());
        
