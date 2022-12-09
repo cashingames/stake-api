@@ -478,7 +478,7 @@ class GameController extends BaseController
                     'wallet_id' => $this->user->wallet->id,
                     'transaction_type' => 'CREDIT',
                     'amount' => $amountWon,
-                    'balance' => $this->user->wallet->withdrawable_balance,
+                    'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
                     'description' => 'Staking winning of ' . $amountWon . ' cash',
                     'reference' => Str::random(10),
                     'viable_date' => Carbon::now()->addHours(config('trivia.hours_before_withdrawal'))
