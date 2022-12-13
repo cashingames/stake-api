@@ -261,7 +261,7 @@ class GameController extends BaseController
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
 
-      
+
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
         $gameSession->game_mode_id = $mode->id;
@@ -306,7 +306,7 @@ class GameController extends BaseController
             if (count($questionHardener->determineQuestions()) < 20) {
                 return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
             }
-            
+
             if (!$request->has('staking_amount')) {
                 $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
                 if ($plan == null) {
@@ -457,6 +457,9 @@ class GameController extends BaseController
             } else {
                 $wrongs = $wrongs + 1;
             }
+
+            DB::table('game_session_questions')->where('game_session_id', $game->id)
+                ->where('question_id', $a['question_id'])->update(['option_id' => $a['id']]);
         }
 
         $staking = null;
