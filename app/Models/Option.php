@@ -15,7 +15,7 @@ class Option extends Model
    * @var array
    */
   protected $hidden = [
-    'question_id ', 'created_at', 'updated_at'
+    'question_id ', 'created_at', 'updated_at', 'is_correct'
   ];
 
   protected $casts = [
