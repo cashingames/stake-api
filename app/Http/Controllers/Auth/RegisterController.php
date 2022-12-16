@@ -69,7 +69,7 @@ class RegisterController extends BaseController
         return Validator::make($data, [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'username' => ['required', 'string','alpha_num', 'max:255', 'unique:users'],
             'country_code' => ['required', 'string', 'max:4'],
             'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule], 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
