@@ -130,12 +130,12 @@ class GameController extends BaseController
         $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
         $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
         $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
-        $result->maximumExhibitionStakeAmount = config('odds.maximum_exhibition_staking_amount');
-        $result->minimumExhibitionStakeAmount = config('odds.minimum_exhibition_staking_amount');
-        $result->maximumChallengeStakeAmount = config('odds.maximum_challenge_staking_amount');
-        $result->minimumChallengeStakeAmount = config('odds.minimum_challenge_staking_amount');
-        $result->maximumLiveTriviaStakeAmount = config('odds.maximum_live_trivia_staking_amount');
-        $result->minimumLiveTriviaStakeAmount = config('odds.minimum_live_trivia_staking_amount');
+        $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
+        $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
+        $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
+        $result->minimumChallengeStakeAmount = config('trivia.minimum_challenge_staking_amount');
+        $result->maximumLiveTriviaStakeAmount = config('trivia.maximum_live_trivia_staking_amount');
+        $result->minimumLiveTriviaStakeAmount = config('trivia.minimum_live_trivia_staking_amount');
         $result->minimumWalletFundableAmount = config('trivia.wallet_funding.min_amount');
         $result->maximumWalletFundableAmount = config('trivia.wallet_funding.max_amount');
         $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
@@ -210,11 +210,11 @@ class GameController extends BaseController
     public function canPlayWithStaking(Request $request)
     {
         if ($request->has('staking_amount')) {
-            if ($request->staking_amount > intval(config('odds.maximum_exhibition_staking_amount'))) {
-                return $this->sendError("The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('odds.maximum_exhibition_staking_amount'));
+            if ($request->staking_amount > intval(config('trivia.maximum_exhibition_staking_amount'))) {
+                return $this->sendError("The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'));
             }
-            if ($request->staking_amount < intval(config('odds.minimum_exhibition_staking_amount'))) {
-                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_exhibition_staking_amount'));
+            if ($request->staking_amount < intval(config('trivia.minimum_exhibition_staking_amount'))) {
+                return $this->sendError("The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'));
             }
         } else {
         }
@@ -269,7 +269,7 @@ class GameController extends BaseController
             'type' => ['required', 'numeric'],
             'mode' => ['required', 'numeric'],
             'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_exhibition_staking_amount'), "min:" . config('odds.minimum_exhibition_staking_amount')]
+            'staking_amount' => ['nullable', 'numeric', "max:" . config('trivia.maximum_exhibition_staking_amount'), "min:" . config('trivia.minimum_exhibition_staking_amount')]
         ]);
 
         $isStakingGame = $request->has('staking_amount');

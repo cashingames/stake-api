@@ -40,8 +40,8 @@ class SendChallengeInviteController extends BaseController
                 return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
             }
 
-            if ($request->staking_amount < config('odds.minimum_challenge_staking_amount')) {
-                return $this->sendError("The minimum amount you can stake is " . config('odds.minimum_challenge_staking_amount'), "The minimum amount you can stake is " . config('odds.minimum_challenge_staking_amount'));
+            if ($request->staking_amount < config('trivia.minimum_challenge_staking_amount')) {
+                return $this->sendError("The minimum amount you can stake is " . config('trivia.minimum_challenge_staking_amount'), "The minimum amount you can stake is " . config('trivia.minimum_challenge_staking_amount'));
             }
         }
 

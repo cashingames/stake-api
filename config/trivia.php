@@ -45,6 +45,11 @@ return [
   'max_withdrawal_amount' => env('MAXIMUM_WITHDRAWAL_AMOUNT', 10000),
   'hours_before_withdrawal' => env('HOURS_BEFORE_WITHDRAWAL', 3),
   'total_withdrawal_days_limit' => env('TOTAL_WITHDRAWAL_DAYS_LIMIT',7),
-  'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000)
-
+  'total_withdrawal_limit' => env('TOTAL_WITHDRAWAL_LIMIT',20000),
+  'minimum_exhibition_staking_amount' => env('MINIMUM_EXHIBITION_STAKING_AMOUNT', 100),
+  'maximum_exhibition_staking_amount' => env('MAXIMUM_EXHIBITION_STAKING_AMOUNT', 1000),
+  'minimum_challenge_staking_amount' => env('MINIMUM_CHALLENGE_STAKING_AMOUNT', 100),
+  'maximum_challenge_staking_amount' => env('MAXIMUM_CHALLENGE_STAKING_AMOUNT', 1000000),
+  'minimum_live_trivia_staking_amount' => env('MINIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 100),
+  'maximum_live_trivia_staking_amount' => env('MAXIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 1000)
 ];
