@@ -324,14 +324,6 @@ class User extends Authenticatable implements JWTSubject
             ->avg('correct_count');
     }
 
-    public function scopeExhibitionStakings()
-    {
-        return $this
-            ->gameSessions()
-            ->completed()
-            ->innerJoin('exhibition_stakings', 'exhibition_stakings.game_session_id', '=', 'game_sessions.id');
-    }
-
     public function getWinRateAttribute()
     {
         $gameWins = GameSession::where('correct_count', '>=', 5)->count();
