@@ -14,7 +14,8 @@ class StakingOdd extends Model
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'module', 'active'];
     protected $table = "staking_odds";
 
-    public function scopeActive($query){
+    public function scopeActive($query)
+    {
         return $query->where('active', true);
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\StakingOdd;
 
 class StakingOddSeeder extends Seeder
 {
@@ -15,12 +16,10 @@ class StakingOddSeeder extends Seeder
      */
     public function run()
     {
-        $odds = config('odds.standard');
-        foreach ($odds as $key => $value) {
-            DB::table('staking_odds')->insert([
-                'score' => $key,
-                'odd' => $value
-            ]);
-        }
+        StakingOdd::factory()->count(11)
+                ->sequence(fn ($sequence) => [
+                    'score' => $sequence->index,
+                    'odd' => $sequence->index*2,
+                ])->create();
     }
 }
