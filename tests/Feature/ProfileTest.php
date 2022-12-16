@@ -94,19 +94,6 @@ class ProfileTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_bank_account_must_be_unique()
-    {   
-        $response = $this->postjson('/api/v2/profile/me/edit-bank', [
-            'accountName' => 'John',
-            'bankName' => 'Access bank',
-            'accountNumber' => $this->user->profile->account_number,
-        ]);
-
-        $response->assertJson([
-            'message' => "The account number has already been taken.",
-        ]);
-    }
-
     public function test_profile_image_can_be_uploaded()
     {
         Storage::fake('avatars');

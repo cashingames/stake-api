@@ -121,6 +121,26 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
     }
 
+     /** @test */
+     public function username_cannot_contain_special_characters()
+     {
+ 
+         $response = $this->postjson(self::REGISTER_URL, [
+             'first_name' => "New",
+             'last_name' => "User",
+             'username' => 'user@$*1',
+             'phone_number' => '88838383844',
+             'email' => 'email@user.com',
+             'password' => 'password',
+             'password_confirmation' => 'password',
+             'country_code' => '+234'
+ 
+         ]);
+        $response->assertJsonFragment([
+            'message' => 'The username must only contain letters and numbers.',
+        ]);
+     }
+
     /** @test */
     public function a_user_cannot_register_with_existing_username_email_or_phone_number()
     {
@@ -170,7 +190,7 @@ class RegisterTest extends TestCase
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
-            'username' => 'user_email',
+            'username' => 'username',
             'country_code' => '+234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
@@ -193,7 +213,7 @@ class RegisterTest extends TestCase
         $response = $this->postjson(self::REGISTER_URL, [
             'first_name' => 'User',
             'last_name' => 'Test',
-            'username' => 'user_otp',
+            'username' => 'userotp',
             'country_code' => '+234',
             'phone_number' => '88838883838',
             'email' => 'user@user.com',
