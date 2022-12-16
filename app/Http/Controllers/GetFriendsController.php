@@ -15,20 +15,18 @@ class GetFriendsController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    function __invoke(Request $request)
+    public function __invoke(Request $request)
     {
-
         $result = $request->has('search') ? $this->searchForFriends($request->search) : $this->getOnlineUsers();
-
         return (new FriendsDataResponse())->transform($result);
     }
 
-    function getOnlineUsers()
+    private function getOnlineUsers()
     {
         return User::mostRecent()->with('profile:user_id,avatar')->where('id', '!=', $this->user->id)->paginate(20);
     }
 
-    function searchForFriends($search)
+    private function searchForFriends($search)
     {
         return User::mostRecent()->with('profile:user_id,avatar')->where('phone_number', 'like', '%' . $search . '%')
             ->orWhere('username', 'like', '%' . $search . '%')

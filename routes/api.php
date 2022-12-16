@@ -38,17 +38,6 @@ use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
 Route::get('playground', PlayGroundController::class);
 Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/login', [LoginController::class, 'login']);
@@ -61,7 +50,6 @@ Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
 Route::post('auth/register/verify-token', VerifyOTPController::class);
 Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP']);
-
 
 Route::middleware('api')->prefix('v3')->group(
     function () {
