@@ -34,7 +34,7 @@ class QuestionHardenerTest extends TestCase
 
     public function testQuestionHardenerDeterminerWorks()
     {
-        $questions = $this->questionHardener->determineQuestions();
+        $questions = $this->questionHardener->determineQuestions(false);
 
         $this->assertIsObject(
             $questions
@@ -47,7 +47,7 @@ class QuestionHardenerTest extends TestCase
             ->count(500)
             ->create();
 
-        $questions = $this->questionHardener->determineQuestions();
+        $questions = $this->questionHardener->determineQuestions(false);
         $questionCategories = [];
        
         foreach ($questions as $q) {

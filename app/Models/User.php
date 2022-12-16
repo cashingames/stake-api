@@ -302,7 +302,7 @@ class User extends Authenticatable implements JWTSubject
         return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
     }
 
-    public function getAverageOfRecentGames()
+        public function getAverageOfRecentGames()
     {
         $lastTwoGamesAverage = $this->gameSessions()
             ->completed()
@@ -312,6 +312,24 @@ class User extends Authenticatable implements JWTSubject
             ->avg('correct_count');
 
         return $lastTwoGamesAverage;
+    }
+
+    public function getAverageStakingScore()
+    {
+        return $this->gameSessions()
+            ->completed()
+            ->latest()
+            ->limit(2)
+            ->get()
+            ->avg('correct_count');
+    }
+
+    public function scopeExhibitionStakings()
+    {
+        return $this
+            ->gameSessions()
+            ->completed()
+            ->innerJoin('exhibition_stakings', 'exhibition_stakings.game_session_id', '=', 'game_sessions.id');
     }
 
     public function getWinRateAttribute()

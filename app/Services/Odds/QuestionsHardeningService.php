@@ -20,8 +20,12 @@ class QuestionsHardeningService
         $this->category = $category;
     }
 
-    public function determineQuestions()
+    public function determineQuestions($isStaking=true)
     {
+        if ($isStaking) {
+            return $this->getQuestionsForStaking();
+        }
+
         //check user game sessions count
         $gameCount = $this->user->gameSessions()->count();
 
@@ -29,10 +33,10 @@ class QuestionsHardeningService
             ->questions()
             ->where('is_published', true);
 
-        if ($gameCount < 3) {
-            $questions = $query->whereIn('level', ['medium', 'hard'])->inRandomOrder()->take(20)->get();
-            return $questions;
+        if ($gameCount <= 3) {
+            return $query->where('level', 'easy')->inRandomOrder()->take(20)->get();
         }
+
 
         $averageOfRecentThreeGames = $this->getAverageOfLastThreeGames($this->user);
         $recentQuestions = $this->getUserAnsweredQuestions($this->user);
@@ -71,7 +75,19 @@ class QuestionsHardeningService
 
     public function getUserAnsweredQuestions()
     {
-        $answeredQuestions = $this->user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
-        return $answeredQuestions;
+        return $this->user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
+    }
+
+    public function getQuestionsForStaking()
+    {
+        $isNewStaker = $this->user->exhibitionStakings()->latest()->take(3)->count() <= 3;
+        $query = $this->category->questions()->where('is_published', true)->inRandomOrder()->take(20);
+
+        if ($isNewStaker) {
+            return $query->where('level', 'easy')->get();
+        } else {
+            $recentQuestionIDs = $this->getUserAnsweredQuestions($this->user);
+            return $query->where('level', 'hard')->whereNotIn('questions.id', $recentQuestionIDs)->get();
+        }
     }
 }

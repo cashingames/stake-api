@@ -272,6 +272,8 @@ class GameController extends BaseController
             'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_exhibition_staking_amount'), "min:" . config('odds.minimum_exhibition_staking_amount')]
         ]);
 
+        $isStakingGame = $request->has('staking_amount');
+
         //@TODO Improve this check
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
             return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
@@ -325,7 +327,7 @@ class GameController extends BaseController
             $gameSession->trivia_id = $request->trivia;
         } else {
 
-            if (count($questionHardener->determineQuestions()) < 20) {
+            if (count($questionHardener->determineQuestions($isStakingGame)) < 20) {
                 return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
             }
 
@@ -344,7 +346,7 @@ class GameController extends BaseController
 
                 $gameSession->plan_id = $plan->id;
             }
-            $questions = $questionHardener->determineQuestions();
+            $questions = $questionHardener->determineQuestions($isStakingGame);
         }
 
         $gameSession->save();

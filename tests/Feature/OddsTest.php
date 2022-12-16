@@ -13,6 +13,9 @@ class OddsTest extends TestCase
 {
     /**
      * A basic feature test example.
+     * 
+     * @TODO - Test for when staging feature flag is turned on
+     * @TODO - Test for when staging feature flag is turned off
      *
      * @return void
      */
@@ -33,8 +36,6 @@ class OddsTest extends TestCase
     {
         $response = $this->get('/api/v3/odds/standard');
 
-        $response->assertJson([
-            'message' => 'staking odds fetched',
-        ]);
+        $response->assertStatus(200);
     }
 }

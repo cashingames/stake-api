@@ -19,25 +19,18 @@ class StakingOddsComputer{
         $oddsCondition = "no_matching_condition";
         
         if($this->isNewPlayer($user)){
-
             $newUserRulesAndConditions = StakingOddsRule::where('rule', 'GAME_COUNT_LESS_THAN_5')->first();    
             $oddsMultiplier = $newUserRulesAndConditions->odds_benefit;
             $oddsCondition = $newUserRulesAndConditions->display_name;
-        }
-        elseif ($averageScoreOfRecentGames <= 4){
-
+        }elseif ($averageScoreOfRecentGames <= 4){
             $lowScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_LESS_THAN_5')->first();    
             $oddsMultiplier = $lowScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $lowScoreRulesAndConditions->display_name;
-        }
-        elseif ($averageScoreOfRecentGames >= 5 && $averageScoreOfRecentGames <= 7){
-
+        }elseif ($averageScoreOfRecentGames >= 5 && $averageScoreOfRecentGames <= 7){
             $moderateScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_BETWEEN_5_AND_7')->first();    
             $oddsMultiplier = $moderateScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $moderateScoreRulesAndConditions->display_name;
-        }
-        elseif($averageScoreOfRecentGames > 7){
-
+        }elseif($averageScoreOfRecentGames > 7){
             $highScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_GREATER_THAN_7')->first();    
             $oddsMultiplier = $highScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $highScoreRulesAndConditions->display_name;
