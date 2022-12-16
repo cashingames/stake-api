@@ -66,7 +66,6 @@ Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP
 Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::post('paystack/transaction/avjshasahnmsa', [WalletController::class, "paymentEventProcessor"]);
-        // Route::post('paystack/reconcile/payments', [WalletController::class, "paymentsTransactionsReconciler"]);
         Route::get('first-time-bonus/fetch', [MessagesController::class, 'fetchFirstTimeBonus']);
         Route::get('feature-flags', [FeatureFlagController::class, 'index']);
         Route::post('client/feedback', [MessagesController::class, 'feedback']);

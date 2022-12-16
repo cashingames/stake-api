@@ -17,6 +17,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.3",
+        "opcodesio/log-viewer": "^1.7",
         "php-open-source-saver/jwt-auth": "^1.4",
         "phpoffice/phpspreadsheet": "^1.18",
         "sentry/sentry-laravel": "^3.1",

@@ -225,6 +225,43 @@ class GameController extends BaseController
         return $this->sendResponse("Can play game with staking", "Can play game with staking");
     }
 
+    private function giftReferrerOnFirstGame()
+    {
+        if (GameSession::where('user_id', $this->user->id)->count() > 1) {
+            Log::info($this->user->username . ' has more than 1 game played already, so no referrer bonus check');
+            return;
+        }
+
+        $referrerProfile = $this->user->profile->getReferrerProfile();
+
+        if ($referrerProfile === null) {
+            Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
+            return;
+        }
+
+        if (
+            config('trivia.bonus.enabled') &&
+            config('trivia.bonus.signup.referral') &&
+            config('trivia.bonus.signup.referral_on_first_game') &&
+            isset($referrerProfile)
+        ) {
+
+            Log::info('Giving : ' . $this->user->profile->referrer . " bonus for " . $this->user->username);
+
+            DB::table('user_plans')->insert([
+                'user_id' => $referrerProfile->user_id,
+                'plan_id' => 1,
+                'description' => 'Bonus Plan for referring ' . $this->user->username,
+
+                'is_active' => true,
+                'used_count' => 0,
+                'plan_count' => 2,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+        }
+    }
+
     public function startSingleGame(Request $request)
     {
         $request->validate([
@@ -234,8 +271,6 @@ class GameController extends BaseController
             'trivia' => ['nullable', 'numeric'],
             'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_exhibition_staking_amount'), "min:" . config('odds.minimum_exhibition_staking_amount')]
         ]);
-
-
 
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
 
@@ -354,42 +389,6 @@ class GameController extends BaseController
         return $this->sendResponse($result, 'Game Started');
     }
 
-    private function giftReferrerOnFirstGame()
-    {
-        if (GameSession::where('user_id', $this->user->id)->count() > 1) {
-            Log::info($this->user->username . ' has more than 1 game played already, so no referrer bonus check');
-            return;
-        }
-
-        $referrerProfile = $this->user->profile->getReferrerProfile();
-
-        if ($referrerProfile === null) {
-            Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
-            return;
-        }
-
-        if (
-            config('trivia.bonus.enabled') &&
-            config('trivia.bonus.signup.referral') &&
-            config('trivia.bonus.signup.referral_on_first_game') &&
-            isset($referrerProfile)
-        ) {
-
-            Log::info('Giving : ' . $this->user->profile->referrer . " bonus for " . $this->user->username);
-
-            DB::table('user_plans')->insert([
-                'user_id' => $referrerProfile->user_id,
-                'plan_id' => 1,
-                'description' => 'Bonus Plan for referring ' . $this->user->username,
-
-                'is_active' => true,
-                'used_count' => 0,
-                'plan_count' => 2,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-        }
-    }
 
     public function endSingleGame(Request $request)
     {
