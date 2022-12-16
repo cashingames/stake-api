@@ -53,7 +53,10 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'accountName' => ['required', 'string', 'max:255'],
             'bankName' => ['required', 'string', 'max:255'],
-            'accountNumber' => ['required', 'string', 'max:255', 'unique:profiles,account_number'],
+            'accountNumber' => [
+                'required','string', 'max:255',
+                Rule::unique('profiles','account_number')->ignore($this->user->id),
+            ],
         ]);
 
 

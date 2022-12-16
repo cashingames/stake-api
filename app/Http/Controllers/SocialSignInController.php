@@ -51,7 +51,7 @@ class SocialSignInController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'username' => ['required','string','alpha_num', 'max:255', 'unique:users'],
             'country_code' => ['nullable', 'string', 'max:4'],
             'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
