@@ -272,15 +272,14 @@ class GameController extends BaseController
             'staking_amount' => ['nullable', 'numeric', "max:" . config('odds.maximum_exhibition_staking_amount'), "min:" . config('odds.minimum_exhibition_staking_amount')]
         ]);
 
+        //@TODO Improve this check
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
-
             return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
         }
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
         $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
-
 
         $gameSession = new GameSession();
         $gameSession->user_id = $this->user->id;
@@ -289,11 +288,14 @@ class GameController extends BaseController
         $gameSession->category_id = $category->id;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
-        $gameSession->end_time = Carbon::now()->addMinutes(1); //if it's live trivia add the actual seconds 
+
+        //@TODO  //if it's live trivia add the actual seconds 
+        $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
 
         $questionHardener = new QuestionsHardeningService($this->user, $category);
 
+        //@TODO Separate live trivia result odds from exhibition result odds
         if (FeatureFlag::isEnabled(FeatureFlags::ODDS)) {
 
             $oddMultiplierComputer = new OddsComputer();

@@ -18,20 +18,27 @@ class GetStakingOddsController extends BaseController
      */
     public function __invoke()
     {
-        $stakingOdds = StakingOdd::active()->orderBy('score', 'DESC')->get();
+        $result = [];
 
-        if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            $allStakingOddsWithOddsMultiplierApplied = [];
-            $oddMultiplierComputer = new StakingOddsComputer();
-            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfRecentGames());
-
-            foreach ($stakingOdds as $odd) {
-                $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);
-                $allStakingOddsWithOddsMultiplierApplied[] = $odd;
-            }
-
-            return $this->sendResponse($allStakingOddsWithOddsMultiplierApplied, 'staking odds fetched');
+        if (!FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+            return $this->sendResponse($result, '');
         }
-        return $this->sendResponse($stakingOdds, 'staking odds fetched');
+
+        $stakingOdds = StakingOdd::active()->orderBy('score', 'DESC')->get();
+        if ($stakingOdds->isEmpty()) {
+            return $this->sendResponse($result, '');
+        }
+
+        $allStakingOddsWithOddsMultiplierApplied = [];
+        $oddMultiplierComputer = new StakingOddsComputer();
+        $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageOfRecentGames());
+
+        foreach ($stakingOdds as $odd) {
+            $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);
+            $allStakingOddsWithOddsMultiplierApplied[] = $odd;
+        }
+
+        return $this->sendResponse($allStakingOddsWithOddsMultiplierApplied, 'staking odds fetched');
+       
     }
 }
