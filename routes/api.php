@@ -71,6 +71,7 @@ Route::middleware('api')->prefix('v3')->group(
         Route::post('client/feedback', [MessagesController::class, 'feedback']);
         Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
         Route::post('category/icon/save', [CategoryController::class, 'saveCategoryIcon']);
+        Route::post('log/frontend-info', FrontEndLogsController::class);
     }
 );
 
@@ -95,7 +96,6 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::post('challenge/leaders/global', ChallengeGlobalLeadersController::class);
         Route::get('user/challenges', GetUserChallengeController::class);
-        Route::post('log/frontend-info', FrontEndLogsController::class);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStakingOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
