@@ -29,8 +29,8 @@ class PaystackService
 
     public function verifyAccount($bankCode)
     {
-
-        $url = 'https://api.paystack.co/bank/resolve?account_number=' . $this->user->profile->account_number . '&bank_code=' . $bankCode;
+        $url = 'https://api.paystack.co/bank/resolve?account_number=' .
+             $this->user->profile->account_number . '&bank_code=' . $bankCode;
         $response = null;
         try {
             $response = $this->client->request('GET', $url);
@@ -45,7 +45,6 @@ class PaystackService
 
     public function createTransferRecipient($bankCode)
     {
-
         $url = "https://api.paystack.co/transferrecipient";
         $response = null;
         try {
@@ -81,7 +80,7 @@ class PaystackService
                 ]
             ]);
         } catch (\Exception $ex) {
-            Log::info($ex);  
+            Log::info($ex);
             throw $ex;
         }
         $data = \json_decode((string) $response->getBody());
@@ -108,6 +107,6 @@ class PaystackService
         $banks = \json_decode((string) $response->getBody());
 
         Cache::forever('banks', $banks);
-        return Cache::get('banks');
+        return $banks;
     }
 }

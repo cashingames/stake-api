@@ -174,14 +174,12 @@ class WalletController extends BaseController
     }
 
     private function savePaymentTransaction($reference, $email, $amount)
-    {   
-        if(!is_null(WalletTransaction::where('reference', $reference)->first())){
+    {
+        if (!is_null(WalletTransaction::where('reference', $reference)->first())) {
             return response("", 200);
         }
 
         $user = User::where('email', $email)->first();
-
-
         $user->wallet->non_withdrawable_balance += ($amount) / 100;
 
         WalletTransaction::create([
@@ -201,8 +199,6 @@ class WalletController extends BaseController
     private function reverseWithdrawalTransaction($reference, $email, $amount)
     {
         $user = User::where('email', $email)->first();
-
-
         $user->wallet->withdrawable_balance += ($amount) / 100;
 
         WalletTransaction::create([
@@ -214,7 +210,6 @@ class WalletController extends BaseController
             'reference' => $reference,
         ]);
         $user->wallet->save();
-
 
         Log::info('withdrawal reversed for ' . $user->username);
         return response("", 200);
