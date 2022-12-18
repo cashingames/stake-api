@@ -9,12 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class PaystackService
 {
-
-    /**
-     * Paystack Api key 
-     */
-    private $paystackKey, $client, $user;
-
+    private $paystackKey;
+    private $client;
+    private $user;
 
     public function __construct()
     {

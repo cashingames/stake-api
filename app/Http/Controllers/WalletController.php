@@ -71,44 +71,48 @@ class WalletController extends BaseController
         Log::info("in paystaaack");
         // Log::info("event from paystack ", $event->raw);
 
-        $my_keys = [
+        $myKeys = [
             'key' => config('trivia.payment_key'),
         ];
 
-        $owner = $event->discoverOwner($my_keys);
+        $owner = $event->discoverOwner($myKeys);
 
         if (!$owner) {
-
             Log::info("paystack call made with invalid key");
-
             return response("", 200);
         }
+
+        $email = $event->obj->data->customer->email;
+        $reference = $event->obj->data->reference;
+        $amount = $event->obj->data->amount;
 
         switch ($event->obj->event) {
 
             case 'charge.success':
                 if ('success' === $event->obj->data->status) {
                     Log::info("successfull charge");
-                    $isValidTransaction = $this->_verifyPaystackTransaction($event->obj->data->reference);
+                    $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
 
                     if ($isValidTransaction) {
                         Log::info("savuing funding transaction");
-                        $this->savePaymentTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                        $this->savePaymentTransaction($reference, $email, $amount);
                     }
                 }
                 break;
             case 'transfer.reversed' || 'transfer.failed':
                 if ('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status) {
-                    $isValidTransaction = $this->_verifyPaystackTransaction($event->obj->data->reference);
+                    $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
-                        $this->reverseWithdrawalTransaction($event->obj->data->reference, $event->obj->data->customer->email, $event->obj->data->amount);
+                        $this->reverseWithdrawalTransaction($reference, $email, $amount);
                     }
                 }
+                break;
+            default:
                 break;
         }
     }
 
-    private function _verifyPaystackTransaction(string $reference)
+    private function verifyPaystackTransaction(string $reference)
     {
         // initiate the Library's Paystack Object
         $paystack = new Paystack(config('trivia.payment_key'));
