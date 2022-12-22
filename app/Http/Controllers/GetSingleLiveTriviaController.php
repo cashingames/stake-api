@@ -6,7 +6,7 @@ use App\Http\ResponseHelpers\LiveTriviaStatusResponse;
 use App\Models\LiveTrivia;
 use Illuminate\Http\Request;
 
-class GetSingleLiveTriviaController extends Controller
+class GetSingleLiveTriviaController extends BaseController
 {
     /**
      * Handle the incoming request.
@@ -16,11 +16,13 @@ class GetSingleLiveTriviaController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $request->validate([
-            'liveTriviaId' => 'required|exists:trivias,id'
-        ]);
+        
 
-        $liveTrivia = LiveTrivia::find($request->liveTriviaId);
+        $liveTrivia = LiveTrivia::find($request->id);
+    
+        if(is_null($liveTrivia)){
+            return $this->sendError('Invalid live trivia', 'Invalid live trivia');
+        }
 
         return (new LiveTriviaStatusResponse())->transform($liveTrivia);
         
