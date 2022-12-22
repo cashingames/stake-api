@@ -73,7 +73,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
-        Route::get('live-trivia/get', GetSingleLiveTriviaController::class);
+        Route::get('live-trivia/{id}/get', GetSingleLiveTriviaController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class);
         Route::post('live-trivia/entrance/pay', LiveTriviaEntrancePaymentController::class);
