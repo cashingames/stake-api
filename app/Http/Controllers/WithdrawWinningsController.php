@@ -21,13 +21,14 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        if (is_null($this->user->email_verified_at)) {
-            return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        }
+        //@TODO Uncomment when the frontend is ready
+        // if (is_null($this->user->email_verified_at)) {
+        //     return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
+        // }
 
-        if (is_null($this->user->phone_verified_at)) {
-            return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');
-        }
+        // if (is_null($this->user->phone_verified_at)) {
+        //     return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');
+        // }
 
         $debitAmount = $this->user->wallet->withdrawable_balance;
 
