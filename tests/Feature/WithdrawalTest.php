@@ -186,4 +186,12 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
+
+    public function test_that_a_deleted_account_cannot_make_withdrawal() {
+        $this->user->delete();
+        $response = $this->post(self::WITHDRAWAL_URL);
+
+        $response->assertStatus(500);
+    }
+
 }

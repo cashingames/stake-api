@@ -85,13 +85,14 @@ class WalletController extends BaseController
         $email = $event->obj->data->customer->email;
         $reference = $event->obj->data->reference;
         $amount = $event->obj->data->amount;
+        $status = $event->obj->data->status;
 
         switch ($event->obj->event) {
 
             case 'charge.success':
-                if ('success' === $event->obj->data->status) {
+                if ('success' === $status) {
                     Log::info("successfull charge");
-                    $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
+                    $isValidTransaction = $this->verifyPaystackTransaction($reference);
 
                     if ($isValidTransaction) {
                         Log::info("savuing funding transaction");
@@ -100,7 +101,7 @@ class WalletController extends BaseController
                 }
                 break;
             case 'transfer.reversed' || 'transfer.failed':
-                if ('reversed' === $event->obj->data->status || 'failed' === $event->obj->data->status) {
+                if ('reversed' === $status|| 'failed' === $status) {
                     $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
                         $this->reverseWithdrawalTransaction($reference, $email, $amount);
@@ -122,11 +123,11 @@ class WalletController extends BaseController
                 'reference' => $reference, // unique to transactions
             ]);
         } catch (PaystackException $e) {
-            Log::info("transaction could ot be verified ", $e->getResponseObject());
+            Log::info("transaction could not be verified ", $e->getResponseObject());
             throw ($e->getMessage());
         }
 
-        if ('success' === $tranx->data->status) {
+        if ('success' == $tranx->data->status) {
             return true;
         }
         return false;
@@ -164,7 +165,7 @@ class WalletController extends BaseController
         foreach ($result->data as $data) {
             $existingReference = WalletTransaction::where('reference', $data->reference)->first();
 
-            if ($existingReference === null) {
+            if ($existingReference == null) {
                 Log::info("successful transaction reference: $data->reference with no record found, inserting... ");
                 $this->savePaymentTransaction($data->reference, $data->customer->email, $data->amount);
             }
@@ -176,6 +177,7 @@ class WalletController extends BaseController
     private function savePaymentTransaction($reference, $email, $amount)
     {
         if (!is_null(WalletTransaction::where('reference', $reference)->first())) {
+            Log::info('payment transaction already exists');
             return response("", 200);
         }
 

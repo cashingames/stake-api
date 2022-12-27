@@ -46,9 +46,6 @@ class UserController extends BaseController
         $result->totalChallenges = $this->user->challenges_played;
         $result->boosts = $this->user->userBoosts();
         $result->achievements = $this->user->userAchievements();
-        $result->recentGames = $this->user->recentGames();
-        //$result->transactions = $this->user->userTransactions(); //remove to wallet endpint
-        $result->pointsTransaction = $this->user->getUserPointTransactions(); //remove to wallet endpint
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->activePlans = $this->composeUserPlans();
         $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
@@ -58,17 +55,6 @@ class UserController extends BaseController
 
     private function composeUserPlans()
     {
-        //get all the active plans the user has
-        //If user has no active plan, return and empty array
-        //If user has active plans, check if a user has bonus plans
-        //if the user has bonus plans, check if user has expirable bonus plan
-        // Add the number of expirable and non expirable bonus plans 
-
-        //check if a user has purchased plans
-        //if user has purchased plans, add the number of purchased plans
-
-        //return user's bonus plans and user's purchased plans
-
         $subscribedPlan = $this->user->activePlans()->get();
 
         if ($subscribedPlan->count() === 0) {
@@ -116,9 +102,9 @@ class UserController extends BaseController
         if(is_null($user)){
             return $this->sendResponse('Your Account has been deleted', 'Your Account has been deleted');
         }
-        $user->wallet()->delete();
-        $user->profile()->delete();
+        
         $user->delete();
+        auth()->logout(true);
 
         return $this->sendResponse('Your Account has been deleted', 'Your Account has been deleted');
     }

@@ -26,10 +26,9 @@ class AccountDeletionTest extends TestCase
 
     public function test_that_an_account_can_be_deleted(){
     
-        $response = $this->post("/api/v3/account/delete");
+        $this->post("/api/v3/account/delete");
 
-        $response->assertJson([
-            'message' => 'Your Account has been deleted'
-        ]);
+        $this->assertSoftDeleted($this->user);
     }
+
 }
