@@ -226,7 +226,7 @@ class WalletController extends BaseController
         ]);
         $transaction->wallet->save();
 
-        Log::info('withdrawal reversed for ' . $transaction->wallet->owner->username);
+        Log::info('withdrawal reversed for transaction reference ' . $reference);
         return response("", 200);
     }
 
