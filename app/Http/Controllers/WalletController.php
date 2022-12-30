@@ -82,7 +82,8 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        $email = $event->obj->data->customer->email;
+        Log::info(json_decode(json_encode($event), true));
+
         $reference = $event->obj->data->reference;
         $amount = $event->obj->data->amount;
         $status = $event->obj->data->status;
@@ -90,6 +91,7 @@ class WalletController extends BaseController
         switch ($event->obj->event) {
 
             case 'charge.success':
+                $email = $event->obj->data->customer->email;
                 if ('success' === $status) {
                     Log::info("successfull charge");
                     $isValidTransaction = $this->verifyPaystackTransaction($reference);
@@ -100,11 +102,16 @@ class WalletController extends BaseController
                     }
                 }
                 break;
+            case 'transfer.success':
+                Log::info("transfer successfull");
+                return response("", 200);
+
             case 'transfer.reversed' || 'transfer.failed':
-                if ('reversed' === $status|| 'failed' === $status) {
+                Log::info("transfer failed or reversed");
+                if ('reversed' === $status || 'failed' === $status) {
                     $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
-                        $this->reverseWithdrawalTransaction($reference, $email, $amount);
+                        $this->reverseWithdrawalTransaction($reference, $amount);
                     }
                 }
                 break;
@@ -198,22 +205,28 @@ class WalletController extends BaseController
         return response("", 200);
     }
 
-    private function reverseWithdrawalTransaction($reference, $email, $amount)
-    {
-        $user = User::where('email', $email)->first();
-        $user->wallet->withdrawable_balance += ($amount) / 100;
+    private function reverseWithdrawalTransaction($reference, $amount)
+    {   
+        $transaction = WalletTransaction::where('reference', $reference)->first();
+
+        if (is_null($transaction)) {
+            Log::info('trying to reverse non existent transaction');
+            return response("", 200);
+        }
+
+        $transaction->wallet->withdrawable_balance += ($amount) / 100;
 
         WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
+            'wallet_id' =>  $transaction->wallet_id,
             'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
-            'balance' => $user->wallet->withdrawable_balance,
+            'balance' => $transaction->wallet->withdrawable_balance,
             'description' => 'Winnings Withdrawal Reversed',
             'reference' => $reference,
         ]);
-        $user->wallet->save();
+        $transaction->wallet->save();
 
-        Log::info('withdrawal reversed for ' . $user->username);
+        Log::info('withdrawal reversed for ' . $transaction->wallet->owner->username);
         return response("", 200);
     }
 
