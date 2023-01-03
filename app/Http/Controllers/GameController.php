@@ -273,6 +273,7 @@ class GameController extends BaseController
         ]);
 
         $isStakingGame = $request->has('staking_amount');
+        $isLiveTriviaGame = $request->has('trivia');
 
         //@TODO Improve this check
         if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
@@ -327,7 +328,9 @@ class GameController extends BaseController
             $gameSession->trivia_id = $request->trivia;
         } else {
 
-            if (count($questionHardener->determineQuestions($isStakingGame)) < 20) {
+            $questions = $questionHardener->determineQuestions($isStakingGame);
+
+            if (count($questions) < 20) {
                 return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
             }
 
@@ -346,7 +349,7 @@ class GameController extends BaseController
 
                 $gameSession->plan_id = $plan->id;
             }
-            $questions = $questionHardener->determineQuestions($isStakingGame);
+
         }
 
         $gameSession->save();
@@ -393,7 +396,6 @@ class GameController extends BaseController
         return $this->sendResponse($result, 'Game Started');
     }
 
-
     public function endSingleGame(Request $request)
     {
 
@@ -416,21 +418,16 @@ class GameController extends BaseController
         $points = 0;
         $wrongs = 0;
 
-        //@TODO: Change our encryption method from base 64.
-        //@TODO: Remove is correct from frontend for now, it's causing security issue as hackers can decode it.
-
+        //@TODO: Change our encryption method from base 64. It is not secure
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
         $chosenOptions =  [];
 
         if (count($request->chosenOptions) > $questionsCount) {
-            Log::info($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
+            Log::error($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
 
-            //we choose to pick first X options to avoid errors
+            //@TODO: we choose to pick first X options to avoid errors
             //refractor this to unique question id and pick 1 option for each
-            //@ CJ
             $chosenOptions = array_slice($request->chosenOptions, 0, $questionsCount);
-
-            //return $this->sendError('Chosen options more than expected', 'Chosen options more than expected');
         } else {
             $chosenOptions = $request->chosenOptions;
         }
@@ -527,6 +524,5 @@ class GameController extends BaseController
         // }
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
-        return $this->sendResponse($game, 'Game Ended');
     }
 }

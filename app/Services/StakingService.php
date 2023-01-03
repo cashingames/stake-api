@@ -40,7 +40,7 @@ class StakingService
 
         $odd = 1;
 
-        if($this->mode == 'exhibition'){
+        if ($this->mode == 'exhibition'){
             $oddMultiplierComputer = new StakingOddsComputer();
             $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
             $odd = $oddMultiplier['oddsMultiplier'];
