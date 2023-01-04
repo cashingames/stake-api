@@ -46,9 +46,9 @@ class GameTest extends TestCase
      * @return void
      */
     const COMMON_DATA_URL = '/api/v3/game/common';
-    const CLAIM_ACHIEVEMENT_URL = '/api/v2/claim/achievement/';
-    const START_EXHIBITION_GAME_URL = '/api/v2/game/start/single-player';
-    const END_EXHIBITION_GAME_URL = '/api/v2/game/end/single-player';
+    const CLAIM_ACHIEVEMENT_URL = '/api/v3/claim/achievement/';
+    const START_EXHIBITION_GAME_URL = '/api/v3/game/start/single-player';
+    const END_EXHIBITION_GAME_URL = '/api/v3/game/end/single-player';
     const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
     const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
 

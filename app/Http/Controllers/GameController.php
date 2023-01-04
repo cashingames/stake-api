@@ -127,9 +127,6 @@ class GameController extends BaseController
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce =  config('trivia.min_version_force');
-        $result->hasLiveTrivia = $this->getTriviaState(); //@TODO, remove this when we release next version don't depend on this
-        $result->upcomingTrivia = Trivia::upcoming()->first(); //@TODO: return null for users that have played
-        $result->liveTrivia = Trivia::ongoingLiveTrivia()->first(); //@TODO: return playedStatus for users that have played and status 
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
@@ -144,18 +141,6 @@ class GameController extends BaseController
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
 
         return $this->sendResponse($result, "Common data");
-    }
-
-    private function getTriviaState()
-    {
-        $trivia = Trivia::where('is_published', true)->where('start_time', '<=', Carbon::now('Africa/Lagos'))
-            ->where('end_time', '>', Carbon::now('Africa/Lagos'))
-            ->get()->count();
-
-        if ($trivia > 0) {
-            return true;
-        }
-        return false;
     }
 
     public function claimAchievement($achievementId)
@@ -225,170 +210,6 @@ class GameController extends BaseController
         return $this->sendResponse("Can play game with staking", "Can play game with staking");
     }
 
-    private function giftReferrerOnFirstGame()
-    {
-        if (GameSession::where('user_id', $this->user->id)->count() > 1) {
-            Log::info($this->user->username . ' has more than 1 game played already, so no referrer bonus check');
-            return;
-        }
-
-        $referrerProfile = $this->user->profile->getReferrerProfile();
-
-        if ($referrerProfile === null) {
-            Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
-            return;
-        }
-
-        if (
-            config('trivia.bonus.enabled') &&
-            config('trivia.bonus.signup.referral') &&
-            config('trivia.bonus.signup.referral_on_first_game') &&
-            isset($referrerProfile)
-        ) {
-
-            Log::info('Giving : ' . $this->user->profile->referrer . " bonus for " . $this->user->username);
-
-            DB::table('user_plans')->insert([
-                'user_id' => $referrerProfile->user_id,
-                'plan_id' => 1,
-                'description' => 'Bonus Plan for referring ' . $this->user->username,
-
-                'is_active' => true,
-                'used_count' => 0,
-                'plan_count' => 2,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-        }
-    }
-
-    public function startSingleGame(Request $request)
-    {
-        $request->validate([
-            'category' => ['required', 'numeric',],
-            'type' => ['required', 'numeric'],
-            'mode' => ['required', 'numeric'],
-            'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', "max:" . config('trivia.maximum_exhibition_staking_amount'), "min:" . config('trivia.minimum_exhibition_staking_amount')]
-        ]);
-
-        $isStakingGame = $request->has('staking_amount');
-        $isLiveTriviaGame = $request->has('trivia');
-
-        //@TODO Improve this check
-        if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
-            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
-        }
-
-        $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
-        $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
-        $mode = Cache::rememberForever("gamemode_$request->mode", fn () => GameMode::find($request->mode));
-
-        $gameSession = new GameSession();
-        $gameSession->user_id = $this->user->id;
-        $gameSession->game_mode_id = $mode->id;
-        $gameSession->game_type_id = $type->id;
-        $gameSession->category_id = $category->id;
-        $gameSession->session_token = Str::random(40);
-        $gameSession->start_time = Carbon::now();
-
-        //@TODO  //if it's live trivia add the actual seconds 
-        $gameSession->end_time = Carbon::now()->addMinutes(1);
-        $gameSession->state = "ONGOING";
-
-        $questionHardener = new QuestionsHardeningService($this->user, $category);
-
-        //@TODO Separate live trivia result odds from exhibition result odds
-        if (FeatureFlag::isEnabled(FeatureFlags::ODDS)) {
-
-            $oddMultiplierComputer = new OddsComputer();
-            $odd = $oddMultiplierComputer->compute($this->user, $questionHardener->getAverageOfLastThreeGames($request->has('trivia') ? 'trivia' : null), $request->has('trivia') ? true : false);
-
-            $gameSession->odd_multiplier = $odd['oddsMultiplier'];
-            $gameSession->odd_condition = $odd['oddsCondition'];
-        }
-
-        $questions = [];
-
-        if ($request->has('trivia')) {
-
-            //ensure that this user has not played this trivia
-            if ($this->user->gameSessions()->where('trivia_id', $request->trivia)->exists()) {
-                return $this->sendError(['You have already played this triva.'], "Attempt to play trivia twice");
-            }
-
-            $triviaList = TriviaQuestion::where('trivia_id', $request->trivia)->inRandomOrder()->pluck('question_id');
-            $questions = Question::whereIn('id', $triviaList)->get();
-            $gameSession->trivia_id = $request->trivia;
-        } else {
-
-            $questions = $questionHardener->determineQuestions($isStakingGame);
-
-            if (count($questions) < 20) {
-                return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
-            }
-
-            if (!$request->has('staking_amount')) {
-                $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
-                if ($plan == null) {
-                    return $this->sendResponse('No available games', 'No available games');
-                }
-
-                $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
-                $userPlan->update(['used_count' => $userPlan->used_count + 1]);
-
-                if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
-                    $userPlan->update(['is_active' => false]);
-                }
-
-                $gameSession->plan_id = $plan->id;
-            }
-
-        }
-
-        $gameSession->save();
-
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            if ($request->has('staking_amount')) {
-                $stakingService = new StakingService($this->user, 'exhibition');
-
-                $stakingId = $stakingService->stakeAmount($request->staking_amount);
-
-                $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
-            }
-        }
-
-        Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'game_session_id' => $gameSession->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('game_session_questions')->insert($data);
-
-        Log::info("questions logged for game session $gameSession->id and user $this->user");
-
-        $gameInfo = new stdClass;
-        $gameInfo->token = $gameSession->session_token;
-        $gameInfo->startTime = $gameSession->start_time;
-        $gameInfo->endTime = $gameSession->end_time;
-
-        $result = [
-            'questions' => $questions,
-            'game' => $gameInfo
-        ];
-
-        $this->giftReferrerOnFirstGame();
-
-        return $this->sendResponse($result, 'Game Started');
-    }
 
     public function endSingleGame(Request $request)
     {
@@ -519,4 +340,5 @@ class GameController extends BaseController
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
+
 }

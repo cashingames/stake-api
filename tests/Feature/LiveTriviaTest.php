@@ -91,7 +91,7 @@ class LiveTriviaTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        $response = $this->postjson('/api/v2/game/start/single-player', [
+        $response = $this->postjson('/api/v3/game/start/single-player', [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
@@ -142,7 +142,7 @@ class LiveTriviaTest extends TestCase
             'updated_at' => Carbon::now()
         ]);
 
-        $response = $this->postjson('/api/v2/game/start/single-player', [
+        $response = $this->postjson('/api/v3/game/start/single-player', [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,

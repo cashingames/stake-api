@@ -38,6 +38,7 @@ use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetSingleLiveTriviaController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
+use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 
 Route::get('playground', PlayGroundController::class);
 Route::post('auth/register', [RegisterController::class, 'register']);
@@ -74,7 +75,6 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
         Route::get('live-trivia/{id}/get', GetSingleLiveTriviaController::class);
-        Route::get('game/common', [GameController::class, 'getCommonData']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class);
         Route::post('live-trivia/entrance/pay', LiveTriviaEntrancePaymentController::class);
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class);
@@ -105,7 +105,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
-        Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
+        Route::post('game/start/single-player', StartSinglePlayerGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
         Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
@@ -131,15 +131,14 @@ Route::prefix('v2')->group(function () {
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
-       
-        Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
-        Route::post('game/start/single-player', [GameController::class, 'startSingleGame']);
+       Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
+        Route::post('game/start/single-player', StartSinglePlayerGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
 
         //updated leaders endpoint
         Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
-
+   
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);
