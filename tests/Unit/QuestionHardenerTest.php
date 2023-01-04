@@ -54,7 +54,7 @@ class QuestionHardenerTest extends TestCase
             $questionCategories[] = $q->category_id;
         }
 
-        if (count($questionCategories) == 0) {
+        if (empty($questionCategories)) {
             $this->assertEmpty($questions);
         }
 

@@ -317,14 +317,8 @@ class GameController extends BaseController
                 return $this->sendError(['You have already played this triva.'], "Attempt to play trivia twice");
             }
 
-            $fetchTriviaQuestions = TriviaQuestion::where('trivia_id', $request->trivia)->get();
-
-            foreach ($fetchTriviaQuestions as $q) {
-                $_question = Question::find($q->question_id); //@TODO: Improve performance bottleneck
-                if ($_question !== null) {
-                    $questions[] = $_question;
-                }
-            }
+            $triviaList = TriviaQuestion::where('trivia_id', $request->trivia)->inRandomOrder()->pluck('question_id');
+            $questions = Question::whereIn('id', $triviaList)->get();
             $gameSession->trivia_id = $request->trivia;
         } else {
 

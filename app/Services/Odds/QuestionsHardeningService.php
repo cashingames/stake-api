@@ -11,8 +11,9 @@ use Exception;
  */
 
 class QuestionsHardeningService
-{   
-    private $user , $category;
+{
+    private $user;
+    private $category;
 
     public function __construct(User $user , Category $category)
     {
@@ -42,40 +43,44 @@ class QuestionsHardeningService
         $recentQuestions = $this->getUserAnsweredQuestions($this->user);
 
         if ($averageOfRecentThreeGames >= 7) {
-            $questions = $query->where('level', 'hard')->whereNotIn('questions.id', $recentQuestions)->inRandomOrder()->take(20)->get();
-            return $questions;
+            return $query->where('level', 'hard')
+                                ->whereNotIn('questions.id', $recentQuestions)
+                                ->inRandomOrder()->take(20)->get();
         }
 
         if ($averageOfRecentThreeGames > 5 && $averageOfRecentThreeGames < 7) {
-            $questions = $query->where('level', 'medium')->whereNotIn('questions.id', $recentQuestions)->inRandomOrder()->take(20)->get();
-            return $questions;
+            return $query->where('level', 'medium')
+                        ->whereNotIn('questions.id', $recentQuestions)
+                        ->inRandomOrder()->take(20)->get();
         }
         
         if ($averageOfRecentThreeGames <= 5){
-            $questions = $query->where('level', 'easy')->inRandomOrder()->take(20)->get();
-            return $questions;
+            return $query->where('level', 'easy')
+                        ->inRandomOrder()->take(20)->get();
         }
     }
 
     public function getAverageOfLastThreeGames($mode=null)
     {
         //@TODO why get all the game sessions and then average them? why not just get the average from the database?
-        $lastThreeGamesAverage = $this->user->gameSessions()
+
+         //if it is live trivia only get average of live trivia, else get average of all game types
+        return $this->user->gameSessions()
             ->when($mode === "trivia", function($query){
-                $query->whereNotNull("trivia_id"); //if it is live trivia only get average of live trivia, else get average of all game types
+                $query->whereNotNull("trivia_id");
             })
             ->completed()
             ->latest()
             ->limit(3)
             ->get()
             ->avg('correct_count');
-
-        return $lastThreeGamesAverage;
     }
 
     public function getUserAnsweredQuestions()
     {
-        return $this->user->gameSessionQuestions()->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
+        return $this->user
+                    ->gameSessionQuestions()
+                    ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
     public function getQuestionsForStaking()
@@ -83,7 +88,6 @@ class QuestionsHardeningService
         /**
          * If the user has not staked before or is considered new user, show easy questions
          */
-        
         $initialQuery = $this->category->questions()->where('is_published', true)
                             ->inRandomOrder()->take(20);
 
@@ -97,22 +101,20 @@ class QuestionsHardeningService
         }
 
         $recentQuestions = $this->getUserAnsweredQuestions($this->user);
-
+        $initialQuery = $initialQuery->whereNotIn('questions.id', $recentQuestions);
         /**
          * If the user is a medium scorer show combination of medium questions and easy questions
          * - Never repeat questions
          */
         if ($this->mediumScorer()) {
-            return $initialQuery->whereIn('level', ['easy','medium'])
-                    ->whereNotIn('questions.id', $recentQuestions)->get();
+            return $initialQuery->whereIn('level', ['easy','medium'])->get();
         }
 
         /**
          * If the user is a high scorer show combination of hard questions and medium questions
          */
         if ($this->highScorer()) {
-            return $initialQuery->whereIn('level', ['hard'])
-                    ->whereNotIn('questions.id', $recentQuestions)->get();
+            return $initialQuery->where('level', 'hard')->get();
         }
         
         
