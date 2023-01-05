@@ -248,15 +248,13 @@ class GameController extends BaseController
             $chosenOptions = $request->chosenOptions;
         }
 
-        //save selected options
-        $transformedData = array_map(function ($a) {
-            return [
-                'option_id' => $a['id'],
-                'question_id' => $a['question_id']
-            ];
-        }, $chosenOptions);
-
-        GameSessionQuestion::where('game_session_id', $game->id)->update($transformedData);
+        DB::transaction(function () use ($chosenOptions, $game) {
+            foreach ($chosenOptions as $value) {
+                GameSessionQuestion::where('game_session_id', $game->id)
+                    ->where('question_id', $value['question_id'])
+                    ->update(['option_id' => $value['id']]);
+            }
+        });
 
         $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
 
