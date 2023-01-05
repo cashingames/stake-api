@@ -153,7 +153,8 @@ class QuestionsHardeningService
 
     private function mediumScorer()
     {
-        return $this->highestScore() >= 5 && $this->averageScore() <= 7;
+        $highest = $this->highestScore();
+        return $highest >= 5 && $highest <= 7;
     }
 
     private function lowScorer()
