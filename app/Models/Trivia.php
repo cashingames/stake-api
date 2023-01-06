@@ -14,9 +14,9 @@ class Trivia extends Model
 
     protected $table = 'trivias';
 
-    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee'];
+    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published', 'entry_fee', 'first_prize', 'second_prize', 'third_prize'];
     protected $appends = ['is_active', 'start_timespan'];
-    protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float'];
+    protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float', 'first_prize' => 'float', 'second_prize' => 'float', 'third_prize' => 'float'];
 
     public function category()
     {
