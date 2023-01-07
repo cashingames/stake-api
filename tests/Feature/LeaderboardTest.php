@@ -14,8 +14,8 @@ class LeaderboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    const GLOBAL_LEADERS_URL = '/api/v3/leaders/global/';
-    const CATEGORIES_LEADERS_URL = '/api/v3/leaders/categories/';
+    const GLOBAL_LEADERS_URL = '/api/v2/leaders/global/';
+    const CATEGORIES_LEADERS_URL = '/api/v2/leaders/categories/';
     protected $user;
 
     protected function setUp(): void
