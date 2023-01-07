@@ -39,6 +39,7 @@ use App\Http\Controllers\GetSingleLiveTriviaController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
+use App\Http\Controllers\V3\GetGlobalLeaderboardController;
 
 Route::get('playground', PlayGroundController::class);
 Route::post('auth/register', [RegisterController::class, 'register']);
@@ -107,7 +108,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
-        Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
+        Route::post('leaders/global', GetGlobalLeaderboardController::class);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
     }
