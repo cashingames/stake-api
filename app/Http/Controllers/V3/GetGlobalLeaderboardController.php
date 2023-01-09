@@ -56,7 +56,7 @@ class GetGlobalLeaderboardController extends BaseController
 
         if($userRank->points == -1){
             $userRank->points = 0;
-            $userRank->rank = count($leaders) < 100 ? (count($leaders) + 1) : rand(101, 150);
+            $userRank->rank = rand(101, 150);
         }
        
         $result = [
