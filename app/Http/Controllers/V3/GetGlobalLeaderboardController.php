@@ -66,4 +66,5 @@ class GetGlobalLeaderboardController extends BaseController
 
         return $this->sendResponse($result, "Leaderboard");
     }
+}   
 }
