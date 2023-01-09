@@ -39,23 +39,24 @@ class GetGlobalLeaderboardController extends BaseController
                 INNER JOIN profiles p ON g.user_id = p.user_id
                 ORDER BY g.points DESC';
                 
-
-        $leaders = DB::select($sql, [$this->toUtcFromNigeriaTimeZone($_startDate),  $this->toUtcFromNigeriaTimeZone($_endDate)]);
+        $leaders = DB::select($sql, [
+            $this->toUtcFromNigeriaTimeZone($_startDate),
+            $this->toUtcFromNigeriaTimeZone($_endDate)
+        ]);
         $userRank = new \stdClass();
         $userRank->points = -1;
 
-        foreach($leaders as $key => $value){
-            if($value->username == $this->user->username){
+        foreach ($leaders as $key => $value){
+            if ($value->username == $this->user->username) {
                 $userRank->points = $value->points;
                 $userRank->rank = $key + 1;
 
                 break;
-            }    
         }
-        
+
         if($userRank->points == -1){
             $userRank->points = 0;
-            $userRank->rank = rand(1000, 9999);
+            $userRank->rank = count($leaders) < 100 ? (count($leaders) + 1) : rand(101, 150);
         }
        
         $result = [
@@ -63,6 +64,6 @@ class GetGlobalLeaderboardController extends BaseController
             "userRank" => $userRank
         ];
 
-        return $this->sendResponse($result, "Global Leaders");
+        return $this->sendResponse($result, "Leaderboard");
     }
 }
