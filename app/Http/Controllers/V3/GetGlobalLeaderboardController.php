@@ -43,6 +43,7 @@ class GetGlobalLeaderboardController extends BaseController
             $this->toUtcFromNigeriaTimeZone($_startDate),
             $this->toUtcFromNigeriaTimeZone($_endDate)
         ]);
+
         $userRank = new \stdClass();
         $userRank->points = -1;
 
@@ -52,6 +53,7 @@ class GetGlobalLeaderboardController extends BaseController
                 $userRank->rank = $key + 1;
 
                 break;
+            }
         }
 
         if($userRank->points == -1){
@@ -67,4 +69,3 @@ class GetGlobalLeaderboardController extends BaseController
         return $this->sendResponse($result, "Leaderboard");
     }
 }   
-}
