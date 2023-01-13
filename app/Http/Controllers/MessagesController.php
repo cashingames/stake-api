@@ -17,8 +17,8 @@ class MessagesController extends BaseController
     public function feedback(Request $request)
     {
         $data = $request->validate([
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
+            'first_name' => ['nullable', 'string'],
+            'last_name' => ['nullable', 'string'],
             'email' => ['required', 'email', 'string'],
             'message_body' => ['required', 'string']
         ]);
@@ -30,35 +30,6 @@ class MessagesController extends BaseController
         return $this->sendResponse("Feedback Sent", 'Feedback Sent');
     }
 
-    // public function sendInvite(Request $request)
-    // {
-    //     $data = $request->validate([
-    //         'email' => ['required', 'string', 'email']
-    //     ]);
-
-    //     $user = User::where('email', $data['email'])->first();
-    //     if (!$user) {
-    //         return $this->sendError('Email address not found', 'A valid email address was not found');
-    //     }
-
-    //     $token = mt_rand(10000, 99999);
-    //     Mail::send(new TokenGenerated($token, $user));
-
-    //     // update user's password token and token expiry time
-    //     $now = Carbon::now();
-
-    //     $exists = DB::select('select * from password_resets where email = ?', [$data['email']]);
-
-    //     if ($exists) {
-    //         DB::table('password_resets')
-    //         ->where('email', $data['email'])
-    //         ->update(['token' => $token]);
-    //     } else {
-    //         DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$data['email'], $token, $now]);
-    //     }
-
-    //     return $this->sendResponse(true, 'Email Sent');
-    // }
 
     public function fetchFaqAndAnswers()
     {
