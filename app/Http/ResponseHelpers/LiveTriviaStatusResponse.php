@@ -115,6 +115,7 @@ class LiveTriviaStatusResponse
         if ($hasPaid) {
             return true;
         }
+
         return false;
     }
 
@@ -174,6 +175,9 @@ class LiveTriviaStatusResponse
     private function getPrizeDisplayText($prize)
     {
         $formatter = new \NumberFormatter('en_US', \NumberFormatter::DECIMAL);
+        if(intval($prize) <= 0){
+            return "PLAY FOR FUN!";
+        }
         return "WIN: ₦" . $formatter->format($prize);
     }
 
