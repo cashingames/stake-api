@@ -35,8 +35,8 @@ class Feedback extends Mailable implements ShouldQueue
     public function build()
     {   
         return $this->to(config('app.admin_email'))
-        ->from($this->email)
-        ->subject('FEEDBACK')
+        ->from('noreply@cashingames.com')
+        ->subject('User Feedback')
         ->view('emails.feedback')
         ->with([
             'first_name' => $this->first_name,
