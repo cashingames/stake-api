@@ -19,6 +19,7 @@ class LiveTriviaStatusController extends Controller
         if($liveTrivia === null){
             return null;
         }
+
         return (new LiveTriviaStatusResponse())->transform($liveTrivia);
     }
 }
