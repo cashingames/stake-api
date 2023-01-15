@@ -23,8 +23,19 @@ class MessagesController extends BaseController
             'message_body' => ['required', 'string']
         ]);
 
+        $firstName = '';
+        $lastName = '';
 
-        Mail::send(new Feedback($data["first_name"], $data["last_name"], $data["email"], $data["message_body"]));
+        
+        if (isset($data["first_name"]) && !is_null($data["first_name"])) {
+            $firstName =  $data["first_name"];
+        }
+
+        if (isset($data["last_name"]) &&  !is_null($data["last_name"])) {
+            $lastName =  $data["last_name"];
+        }
+
+        Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"]));
 
 
         return $this->sendResponse("Feedback Sent", 'Feedback Sent');

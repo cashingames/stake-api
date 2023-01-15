@@ -50,6 +50,18 @@ class FeedbackTest extends TestCase
         Mail::assertNotSent(Feedback::class);
     }
 
+    public function test_a_feedback_can_be_sent_without_first_name_and_last_name()
+    {
+        Mail::fake();
+
+        $this->post('/api/v2/client/feedback', [
+            "email" => 'email@email.com',
+            "message_body" => "lorem ipsum "
+        ]);
+
+        Mail::assertQueued(Feedback::class);
+    }
+
     public function test_faq_and_answers_can_be_fetched()
     {   
         $response = $this->get('/api/v2/faq/fetch');
