@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create('contests', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('start_date')->default(Carbon::now('Africa/Lagos'));
-            $table->dateTime('end_date')->default(Carbon::now('Africa/Lagos'));
+            $table->dateTime('start_date')->default(Carbon::now());
+            $table->dateTime('end_date')->default(Carbon::now());
             $table->string('name');
             $table->string('description');
             $table->string('display_name');
