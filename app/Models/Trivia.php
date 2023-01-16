@@ -14,7 +14,7 @@ class Trivia extends Model
 
     protected $table = 'trivias';
 
-    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee'];
+    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee','contest_id'];
     protected $appends = ['is_active', 'start_timespan'];
     protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float'];
 
@@ -31,6 +31,10 @@ class Trivia extends Model
     public function gameSessions()
     {
         return $this->hasMany(GameSession::class);
+    }
+
+    public function contest(){
+        return $this->belongsTo(Contest::class);
     }
 
     public function getIsActiveAttribute()
