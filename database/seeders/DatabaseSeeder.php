@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ContestPrizePool;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,6 +26,8 @@ class DatabaseSeeder extends Seeder
             OddsConditionsAndRulesSeeder::class,
             StakingOddsRulesSeeder::class,
             ChallengeSeeder::class,
+            ContestSeeder::class,
+            ContestPrizePoolSeeder::class,
             TriviaSeeder::class,
             NotificationSeeder::class,
             WalletTransactionSeeder::class,
@@ -33,6 +36,7 @@ class DatabaseSeeder extends Seeder
             // QuestionSeeder::class,
             StakingSeeder::class,
             StakingOddSeeder::class,
+         
         ]);
     }
 }

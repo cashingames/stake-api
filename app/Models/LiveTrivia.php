@@ -13,12 +13,16 @@ class LiveTrivia extends Model
 
     protected $table = 'trivias';
 
-    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee'];
+    protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee','contest_id'];
     protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float'];
 
     public function gameSessions()
     {
         return $this->hasMany(GameSession::class, 'trivia_id');
+    }
+
+    public function contest(){
+        return $this->belongsTo(Contest::class);
     }
 
     /**
