@@ -14,6 +14,13 @@ class Contest extends Model
         'name', 'display_name', 'contest_type', 'entry_mode'
     ];
 
+    protected $with = [
+        'winningPrizePools'
+    ];
+
+   // protected $appends = ['winning_prize_pools'];
+    
+
     public function winningPrizePools()
     {
       return $this->hasMany(ContestPrizePool::class);

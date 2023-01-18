@@ -17,6 +17,7 @@ class ContestSeeder extends Seeder
     {
         Contest::factory()
         ->count(5)
+        ->hasWinningPrizePools(3)
         ->create();
     }
 }
