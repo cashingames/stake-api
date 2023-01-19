@@ -18,9 +18,6 @@ class Contest extends Model
         'winningPrizePools'
     ];
 
-   // protected $appends = ['winning_prize_pools'];
-    
-
     public function winningPrizePools()
     {
       return $this->hasMany(ContestPrizePool::class);
