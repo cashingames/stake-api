@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\ResponseHelpers\ContestDetailsResponse;
+use App\Http\ResponseHelpers\GetContestDetailsResponse;
 use App\Models\Contest;
+use App\Services\ContestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,17 +19,11 @@ class GetContestDetailsController extends BaseController
      */
     public function __invoke()
     {   
-        $contests = Contest::select(
-            'id',
-            'name',
-            'description',
-            'display_name as displayName',
-            'start_date as startDate',
-            'end_date as endDate',
-            'contest_type as contestType',
-            'entry_mode as entryMode'
-        )->get();
+    
+        $contestService = new ContestService;
 
-        return $this->sendResponse($contests, 'contests');
+        $contests = $contestService->getContests();
+
+        return (new GetContestDetailsResponse())->massTransform($contests);
     }
 }
