@@ -39,19 +39,19 @@ class ContestsTest extends TestCase
 
     public function test_all_contests_can_be_gotten()
     {
-        $response = $this->get('/api/v3/contests/get');
+        $response = $this->get('/api/v3/contests');
 
-        $response->assertJsonCount(5, 'data');
+        $response->assertJsonCount(5,'*');
         $response->assertStatus(200);
     }
 
     public function test_all_contests_can_be_gotten_with_their_prize_pools()
     {
-        $response = $this->get('/api/v3/contests/get');
+        $response = $this->get('/api/v3/contests');
 
         $response->assertJsonStructure([
-            'data' => [
-                '*' => [
+            [
+                
                     "id",
                     "name",
                     "description",
@@ -60,8 +60,8 @@ class ContestsTest extends TestCase
                     "endDate",
                     "contestType",
                     "entryMode",
-                    "winning_prize_pools" => [],
-                ]
+                    "prizePool" => [],
+               
             ]
         ]);
         $response->assertStatus(200);
@@ -70,7 +70,7 @@ class ContestsTest extends TestCase
 
     public function test_a_single_contest_can_be_gotten()
     {
-        $response = $this->get('/api/v3/contest/'.$this->contest->id.'/get');
+        $response = $this->get('/api/v3/contest/'.$this->contest->id);
 
         $response->assertStatus(200);
     }
