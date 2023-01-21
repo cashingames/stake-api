@@ -22,6 +22,5 @@ class GetSingleContestController extends BaseController
 
         return (new GetContestDetailsResponse())->singleTransform($contest);
         
-        return $this->sendResponse($contest, 'contest');
     }
 }

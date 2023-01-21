@@ -23,23 +23,21 @@ class ContestService
             'end_date as endDate',
             'contest_type as contestType',
             'entry_mode as entryMode'
-        )->get();
+        )->limit(50)->get();
 
         return  $contests;
     }
 
     public function getSingleContest($id)
     {
-        $contest = Contest::select(
-            'id',
-            'name',
-            'description',
-            'display_name as displayName',
-            'start_date as startDate',
-            'end_date as endDate',
-            'contest_type as contestType',
-            'entry_mode as entryMode'
-        )->where('id', $id)->first();
+        $contest = Contest::select('id',
+        'name',
+        'description',
+        'display_name as displayName',
+        'start_date as startDate',
+        'end_date as endDate',
+        'contest_type as contestType',
+        'entry_mode as entryMode')->find($id);
 
         return $contest;
     } 

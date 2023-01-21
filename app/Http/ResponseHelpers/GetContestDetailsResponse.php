@@ -23,18 +23,7 @@ class GetContestDetailsResponse
         $response = [];
 
         foreach ($contests as $contest) {
-            $presenter = new GetContestDetailsResponse;
-
-            $presenter->id = $contest->id;
-            $presenter->name = $contest->name;
-            $presenter->description = $contest->description;
-            $presenter->displayName = $contest->displayName;
-            $presenter->startDate = $contest->startDate;
-            $presenter->endDate = $contest->endDate;
-            $presenter->contestType = $contest->contestType;
-            $presenter->entryMode = $contest->entryMode;
-            $presenter->prizePool = $contest->winningPrizePools;
-
+            $presenter = $this->makePresenter($contest);
             $response[] = $presenter;
         }
 
@@ -43,9 +32,13 @@ class GetContestDetailsResponse
 
     public function singleTransform($contest): JsonResponse
     {
+        $presenter = $this->makePresenter($contest);
+        return response()->json($presenter);
+    }
 
+    private function makePresenter($contest)
+    {
         $presenter = new GetContestDetailsResponse;
-
         $presenter->id = $contest->id;
         $presenter->name = $contest->name;
         $presenter->description = $contest->description;
@@ -56,8 +49,6 @@ class GetContestDetailsResponse
         $presenter->entryMode = $contest->entryMode;
         $presenter->prizePool = $contest->winningPrizePools;
 
-
-        return response()->json($presenter);
+        return $presenter;
     }
-    
 }
