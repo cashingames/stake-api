@@ -19,10 +19,6 @@ class ContestsTest extends TestCase
      * @return void
      */
 
-    protected $user, $contest;
-    // const GET_ALL_CONTEST_URL = '/api/v3/contests/get';
-    // const GET_A_SINGLE_CONTEST_URL = '/api/v3/contest/.'{id}/get';
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,10 +26,7 @@ class ContestsTest extends TestCase
         $this->seed(UserSeeder::class);
         $this->seed(ContestSeeder::class);
 
-        $this->user = User::first();
-        $this->contest = Contest::first();
-
-        $this->actingAs($this->user);
+        $this->actingAs(User::first());
     }
 
 
@@ -41,7 +34,7 @@ class ContestsTest extends TestCase
     {
         $response = $this->get('/api/v3/contests');
 
-        $response->assertJsonCount(5,'*');
+        $response->assertJsonCount(5, '*');
         $response->assertStatus(200);
     }
 
@@ -51,27 +44,27 @@ class ContestsTest extends TestCase
 
         $response->assertJsonStructure([
             [
-                
-                    "id",
-                    "name",
-                    "description",
-                    "displayName",
-                    "startDate",
-                    "endDate",
-                    "contestType",
-                    "entryMode",
-                    "prizePool" => [],
-               
+
+                "id",
+                "name",
+                "description",
+                "displayName",
+                "startDate",
+                "endDate",
+                "contestType",
+                "entryMode",
+                "prizePool" => [],
+
             ]
         ]);
         $response->assertStatus(200);
-
     }
 
     public function test_a_single_contest_can_be_gotten()
     {
-        $response = $this->get('/api/v3/contest/'.$this->contest->id);
+        $response = $this->get('/api/v3/contest/' . Contest::first()->id);
 
+        $response->assertJsonCount(9, '*');
         $response->assertStatus(200);
     }
 }

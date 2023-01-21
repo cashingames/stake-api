@@ -17,11 +17,8 @@ class GetContestDetailsController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke()
+    public function __invoke(ContestService $contestService)
     {   
-    
-        $contestService = new ContestService;
-
         $contests = $contestService->getContests();
 
         return (new GetContestDetailsResponse())->massTransform($contests);
