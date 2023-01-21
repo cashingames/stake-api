@@ -8,16 +8,16 @@ use App\Mail\Feedback;
 use App\Mail\TokenGenerated;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\SupportTicketService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class MessagesController extends BaseController
 {
     //
 
-    public function feedback(Request $request)
+    public function feedback(Request $request, SupportTicketService $ticketService)
     {
         $data = $request->validate([
             'first_name' => ['nullable', 'string'],
@@ -41,24 +41,14 @@ class MessagesController extends BaseController
         Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"]));
 
         //create automated ticket for support
-     
-        try {
-            Http::withHeaders([
-                'X-API-Key' => config('app.osticket_support_key'),
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ])->post(config('app.osticket_support_url'), [
-                'name'     =>     $firstName . ' ' . $lastName,
-                'email'    =>     $data["email"],
-                'subject'   =>      'Inquiry/Complaint',
-                'message'   =>   $data["message_body"],
-                'ip'       =>      $request->ip(),
-                'topicId'   =>      '1',
-                'attachments' => array()
-            ]);
-        } catch (\Exception $ex) {
-            Log::info('ticket could not be created. something went wrong');
-        }
+
+        $ticketService->createTicket(
+            $firstName,
+            $lastName,
+            $data["email"],
+            $data["message_body"],
+            $request->ip()
+        );
 
         return $this->sendResponse("Feedback Sent", 'Feedback Sent');
     }
