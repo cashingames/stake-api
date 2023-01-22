@@ -3,7 +3,7 @@
 namespace App\Http\ResponseHelpers;
 
 use \Illuminate\Http\JsonResponse;
-
+use stdClass;
 
 class GetContestDetailsResponse
 {
@@ -47,8 +47,26 @@ class GetContestDetailsResponse
         $presenter->endDate = $contest->endDate;
         $presenter->contestType = $contest->contestType;
         $presenter->entryMode = $contest->entryMode;
-        $presenter->prizePool = $contest->winningPrizePools;
+        $presenter->prizePool = $this->transformPrizePool($contest->winningPrizePools);
 
         return $presenter;
+    }
+
+    private function transformPrizePool($prizePools)
+    {
+        $data = [];
+
+        foreach ($prizePools as $_prizePool) {
+            $_presenter =  new stdClass;
+            $_presenter->id = $_prizePool->id;
+            $_presenter->contestId = $_prizePool->contest_id;
+            $_presenter->rankFrom = $_prizePool->rank_from;
+            $_presenter->rankTo = $_prizePool->rank_to;
+            $_presenter->prize = $_prizePool->prize;
+            $_presenter->eachPrize = $_prizePool->each_prize;
+            $_presenter->netPrize = $_prizePool->net_prize;
+            $data[] = $_presenter;
+        }
+        return $data;
     }
 }
