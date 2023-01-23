@@ -15,7 +15,6 @@ use App\Services\ChallengeGameService;
 
 class EndChallengeGameController extends  BaseController
 {
-    protected $MINIMUM_GAME_BOAST_SCORE = 4;
     /**
      * Handle the incoming request.
      *
