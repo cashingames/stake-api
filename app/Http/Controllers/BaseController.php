@@ -10,6 +10,7 @@ class BaseController extends Controller
 {
     public $token;
     public $user;
+    public $MINIMUM_GAME_BOAST_SCORE = 4;
 
     function __construct()
     {
