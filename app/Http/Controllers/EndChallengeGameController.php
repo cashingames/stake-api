@@ -87,7 +87,7 @@ class EndChallengeGameController extends  BaseController
         $challengeGameService = new ChallengeGameService();
         $challengeGameService->creditStakeWinner($game->challenge);
 
-        $game->minimum_boast_score = $this->MINIMUM_GAME_BOOST_SCORE;
+        $game->minimum_boost_score = $this->MINIMUM_GAME_BOOST_SCORE;
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
 
