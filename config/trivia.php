@@ -28,13 +28,14 @@ return [
     'enabled' => env('HAS_LIVE_TRIVIA',false),
     'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
   ],
- 
-  
+
+
   'wallet_funding'=>[
     'min_amount' => env('MINIMUM_WALLET_FUNDABLE_AMOUNT',100),
     'max_amount' => env('MAXIMUM_WALLET_FUNDABLE_AMOUNT',100000)
   ],
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
+  'minimum_game_boost_score' => env("MINIMUM_GAME_BOOST_SCORE", 4),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
