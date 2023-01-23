@@ -15,6 +15,7 @@ use App\Services\ChallengeGameService;
 
 class EndChallengeGameController extends  BaseController
 {
+    protected $MINIMUM_GAME_BOAST_SCORE = 4;
     /**
      * Handle the incoming request.
      *
@@ -31,6 +32,7 @@ class EndChallengeGameController extends  BaseController
         }
         //@TODO Remove after fixing double submission bug.
         if ($game->state === "COMPLETED") {
+            $game->minimum_boast_score = $this->MINIMUM_GAME_BOAST_SCORE;
             return $this->sendResponse($game, 'Challenge Game Ended');
         }
         $game->end_time = Carbon::now()->subMilliseconds(500);
@@ -73,7 +75,7 @@ class EndChallengeGameController extends  BaseController
             ]);
         }
 
-        
+
         $sendPushNotification->sendChallengeCompletedNotification($this->user, $game->challenge);
 
         if ($this->user->id == $game->challenge->user_id) {
@@ -82,12 +84,13 @@ class EndChallengeGameController extends  BaseController
             $recipient = $game->challenge->users;
         }
         $recipient->notify(new ChallengeCompletedNotification($game->challenge, $this->user));
-        
+
         $challengeGameService = new ChallengeGameService();
         $challengeGameService->creditStakeWinner($game->challenge);
-        
+
+        $game->minimum_boast_score = $this->MINIMUM_GAME_BOAST_SCORE;
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
 
-    
+
 }
