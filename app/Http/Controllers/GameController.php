@@ -59,13 +59,13 @@ class GameController extends BaseController
         $categories = Cache::rememberForever('categories', fn () => Category::all());
 
         $gameInfo = DB::select("
-        SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id, 
-        c.id as subcategory_id, c.name subcategory_name, count(q.id) questons, 
-        (SELECT name from categories WHERE categories.id = c.category_id) category_name, 
-        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played 
-        FROM questions q 
-        JOIN categories_questions cq ON cq.question_id = q.id 
-        JOIN categories AS c ON c.id = cq.category_id 
+        SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
+        c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+        (SELECT name from categories WHERE categories.id = c.category_id) category_name,
+        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played
+        FROM questions q
+        JOIN categories_questions cq ON cq.question_id = q.id
+        JOIN categories AS c ON c.id = cq.category_id
         JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL AND q.is_published = true AND c.is_enabled = true
         GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
         ");
@@ -140,6 +140,7 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
+        $result->minimumBoastScore = $this->MINIMUM_GAME_BOAST_SCORE;
 
         return $this->sendResponse($result, "Common data");
     }
