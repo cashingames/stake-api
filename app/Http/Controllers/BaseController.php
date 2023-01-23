@@ -10,7 +10,7 @@ class BaseController extends Controller
 {
     public $token;
     public $user;
-    public $MINIMUM_GAME_BOAST_SCORE;
+    public $MINIMUM_GAME_BOOST_SCORE;
 
     function __construct()
     {
@@ -20,7 +20,7 @@ class BaseController extends Controller
         }
 
         // setting minimum game score
-        $this->MINIMUM_GAME_BOAST_SCORE = env("MINIMUM_GAME_BOAST_SCORE", 4);
+        $this->MINIMUM_GAME_BOOST_SCORE = config("trivia.minimum_game_boost_score");
     }
 
     /**

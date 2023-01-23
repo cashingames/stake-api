@@ -140,7 +140,7 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
-        $result->minimumBoastScore = $this->MINIMUM_GAME_BOAST_SCORE;
+        $result->minimumBoastScore = $this->MINIMUM_GAME_BOOST_SCORE;
 
         return $this->sendResponse($result, "Common data");
     }
