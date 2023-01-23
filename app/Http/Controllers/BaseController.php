@@ -10,7 +10,7 @@ class BaseController extends Controller
 {
     public $token;
     public $user;
-    public $MINIMUM_GAME_BOAST_SCORE = 4;
+    public $MINIMUM_GAME_BOAST_SCORE;
 
     function __construct()
     {
@@ -18,6 +18,9 @@ class BaseController extends Controller
         if ($this->user && $this->user->trashed()) {
             auth()->logout(true);
         }
+
+        // setting minimum game score
+        $this->MINIMUM_GAME_BOAST_SCORE = env("MINIMUM_GAME_BOAST_SCORE", 4);
     }
 
     /**
