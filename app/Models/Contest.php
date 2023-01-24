@@ -15,10 +15,10 @@ class Contest extends Model
     ];
 
     protected $with = [
-        'winningPrizePools'
+        'contestPrizePools'
     ];
 
-    public function winningPrizePools()
+    public function contestPrizePools()
     {
       return $this->hasMany(ContestPrizePool::class);
     }

@@ -113,6 +113,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('leaders/global', GetGlobalLeaderboardController::class);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
+        Route::delete('account/delete', [UserController::class, 'deleteAccount']);
         Route::get('contests', GetContestDetailsController::class);
         Route::get('contest/{id}', GetSingleContestController::class);
     }

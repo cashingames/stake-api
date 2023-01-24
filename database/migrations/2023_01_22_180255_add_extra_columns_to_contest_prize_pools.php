@@ -27,7 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('contest_prize_pools', function (Blueprint $table) {
-            //
+            $table->dropColumn('each_prize');
+            $table->dropColumn('net_prize');
         });
     }
 };

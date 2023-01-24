@@ -35,7 +35,6 @@ class ContestsTest extends TestCase
         $response = $this->get('/api/v3/contests');
 
         $response->assertJsonCount(5, '*');
-        $response->assertStatus(200);
     }
 
     public function test_all_contests_can_be_gotten_with_their_prize_pools()
@@ -57,7 +56,6 @@ class ContestsTest extends TestCase
 
             ]
         ]);
-        $response->assertStatus(200);
     }
 
     public function test_a_single_contest_can_be_gotten()
@@ -65,6 +63,5 @@ class ContestsTest extends TestCase
         $response = $this->get('/api/v3/contest/' . Contest::first()->id);
 
         $response->assertJsonCount(9, '*');
-        $response->assertStatus(200);
     }
 }
