@@ -23,7 +23,7 @@ class ContestService
             'end_date as endDate',
             'contest_type as contestType',
             'entry_mode as entryMode'
-        )->limit(50)->get();
+        )->limit(10)->get();
     }
 
     public function getSingleContest($id)

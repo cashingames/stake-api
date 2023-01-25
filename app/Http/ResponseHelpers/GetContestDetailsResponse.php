@@ -47,16 +47,14 @@ class GetContestDetailsResponse
         $presenter->endDate = $contest->endDate;
         $presenter->contestType = $contest->contestType;
         $presenter->entryMode = $contest->entryMode;
-        $presenter->prizePool = $this->transformPrizePool($contest->contestPrizePools);
+        $presenter->prizePool = $this->transformPrizePools($contest->contestPrizePools ?? []);
 
         return $presenter;
     }
 
-    private function transformPrizePool($prizePools)
+    private function transformPrizePools($prizePools)
     {
         $data = [];
-
-        if (!is_null($prizePools)) {
 
             foreach ($prizePools as $_prizePool) {
                 $_presenter =  new stdClass;
@@ -69,7 +67,6 @@ class GetContestDetailsResponse
                 $_presenter->netPrize = $_prizePool->net_prize;
                 $data[] = $_presenter;
             }
-        }
 
         return $data;
     }
