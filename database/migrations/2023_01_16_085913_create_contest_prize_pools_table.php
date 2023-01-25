@@ -19,7 +19,7 @@ return new class extends Migration
             $table->smallInteger('rank_from');
             $table->smallInteger('rank_to');
             $table->string('prize');
-            $table->enum('prize_type',['MONEY_TO_WALLET','POINTS','MONEY_TO_BANK','PHYSICAL_ITEM']);
+            $table->string('prize_type');
             $table->timestamps();
         });
     }
