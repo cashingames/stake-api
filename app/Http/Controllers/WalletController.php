@@ -130,8 +130,8 @@ class WalletController extends BaseController
                 'reference' => $reference, // unique to transactions
             ]);
         } catch (PaystackException $e) {
-            Log::info("transaction could not be verified ", $e->getResponseObject());
-            throw ($e->getMessage());
+            Log::info("transaction could not be verified ", $e->getMessage());
+            return false;
         }
 
         if ('success' == $tranx->data->status) {
@@ -206,7 +206,7 @@ class WalletController extends BaseController
     }
 
     private function reverseWithdrawalTransaction($reference, $amount)
-    {   
+    {
         $transaction = WalletTransaction::where('reference', $reference)->first();
 
         if (is_null($transaction)) {
