@@ -56,18 +56,25 @@ class GetContestDetailsResponse
     {
         $data = [];
 
-            foreach ($prizePools as $_prizePool) {
-                $_presenter =  new stdClass;
-                $_presenter->id = $_prizePool->id;
-                $_presenter->contestId = $_prizePool->contest_id;
-                $_presenter->rankFrom = $_prizePool->rank_from;
-                $_presenter->rankTo = $_prizePool->rank_to;
-                $_presenter->prize = $_prizePool->prize;
-                $_presenter->eachPrize = $_prizePool->each_prize;
-                $_presenter->netPrize = $_prizePool->net_prize;
-                $data[] = $_presenter;
-            }
+        foreach ($prizePools as $_prizePool) {
+            $_presenter = $this->transformPrizePool($_prizePool);
+            $data[] = $_presenter;
+        }
 
         return $data;
+    }
+
+    private function transformPrizePool($_prizePool)
+    {
+        $_presenter =  new stdClass;
+        $_presenter->id = $_prizePool->id;
+        $_presenter->contestId = $_prizePool->contest_id;
+        $_presenter->rankFrom = $_prizePool->rank_from;
+        $_presenter->rankTo = $_prizePool->rank_to;
+        $_presenter->prize = $_prizePool->prize;
+        $_presenter->eachPrize = $_prizePool->each_prize;
+        $_presenter->netPrize = $_prizePool->net_prize;
+
+        return $_presenter;
     }
 }
