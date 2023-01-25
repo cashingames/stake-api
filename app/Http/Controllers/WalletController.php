@@ -131,8 +131,6 @@ class WalletController extends BaseController
             ]);
         } catch (PaystackException $e) {
             Log::info("transaction could not be verified ", $e->getMessage());
-            // Log::info("transaction could not be verified ", $e->getResponseObject());
-            // throw ($e->getMessage());
             return false;
         }
 
