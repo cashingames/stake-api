@@ -60,7 +60,6 @@ class GetContestDetailsResponse
          
             $data[] =  $this->transformPrizePool($_prizePool);
         }
-
         return $data;
     }
 
