@@ -57,8 +57,8 @@ class GetContestDetailsResponse
         $data = [];
 
         foreach ($prizePools as $_prizePool) {
-            $_presenter = $this->transformPrizePool($_prizePool);
-            $data[] = $_presenter;
+         
+            $data[] =  $this->transformPrizePool($_prizePool);
         }
 
         return $data;
