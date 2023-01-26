@@ -24,9 +24,16 @@ class AccountDeletionTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_that_an_account_can_be_deleted(){
+    public function test_that_an_account_can_be_deleted_with_post_method(){
     
         $this->post("/api/v3/account/delete");
+
+        $this->assertSoftDeleted($this->user);
+    }
+
+    public function test_that_an_account_can_be_deleted_with_delete_method(){
+    
+        $this->delete("/api/v3/account/delete");
 
         $this->assertSoftDeleted($this->user);
     }

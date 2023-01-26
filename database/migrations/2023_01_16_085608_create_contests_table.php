@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->string('display_name');
-            $table->enum('contest_type',['LIVE_TRIVIA','LEADERBOARD','CHALLENGE']);
-            $table->enum('entry_mode',['FREE','PAY_WITH_POINTS','PAY_WITH_MONEY','MINIMUM_POINTS']);
+            $table->string('contest_type');
+            $table->string('entry_mode');
             $table->timestamps();
         });
     }

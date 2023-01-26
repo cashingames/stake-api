@@ -35,6 +35,8 @@ use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\ChallengeGlobalLeadersController;
 use App\Http\Controllers\FeatureFlagController;
+use App\Http\Controllers\GetContestDetailsController;
+use App\Http\Controllers\GetSingleContestController;
 use App\Http\Controllers\GetSingleLiveTriviaController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
@@ -111,6 +113,9 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('leaders/global', GetGlobalLeaderboardController::class);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
+        Route::delete('account/delete', [UserController::class, 'deleteAccount']);
+        Route::get('contests', GetContestDetailsController::class);
+        Route::get('contest/{id}', GetSingleContestController::class);
     }
 );
 

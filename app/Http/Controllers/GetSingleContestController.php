@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\ResponseHelpers\GetContestDetailsResponse;
+use App\Models\Contest;
+use App\Services\ContestService;
 use Illuminate\Http\Request;
 
-class GetSingleContestController extends Controller
+class GetSingleContestController extends BaseController
 {
-    /**
-     * Handle the incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, ContestService   $contestService)
     {
-        //
+        $contest = $contestService->getSingleContest($request->id);
+
+        if (is_null($contest)) {
+            return $this->sendError('Invalid contest', 'Invalid contest');
+        }
+
+        return (new GetContestDetailsResponse())->singleTransform($contest);
+        
     }
 }
