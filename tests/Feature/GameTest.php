@@ -237,6 +237,19 @@ class GameTest extends TestCase
         $opponent = User::latest()->limit(2)->first();
         $category = $this->category;
 
+        $questions = Question::factory()
+        ->count(10)
+        ->create();
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'category_id' => $this->category->id,
+                'question_id' => $question->id
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+
         $response = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
             'opponentId' => $opponent->id,
             'categoryId' => $category->id

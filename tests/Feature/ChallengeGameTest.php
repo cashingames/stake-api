@@ -27,6 +27,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Notifications\ChallengeReceivedNotification;
 use App\Notifications\ChallengeCompletedNotification;
 use App\Services\ChallengeGameService;
+use Illuminate\Support\Facades\DB;
 
 class ChallengeGameTest extends TestCase
 {
@@ -37,13 +38,13 @@ class ChallengeGameTest extends TestCase
      * @return void
      */
     const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
-    const START_CHALLENGE_GAME_URL= "/api/v3/challenge/start/game";
+    const START_CHALLENGE_GAME_URL = "/api/v3/challenge/start/game";
     const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
     const CHALLENGE_RESPONSE_URL = "/api/v3/challenge/invite/respond";
 
     protected $user;
     protected $category;
-    
+
     protected $staking;
 
     protected function setUp(): void
@@ -52,25 +53,37 @@ class ChallengeGameTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
-        
-        
+
+
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
-        
+
         $this->user = User::first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
-        
+
         $this->actingAs($this->user);
-        
-        
     }
 
-    
+
     public function test_challenge_invite_sent_with_staking_successfully()
     {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
         Mail::fake();
         Notification::fake();
+
+
+        $questions = Question::factory()
+            ->count(10)
+            ->create();
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'category_id' => $this->category->id,
+                'question_id' => $question->id
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         $this->user->wallet()->update([
             'non_withdrawable_balance' => 2500,
@@ -79,7 +92,7 @@ class ChallengeGameTest extends TestCase
         $player = $this->user;
         $opponent = User::where('id', '<>', $player->id)->first();
 
-        
+
         $category = $this->category;
         $amountToStake = 1500;
 
@@ -103,11 +116,11 @@ class ChallengeGameTest extends TestCase
         ]);
 
         $staking = Staking::first();
-        
+
         $challenge = Challenge::where('user_id', $player->id)
-         ->where('opponent_id', $opponent->id)
-         ->where('category_id', $category->id)
-         ->first();
+            ->where('opponent_id', $opponent->id)
+            ->where('category_id', $category->id)
+            ->first();
 
         $this->assertDatabaseHas('challenge_stakings', [
             'challenge_id' => $challenge->id,
@@ -115,10 +128,10 @@ class ChallengeGameTest extends TestCase
         ]);
         Mail::assertQueued(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
-        
     }
 
-    public function test_can_not_accept_staking_challenge_with_insufficient_balance(){
+    public function test_can_not_accept_staking_challenge_with_insufficient_balance()
+    {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
         $opponent = $this->user;
         $creator = User::where('id', '<>', $opponent->id)->first();
@@ -145,14 +158,16 @@ class ChallengeGameTest extends TestCase
         ]);
     }
 
-    public function test_can_not_accept_invalid_challenge(){
+    public function test_can_not_accept_invalid_challenge()
+    {
         $acceptanceResponse = $this->postJson(self::CHALLENGE_RESPONSE_URL, [
             'status' => true,
         ])->assertStatus(400);
     }
-    public function test_can_accept_challenge_with_staking(){
+    public function test_can_accept_challenge_with_staking()
+    {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
-        
+
         $this->user->wallet()->update([
             'non_withdrawable_balance' => 2500,
         ]);
@@ -192,10 +207,10 @@ class ChallengeGameTest extends TestCase
             'challenge_id' => $challenge->id,
             'staking_id' => $staking->id
         ]);
-
     }
 
-    public function test_challenge_game_ends_for_first_player_successfully(){
+    public function test_challenge_game_ends_for_first_player_successfully()
+    {
         Notification::fake();
         $this->mock(SendPushNotification::class, function (MockInterface $mock) {
             $mock->shouldReceive('sendChallengeCompletedNotification')->once();
@@ -226,9 +241,9 @@ class ChallengeGameTest extends TestCase
             'type' => 2
         ])->assertOk();
 
-        
+
         $gameSession = $this->user->challengeGameSessions()->first();
-        
+
 
         $this->postjson(self::END_CHALLENGE_URL, [
             "token" => $gameSession->session_token,
@@ -237,14 +252,27 @@ class ChallengeGameTest extends TestCase
         ]);
 
         Notification::assertSentTo($opponent, ChallengeCompletedNotification::class);
-
     }
 
-    public function test_challenge_winner_takes_twice_stake_amount(){
+    public function test_challenge_winner_takes_twice_stake_amount()
+    {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
         $creator = $this->user;
         $opponent = User::where('id', '<>', $this->user->id)->first();
         $category = $this->category;
+
+        $questions = Question::factory()
+            ->count(10)
+            ->create();
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'category_id' => $this->category->id,
+                'question_id' => $question->id
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         $creator->wallet()->update([
             'non_withdrawable_balance' => 2500,
@@ -252,10 +280,10 @@ class ChallengeGameTest extends TestCase
         $opponent->wallet()->update([
             'non_withdrawable_balance' => 2500,
         ]);
-        
+
 
         $amountToStake = 2000;
-        
+
         $challengeInvitationResponse = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
             'opponentId' => $opponent->id,
             'categoryId' => $category->id,
@@ -264,7 +292,7 @@ class ChallengeGameTest extends TestCase
 
         $challenge = Challenge::where('user_id', $creator->id)->where('opponent_id', $opponent->id)->first();
 
-        
+
         $acceptanceResponse = $this->actingAs($opponent)->postJson(self::CHALLENGE_RESPONSE_URL, [
             'status' => true,
             'challenge_id' => $challenge->id
@@ -307,11 +335,25 @@ class ChallengeGameTest extends TestCase
         ]);
     }
 
-    public function test_stake_is_shared_when_game_ends_in_draw(){
+    public function test_stake_is_shared_when_game_ends_in_draw()
+    {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
         $creator = $this->user;
         $opponent = User::where('id', '<>', $this->user->id)->first();
         $category = $this->category;
+
+        $questions = Question::factory()
+            ->count(10)
+            ->create();
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'category_id' => $this->category->id,
+                'question_id' => $question->id
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
 
         $creator->wallet()->update([
             'non_withdrawable_balance' => 2500,
@@ -382,4 +424,20 @@ class ChallengeGameTest extends TestCase
             'transaction_type' => 'CREDIT'
         ]);
     }
+
+    public function test_challenge_cannot_be_created_when_category_questions_are_not_enough()
+    {
+        $opponent = User::where('id', '<>', $this->user->id)->first();
+        $category = $this->category;
+
+        $response = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
+            'opponentId' => $opponent->id,
+            'categoryId' => $category->id
+        ]);
+
+        $response->assertJson([
+            'errors' => 'Category is not available',
+        ]);
+    }
+
 }

@@ -49,6 +49,10 @@ class SendChallengeInviteController extends BaseController
 
         $challenges = $challengeGameService->createChallenge($this->user, $request->opponentId, $request->categoryId);
 
+        if (is_null($challenges)) {
+            return $this->sendError("Category is not available", "Category is not available");
+        }
+
         if ($request->has('staking_amount') && FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)) {
             foreach ($challenges as $challenge) {
                 $staking = new StakingService($this->user, 'challenge');
@@ -56,24 +60,6 @@ class SendChallengeInviteController extends BaseController
                 $staking->createChallengeStaking($stakingId, $challenge->id);
             }
         }
-
-        // $challenge = Challenge::create([
-        //     'status' => 'PENDING',
-        //     'user_id' => $this->user->id,
-        //     'category_id' => $request->categoryId,
-        //     'opponent_id' => $request->opponentId
-        // ]);
-
-        // $opponent = User::find($request->opponentId);
-        // Mail::send(new ChallengeInvite($opponent, $challenge->id));
-
-
-        // $pushAction = new SendPushNotification();
-        // $pushAction->sendChallengeInviteNotification($this->user, $opponent, $challenge);
-
-        // $opponent->notify(new ChallengeReceivedNotification($challenge, $this->user));
-
-        // Log::info("Challenge id : $challenge->id  invite from " . $this->user->username . " sent" );
 
         return $this->sendResponse('Invite Sent', 'Invite Sent');
     }
