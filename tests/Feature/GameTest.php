@@ -228,6 +228,38 @@ class GameTest extends TestCase
         ]);
     }
 
+    public function test_used_boost_is_saved_when_exhibition_game_ends()
+    {
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+
+        $boost = Boost::inRandomOrder()->first();
+
+        UserBoost::create([
+            'user_id' => $this->user->id,
+            'boost_id' => $boost->id,
+            'boost_count' => $boost->pack_count,
+            'used_count' => 0
+        ]);
+
+        $userBoost = $this->user->userBoosts();
+
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => [
+                ['boost' => Boost::where('id', $userBoost[0]->id)->first()]
+            ]
+        ]);
+       
+        $this->assertDatabaseHas('exhibition_boosts', [
+            'boost_id' => Boost::where('id', $userBoost[0]->id)->first()->id,
+            'game_session_id' => $game->id,
+        ]);
+
+    }
+
     public function test_challenge_invite_sent_successfully()
     {
         Mail::fake();
