@@ -217,7 +217,7 @@ class GameController extends BaseController
     {
 
         Log::info($request->all());
-
+        
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if ($game == null) {
             Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
@@ -234,7 +234,7 @@ class GameController extends BaseController
 
         $points = 0;
         $wrongs = 0;
-
+        
         //@TODO: Change our encryption method from base 64. It is not secure
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
         $chosenOptions =  [];
@@ -248,7 +248,7 @@ class GameController extends BaseController
         } else {
             $chosenOptions = $request->chosenOptions;
         }
-
+       
         DB::transaction(function () use ($chosenOptions, $game) {
             foreach ($chosenOptions as $value) {
                 GameSessionQuestion::where('game_session_id', $game->id)
@@ -330,22 +330,26 @@ class GameController extends BaseController
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
+       
+        DB::transaction(function () use ($request, $game) {
+            foreach ($request->consumedBoosts as $row) {
+                $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
 
-        foreach ($request->consumedBoosts as $row) {
-            $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
+                $userBoost->update([
+                    'used_count' => $userBoost->used_count + 1,
+                    'boost_count' => $userBoost->boost_count - 1
+                ]);
 
-            $userBoost->update([
-                'used_count' => $userBoost->used_count + 1,
-                'boost_count' => $userBoost->boost_count - 1
-            ]);
-        }
+                DB::table('exhibition_boosts')->insert([
+                    'game_session_id' => $game->id,
+                    'boost_id' => $row['boost']['id'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+        });
 
-        //find if this is the first time this user is playing this subcategory
-        // if (GameSession::where('category_id')->first() == null) {
-        //     $this->creditPoints($this->user->id, 30, "Bonus for playing new category");
-        // }
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
-
 }
