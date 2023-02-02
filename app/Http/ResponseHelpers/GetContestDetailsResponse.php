@@ -52,7 +52,7 @@ class GetContestDetailsResponse
         return $presenter;
     }
 
-    private function transformPrizePools($prizePools)
+    public function transformPrizePools($prizePools)
     {
         $data = [];
 
@@ -63,7 +63,7 @@ class GetContestDetailsResponse
         return $data;
     }
 
-    private function transformPrizePool($_prizePool)
+    public function transformPrizePool($_prizePool)
     {
         $_presenter =  new stdClass;
         $_presenter->id = $_prizePool->id;
