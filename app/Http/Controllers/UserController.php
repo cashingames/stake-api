@@ -24,6 +24,7 @@ class UserController extends BaseController
         $result->email = $this->user->email;
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;
+        $result->joinedOn = Carbon::parse($this->user->created_at)->toDateTimeString();
         $result->fullName = $this->user->profile->full_name;
         $result->countryCode = $this->user->country_code;
         $result->phoneNumber = $this->user->phone_number;

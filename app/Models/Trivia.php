@@ -88,4 +88,9 @@ class Trivia extends Model
             ->where('is_published', true)
             ->orderBy('start_time', 'DESC');
     }
+
+    public function getPrizePool()
+    {
+       return $this->contest->contestPrizePools ?? [] ;
+    }
 }

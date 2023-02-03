@@ -40,4 +40,9 @@ class LiveTrivia extends Model
             ->where('end_time', '>=', now())
             ->orderBy('start_time', 'ASC');
     }
+
+    public function getPrizePool()
+    {
+       return $this->contest->contestPrizePools ?? [] ;
+    }
 }
