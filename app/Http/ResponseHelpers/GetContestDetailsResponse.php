@@ -71,6 +71,7 @@ class GetContestDetailsResponse
         $_presenter->rankFrom = $_prizePool->rank_from;
         $_presenter->rankTo = $_prizePool->rank_to;
         $_presenter->prize = $_prizePool->prize;
+        $_presenter->prizeType = $_prizePool->prize_type;
         $_presenter->eachPrize = $_prizePool->each_prize;
         $_presenter->netPrize = $_prizePool->net_prize;
 

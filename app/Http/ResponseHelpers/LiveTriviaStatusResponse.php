@@ -23,6 +23,8 @@ class LiveTriviaStatusResponse
     public int $categoryId;
     public string $title;
     public string $prize;
+    public string $description;
+    public string $entryMode;
     public $entryFee;
     public $isFreeLiveTrivia;
     public $entryFreePaid;
@@ -53,6 +55,8 @@ class LiveTriviaStatusResponse
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
         $response->entryFee = $model->entry_fee;
+        $response->entryMode = $model->contest->entry_mode ?? '';
+        $response->description = $model->contest->description ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -65,7 +69,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
-        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest_id ?? []);
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return response()->json($response);
     }
 
@@ -82,6 +86,8 @@ class LiveTriviaStatusResponse
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
         $response->entryFee = $model->entry_fee;
+        $response->entryMode = $model->contest->entry_mode ?? '';
+        $response->description = $model->contest->description ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -94,7 +100,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
-        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest_id ?? []);
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return $response;
     }
 
@@ -197,9 +203,8 @@ class LiveTriviaStatusResponse
             ->sum('value');
     }
 
-    private function getLiveTriviaPrizePool($id){
-        $prizePools = ContestPrizePool::where('contest_id', $id)->get();
-
+    private function getLiveTriviaPrizePool($prizePools){
+        
         return (new GetContestDetailsResponse())->transformPrizePools(($prizePools));
         
     }
