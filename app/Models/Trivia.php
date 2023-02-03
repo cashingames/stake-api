@@ -17,6 +17,7 @@ class Trivia extends Model
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee','contest_id'];
     protected $appends = ['is_active', 'start_timespan'];
     protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float'];
+    protected $with =['contest'];
 
     public function category()
     {
@@ -87,10 +88,5 @@ class Trivia extends Model
             ->whereNull('deleted_at')
             ->where('is_published', true)
             ->orderBy('start_time', 'DESC');
-    }
-
-    public function getPrizePool()
-    {
-       return $this->contest->contestPrizePools ?? [] ;
     }
 }

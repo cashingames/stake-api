@@ -69,7 +69,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
-        $response->prizePool = $this->getLiveTriviaPrizePool($model->getPrizePool() ?? []);
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return response()->json($response);
     }
 
@@ -100,7 +100,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
-        $response->prizePool = $this->getLiveTriviaPrizePool($model->getPrizePool() ?? []);
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return $response;
     }
 

@@ -15,6 +15,7 @@ class LiveTrivia extends Model
 
     protected $fillable = ['name', 'category_id', 'game_type_id', 'game_mode_id', 'grand_price', 'point_eligibility', 'start_time', 'end_time', 'is_published','entry_fee','contest_id'];
     protected $casts = ['is_published' => 'boolean', 'entry_fee' => 'float'];
+    protected $with =['contest'];
 
     public function gameSessions()
     {
@@ -39,10 +40,5 @@ class LiveTrivia extends Model
             ->where('is_published', true)
             ->where('end_time', '>=', now())
             ->orderBy('start_time', 'ASC');
-    }
-
-    public function getPrizePool()
-    {
-       return $this->contest->contestPrizePools ?? [] ;
     }
 }
