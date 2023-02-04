@@ -17,7 +17,7 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
-        $recentLiveTrivia = Trivia::recent()->with('contest')->paginate(10);
+        $recentLiveTrivia = Trivia::recent()->with(['contest','contest.contestPrizePools'])->paginate(10);
     
         $response = [];
        
