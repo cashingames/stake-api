@@ -14,7 +14,7 @@ class LiveTriviaStatusController extends Controller
      */
     public function __invoke()
     {
-        $liveTrivia = LiveTrivia::active()->first();
+        $liveTrivia = LiveTrivia::active()->with(['contest','contest.contestPrizePools'])->first();
 
         if($liveTrivia === null){
             return null;
