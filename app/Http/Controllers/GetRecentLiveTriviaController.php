@@ -17,12 +17,11 @@ class GetRecentLiveTriviaController extends Controller
      */
     public function __invoke()
     {   
-        $recentLiveTrivia = Trivia::recent()->paginate(10);
+        $recentLiveTrivia = Trivia::recent()->with('contest')->paginate(10);
     
         $response = [];
        
         foreach($recentLiveTrivia as $liveTrivia){
-            // dd($liveTrivia);
             $response[]= (new LiveTriviaStatusResponse())->transformAndReturnObject($liveTrivia);
         }
         return $response;
