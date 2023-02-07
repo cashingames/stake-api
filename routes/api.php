@@ -38,6 +38,7 @@ use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetContestDetailsController;
 use App\Http\Controllers\GetSingleContestController;
 use App\Http\Controllers\GetSingleLiveTriviaController;
+use App\Http\Controllers\GetStakersSessionController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
@@ -116,6 +117,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::delete('account/delete', [UserController::class, 'deleteAccount']);
         Route::get('contests', GetContestDetailsController::class);
         Route::get('contest/{id}', GetSingleContestController::class);
+        Route::get('stakers/sessions/recent', GetStakersSessionController::class);
     }
 );
 
