@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\PlayGame;
 
+use App\Actions\SendPushNotification;
 use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
@@ -71,7 +72,7 @@ class StartSinglePlayerGameController extends BaseController
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
 
-        //@TODO  //if it's live trivia add the actual seconds 
+        //@TODO  //if it's live trivia add the actual seconds
         $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
 
@@ -204,6 +205,9 @@ class StartSinglePlayerGameController extends BaseController
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);
+
+            // send push notification ot user
+            (new SendPushNotification())->sendReferralBonusNotification($referrerProfile);
         }
     }
 
