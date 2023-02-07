@@ -11,11 +11,15 @@ class GetStakersSessionController extends BaseController
 {
     public function __invoke()
     {
-        $sessions = GameSession::whereHas('exhibitionStakings')->where('points_gained','>=', 5)->latest()->limit(10)->get();
+        $sessions = GameSession::whereHas('exhibitionStakings')
+            ->where('points_gained', '>=', 5)
+            ->orderBy('amount_won', 'DESC')
+            ->orderBy('created_at', 'DESC')
+            ->limit(10)->get();
         $data = [];
 
-        foreach($sessions as $session){
-            $data[]= (new GameSessionResponse())->transform($session);
+        foreach ($sessions as $session) {
+            $data[] = (new GameSessionResponse())->transform($session);
         }
         return $data;
     }
