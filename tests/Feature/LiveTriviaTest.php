@@ -12,9 +12,12 @@ use GameTypeSeeder;
 use GameModeSeeder;
 use App\Models\Question;
 use App\Models\Category;
+use App\Models\Contest;
 use App\Models\User;
 use App\Models\Trivia;
 use App\Models\GameSession;
+use App\Models\LiveTrivia;
+use Database\Seeders\ContestSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,6 +44,7 @@ class LiveTriviaTest extends TestCase
         $this->seed(TriviaSeeder::class);
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
+        $this->seed(ContestSeeder::class);
         $this->user = User::first();
         $this->trivia = Trivia::inRandomOrder()->first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
@@ -122,7 +126,7 @@ class LiveTriviaTest extends TestCase
         }
 
         DB::table('categories_questions')->insert($data);
-        
+
         GameSession::create([
             'category_id' => 101,
             'trivia_id' => $this->trivia->id,
@@ -159,5 +163,57 @@ class LiveTriviaTest extends TestCase
         $response = $this->get(self::RECENT_LIVE_TRIVIA_URL);
 
         $response->assertStatus(200);
+    }
+
+    public function test_live_trivia_can_be_ended()
+    {
+        $questions = Question::factory()
+            ->count(250)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+
+        $this->trivia->update(['contest_id' => Contest::first()->id]);
+
+        $game = GameSession::create([
+            'category_id' => 101,
+            'trivia_id' => $this->trivia->id,
+            'game_mode_id' => 2,
+            'game_type_id' => 2,
+            'plan_id' => 1,
+            'user_id' => $this->user->id,
+            'start_time' => Carbon::now(),
+            'end_time' => Carbon::now()->addMinutes(1),
+            'session_token' => Str::random(20),
+            'state' => 'ONGOING',
+            'correct_count' => 4,
+            'wrong_count' => 6,
+            'total_count' => 10,
+            'points_gained' => 15,
+            'created_at' => Carbon::today(),
+            'updated_at' => Carbon::now()
+        ]);
+
+
+        $response = $this->postjson('/api/v3/game/end/single-player', [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $response->assertJson([
+            'message' => 'Game Ended',
+        ]);
     }
 }
