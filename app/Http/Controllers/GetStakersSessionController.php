@@ -16,16 +16,14 @@ class GetStakersSessionController extends BaseController
             ->where('points_gained', '>=', 5)
             ->orderBy('amount_won', 'DESC')
             ->orderBy('created_at', 'DESC')
+            ->groupBy('user_id')
             ->limit(10)->get();
         $data = [];
 
-        // return $sessions;
 
         foreach ($sessions as $session) {
             $data[] = (new RecentStakersResponse())->transform($session);
         }
         return $data;
-
-        //return $this->sendResponse($sessions, "Global Leaders");
     }
 }
