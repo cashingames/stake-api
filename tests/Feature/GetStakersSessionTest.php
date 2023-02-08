@@ -59,24 +59,10 @@ class GetStakersSessionTest extends TestCase
         $response->assertJsonStructure([
             [
                 "id",
-                "game_mode_id",
-                "game_type_id",
-                "category_id",
-                "user_id",
-                "start_time",
-                "end_time",
-                "session_token",
+                "username",
+                "avatar",
                 "correct_count",
-                "wrong_count",
-                "total_count",
-                "points_gained",
-                "state",
-                "trivia_id",
-                "with_staking",
-                "amount_staked",
                 "amount_won",
-                "staking_odd"
-
             ]
         ]);
     }
