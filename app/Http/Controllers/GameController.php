@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Contest\PrizeType;
 use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
@@ -217,7 +218,7 @@ class GameController extends BaseController
     {
 
         Log::info($request->all());
-        
+
         $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
         if ($game == null) {
             Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
@@ -234,7 +235,7 @@ class GameController extends BaseController
 
         $points = 0;
         $wrongs = 0;
-        
+
         //@TODO: Change our encryption method from base 64. It is not secure
         $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
         $chosenOptions =  [];
@@ -248,9 +249,10 @@ class GameController extends BaseController
         } else {
             $chosenOptions = $request->chosenOptions;
         }
-       
+
         DB::transaction(function () use ($chosenOptions, $game) {
             foreach ($chosenOptions as $value) {
+                //  dd($value['id']);
                 GameSessionQuestion::where('game_session_id', $game->id)
                     ->where('question_id', $value['question_id'])
                     ->update(['option_id' => $value['id']]);
@@ -301,21 +303,24 @@ class GameController extends BaseController
                 } else {
                     ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
                 }
-
-                // $game->amount_won = $amountWon;
             }
         }
 
 
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        // if ((FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) OR FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) && $staking != null){
-        //     $game->points_gained = $points;
-        // }
+        
         if (FeatureFlag::isEnabled('odds') && $staking == null) {
             $game->points_gained = $points * $game->odd_multiplier;
         } else {
             $game->points_gained = $points;
+        }
+
+        if (!is_null($game->trivia_id)) {
+            $prizeType = $game->liveTrivia->contest->prize_type;
+            if ($prizeType == PrizeType::Points->value) {
+                $game->points_gained = $points * $game->liveTrivia->prize_multiplier;
+            }
         }
 
         $game->total_count = $points + $wrongs;
@@ -330,7 +335,7 @@ class GameController extends BaseController
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }
-       
+
         DB::transaction(function () use ($request, $game) {
             foreach ($request->consumedBoosts as $row) {
                 $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
