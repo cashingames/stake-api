@@ -12,11 +12,14 @@ class GetStakersSessionController extends BaseController
 {
     public function __invoke()
     {
-        $sessions = GameSession::whereHas('exhibitionStakings')->with(['exhibitionStakings','user', 'user.profile'])
-            ->where('points_gained', '>=', 5)
-            ->orderBy('amount_won', 'DESC')
-            ->orderBy('created_at', 'DESC')
-            ->groupBy('user_id')
+        $sessions = Staking::whereHas('exhibitionStakings')->with(['user', 'user.profile'])
+            ->join('exhibition_stakings', 'stakings.id', '=', 'exhibition_stakings.staking_id')
+            ->join('game_sessions', 'exhibition_stakings.game_session_id', '=', 'game_sessions.id')
+            ->where('game_sessions.points_gained', '>=', 5)
+            ->whereColumn('stakings.amount_won', '>', 'stakings.amount_staked')
+            ->orderBy('stakings.amount_won', 'DESC')
+            ->orderBy('stakings.created_at', 'ASC')
+            ->groupBy('stakings.user_id')
             ->limit(10)->get();
         $data = [];
 
