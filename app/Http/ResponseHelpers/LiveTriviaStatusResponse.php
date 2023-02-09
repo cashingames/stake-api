@@ -4,8 +4,10 @@ namespace App\Http\ResponseHelpers;
 
 use App\Enums\LiveTriviaPlayerStatus;
 use App\Enums\LiveTriviaStatus;
+use App\Models\ContestPrizePool;
 use App\Models\LiveTrivia;
 use App\Models\LiveTriviaUserPayment;
+use App\Models\Trivia;
 use App\Models\UserPoint;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Carbon;
@@ -21,6 +23,8 @@ class LiveTriviaStatusResponse
     public int $categoryId;
     public string $title;
     public string $prize;
+    public string $description;
+    public string $entryMode;
     public $entryFee;
     public $isFreeLiveTrivia;
     public $entryFreePaid;
@@ -36,9 +40,10 @@ class LiveTriviaStatusResponse
     public string $statusDisplayText; //we want to control how the status is displayed to the user
     public string $startDateDisplayText; //we want to control how the date is displayed to the user
     public string $actionDisplayText; //we want to control the button label from BE
+    public $prizePool;
 
     public function transform($model): JsonResponse
-    {
+    {   
         $response = new LiveTriviaStatusResponse;
         $response->id = $model->id;
         $response->categoryId = $model->category_id;
@@ -50,6 +55,8 @@ class LiveTriviaStatusResponse
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
         $response->entryFee = $model->entry_fee;
+        $response->entryMode = $model->contest->entry_mode ?? '';
+        $response->description = $model->contest->description ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -62,6 +69,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return response()->json($response);
     }
 
@@ -78,6 +86,8 @@ class LiveTriviaStatusResponse
         $response->questionsCount = $model->question_count;
         $response->pointsRequired = $model->point_eligibility;
         $response->entryFee = $model->entry_fee;
+        $response->entryMode = $model->contest->entry_mode ?? '';
+        $response->description = $model->contest->description ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -90,6 +100,7 @@ class LiveTriviaStatusResponse
         $response->actionDisplayText = $this->getActionDisplayText($response->playerStatus, $response->status);
         $response->entryFreePaid = $this->getUserEntryFeeEligibilityStatus($model->id);
         $response->isFreeLiveTrivia = $model->entry_fee <= 0 ? true : false;
+        $response->prizePool = $this->getLiveTriviaPrizePool($model->contest->contestPrizePools ?? []);
         return $response;
     }
 
@@ -190,5 +201,11 @@ class LiveTriviaStatusResponse
                 Carbon::parse($model->end_time)
             )
             ->sum('value');
+    }
+
+    private function getLiveTriviaPrizePool($prizePools){
+        
+        return (new GetContestDetailsResponse())->transformPrizePools(($prizePools));
+        
     }
 }

@@ -42,31 +42,25 @@ class LiveTriviaStatusTest extends TestCase
         ]);
     }
 
-    // public function test_that_live_trivia_status_endpoint_returns_data()
-    // {
-    //     $start = Carbon::now();
-    //     $end = Carbon::now()->addHour();
+    public function test_that_live_trivia_status_endpoint_returns_data()
+    {
+        $start = Carbon::now('Africa/Lagos');
+        $end = Carbon::now('Africa/Lagos')->addHour();
 
-    //     $this->createTestLiveTrivia($start, $end);
+        $this->createTestLiveTrivia($start, $end);
 
-    //     $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
+        $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
-    //     /**
-    //      * @TODO: Please help me fix
-    //      */
-    //     $response->assertJsonFragment([
-    //         "id" => 1,
-    //         "name" => "Test Live Trivia",
-    //         "category_id" => $this->category->id,
-    //         "game_mode_id" => 1,
-    //         "game_type_id" => 2,
-    //         "point_eligibility" => 500,
-    //         "grand_price" => 1000,
-    //         "start_time" => $start->toDateTimeString(),
-    //         "end_time" => $end->toDateTimeString(),
-    //         "is_published" => true,
-    //     ]);
-    // }
+        $response->assertJsonFragment([
+            "title"=>"Test Live Trivia",
+            "categoryId" => $this->category->id,
+            "modeId" => 1,
+            "typeId" => 2,
+            "pointsAcquiredBeforeStart" => 500,
+            "questionsCount"=>10,
+            "playerStatus" => "CANPLAY"
+        ]);
+    }
 
     public function test_that_live_trivia_status_endpoint_returns_trivia_waiting_status()
     {
@@ -100,6 +94,17 @@ class LiveTriviaStatusTest extends TestCase
             "status" => "CLOSED",
         ]);
     }
+
+    public function test_that_live_trivia_returns_prize_pool()
+    {
+        $this->createTestLiveTrivia(Carbon::now(), Carbon::now()->addHour());
+        $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
+
+        $response->assertJsonFragment([
+            "prizePool" => [],
+        ]);
+    }
+
 
     private function createTestLiveTrivia($start, $end)
     {

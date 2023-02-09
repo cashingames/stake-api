@@ -51,4 +51,9 @@ class GameSession extends Model
     public function odds(){
         return $this->hasMany(GameSessionOdd::class, 'game_session_id', 'id');
     }
+
+    public function exhibitionStakings()
+    {
+      return $this->hasMany(ExhibitionStaking::class);
+    }
 }

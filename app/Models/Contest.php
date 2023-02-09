@@ -11,11 +11,7 @@ class Contest extends Model
 
     protected $fillable = [
         'start_date', 'end_date', 'description',
-        'name', 'display_name', 'contest_type', 'entry_mode'
-    ];
-
-    protected $with = [
-        'contestPrizePools'
+        'name', 'display_name', 'contest_type', 'entry_mode','prize_type'
     ];
 
     public function contestPrizePools()

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class GetSingleContestController extends BaseController
 {
-    public function __invoke(Request $request, ContestService   $contestService)
+    public function __invoke(Request $request, ContestService $contestService)
     {
         $contest = $contestService->getSingleContest($request->id);
 
