@@ -24,8 +24,8 @@ class RecentStakersResponse
     {
         $response = new RecentStakersResponse;
         $response->id = $gameSession->id;
-        $response->username = $gameSession->user->username;
-        $response->avatar = $gameSession->user->profile->avatar ? $this->getAvatarUrl($gameSession->user->profile->avatar) : '';
+        $response->username = $gameSession->username;
+        $response->avatar = $gameSession->avatar ? $this->getAvatarUrl($gameSession->avatar) : '';
         $response->correct_count = $gameSession->correct_count;
         $response->points_gained = $gameSession->points_gained;
         $response->amount_won = $gameSession->amount_won ;
