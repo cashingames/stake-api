@@ -53,7 +53,7 @@ class QuestionsHardeningService
                         ->whereNotIn('questions.id', $recentQuestions)
                         ->inRandomOrder()->take(20)->get();
         }
-        
+
         if ($averageOfRecentThreeGames <= 5){
             return $query->where('level', 'easy')
                         ->inRandomOrder()->take(20)->get();
@@ -88,36 +88,37 @@ class QuestionsHardeningService
         /**
          * If the user has not staked before or is considered new user, show easy questions
          */
-        $initialQuery = $this->category->questions()->where('is_published', true)
-                            ->inRandomOrder()->take(20);
+        // $initialQuery = $this->category->questions()->where('is_published', true)
+        //                     ->inRandomOrder()->take(20);
 
 
         /**
          * If the user is a low scorer show easy questions and repeat questions
          */
-        $isNewStaker = $this->user->exhibitionStakings()->latest()->take(1)->count() == 0;
-        if ($isNewStaker || $this->lowScorer()) {
-            return $initialQuery->where('level', 'easy')->get();
-        }
+        // $isNewStaker = $this->user->exhibitionStakings()->latest()->take(1)->count() == 0;
+        // if ($isNewStaker || $this->lowScorer()) {
+        //     return $initialQuery->where('level', 'easy')->get();
+        // }
 
-        $recentQuestions = $this->getUserAnsweredQuestions($this->user);
-        $initialQuery = $initialQuery->whereNotIn('questions.id', $recentQuestions);
+        // $recentQuestions = $this->getUserAnsweredQuestions($this->user);
+        // $initialQuery = $initialQuery->whereNotIn('questions.id', $recentQuestions);
         /**
          * If the user is a medium scorer show combination of medium questions and easy questions
          * - Never repeat questions
          */
-        if ($this->mediumScorer()) {
-            return $initialQuery->whereIn('level', ['easy','medium'])->get();
-        }
+        // if ($this->mediumScorer()) {
+        //     return $initialQuery->whereIn('level', ['easy','medium'])->get();
+        // }
 
         /**
          * If the user is a high scorer show combination of hard questions and medium questions
          */
-        if ($this->highScorer()) {
-            return $initialQuery->where('level', 'hard')->get();
-        }
-        
-        
+        // if ($this->highScorer()) {
+        //     return $initialQuery->where('level', 'hard')->get();
+        // }
+
+        return $this->category->questions()->where('is_published', true)->where('level', 'easy')
+                            ->inRandomOrder()->take(20);
     }
 
     //check if the user has a clean sheet anywhere in the system
