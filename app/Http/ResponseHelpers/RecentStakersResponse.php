@@ -18,16 +18,18 @@ class RecentStakersResponse
     public $correct_count;
     public $points_gained;
     public $amount_won;
+    public $amount_staked;
 
     public function transform($gameSession)
     {
         $response = new RecentStakersResponse;
         $response->id = $gameSession->id;
-        $response->username = $gameSession->user->username;
-        $response->avatar = $this->getAvatarUrl($gameSession->user->profile->avatar ?? '');
+        $response->username = $gameSession->username;
+        $response->avatar = $gameSession->avatar ? $this->getAvatarUrl($gameSession->avatar) : '';
         $response->correct_count = $gameSession->correct_count;
         $response->points_gained = $gameSession->points_gained;
-        $response->amount_won = $gameSession->exhibitionStaking->staking->amount_won ?? $gameSession->amount_won  ;
+        $response->amount_won = $gameSession->amount_won ;
+        $response->amount_staked = $gameSession->amount_staked;
 
         return $response;
     }
