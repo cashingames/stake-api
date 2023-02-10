@@ -15,7 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class GetStakersSessionTest extends TestCase
-{   
+{
     use RefreshDatabase;
     /**
      * A basic feature test example.
@@ -23,7 +23,7 @@ class GetStakersSessionTest extends TestCase
      * @return void
      */
 
-    public $user, $category , $plan;
+    public $user, $category, $plan;
 
     protected function setUp(): void
     {
@@ -47,13 +47,21 @@ class GetStakersSessionTest extends TestCase
         $staking = Staking::create([
             'user_id' => $this->user->id,
             'amount_staked' => 1000,
-            'odd_applied_during_staking' => 3.0
+            'odd_applied_during_staking' => 3.0,
+            'amount_won' => 0.0
         ]);
+
+        $session = GameSession::first();
+
+        $session->update(['points_gained' => 7]);
 
         ExhibitionStaking::create([
             'staking_id' => $staking->id,
-            'game_session_id' => GameSession::first()->id
+            'game_session_id' => $session->id
         ]);
+
+        $staking->update(['amount_won' => 2000]);
+
         $response = $this->get('/api/v3/stakers/sessions/recent');
 
         $response->assertJsonStructure([
@@ -63,6 +71,9 @@ class GetStakersSessionTest extends TestCase
                 "avatar",
                 "correct_count",
                 "amount_won",
+                "points_gained",
+                "amount_won",
+                "amount_staked"
             ]
         ]);
     }
