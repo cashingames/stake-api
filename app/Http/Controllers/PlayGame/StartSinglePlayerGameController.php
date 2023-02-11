@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\PlayGame;
 
 use App\Enums\FeatureFlags;
+use App\Factories\GameTypeFactory;
+use App\Http\Requests\StartSinglePlayerRequest;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
 use App\Models\Boost;
@@ -41,15 +43,11 @@ use stdClass;
 class StartSinglePlayerGameController extends BaseController
 {
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, StartSinglePlayerRequest $reqeuestModel)
     {
-        $request->validate([
-            'category' => ['required', 'numeric',],
-            'type' => ['required', 'numeric'],
-            'mode' => ['required', 'numeric'],
-            'trivia' => ['nullable', 'numeric'],
-            'staking_amount' => ['nullable', 'numeric', "max:" . config('trivia.maximum_exhibition_staking_amount'), "min:" . config('trivia.minimum_exhibition_staking_amount')]
-        ]);
+        $validated = $reqeuestModel->validated();
+        // $validatedRequest = (object) $validated;
+        // $currentGameType = GameTypeFactory::detect($validated);
 
         $isStakingGame = $request->has('staking_amount');
         $isLiveTriviaGame = $request->has('trivia');

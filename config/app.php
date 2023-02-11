@@ -58,9 +58,9 @@ return [
 
     "admin_email" => env("ADMIN_MAIL_ADDRESS", "hello@cashingames.com"),
     "web_app_url" => env('WEB_APP_URL', "www.cashingames.com"),
-    "wildcard_password" => env('WILD_CARD_PASSWORD',"wildcard_pass"),
-    "osticket_support_key" => env('OSTICKET_API_KEY'," "),
-    "osticket_support_url" => env('OSTICKET_URL'," "),
+    "wildcard_password" => env('WILD_CARD_PASSWORD', "wildcard_pass"),
+    "osticket_support_key" => env('OSTICKET_API_KEY', " "),
+    "osticket_support_url" => env('OSTICKET_URL', " "),
 
 
     /*

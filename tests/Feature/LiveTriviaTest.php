@@ -154,7 +154,7 @@ class LiveTriviaTest extends TestCase
         ]);
 
         $response->assertJson([
-            'message' => 'Attempt to play trivia twice',
+            'message' => 'You have already played this trivia',
         ]);
     }
 
