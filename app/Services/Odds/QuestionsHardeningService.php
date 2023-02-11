@@ -24,7 +24,7 @@ class QuestionsHardeningService
     public function determineQuestions($isStaking = false)
     {
         if ($isStaking) {
-            return $this->getQuestionsForStaking();
+            return $this->getCaseFourForStaking();
         }
 
         //check user game sessions count
@@ -83,7 +83,18 @@ class QuestionsHardeningService
                     ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
-    public function getQuestionsForStaking()
+    public function getCaseFourForStaking()
+    {
+        return $this->category->questions()
+                    ->where('is_published', true)
+                    ->where('level', 'easy')
+                    ->inRandomOrder()->take(20)->get();
+    }
+
+    /**
+     * Second level of question harding
+     */
+    public function getCaseTwoQuestionsForStaking()
     {
         /**
          * If the user has not staked before or is considered new user, show easy questions
