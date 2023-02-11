@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\GameType;
 use App\Factories\GameTypeFactory;
 use App\Models\LiveTrivia;
 use Illuminate\Foundation\Http\FormRequest;
@@ -72,14 +73,14 @@ class StartSinglePlayerRequest extends FormRequest
             return;
         }
 
-        switch ($gameType->name) {
-            case 'StakingExhibition':
+        switch ($gameType) {
+            case GameType::StakingExhibition:
                 $this->validateStakingExhibition($validator);
                 break;
-            case 'LiveTrivia':
+            case GameType::LiveTrivia:
                 $this->validateLiveTrivia($validator);
                 break;
-            case 'StandardExhibition':
+            case GameType::StandardExhibition:
                 $this->validateStandardExhibition($validator);
                 break;
             default:

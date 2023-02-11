@@ -2,8 +2,7 @@
 
 namespace App\Factories;
 
-use App\Models\GameType;
-use App\Enums\GameType as GameTypeEnum;
+use App\Enums\GameType;
 use Illuminate\Support\Arr;
 
 /**
@@ -13,47 +12,41 @@ use Illuminate\Support\Arr;
  */
 class GameTypeFactory
 {
-    public static function detect($payload): GameTypeEnum
+    public static function detect($payload): GameType
     {
-        $type = "";
-
         switch ($payload['mode']) {
             case 2:
-                $type = GameTypeFactory::detectChallengeGames($payload);
-                break;
+                return GameTypeFactory::detectChallengeGames($payload);
             case 1:
             default:
-                $type = GameTypeFactory::detectExhibitionGames($payload);
-                break;
+                return GameTypeFactory::detectExhibitionGames($payload);
         }
-
-        return $type;
     }
 
-    public static function detectExhibitionGames($payload): GameTypeEnum
+    public static function detectExhibitionGames($payload): GameType
     {
-        $type = GameTypeEnum::StandardExhibition;
+        $type = GameType::StandardExhibition;
         $hasLiveTrivia = Arr::has($payload, 'trivia') && (bool) $payload['trivia'];
         $hasStaking = Arr::has($payload, 'staking_amount') && (bool) $payload['staking_amount'];
 
         if ($hasStaking && !$hasLiveTrivia) {
-            $type = GameTypeEnum::StakingExhibition;
+            $type = GameType::StakingExhibition;
         } elseif (!$hasStaking && $hasLiveTrivia) {
-            $type = GameTypeEnum::LiveTrivia;
+            $type = GameType::LiveTrivia;
         } elseif ($hasStaking && $hasLiveTrivia) {
-            $type = GameTypeEnum::LiveTriviaStaking;
+            $type = GameType::LiveTriviaStaking;
         }
 
         return $type;
     }
 
-    public static function detectChallengeGames($payload): GameTypeEnum
+    public static function detectChallengeGames($payload): GameType
     {
         if (Arr::has($payload, 'staking_amount')) {
-            return GameTypeEnum::StakingChallenge;
+            return GameType::StakingChallenge;
         }
 
-        return GameTypeEnum::StandardChallenge;
+        return GameType::StandardChallenge;
     }
 
 
