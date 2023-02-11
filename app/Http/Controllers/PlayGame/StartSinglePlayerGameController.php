@@ -3,47 +3,33 @@
 namespace App\Http\Controllers\PlayGame;
 
 use App\Enums\FeatureFlags;
-use App\Factories\GameTypeFactory;
 use App\Http\Requests\StartSinglePlayerRequest;
-use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
-use App\Models\Boost;
-use App\Models\Plan;
 use App\Models\Category;
 use App\Models\UserPlan;
 use App\Models\GameType;
-use App\Models\UserBoost;
-use App\Models\Achievement;
-use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
-use App\Models\GameSessionOdd;
 use App\Models\Question;
-use App\Models\Staking;
-use App\Models\StakingOdd;
-use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\TriviaQuestion;
-use App\Models\TriviaStaking;
-use App\Models\User;
-use App\Models\WalletTransaction;
 use App\Services\FeatureFlag;
 use App\Services\Odds\QuestionsHardeningService;
 use App\Services\OddsComputer;
 use App\Services\StakingService;
-use Carbon\Carbon as CarbonCarbon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\BaseController;
+use App\Enums\GameType as EnumsGameType;
 
 use stdClass;
 
 class StartSinglePlayerGameController extends BaseController
 {
 
-    public function __invoke(Request $request, StartSinglePlayerRequest $reqeuestModel)
+    public function __invoke(Request $request, StartSinglePlayerRequest $reqeuestModel, EnumsGameType $customType)
     {
         $validated = $reqeuestModel->validated();
         // $validatedRequest = (object) $validated;
@@ -51,11 +37,6 @@ class StartSinglePlayerGameController extends BaseController
 
         $isStakingGame = $request->has('staking_amount');
         $isLiveTriviaGame = $request->has('trivia');
-
-        //@TODO Improve this check
-        if ($isStakingGame && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
-            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
-        }
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));

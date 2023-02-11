@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Enums\GameType;
-use App\Factories\GameTypeFactory;
 use App\Models\LiveTrivia;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -62,11 +61,15 @@ class StartSinglePlayerRequest extends FormRequest
         $validator->after(function ($validator) {
             $this->validateStartGame($validator);
         });
+
+        if ($validator->passes()) {
+            app()->instance(GameType::class, GameType::detect($this->all()));
+        }
     }
 
     private function validateStartGame($validator)
     {
-        $gameType = GameTypeFactory::detect($this->all());
+        $gameType = GameType::detect($this->all());
 
         if (!$gameType) {
             $validator->errors()->add('type', 'Invalid game type');
