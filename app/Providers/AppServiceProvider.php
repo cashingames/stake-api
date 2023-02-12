@@ -30,25 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // DB::listen(function ($query) {
-        //     $query = $query->sql;
-        //     // $query->time;
-        // });
-
-        // LogViewer::auth(function ($request) {
-        //     return $request->user()
-        //     && in_array($request->user()->email, [
-        //         'john@example.com',
-        //     ]);
-        // });
-
-        $this->app->bind(SMSProviderInterface::class, function($app){
-            $api_key = config('services.termii.api_key');
-            return new TermiiService($api_key);
-        });
-
-        $this->app->bind(PaystackWithdrawalService::class, function($app){
-            return new PaystackWithdrawalService(config('trivia.payment_key'));
+        $this->app->bind(SMSProviderInterface::class, function () {
+            return new TermiiService(config('services.termii.api_key'));
         });
     }
 }

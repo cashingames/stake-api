@@ -16,7 +16,8 @@ use Illuminate\Support\Str;
 
 class StakingService
 {
-    private $user, $mode;
+    private $user;
+    private $mode;
 
     public function __construct(User $user, $mode=null)
     {
@@ -40,7 +41,7 @@ class StakingService
 
         $odd = 1;
 
-        if ($this->mode == 'exhibition'){
+        if ($this->mode == 'exhibition') {
             $oddMultiplierComputer = new StakingOddsComputer();
             $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
             $odd = $oddMultiplier['oddsMultiplier'];
@@ -58,22 +59,19 @@ class StakingService
 
     public function createExhibitionStaking($stakingId, $gameSessionId)
     {
-        $record = ExhibitionStaking::create([
+        return ExhibitionStaking::create([
             'game_session_id' => $gameSessionId,
             'staking_id' => $stakingId
         ]);
-
-        return $record;
     }
 
-    public function createChallengeStaking($stakingId, $challengeId){
-        $record = ChallengeStaking::create([
+    public function createChallengeStaking($stakingId, $challengeId)
+    {
+        return ChallengeStaking::create([
             'challenge_id' => $challengeId,
             'staking_id' => $stakingId,
             'user_id' => Staking::find($stakingId)->user_id
         ]);
-
-        return $record;
     }
 
 }

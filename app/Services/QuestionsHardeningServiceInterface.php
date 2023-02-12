@@ -15,6 +15,5 @@ interface QuestionsHardeningServiceInterface
     * @param array $attributes
     * @return Question
     */
-   public function determineQuestions(string $userId, string $categoryId): Collection;
-
+   public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection;
 }

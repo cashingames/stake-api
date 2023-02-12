@@ -2,10 +2,14 @@
 
 namespace App\Services\PlayGame;
 
+use App\Enums\FeatureFlags;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
 use App\Models\Staking;
+use App\Models\UserPlan;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
+use App\Services\OddsComputer;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
 use App\Services\StakingOddsComputer;
@@ -15,7 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class StakingExhibitionGameService implements PlayGameServiceInterface
+
+class StandardExhibitionGameService implements PlayGameServiceInterface
 {
 
     private \stdClass $validatedRequest;
@@ -39,9 +44,9 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         DB::beginTransaction();
 
-        $gameSession = $this->generateSession();
-        $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
-        $this->createExhibitionStaking($stakingId, $gameSession->id);
+        $odds = $this->getMultiplierOdds();
+        $planId = $this->applyGamePlan();
+        $gameSession = $this->generateSession($odds, $planId);
         $this->logQuestions($questions, $gameSession);
 
         DB::commit();
@@ -53,7 +58,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     }
 
-    private function generateSession(): GameSession
+    private function generateSession($odds, $planId): GameSession
     {
         $gameSession = new GameSession();
         $gameSession->user_id = auth()->user()->id;
@@ -65,51 +70,54 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $gameSession->end_time = Carbon::now()->addMinutes(1);
         $gameSession->state = "ONGOING";
 
+        $gameSession->odd_multiplier = $odds->oddsMultiplier;
+        $gameSession->odd_condition = $odds->oddsCondition;
+
+        $gameSession->plan_id = $planId;
+
         $gameSession->save();
 
         return $gameSession;
     }
 
-    public function stakeAmount($stakingAmount)
+    private function applyGamePlan(): int
     {
-        $this->user->wallet->non_withdrawable_balance -= $stakingAmount;
-        $this->user->wallet->save();
+        $plan = $this->user->getNextFreePlan() ?? $this->user->getNextPaidPlan();
+        $userPlan = UserPlan::where('id', $plan->pivot->id)->first();
+        $userPlan->update(['used_count' => $userPlan->used_count + 1]);
 
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $stakingAmount,
-            'balance' => $this->user->wallet->non_withdrawable_balance,
-            'description' => 'Placed a staking of ' . $stakingAmount,
-            'reference' => Str::random(10),
-        ]);
+        if ($plan->game_count * $userPlan->plan_count <= $userPlan->used_count) {
+            $userPlan->update(['is_active' => false]);
+        }
 
-        $odd = 1;
-
-        $oddMultiplierComputer = new StakingOddsComputer();
-        $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
-        $odd = $oddMultiplier['oddsMultiplier'];
-
-        $staking = Staking::create([
-            'user_id' => $this->user->id,
-            'amount_staked' => $stakingAmount,
-            'odd_applied_during_staking' => $odd
-        ]);
-
-        Log::info($stakingAmount . ' staking made for ' . $this->user->username);
-        return $staking->id;
+        return $plan->id;
     }
 
-    public function createExhibitionStaking($stakingId, $gameSessionId): void
+    private function getMultiplierOdds(): \stdClass
     {
-        ExhibitionStaking::create([
-            'game_session_id' => $gameSessionId,
-            'staking_id' => $stakingId
-        ]);
+        if (!FeatureFlag::isEnabled(FeatureFlags::ODDS)) {
+            return (object) [
+                'oddsMultiplier' => 1,
+                'oddsCondition' => 'no_matching_condition'
+            ];
+        }
 
+        $oddMultiplierComputer = new OddsComputer();
+
+        $average = $this->getAverageOfLastThreeGames();
+        return (object) $oddMultiplierComputer->compute($this->user, $average, false);
     }
 
-    public function logQuestions($questions, $gameSession): void
+    private function getAverageOfLastThreeGames(): float
+    {
+        return $this->user->gameSessions()
+            ->completed()
+            ->latest()
+            ->limit(3)
+            ->avg('correct_count');
+    }
+
+    private function logQuestions($questions, $gameSession): void
     {
         $data = [];
 
@@ -124,7 +132,5 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         DB::table('game_session_questions')->insert($data);
     }
-
-
 
 }

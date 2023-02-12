@@ -501,7 +501,7 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
@@ -574,7 +574,7 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
