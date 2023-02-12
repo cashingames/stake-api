@@ -16,24 +16,34 @@ use App\Models\TriviaQuestion;
 use App\Services\FeatureFlag;
 use App\Services\Odds\QuestionsHardeningService;
 use App\Services\OddsComputer;
-use App\Services\StakingService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\BaseController;
 use App\Enums\GameType as EnumsGameType;
+use App\Services\PlayGame\PlayGameServiceFactory;
 
 use stdClass;
 
 class StartSinglePlayerGameController extends BaseController
 {
 
-    public function __invoke(Request $request, StartSinglePlayerRequest $reqeuestModel, EnumsGameType $customType)
+    public function __invoke(
+        Request $request,
+        StartSinglePlayerRequest $reqeuestModel,
+        EnumsGameType $customType,
+        PlayGameServiceFactory $gameService
+    )
     {
         $validated = $reqeuestModel->validated();
-        // $validatedRequest = (object) $validated;
-        // $currentGameType = GameTypeFactory::detect($validated);
+        $validatedRequest = (object) $validated;
+
+        if ($customType == EnumsGameType::StakingExhibition) {
+            $startResponse = $gameService->startGame($validatedRequest);
+            $result = $this->formatResponse($startResponse->gameSession, $startResponse->questions);
+            return $this->sendResponse($result, 'Game Started');
+        }
 
         $isStakingGame = $request->has('staking_amount');
         $isLiveTriviaGame = $request->has('trivia');
@@ -71,12 +81,6 @@ class StartSinglePlayerGameController extends BaseController
         $questions = [];
 
         if ($isLiveTriviaGame) {
-
-            //ensure that this user has not played this trivia
-            if ($this->user->gameSessions()->where('trivia_id', $request->trivia)->exists()) {
-                return $this->sendError(['You have already played this triva.'], "Attempt to play trivia twice");
-            }
-
             $triviaList = TriviaQuestion::where('trivia_id', $request->trivia)->inRandomOrder()->pluck('question_id');
             $questions = Question::whereIn('id', $triviaList)->get();
             $gameSession->trivia_id = $request->trivia;
@@ -84,6 +88,8 @@ class StartSinglePlayerGameController extends BaseController
 
             $questions = $questionHardener->determineQuestions($isStakingGame);
 
+
+            //@TODO move this to request validation
             if (count($questions) < 20) {
                 return $this->sendError('Category not available for now, try again later', 'Category not available for now, try again later');
             }
@@ -108,13 +114,13 @@ class StartSinglePlayerGameController extends BaseController
 
         $gameSession->save();
 
-        if ($this->shouldApplyExhibitionStaking($isStakingGame)) {
-            $stakingService = new StakingService($this->user, 'exhibition');
+        // if ($this->shouldApplyExhibitionStaking($isStakingGame)) {
+        //     $stakingService = new StakingService($this->user, 'exhibition');
 
-            $stakingId = $stakingService->stakeAmount($request->staking_amount);
+        //     $stakingId = $stakingService->stakeAmount($request->staking_amount);
 
-            $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
-        }
+        //     $stakingService->createExhibitionStaking($stakingId, $gameSession->id);
+        // }
 
         Log::info("About to log selected game questions for game session $gameSession->id and user $this->user");
 
@@ -133,19 +139,10 @@ class StartSinglePlayerGameController extends BaseController
 
         Log::info("questions logged for game session $gameSession->id and user $this->user");
 
-        $gameInfo = new stdClass;
-        $gameInfo->token = $gameSession->session_token;
-        $gameInfo->startTime = $gameSession->start_time;
-        $gameInfo->endTime = $gameSession->end_time;
-
-        $result = [
-            'questions' => $questions,
-            'game' => $gameInfo
-        ];
 
         $this->giftReferrerOnFirstGame();
 
-        return $this->sendResponse($result, 'Game Started');
+        return $this->sendResponse($this->formatResponse($gameSession, $questions), 'Game Started');
     }
 
 
@@ -186,12 +183,25 @@ class StartSinglePlayerGameController extends BaseController
         }
     }
 
-    private function shouldApplyExhibitionStaking($isStaking)
+    // private function shouldApplyExhibitionStaking($isStaking)
+    // {
+    //     if (!$isStaking){
+    //         return false;
+    //     }
+    //     return FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) ||
+    //             FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
+    // }
+
+    private function formatResponse($gameSession, $questions): array
     {
-        if (!$isStaking){
-            return false;
-        }
-        return FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) ||
-                FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
+        $gameInfo = new stdClass;
+        $gameInfo->token = $gameSession->session_token;
+        $gameInfo->startTime = $gameSession->start_time;
+        $gameInfo->endTime = $gameSession->end_time;
+
+        return [
+            'questions' => $questions,
+            'game' => $gameInfo
+        ];
     }
 }

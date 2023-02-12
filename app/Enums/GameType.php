@@ -24,7 +24,7 @@ enum GameType
         }
     }
 
-    public static function detectExhibitionGames($payload): self
+    private static function detectExhibitionGames($payload): self
     {
         $type = self::StandardExhibition;
         $hasLiveTrivia = Arr::has($payload, 'trivia') && (bool) $payload['trivia'];
@@ -41,7 +41,7 @@ enum GameType
         return $type;
     }
 
-    public static function detectChallengeGames($payload): self
+    private static function detectChallengeGames($payload): self
     {
         if (Arr::has($payload, 'staking_amount')) {
             return self::StakingChallenge;
