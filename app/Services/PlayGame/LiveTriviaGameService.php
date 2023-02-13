@@ -88,14 +88,14 @@ class LiveTriviaGameService implements PlayGameServiceInterface
         return (object) $oddMultiplierComputer->compute($this->user, $average, false);
     }
 
-    private function getAverageOfLastThreeGames(): float
+    public function getAverageOfLastThreeGames(): float
     {
         return $this->user->gameSessions()
             ->whereNotNull("trivia_id")
             ->completed()
             ->latest()
             ->limit(3)
-            ->avg('correct_count');
+            ->avg('correct_count') ?? 0.0;
     }
 
     public function logQuestions($questions, $gameSession): void
