@@ -353,8 +353,13 @@ class GameTest extends TestCase
             "type" => 2,
             "staking_amount" => 500
         ]);
+
+        // {"message":"Insufficient funds","errors":{"staking_amount":["Insufficient funds"]}}
         $response->assertJson([
-            'message' => 'Insufficient wallet balance',
+            'message' => 'Insufficient funds',
+            'errors' => [
+                'staking_amount' => ['Insufficient funds']
+            ]
         ]);
     }
 
@@ -496,7 +501,7 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
@@ -569,7 +574,7 @@ class GameTest extends TestCase
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'CREDIT'
         ]);
-        $correctOptionsCount = collect($chosenOptions)->filter(function ($value, $key) {
+        $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
             return base64_decode($value->is_correct) == 1;
         })->count();
 
@@ -589,19 +594,15 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_exhibition_game_cannot_be_started_if_questions_are_not_enough()
+    public function test_standard_exhibition_game_cannot_be_started_if_no_plan()
     {
-        // Question::factory()
-        //     ->count(50)
-        //     ->create();
-
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2
         ]);
         $response->assertJson([
-            'message' => 'Category not available for now, try again later',
+            'message' => 'You do not have a valid plan',
         ]);
     }
 }

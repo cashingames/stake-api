@@ -27,6 +27,7 @@ class LiveTriviaStatusResponse
     public string $entryMode;
     public $entryFee;
     public $isFreeLiveTrivia;
+    public $prizeType;
     public $entryFreePaid;
     public int $duration;
     public int $questionsCount;
@@ -57,6 +58,7 @@ class LiveTriviaStatusResponse
         $response->entryFee = $model->entry_fee;
         $response->entryMode = $model->contest->entry_mode ?? '';
         $response->description = $model->contest->description ?? '';
+        $response->prizeType = $model->contest->prize_type ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
@@ -88,6 +90,7 @@ class LiveTriviaStatusResponse
         $response->entryFee = $model->entry_fee;
         $response->entryMode = $model->contest->entry_mode ?? '';
         $response->description = $model->contest->description ?? '';
+        $response->prizeType = $model->contest->prize_type ?? '';
         $response->pointsAcquiredBeforeStart = $this->getPointsAcquiredBeforeStart($model);
 
         $response->startAt = $this->toNigeriaTimeZoneFromUtc($model->start_time);
