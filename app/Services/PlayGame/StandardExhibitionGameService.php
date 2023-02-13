@@ -108,7 +108,7 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
         return (object) $oddMultiplierComputer->compute($this->user, $average, false);
     }
 
-    public function getAverageOfLastThreeGames(): float
+    private function getAverageOfLastThreeGames(): float
     {
         return $this->user->gameSessions()
             ->completed()
