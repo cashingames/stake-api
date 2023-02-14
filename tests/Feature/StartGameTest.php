@@ -149,8 +149,6 @@ class StartGameTest extends TestCase
             'used_count' => 0,
             'plan_count' => 1,
             'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
             'expire_at' => Carbon::now()->endOfDay()
         ]);
 
