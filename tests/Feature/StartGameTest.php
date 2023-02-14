@@ -15,15 +15,18 @@ use Database\Seeders\GameTypeSeeder;
 use Database\Seeders\PlanSeeder;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class StartGameTest extends TestCase
-{   
+{
     use RefreshDatabase;
 
-    private $user, $category, $plan;
+    private $user;
+    private $category;
+    private $plan;
     const START_EXHIBITION_GAME_URL = '/api/v3/game/start/single-player';
 
     protected function setUp(): void
@@ -47,6 +50,11 @@ class StartGameTest extends TestCase
     {
         $questions = Question::factory()
             ->count(250)
+            ->state(
+                new Sequence(
+                    ['level' => 'easy'],
+                )
+            )
             ->create();
 
         $data = [];
