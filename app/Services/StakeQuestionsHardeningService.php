@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Question;
+use App\Models\Category;
 use Illuminate\Support\Collection;
 
 /**
@@ -16,14 +16,13 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         return $this->getEasyQuestions($categoryId);
     }
 
-    private function getEasyQuestions($categoryId): Collection
+    private function getEasyQuestions(string $categoryId): Collection
     {
-        return Question::where('category_id', $categoryId)
+
+        return Category::find($categoryId)->questions()
             ->where('is_published', true)
             ->where('level', 'easy')
-            ->inRandomOrder()
-            ->take(20)
-            ->get();
+            ->inRandomOrder()->take(20)->get();
     }
 
 }
