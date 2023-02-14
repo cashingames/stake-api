@@ -36,11 +36,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+
 use stdClass;
 
 class GameController extends BaseController
 {
-    public function getCommonData()
+    public function getCommonData(Request $request)
     {
         $result = new stdClass;
 
@@ -358,6 +362,8 @@ class GameController extends BaseController
             }
         });
 
+        // call the event listener
+        Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }

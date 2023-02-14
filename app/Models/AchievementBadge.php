@@ -9,7 +9,7 @@ class AchievementBadge extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'milestone_type', 'milestone', 'reward_type', 'reward','description', 'medal'];
+    protected $fillable = ['title', 'milestone_type', 'milestone', 'milestone_count', 'reward_type', 'reward','description', 'medal'];
 
     public function userAchievementBadge()
     {

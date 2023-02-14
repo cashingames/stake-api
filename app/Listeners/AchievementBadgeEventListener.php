@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class AchievementBadgeListener
+class AchievementBadgeEventListener
 {
     /**
      * Create the event listener.
@@ -29,24 +29,34 @@ class AchievementBadgeListener
     {
         //
         $user = $event->request->user();
+        // $user = $event->request;
         $type = $event->type;
-        $game_session = $event->game_session;
-
-
-        Log::info($user.$type.$game_session);
-
+        $data = $event->data;
 
         // switch to determine
         switch ($type) {
             case 'GAME_PLAYED':
                 # code...
+                $this->gamePlayed($user, $data);
                 break;
 
             case 'GAME_BOUGHT':
                 # code...
                 break;
 
+            case 'SKIP_BOUGHT':
+                # code...
+                break;
+
+            case 'TIME_FREEZE_BOUGHT':
+                # code...
+                break;
+
             case 'REFERRAL':
+                # code...
+                break;
+
+            case 'CHALLENGE_STARTED':
                 # code...
                 break;
 
@@ -58,5 +68,9 @@ class AchievementBadgeListener
                 # code...
                 break;
         }
+    }
+
+    public function gamePlayed($user, $data){
+        Log::info($user.$type.$data."loggChecker");
     }
 }

@@ -92,7 +92,7 @@ class EndChallengeGameController extends  BaseController
         $game->minimum_boost_score = $this->MINIMUM_GAME_BOOST_SCORE;
 
         // call the event listener
-        Event::fire(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
+        Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
 
         return $this->sendResponse($game, 'Challenge Game Ended');
     }

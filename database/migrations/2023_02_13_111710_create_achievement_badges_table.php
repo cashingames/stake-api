@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('milestone_type');
             $table->integer('milestone');
+            $table->integer('milestone_count');
             $table->string('description');
             $table->string('reward_type');
             $table->string('reward');

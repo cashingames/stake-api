@@ -80,9 +80,6 @@ class LoginController extends BaseController
                 return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
             }
         }
-        
-
-        
         return $this->respondWithToken($token);
     }
 

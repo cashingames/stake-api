@@ -20,14 +20,14 @@ class AchievementBadgeEvent
      *
      * @return void
      */
-    public $request, $type, $game_session;
+    public $request, $type, $data;
 
-    public function __construct(Request $request, $type, $game_session)
+    public function __construct(Request $request, $type, $data)
     {
         //
         $this->request = $request;
         $this->type = $type;
-        $this->game_session = $game_session;
+        $this->data = $data;
     }
 
     /**
