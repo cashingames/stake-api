@@ -26,7 +26,7 @@ class StartSinglePlayerGameController extends BaseController
         $startResponse = $gameService->startGame($validatedRequest);
 
         //@TODO: Handle business error states in the services
-        if (count($startResponse->questions) < 10 && $customType::LiveTrivia != GameType::LiveTrivia) {
+        if (count($startResponse->questions) < 10 && $customType != GameType::LiveTrivia) {
             return $this->sendError(
                 'Category not available for now, try again later',
                 'Category not available for now, try again later'
