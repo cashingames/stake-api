@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             GameTypeSeeder::class,
             GameModeSeeder::class,
             AchievementSeeder::class,
+            AchievementBadgeSeeder::class,
             BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
             // QuestionSeeder::class,
             StakingSeeder::class,
             StakingOddSeeder::class,
-         
+
         ]);
     }
 }

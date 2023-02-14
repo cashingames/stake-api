@@ -46,6 +46,10 @@ class GameController extends BaseController
 
         $result->achievements = Cache::rememberForever('achievements', fn () => Achievement::all());
 
+        // $result->achievements = DB::select("")
+        $result->myAchievementBadge = $this->user->userAchievementBadge();
+        $result->allAchievementBadge = $this->user->achievementBadge();
+
         $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
 
         $result->plans = Cache::rememberForever('plans', fn () => Plan::where('is_free', false)->orderBy('price', 'ASC')->get());
@@ -309,7 +313,7 @@ class GameController extends BaseController
 
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-        
+
         if (FeatureFlag::isEnabled('odds') && $staking == null) {
             $game->points_gained = $points * $game->odd_multiplier;
         } else {
