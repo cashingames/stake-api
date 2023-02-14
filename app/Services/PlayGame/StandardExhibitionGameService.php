@@ -101,10 +101,9 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
                 'oddsCondition' => 'no_matching_condition'
             ];
         }
+        $average = $this->getAverageOfLastThreeGames();
 
         $oddMultiplierComputer = new OddsComputer();
-
-        $average = $this->getAverageOfLastThreeGames();
         return (object) $oddMultiplierComputer->compute($this->user, $average, false);
     }
 
