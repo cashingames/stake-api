@@ -11,12 +11,12 @@ use Illuminate\Support\Collection;
 
 class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterface
 {
-    public function determineQuestions(string $userId, int $categoryId, ?string $triviaId): Collection
+    public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection
     {
         return $this->getEasyQuestions($categoryId);
     }
 
-    private function getEasyQuestions(int $categoryId): Collection
+    private function getEasyQuestions(string $categoryId): Collection
     {
 
         return Category::find($categoryId)->questions()

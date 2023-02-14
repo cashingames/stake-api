@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Log;
 
 class SupportTicketService
 {
-    private $ticketUrl, $ticketKey;
+    private $ticketUrl;
+    private $ticketKey;
 
     public function __construct()
     {
