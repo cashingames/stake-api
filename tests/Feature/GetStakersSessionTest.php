@@ -64,16 +64,17 @@ class GetStakersSessionTest extends TestCase
 
         $response = $this->get('/api/v3/stakers/sessions/recent');
 
+        //@TODO: This is not a proper assertion. It should be improved
+        //and this was written a few days ago
         $response->assertJsonStructure([
             [
                 "id",
                 "username",
                 "avatar",
-                "correct_count",
-                "amount_won",
-                "points_gained",
-                "amount_won",
-                "amount_staked"
+                "correctCount",
+                "amountWon",
+                "amountWon",
+                "amountStaked"
             ]
         ]);
     }

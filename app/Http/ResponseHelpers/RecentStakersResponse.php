@@ -15,22 +15,20 @@ class RecentStakersResponse
     public $id;
     public $username;
     public $avatar;
-    public $correct_count;
-    public $points_gained;
-    public $amount_won;
-    public $amount_staked;
+    public $correctCount;
+    public $pointsGained;
+    public $amountWon;
+    public $amountStaked;
 
-    public function transform($gameSession)
+    public function transform($resultset): self
     {
-        $response = new RecentStakersResponse;
-        $response->id = $gameSession->id;
-        $response->username = $gameSession->username;
-        $response->avatar = $gameSession->avatar ? $this->getAvatarUrl($gameSession->avatar) : '';
-        $response->correct_count = $gameSession->correct_count;
-        $response->points_gained = $gameSession->points_gained;
-        $response->amount_won = $gameSession->amount_won ;
-        $response->amount_staked = $gameSession->amount_staked;
+        $this->id = $resultset->id;
+        $this->username = $resultset->username;
+        $this->avatar = $resultset->avatar ? $this->getAvatarUrl($resultset->avatar) : '';
+        $this->correctCount = $resultset->correct_count;
+        $this->amountWon = $resultset->amount_won;
+        $this->amountStaked = $resultset->amount_staked;
 
-        return $response;
+        return $this;
     }
 }
