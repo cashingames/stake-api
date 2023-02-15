@@ -32,12 +32,9 @@ class GetStakersSessionController extends BaseController
             ->orderBy('stakings.amount_won', 'DESC')
             ->groupBy('stakings.user_id')
             ->limit(10)->get();
-        $data = [];
 
-
-        foreach ($sessions as $session) {
-            $data[] = (new RecentStakersResponse())->transform($session);
-        }
-        return $data;
+        return $sessions->map(function ($session) {
+            return (new RecentStakersResponse())->transform($session);
+        });
     }
 }
