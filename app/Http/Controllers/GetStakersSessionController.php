@@ -27,6 +27,7 @@ class GetStakersSessionController extends BaseController
                 'stakings.created_at'
             )
             ->whereColumn('stakings.amount_won', '>', 'stakings.amount_staked')
+            ->where('game_sessions.points_gained', '>=', 5)
             ->orderBy('game_sessions.created_at', 'DESC')
             ->orderBy('stakings.amount_won', 'DESC')
             ->groupBy('stakings.user_id')
