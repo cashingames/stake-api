@@ -278,7 +278,7 @@ class AchievementBadgeSeeder extends Seeder
                 'title' => "pro connector",
                 'milestone' => 20,
                 'milestone_count' => 1,
-                'milestone_type' => "CHALLENGE_ACCEPTED",
+                'milestone_type' => "CHALLENGE_STARTED",
                 'reward' => 60,
                 'reward_type' => "POINTS",
                 'description' => "accepted 20 challenges",

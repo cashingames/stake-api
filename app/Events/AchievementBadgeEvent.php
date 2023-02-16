@@ -22,7 +22,7 @@ class AchievementBadgeEvent
      */
     public $request, $type, $data;
 
-    public function __construct(Request $request, $type, $data)
+    public function __construct($request, $type, $data)
     {
         //
         $this->request = $request;

@@ -9,9 +9,9 @@ class UserAchievementBadge extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["user_id", "achievementbadge_id", "count", "is_claimed",  "created_at", "updated_at"];
+    protected $fillable = ["user_id", "achievementbadge_id", "count", "is_claimed", "is_rewarded", "is_notified",  "created_at", "updated_at"];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = ['is_claimed' => 'boolean', 'is_rewarded' => 'boolean'];
 
     public function user()
     {

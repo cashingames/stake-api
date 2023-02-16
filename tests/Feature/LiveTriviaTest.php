@@ -8,6 +8,7 @@ use Tests\TestCase;
 use Database\Seeders\TriviaSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\AchievementBadgeSeeder;
 use GameTypeSeeder;
 use GameModeSeeder;
 use App\Models\Question;
@@ -45,6 +46,7 @@ class LiveTriviaTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(ContestSeeder::class);
+        $this->seed(AchievementBadgeSeeder::Class);
         $this->user = User::first();
         $this->trivia = Trivia::inRandomOrder()->first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();

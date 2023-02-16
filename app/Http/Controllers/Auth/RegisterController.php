@@ -26,6 +26,9 @@ use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Cache;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+
 class RegisterController extends BaseController
 {
     /*
@@ -170,9 +173,14 @@ class RegisterController extends BaseController
             $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
 
             if ($profileReferral === null) {
-                $referrerId = User::where('username', $data["referrer"])->first()->id;
+                $profileReferral = User::where('username', $data["referrer"])->first();
+                $referrerId = $profileReferral->id;
             } else {
                 $referrerId = $profileReferral->user_id;
+            }
+
+            if($profileReferral !== null){
+                Event::dispatch(new AchievementBadgeEvent($profileReferral, "REFERRAL", null));
             }
 
             /** @TODO: this needs to be changed to plan */

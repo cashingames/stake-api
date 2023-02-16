@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreignId('achievementbadge_id');
             $table->integer('count');
             $table->integer('is_claimed');
+            $table->integer('is_rewarded');
+            $table->integer('is_notified')->default(0);
             $table->timestamps();
         });
     }

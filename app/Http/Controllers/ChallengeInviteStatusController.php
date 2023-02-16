@@ -15,6 +15,9 @@ use App\Notifications\ChallengeStatusUpdateNotification;
 use App\Services\FeatureFlag;
 use App\Services\StakingService;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+
 class ChallengeInviteStatusController extends BaseController
 {
     /**
@@ -50,13 +53,18 @@ class ChallengeInviteStatusController extends BaseController
 
         Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-        
+
         $pushAction = new SendPushNotification();
         $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
-        
+
         $player->notify(new ChallengeStatusUpdateNotification($updatedChallenge, $status));
 
         Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
+
+        if($status === "ACCEPTED"){
+            // call the event listener
+        Event::dispatch(new AchievementBadgeEvent($request, "CHALLENGE_ACCEPTED", null));
+        }
 
         return $this->sendResponse('Response email sent', 'Response email sent');
     }

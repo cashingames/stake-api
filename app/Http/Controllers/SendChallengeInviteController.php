@@ -16,6 +16,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+
 class SendChallengeInviteController extends BaseController
 {
     /**
@@ -60,6 +63,9 @@ class SendChallengeInviteController extends BaseController
                 $staking->createChallengeStaking($stakingId, $challenge->id);
             }
         }
+
+        // call the event listener
+        Event::dispatch(new AchievementBadgeEvent($request, "CHALLENGE_STARTED", null));
 
         return $this->sendResponse('Invite Sent', 'Invite Sent');
     }
