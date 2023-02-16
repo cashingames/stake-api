@@ -9,6 +9,7 @@ use App\Services\FeatureFlag;
 use App\Services\OddsComputer;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
+use App\Services\StandardExhibitionQuestionsHardeningService;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,7 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct()
     {
-        $this->questionsHardeningService = new StakeQuestionsHardeningService();
+        $this->questionsHardeningService = new StandardExhibitionQuestionsHardeningService();
         $this->user = auth()->user();
     }
 
