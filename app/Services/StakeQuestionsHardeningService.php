@@ -33,7 +33,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     private function getHardQuestions($user, string $categoryId): Collection
     {
 
-        $recentQuestions = $this->getUserAnsweredQuestions($user);
+        $recentQuestions = $this->previouslySeenQuestionsInCategory($user, $categoryId);
 
         return Category::find($categoryId)->questions()
             ->where('is_published', true)
@@ -42,10 +42,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->inRandomOrder()->take(20)->get();
     }
 
-    private function getUserAnsweredQuestions($user)
+    private function previouslySeenQuestionsInCategory($user, $categoryId)
     {
         return $user
             ->gameSessionQuestions()
+            ->where('game_sessions.category_id', $categoryId)
             ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
