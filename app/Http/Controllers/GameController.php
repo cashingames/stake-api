@@ -9,29 +9,18 @@ use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Plan;
 use App\Models\Category;
-use App\Models\UserPlan;
 use App\Models\GameType;
 use App\Models\UserBoost;
 use App\Models\Achievement;
 use App\Models\ExhibitionStaking;
-use App\Models\GameSession;
-use App\Models\GameSessionOdd;
 use App\Models\GameSessionQuestion;
 use App\Models\Question;
-use App\Models\Staking;
 use App\Models\StakingOdd;
 use App\Models\Trivia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\TriviaQuestion;
-use App\Models\TriviaStaking;
-use App\Models\User;
 use App\Models\WalletTransaction;
 use App\Services\FeatureFlag;
-use App\Services\Odds\QuestionsHardeningService;
-use App\Services\OddsComputer;
-use App\Services\StakingService;
-use Carbon\Carbon as CarbonCarbon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -48,34 +37,47 @@ class GameController extends BaseController
     {
         $result = new stdClass;
 
-        $result->achievements = Cache::rememberForever('achievements', fn () => Achievement::all());
+        $result->achievements = Cache::rememberForever('achievements', fn() => Achievement::all());
 
-        // $result->achievements = DB::select("")
         $result->myAchievementBadge = $this->user->userAchievementBadge();
         $result->allAchievementBadge = $this->user->achievementBadge();
 
         $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
 
-        $result->plans = Cache::rememberForever('plans', fn () => Plan::where('is_free', false)->orderBy('price', 'ASC')->get());
+        $result->plans = Cache::rememberForever(
+            'plans',
+            fn() => Plan::where('is_free', false)->orderBy('price', 'ASC')->get()
+        );
 
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn () => GameMode::select('id', 'name', 'description', 'icon', 'background_color as bgColor', 'display_name as displayName')->get()
+            fn() =>
+            GameMode::select(
+                'id',
+                'name',
+                'description',
+                'icon',
+                'background_color as bgColor',
+                'display_name as displayName'
+            )
+                ->get()
         );
 
-        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
+        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn () => Category::all());
+        $categories = Cache::rememberForever('categories', fn() => Category::all());
 
         $gameInfo = DB::select("
         SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
         c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
         (SELECT name from categories WHERE categories.id = c.category_id) category_name,
-        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played
+        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and
+        gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played
         FROM questions q
         JOIN categories_questions cq ON cq.question_id = q.id
         JOIN categories AS c ON c.id = cq.category_id
-        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL AND q.is_published = true AND c.is_enabled = true
+        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL
+        AND q.is_published = true AND c.is_enabled = true
         GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
         ");
 
@@ -136,7 +138,7 @@ class GameController extends BaseController
 
         $result->gameTypes = $toReturnTypes;
         $result->minVersionCode = config('trivia.min_version_code');
-        $result->minVersionForce =  config('trivia.min_version_force');
+        $result->minVersionForce = config('trivia.min_version_force');
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
@@ -145,7 +147,8 @@ class GameController extends BaseController
         $result->minimumLiveTriviaStakeAmount = config('trivia.minimum_live_trivia_staking_amount');
         $result->minimumWalletFundableAmount = config('trivia.wallet_funding.min_amount');
         $result->maximumWalletFundableAmount = config('trivia.wallet_funding.max_amount');
-        $result->periodBeforeChallengeStakingExpiry = config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
+        $result->periodBeforeChallengeStakingExpiry =
+            config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
@@ -203,25 +206,6 @@ class GameController extends BaseController
         );
     }
 
-    public function canPlayWithStaking(Request $request)
-    {
-        if ($request->has('staking_amount')) {
-            if ($request->staking_amount > intval(config('trivia.maximum_exhibition_staking_amount'))) {
-                return $this->sendError("The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'));
-            }
-            if ($request->staking_amount < intval(config('trivia.minimum_exhibition_staking_amount'))) {
-                return $this->sendError("The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'));
-            }
-        } else {
-        }
-        if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
-
-            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
-        }
-        return $this->sendResponse("Can play game with staking", "Can play game with staking");
-    }
-
-
     public function endSingleGame(Request $request)
     {
 
@@ -245,8 +229,8 @@ class GameController extends BaseController
         $wrongs = 0;
 
         //@TODO: Change our encryption method from base 64. It is not secure
-        $questionsCount =  !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
-        $chosenOptions =  [];
+        $questionsCount = !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
+        $chosenOptions = [];
 
         if (count($request->chosenOptions) > $questionsCount) {
             Log::error($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
@@ -289,9 +273,9 @@ class GameController extends BaseController
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
                 if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-                    $amountWon = $staking->amount_staked *  $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
+                    $amountWon = $staking->amount_staked * $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
                 } else {
-                    $amountWon = $staking->amount_staked *  $pointStandardOdd;
+                    $amountWon = $staking->amount_staked * $pointStandardOdd;
                 }
 
                 WalletTransaction::create([

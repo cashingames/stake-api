@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
  * Determining Question Hardening odds of a user
  */
 
-class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterface
+class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningServiceInterface
 {
     public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection
     {

@@ -3,20 +3,16 @@
 namespace App\Services\PlayGame;
 
 use App\Enums\FeatureFlags;
-use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
-use App\Models\Staking;
 use App\Models\UserPlan;
-use App\Models\WalletTransaction;
 use App\Services\FeatureFlag;
 use App\Services\OddsComputer;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
-use App\Services\StakingOddsComputer;
+use App\Services\StandardExhibitionQuestionsHardeningService;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 
@@ -31,7 +27,7 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct()
     {
-        $this->questionsHardeningService = new StakeQuestionsHardeningService();
+        $this->questionsHardeningService = new StandardExhibitionQuestionsHardeningService();
         $this->user = auth()->user();
     }
 
@@ -101,10 +97,9 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
                 'oddsCondition' => 'no_matching_condition'
             ];
         }
+        $average = $this->getAverageOfLastThreeGames();
 
         $oddMultiplierComputer = new OddsComputer();
-
-        $average = $this->getAverageOfLastThreeGames();
         return (object) $oddMultiplierComputer->compute($this->user, $average, false);
     }
 
@@ -114,7 +109,7 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
             ->completed()
             ->latest()
             ->limit(3)
-            ->avg('correct_count');
+            ->avg('correct_count') ?? 0.0;
     }
 
     private function logQuestions($questions, $gameSession): void
