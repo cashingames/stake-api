@@ -4,8 +4,8 @@ namespace App\Services\PlayGame;
 
 class StandardChallengeGameService implements PlayGameServiceInterface
 {
-    public function startGame(): string
+    public function startGame(\stdClass $validatedRequest): array
     {
-        return "StandardChallengeGameService: The result of the StandardChallengeGameService.\n";
+        return [];
     }
 }
