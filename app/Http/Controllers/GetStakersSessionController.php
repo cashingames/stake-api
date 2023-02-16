@@ -24,21 +24,17 @@ class GetStakersSessionController extends BaseController
                 'users.username',
                 'profiles.avatar',
                 'game_sessions.correct_count',
-                'game_sessions.points_gained',
                 'stakings.created_at'
             )
-            ->where('game_sessions.points_gained', '>=', 5)
             ->whereColumn('stakings.amount_won', '>', 'stakings.amount_staked')
-            ->orderBy('stakings.amount_won', 'DESC')
+            ->where('game_sessions.points_gained', '>=', 5)
             ->orderBy('game_sessions.created_at', 'DESC')
+            ->orderBy('stakings.amount_won', 'DESC')
             ->groupBy('stakings.user_id')
             ->limit(10)->get();
-        $data = [];
 
-
-        foreach ($sessions as $session) {
-            $data[] = (new RecentStakersResponse())->transform($session);
-        }
-        return $data;
+        return $sessions->map(function ($session) {
+            return (new RecentStakersResponse())->transform($session);
+        });
     }
 }

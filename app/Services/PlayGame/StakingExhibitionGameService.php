@@ -2,10 +2,13 @@
 
 namespace App\Services\PlayGame;
 
+use App\Enums\FeatureFlags;
+use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
 use App\Services\StakingOddsComputer;
@@ -63,7 +66,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
         $gameSession->end_time = Carbon::now()->addMinutes(1);
-        $gameSession->state = "ONGOING";
+        $gameSession->state = GameSessionStatus::ONGOING;
 
         $gameSession->save();
 
@@ -86,9 +89,11 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         $odd = 1;
 
-        $oddMultiplierComputer = new StakingOddsComputer();
-        $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
-        $odd = $oddMultiplier['oddsMultiplier'];
+        if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+            $oddMultiplierComputer = new StakingOddsComputer();
+            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
+            $odd = $oddMultiplier['oddsMultiplier'];
+        }
 
         $staking = Staking::create([
             'user_id' => $this->user->id,
