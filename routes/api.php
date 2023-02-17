@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\AchievementBadeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TriviaController;
 use App\Http\Controllers\WalletController;
@@ -74,6 +75,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('user/profile', [UserController::class, 'profile']);
         Route::get('user/search/friends', GetFriendsController::class);
         Route::get('game/common', [GameController::class, 'getCommonData']);
+        Route::get('achievement-badges', [AchievementBadeController::class, 'getAchievements']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
         Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);

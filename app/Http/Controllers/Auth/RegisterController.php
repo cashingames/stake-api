@@ -172,14 +172,12 @@ class RegisterController extends BaseController
             $referrerId = 0;
             $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
 
-            if ($profileReferral === null) {
+            if ($profileReferral == null) {
                 $profileReferral = User::where('username', $data["referrer"])->first();
                 $referrerId = $profileReferral->id;
             } else {
                 $referrerId = $profileReferral->user_id;
-            }
 
-            if($profileReferral !== null){
                 Event::dispatch(new AchievementBadgeEvent($profileReferral, "REFERRAL", null));
             }
 

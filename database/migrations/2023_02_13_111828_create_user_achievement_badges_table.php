@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('user_achievement_badges', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->foreignId('achievementbadge_id');
+            $table->foreignId('achievement_badge_id');
             $table->integer('count');
             $table->integer('is_claimed');
             $table->integer('is_rewarded');

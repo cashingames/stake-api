@@ -264,35 +264,4 @@ class SendPushNotification
             ->send();
     }
 
-    // public function sendReferralBonusNotification($user)
-    // {
-    //     $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-    //     if (is_null($device_token)) {
-    //         Log::info('Logger: no device token for');
-    //         Log::info($user);
-    //         return;
-    //     }
-
-    //     $this->pushService->setNotification(
-    //         [
-    //             'title' => "You've Been Rewarded For Referral!",
-    //             'body' => "Bonus Plan of 2 Games has been rewarded for your referralg!"
-    //         ]
-    //     )
-    //         ->setData(
-    //             [
-
-    //                 'title' => "You've Been Rewarded For Referral!",
-    //                 'body' => "Bonus Plan of 2 Games has been rewarded for your referral!",
-    //                 'action_type' => "#",
-    //                 'action_id' => "#"
-
-    //             ]
-    //         )
-    //         ->setTo($device_token->device_token)
-    //         ->send();
-
-    //     Log::info('Logger: FCM Sent TO-> '.$device_token->device_token);
-    // }
-
 }

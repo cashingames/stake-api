@@ -379,7 +379,7 @@ class User extends Authenticatable implements JWTSubject
     {
         $db = DB::table('achievement_badges')
             ->join('user_achievement_badges', function ($join) {
-                $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievementbadge_id');
+                $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
             })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl')->get();
 
         DB::table('user_achievement_badges')->where('user_id', $this->id)->where('is_claimed', 1)->update(array(

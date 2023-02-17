@@ -61,7 +61,7 @@ class ChallengeInviteStatusController extends BaseController
 
         Log::info("Challenge $request->challenge_id  response has been sent from " . $this->user->username);
 
-        if($status === "ACCEPTED"){
+        if($status == "ACCEPTED"){
             // call the event listener
         Event::dispatch(new AchievementBadgeEvent($request, "CHALLENGE_ACCEPTED", null));
         }

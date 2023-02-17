@@ -37,6 +37,6 @@ class AchievementBadgeEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new PrivateChannel('achievement-badge-event');
     }
 }

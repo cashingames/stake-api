@@ -204,8 +204,8 @@ class AchievementBadgeEventListener
         }
     }
 
-    public function getSingleBadge($user_id, $achievementbadge_id){
-        $data = (DB::table('user_achievement_badges')->where('user_id', $user_id)->where('achievementbadge_id', $achievementbadge_id)->get());
+    public function getSingleBadge($user_id, $achievement_badge_id){
+        $data = (DB::table('user_achievement_badges')->where('user_id', $user_id)->where('achievement_badge_id', $achievement_badge_id)->get());
 
         if(count($data) != 0){
 
@@ -220,7 +220,7 @@ class AchievementBadgeEventListener
             // create and end
             $badge = new UserAchievementBadge;
             $badge->user_id = $uid;
-            $badge->achievementbadge_id = $aid;
+            $badge->achievement_badge_id = $aid;
             $badge->count = $count;
             $badge->is_claimed = 1;
             $badge->is_rewarded = 0;
@@ -245,7 +245,7 @@ class AchievementBadgeEventListener
             // create
             $badge = new UserAchievementBadge;
             $badge->user_id = $uid;
-            $badge->achievementbadge_id = $aid;
+            $badge->achievement_badge_id = $aid;
             $badge->count = $count;
             $badge->is_claimed = 0;
             $badge->is_rewarded = 0;
