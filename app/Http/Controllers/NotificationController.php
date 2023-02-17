@@ -26,18 +26,15 @@ class NotificationController extends BaseController
     {
         if ($notificationId == "all") {
             if ($request->header('x-brand-id') == 2) {
-                foreach ($this->user->unreadNotifications()->where('data', 'not like', '%CHALLENGE%') as $notification) {
-                    $notification->update(['read_at' => now()]);
-                }
+                $this->user->unreadNotifications()->where('data', 'not like', '%CHALLENGE%')->update(['read_at' => now()]);
             } else {
-                foreach ($this->user->unreadNotifications as $notification) {
-                    $notification->update(['read_at' => now()]);
-                }
+                $this->user->unreadNotifications()->update(['read_at' => now()]);
             }
         } else {
             UserNotification::whereId($notificationId)->update(['read_at' => now()]);
         }
 
+        
         $unreadNotifications = $this->user->unreadNotifications()->count();
         $result = [
             'unreadNotificationsCount' => $unreadNotifications
