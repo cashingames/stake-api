@@ -12,6 +12,8 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Carbon\Carbon;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use App\Models\AchievementBadge;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -116,7 +118,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function userAchievementBadges()
     {
-        return $this->hasMany(UserAchievementBadge::class);
+        return $this->belongsToMany(AchievementBadge::class, 'user_achievement_badges')->withPivot('id', 'count', 'is_claimed', 'is_rewarded', 'is_notified');
     }
 
     public function plans()
@@ -377,8 +379,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function userAchievementBadge()
     {
-        $db = DB::table('achievement_badges')
-            ->join('user_achievement_badges', function ($join) {
+        $db = AchievementBadge::join('user_achievement_badges', function ($join) {
                 $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
             })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl')->get();
 
@@ -386,11 +387,6 @@ class User extends Authenticatable implements JWTSubject
             'is_notified' => 1
         ));
         return $db;
-    }
-
-    public function achievementBadge()
-    {
-        return DB::table('achievement_badges')->get();
     }
 
     public function userBoosts()

@@ -183,4 +183,11 @@ class AchievementBadgeTest extends TestCase
 
         $this->assertTrue($awarded);
     }
+
+    public function test_get_achievment_collections()
+    {
+        $response = $this->get("/api/v3/achievement-badges");
+
+        $response->assertStatus(200);
+    }
 }

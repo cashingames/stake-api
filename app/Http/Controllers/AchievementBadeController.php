@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\AchievementBadge;
+use Illuminate\Support\Facades\Log;
 
 use stdClass;
 
-class AchievementBadeController extends Controller
+class AchievementBadeController extends BaseController
 {
     //
-    public function getAchievements(){
+    public function getAchievements(Request $request){
         $result = new stdClass;
 
-        $result->myAchievementBadges = $this->user->userAchievementBadge();
-        $result->allAchievementBadges = $this->user->achievementBadge();
+        $result->myAchievementBadges = $request->user()->userAchievementBadge();
+        $result->allAchievementBadges = AchievementBadge::get();
 
         return $this->sendResponse($result, "Achievements");
     }

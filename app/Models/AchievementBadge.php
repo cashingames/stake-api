@@ -13,6 +13,6 @@ class AchievementBadge extends Model
 
     public function userAchievementBadge()
     {
-        return $this->hasMany(UserAchievementBadge::class);
+        return $this->belongsToMany(AchievementBadge::class, 'user_achievement_badges');
     }
 }

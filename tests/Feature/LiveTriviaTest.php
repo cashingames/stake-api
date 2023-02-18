@@ -46,7 +46,7 @@ class LiveTriviaTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(ContestSeeder::class);
-        $this->seed(AchievementBadgeSeeder::Class);
+        $this->seed(AchievementBadgeSeeder::class);
         $this->user = User::first();
         $this->trivia = Trivia::inRandomOrder()->first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();

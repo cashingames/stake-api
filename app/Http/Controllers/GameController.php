@@ -39,9 +39,6 @@ class GameController extends BaseController
 
         $result->achievements = Cache::rememberForever('achievements', fn() => Achievement::all());
 
-        $result->myAchievementBadge = $this->user->userAchievementBadge();
-        $result->allAchievementBadge = $this->user->achievementBadge();
-
         $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
 
         $result->plans = Cache::rememberForever(
