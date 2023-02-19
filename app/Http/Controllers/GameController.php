@@ -33,7 +33,10 @@ class GameController extends BaseController
     {
         $result = new stdClass;
 
-        $result->achievements = Cache::rememberForever('achievements', fn() => Achievement::all());
+        $result->achievements = Cache::rememberForever('achievements', function () {
+            Log::info('achievements cache miss');
+            return Achievement::all();
+        });
 
         $result->boosts = Cache::rememberForever('boosts', fn() => Boost::all());
 
