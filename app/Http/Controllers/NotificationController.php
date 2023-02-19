@@ -10,22 +10,31 @@ class NotificationController extends BaseController
     /**
      * Fetch all notifications
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+        if ($request->header('x-brand-id') == 2) {
+            $notifications = $this->user->notifications()->where('data', 'not like', '%CHALLENGE%')->paginate(20);
+            return $this->sendResponse($notifications, "Notifications fetched successfully");
+        }
         $notifications = $this->user->notifications()->paginate(20);
         return $this->sendResponse($notifications, "Notifications fetched successfully");
     }
     /**
      * Mark single or all user notifications as read
      */
-    public function readNotification($notificationId){
-        if ($notificationId == "all"){
-            foreach ($this->user->unreadNotifications as $notification) {
-                $notification->update(['read_at' => now()]);
+    public function readNotification(Request $request, $notificationId)
+    {
+        if ($notificationId == "all") {
+            if ($request->header('x-brand-id') == 2) {
+                $this->user->unreadNotifications()->where('data', 'not like', '%CHALLENGE%')->update(['read_at' => now()]);
+            } else {
+                $this->user->unreadNotifications()->update(['read_at' => now()]);
             }
-        }else{
+        } else {
             UserNotification::whereId($notificationId)->update(['read_at' => now()]);
         }
 
+        
         $unreadNotifications = $this->user->unreadNotifications()->count();
         $result = [
             'unreadNotificationsCount' => $unreadNotifications
