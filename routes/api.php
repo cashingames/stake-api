@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\UserController;
@@ -61,35 +60,35 @@ Route::middleware('api')->prefix('v3')->group(
     function () {
         Route::post('paystack/transaction/avjshasahnmsa', [WalletController::class, "paymentEventProcessor"]);
         Route::get('first-time-bonus/fetch', [MessagesController::class, 'fetchFirstTimeBonus']);
-        Route::get('feature-flags', [FeatureFlagController::class, 'index']);
+        Route::get('feature-flags', [FeatureFlagController::class, 'index'])->middleware(['cacheResponse:300']);
         Route::post('client/feedback', [MessagesController::class, 'feedback']);
-        Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
+        Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers'])->middleware(['cacheResponse:300']);
         Route::post('category/icon/save', [CategoryController::class, 'saveCategoryIcon']);
         Route::post('log/frontend-info', FrontEndLogsController::class);
     }
 );
 
-Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
+Route::middleware(['auth:api'])->prefix('v3')->group(
     function () {
-        Route::get('user/profile', [UserController::class, 'profile']);
+        Route::get('user/profile', [UserController::class, 'profile'])->middleware(['last_active']);
         Route::get('user/search/friends', GetFriendsController::class);
-        Route::get('game/common', [GameController::class, 'getCommonData']);
-        Route::get('fetch/trivia', [TriviaController::class, 'getTrivia']);
-        Route::get('live-trivia/recent', GetRecentLiveTriviaController::class);
-        Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard']);
-        Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class);
-        Route::get('live-trivia/{id}/get', GetSingleLiveTriviaController::class);
+        Route::get('game/common', [GameController::class, 'getCommonData'])->middleware(['cacheResponse:300']);
+        Route::get('fetch/trivia', [TriviaController::class, 'getTrivia'])->middleware(['cacheResponse:300']);
+        Route::get('live-trivia/recent', GetRecentLiveTriviaController::class)->middleware(['cacheResponse:60']);
+        Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard'])->middleware(['cacheResponse:300']);
+        Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class)->middleware(['cacheResponse:300']);
+        Route::get('live-trivia/{id}/get', GetSingleLiveTriviaController::class)->middleware(['cacheResponse:300']);
         Route::get('live-trivia/status', LiveTriviaStatusController::class);
         Route::post('live-trivia/entrance/pay', LiveTriviaEntrancePaymentController::class);
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class);
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
         Route::post('challenge/invite/respond', ChallengeInviteStatusController::class);
-        Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class);
+        Route::get('challenge/{challengeId}/details', GetChallengeDetailsController::class)->middleware(['cacheResponse:60']);
         Route::post('challenge/start/game', StartChallengeGameController::class);
         Route::post('challenge/end/game', EndChallengeGameController::class);
         Route::get('challenge/{challengeId}/leaderboard', GetChallengeLeaderboardController::class);
         Route::post('challenge/leaders/global', ChallengeGlobalLeadersController::class);
-        Route::get('user/challenges', GetUserChallengeController::class);
+        Route::get('user/challenges', GetUserChallengeController::class)->middleware(['cacheResponse:300']);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStakingOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
@@ -104,7 +103,7 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
         Route::get('wallet/me/transactions/earnings', [WalletController::class, 'earnings']);
         Route::get('wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"]);
-        Route::get('wallet/banks', [WalletController::class, 'getBanks']);
+        Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
@@ -116,8 +115,8 @@ Route::middleware(['auth:api', 'last_active'])->prefix('v3')->group(
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
         Route::delete('account/delete', [UserController::class, 'deleteAccount']);
         Route::get('contests', GetContestDetailsController::class);
-        Route::get('contest/{id}', GetSingleContestController::class);
-        Route::get('stakers/sessions/recent', GetStakersSessionController::class);
+        Route::get('contest/{id}', GetSingleContestController::class)->middleware(['cacheResponse:300']);
+        Route::get('stakers/sessions/recent', GetStakersSessionController::class)->middleware(['cacheResponse:300']);
     }
 );
 
@@ -125,7 +124,7 @@ Route::prefix('v2')->group(function () {
     Route::post('client/feedback', [MessagesController::class, 'feedback']);
     Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers']);
 
-    Route::middleware(['auth:api', 'last_active'])->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);

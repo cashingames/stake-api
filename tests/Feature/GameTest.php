@@ -125,8 +125,6 @@ class GameTest extends TestCase
         $response = $this->post(self::CLAIM_ACHIEVEMENT_URL . $achievement->id);
 
         $response->assertStatus(200);
-
-        $this->assertTrue($this->user->last_activity_time !== null);
     }
 
     public function test_achievement_cannot_be_claimed_if_points_are_not_enough()

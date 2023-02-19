@@ -27,6 +27,10 @@ class LiveTriviaStatusTest extends TestCase
     {
         parent::setUp();
 
+        $this->withHeaders([
+            'x-cache-bypass' => true,
+        ]);
+
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
         $this->user = User::first();
