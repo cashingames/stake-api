@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         );
         $this->app->scoped(
             ClientPlatform::class,
-            fn() => ClientPlatform::detect(request()->all())
+            fn() => ClientPlatform::detect($this->app->request->header('x-brand-id'))
         );
     }
 }
