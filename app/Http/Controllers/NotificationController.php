@@ -15,7 +15,7 @@ class NotificationController extends BaseController
     {
         $notifications = $this->user->notifications();
         if ($platform == ClientPlatform::StakingMobileWeb) {
-            $notifications->where('data', 'not like', '%CHALLENGE%');
+            $notifications->where('data->action_type','!=','CHALLENGE');
         }
 
         return $this->sendResponse($notifications->paginate(20), "Notifications fetched successfully");
