@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\Payments\PaystackWithdrawalService;
-use Illuminate\Support\Facades\DB;
-use Opcodes\LogViewer\Facades\LogViewer;
+use App\Enums\ClientPlatform;
 
 use App\Services\SMS\TermiiService;
 use Illuminate\Support\Facades\Schema;
@@ -30,8 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind(SMSProviderInterface::class, function () {
-            return new TermiiService(config('services.termii.api_key'));
-        });
+        $this->app->bind(SMSProviderInterface::class, fn() => new TermiiService(config('services.termii.api_key')));
+        $this->app->bind(ClientPlatform::class, fn() => ClientPlatform::detect(request()->all()));
     }
 }
