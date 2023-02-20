@@ -30,7 +30,6 @@ class DatabaseSeeder extends Seeder
             ContestSeeder::class,
             //ContestPrizePoolSeeder::class,
             TriviaSeeder::class,
-            NotificationSeeder::class,
             WalletTransactionSeeder::class,
             WalletSeeder::class,
             ProfileSeeder::class,
