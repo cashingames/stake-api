@@ -10,7 +10,6 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Database\Seeders\UserSeeder;
-use Database\Seeders\NotificationSeeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 
@@ -85,7 +84,7 @@ class FeedbackTest extends TestCase
         ]);
 
         $this->assertEquals($response->getStatusCode(), 200);
-       
+
     }
 
     public function test_faq_and_answers_can_be_fetched()
