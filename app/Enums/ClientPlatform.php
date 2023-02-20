@@ -11,7 +11,7 @@ enum ClientPlatform
     case CashingamesMobile;
     case CashingamesWeb;
 
-    public static function detect(int $brandId): self
+    public static function detect($brandId): self
     {
         switch ($brandId) {
             case 2:
