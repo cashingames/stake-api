@@ -28,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind(SMSProviderInterface::class, fn() => new TermiiService(config('services.termii.api_key')));
-        $this->app->bind(ClientPlatform::class, fn() => ClientPlatform::detect(request()->all()));
+        $this->app->singleton(
+            SMSProviderInterface::class,
+            fn() => new TermiiService(config('services.termii.api_key'))
+        );
+        $this->app->scoped(
+            ClientPlatform::class,
+            fn() => ClientPlatform::detect(request()->all())
+        );
     }
 }

@@ -25,7 +25,7 @@ class NotificationController extends BaseController
      */
     public function readNotification(ClientPlatform $platform, Request $request, $notificationId)
     {
-        $notificationId == "all" ? 
+        $notificationId == "all" ?
             $this->readAllNotifications($platform) :
             $this->readSingleNotification($notificationId);
 
