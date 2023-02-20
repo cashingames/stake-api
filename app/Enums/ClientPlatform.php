@@ -11,13 +11,9 @@ enum ClientPlatform
     case CashingamesMobile;
     case CashingamesWeb;
 
-    public static function detect($payload): self
+    public static function detect(int $brandId): self
     {
-        if (!Arr::has($payload, 'x-brand-id')) {
-            return self::CashingamesMobile;
-        }
-
-        switch ($payload['x-brand-id']) {
+        switch ($brandId) {
             case 2:
                 return self::StakingMobileWeb;
             case 1 || 3:
