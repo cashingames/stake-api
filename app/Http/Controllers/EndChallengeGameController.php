@@ -12,6 +12,8 @@ use App\Actions\SendPushNotification;
 use App\Notifications\ChallengeCompletedNotification;
 use App\Notifications\ChallengeStatusUpdateNotification;
 use App\Services\ChallengeGameService;
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
 
 class EndChallengeGameController extends  BaseController
 {
@@ -88,6 +90,10 @@ class EndChallengeGameController extends  BaseController
         $challengeGameService->creditStakeWinner($game->challenge);
 
         $game->minimum_boost_score = $this->MINIMUM_GAME_BOOST_SCORE;
+
+        // call the event listener
+        Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
+
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
 

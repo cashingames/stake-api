@@ -18,6 +18,7 @@ use Database\Seeders\UserSeeder;
 use App\Models\ChallengeGameSession;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
+use Database\Seeders\AchievementBadgeSeeder;
 use Database\Seeders\GameTypeSeeder;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\SendPushNotification;
@@ -57,6 +58,7 @@ class ChallengeGameTest extends TestCase
 
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
+        $this->seed(AchievementBadgeSeeder::class);
 
         $this->user = User::first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();

@@ -4,6 +4,8 @@
 /storage/*.key
 /public/avatar
 /vendor
+/*.DS_Store
+.DS_Store
 .env
 .env.backup
 .phpunit.result.cache

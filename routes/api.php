@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\AchievementBadeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TriviaController;
 use App\Http\Controllers\WalletController;
@@ -73,6 +74,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('user/profile', [UserController::class, 'profile'])->middleware(['last_active']);
         Route::get('user/search/friends', GetFriendsController::class);
         Route::get('game/common', [GameController::class, 'getCommonData'])->middleware(['cacheResponse:300']);
+        Route::get('achievement-badges', [AchievementBadeController::class, 'getAchievements']);
         Route::get('fetch/trivia', [TriviaController::class, 'getTrivia'])->middleware(['cacheResponse:300']);
         Route::get('live-trivia/recent', GetRecentLiveTriviaController::class)->middleware(['cacheResponse:60']);
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard'])->middleware(['cacheResponse:300']);
@@ -145,7 +147,7 @@ Route::prefix('v2')->group(function () {
         //updated leaders endpoint
         Route::post('leaders/global', [LeadersController::class, 'globalLeaders']);
         Route::post('leaders/categories', [LeadersController::class, 'categoriesLeaders']);
-   
+
         Route::get('user/fetch/notifications', [MessagesController::class, 'fetchNotifications']);
         Route::post('user/read/notification/{notificationId}', [MessagesController::class, 'readNotification']);
         Route::post('user/read/all/notifications', [MessagesController::class, 'readAllNotifications']);

@@ -30,6 +30,7 @@ use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
 use Database\Seeders\StakingOddsRulesSeeder;
+use Database\Seeders\AchievementBadgeSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -70,6 +71,7 @@ class GameTest extends TestCase
         $this->seed(PlanSeeder::class);
         $this->seed(StakingOddSeeder::class);
         $this->seed(StakingOddsRulesSeeder::class);
+        $this->seed(AchievementBadgeSeeder::Class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -250,7 +252,7 @@ class GameTest extends TestCase
                 ['boost' => Boost::where('id', $userBoost[0]->id)->first()]
             ]
         ]);
-       
+
         $this->assertDatabaseHas('exhibition_boosts', [
             'boost_id' => Boost::where('id', $userBoost[0]->id)->first()->id,
             'game_session_id' => $game->id,
@@ -408,7 +410,7 @@ class GameTest extends TestCase
             ->hasOptions(4)
             ->count(250)
             ->create();
-            
+
         $data = [];
 
         foreach ($questions as $question) {
