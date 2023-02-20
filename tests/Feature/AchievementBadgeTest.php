@@ -48,7 +48,7 @@ class AchievementBadgeTest extends TestCase
 
     use RefreshDatabase;
     /**
-     * A basic feature test example.
+     * A basic feature test example..
      *
      * @return void
      */
