@@ -62,46 +62,7 @@ class MessagesController extends BaseController
         return $this->sendResponse($faqs, 'data fetched');
     }
 
-    public function fetchNotifications()
-    {
-
-        $user = $this->user;
-
-        $notifications = Notification::where('user_id', $user->id)->latest()->limit(20)->get();
-
-        return $this->sendResponse($notifications, 'Recent Notifications');
-    }
-
-    public function readNotification($notificationId)
-    {
-
-        $notification = Notification::find($notificationId);
-
-        if ($notification === null) {
-            return $this->sendError('Notification not found', 'Notification not found');
-        }
-
-        $notification->update(['is_read' => true]);
-
-        return $this->sendResponse('message read', 'message read');
-    }
-
-    public function readAllNotifications()
-    {
-
-        $notifications = Notification::where('user_id', $this->user->id)->get();
-
-        if (count($notifications) === 0) {
-            return $this->sendError('No Notifications found', 'No Notifications found');
-        }
-
-        foreach ($notifications as $n) {
-            $n->update(['is_read' => true]);
-        }
-
-        return $this->sendResponse('messages read', 'messages read');
-    }
-
+  
     public function fetchFirstTimeBonus()
     {
 
