@@ -33,7 +33,10 @@ class GameController extends BaseController
     {
         $result = new stdClass;
 
-        $result->achievements = Cache::rememberForever('achievements', fn() => Achievement::all());
+        $result->achievements = Cache::rememberForever('achievements', function () {
+            Log::info('achievements cache miss');
+            return Achievement::all();
+        });
 
         $result->boosts = Cache::rememberForever('boosts', fn() => Boost::all());
 
@@ -197,6 +200,24 @@ class GameController extends BaseController
             $achievement,
             'Achievement Claimed'
         );
+    }
+
+    public function canPlayWithStaking(Request $request)
+    {
+        if ($request->has('staking_amount')) {
+            if ($request->staking_amount > intval(config('trivia.maximum_exhibition_staking_amount'))) {
+                return $this->sendError("The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'), "The maximum amount you can stake is " . config('trivia.maximum_exhibition_staking_amount'));
+            }
+            if ($request->staking_amount < intval(config('trivia.minimum_exhibition_staking_amount'))) {
+                return $this->sendError("The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'), "The minimum amount you can stake is " . config('trivia.minimum_exhibition_staking_amount'));
+            }
+        } else {
+        }
+        if ($request->has('staking_amount') && $this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
+
+            return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
+        }
+        return $this->sendResponse("Can play game with staking", "Can play game with staking");
     }
 
     public function endSingleGame(Request $request)
