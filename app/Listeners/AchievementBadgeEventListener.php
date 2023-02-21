@@ -93,14 +93,15 @@ class AchievementBadgeEventListener
     }
 
     public function boostBought($user, $payload){
-        switch ($payload->id) {
+        // change from id to name
+        switch ($payload->name) {
 
-            case 1:
+            case 'Time Freeze':
                 # code for time freeze...
                 $this->BadgeStateLogic($user, 23, 5);
                 break;
 
-            case 3:
+            case 'Skip':
                 # code for skip...
                 $this->BadgeStateLogic($user, 22, 5);
                 break;
@@ -112,18 +113,19 @@ class AchievementBadgeEventListener
     }
 
     public function gameBought($user, $payload){
-        switch ($payload->id) {
-            case 2:
-                # code for double o bought...
+        // change from id to name
+        switch ($payload->name) {
+            case 'Least Plan':
+                # code for least p bought...
                 $this->BadgeStateLogic($user, 19, 10);
                 break;
 
-            case 4:
+            case 'Double O':
                 # code for double o bought...
                 $this->BadgeStateLogic($user, 20, 10);
                 break;
 
-            case 6:
+            case 'The Ultimate':
                 # code for ultimate bought...
                 $this->BadgeStateLogic($user, 21, 10);
                 break;

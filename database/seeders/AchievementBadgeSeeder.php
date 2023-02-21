@@ -281,7 +281,7 @@ class AchievementBadgeSeeder extends Seeder
                 'milestone_type' => "CHALLENGE_STARTED",
                 'reward' => 60,
                 'reward_type' => "POINTS",
-                'description' => "accepted 20 challenges",
+                'description' => "start 20 challenge games",
                 'medal'=> 'achievements/19.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
@@ -353,7 +353,7 @@ class AchievementBadgeSeeder extends Seeder
                 'title' => "wise gamer",
                 'milestone' => 5,
                 'milestone_count' => 1,
-                'milestone_type' => "24",
+                'milestone_type' => "TIME_FREEZE_BOUGHT",
                 'reward' => 250,
                 'reward_type' => "CASH",
                 'description' => "buy 5 time freeze",
