@@ -27,7 +27,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 50,
                 'reward_type' => "CASH",
                 'description' => "Exhaust all 5 daily free games at a go",
-                'medal'=>'medals/sage_medal.png',
+                'medal'=>'achievements/1.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ],
@@ -42,7 +42,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 60,
                 'reward_type' => "POINTS",
                 'description' => "Play 50 games in general knowledge",
-                'medal'=> 'medals/regal_medal.png',
+                'medal'=> 'achievements/2.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -57,7 +57,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 60,
                 'reward_type' => "POINTS",
                 'description' => "play 50 games in music",
-                'medal'=> 'medals/knight_medal.png',
+                'medal'=> 'achievements/3.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -72,7 +72,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 60,
                 'reward_type' => "POINTS",
                 'description' => "play 50 games in football",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/4.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -87,7 +87,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 25,
                 'reward_type' => "POINTS",
                 'description' => "Score above 7 in 10 consecutive games in music",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/5.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -102,7 +102,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 25,
                 'reward_type' => "POINTS",
                 'description' => "score above 7 in 10 games in football",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/7.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -117,7 +117,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 50,
                 'reward_type' => "POINTS",
                 'description' => "Score above 7 in 50 games in general knowledge",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/8.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -132,7 +132,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 50,
                 'reward_type' => "POINTS",
                 'description' => "Score above 7 in 50 games in music",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/9.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -147,7 +147,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 100,
                 'reward_type' => "POINTS",
                 'description' => "Score above 7 in 50 games in football",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/10.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -162,7 +162,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 100,
                 'reward_type' => "POINTS",
                 'description' => "Play 100 games in general knowledge",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/11.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -177,7 +177,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 100,
                 'reward_type' => "POINTS",
                 'description' => "Play 100 games in music",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/12.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -192,7 +192,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 100,
                 'reward_type' => "POINTS",
                 'description' => "Play 100 games in football",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/13.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -207,7 +207,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 200,
                 'reward_type' => "CASH",
                 'description' => "Score above 7 in 100 games in general knowledge",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/14.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -222,7 +222,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 500,
                 'reward_type' => "CASH",
                 'description' => "Score above 7 in 100 games in music",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/15.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -237,7 +237,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 500,
                 'reward_type' => "CASH",
                 'description' => "Score above 7 in 100 games in football",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/16.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -252,7 +252,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 50,
                 'reward_type' => "POINTS",
                 'description' => "start 10 challenge games",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/17.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -260,14 +260,14 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'title' => "connector",
+                'title' => "engager",
                 'milestone' => 10,
                 'milestone_count' => 1,
                 'milestone_type' => "CHALLENGE_ACCEPTED",
                 'reward' => 50,
                 'reward_type' => "POINTS",
                 'description' => "accepted 10 challenges",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/18.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -282,7 +282,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 60,
                 'reward_type' => "POINTS",
                 'description' => "accepted 20 challenges",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/19.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -297,7 +297,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 300,
                 'reward_type' => "CASH",
                 'description' => "buy 10 least game plan",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/20.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -305,14 +305,14 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'title' => "good gamer",
+                'title' => "pro gamer",
                 'milestone' => 10,
                 'milestone_count' => 1,
                 'milestone_type' => "GAME_BOUGHT_DOUBLE",
                 'reward' => 500,
                 'reward_type' => "CASH",
                 'description' => "buy 10 least game plan",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/21.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -320,14 +320,14 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'title' => "good gamer",
+                'title' => "more spender",
                 'milestone' => 10,
                 'milestone_count' => 1,
                 'milestone_type' => "GAME_BOUGHT_ULTIMATE",
                 'reward' => 1000,
                 'reward_type' => "CASH",
                 'description' => "buy 10 least game plan",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/22.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -342,7 +342,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 250,
                 'reward_type' => "CASH",
                 'description' => "buy 5 skip",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/23.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -353,11 +353,11 @@ class AchievementBadgeSeeder extends Seeder
                 'title' => "wise gamer",
                 'milestone' => 5,
                 'milestone_count' => 1,
-                'milestone_type' => "TIME_FREEZE_BOUGHT",
+                'milestone_type' => "24",
                 'reward' => 250,
                 'reward_type' => "CASH",
                 'description' => "buy 5 time freeze",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/conqueror_medal.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
@@ -372,7 +372,7 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 300,
                 'reward_type' => "CASH",
                 'description' => "invite 30 friends",
-                'medal'=> 'medals/conqueror_medal.png',
+                'medal'=> 'achievements/25.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
