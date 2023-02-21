@@ -88,6 +88,7 @@ class AchievementBadgeTest extends TestCase
         $this->actingAs($this->user);
         FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
+        FeatureFlag::isEnabled(FeatureFlags::ACHIEVEMENT_BADGES);
         config(['odds.maximum_exhibition_staking_amount' => 1000]);
     }
 
@@ -189,5 +190,30 @@ class AchievementBadgeTest extends TestCase
         $response = $this->get("/api/v3/achievement-badges");
 
         $response->assertStatus(200);
+    }
+
+    public function test_is_achievement_feature_flag_functioning()
+    {
+        // disable
+        FeatureFlag::disable(FeatureFlags::ACHIEVEMENT_BADGES);
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $achievement = DB::table('user_achievement_badges')
+            ->where('user_id', $this->user->id)
+            ->where('is_claimed', true)
+            ->first();
+
+        $awarded = (is_null($achievement)) ? true : false;
+
+        $this->assertTrue($awarded);
     }
 }

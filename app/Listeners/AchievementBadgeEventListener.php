@@ -15,6 +15,9 @@ use App\Models\WalletTransaction;
 use Illuminate\Support\Str;
 use App\Models\Wallet;
 
+use App\Enums\FeatureFlags;
+use App\Services\FeatureFlag;
+
 class AchievementBadgeEventListener
 {
     /**
@@ -37,54 +40,55 @@ class AchievementBadgeEventListener
      */
     public function handle(AchievementBadgeEvent $event)
     {
+        if(FeatureFlag::isEnabled(FeatureFlags::ACHIEVEMENT_BADGES)){
+            $AchievementType = $event->AchievementType;
 
-        $AchievementType = $event->AchievementType;
+            $user = null;
+            if(($AchievementType === "GAME_BOUGHT") || ($AchievementType === "BOOST_BOUGHT") ){
+                $user = $event->request;
+            }else{
+                $user = $event->request->user();
+            }
+            $this->user = $user;
+            // $user = $event->request;
+            $payload = $event->payload;
 
-        $user = null;
-        if(($AchievementType === "GAME_BOUGHT") || ($AchievementType === "BOOST_BOUGHT") ){
-            $user = $event->request;
-        }else{
-            $user = $event->request->user();
-        }
-        $this->user = $user;
-        // $user = $event->request;
-        $payload = $event->payload;
+            // switch to determine
+            switch ($AchievementType) {
+                case 'GAME_PLAYED':
+                    # code...
+                    $this->gamePlayed($user, $payload);
+                    break;
 
-        // switch to determine
-        switch ($AchievementType) {
-            case 'GAME_PLAYED':
-                # code...
-                $this->gamePlayed($user, $payload);
-                break;
+                case 'GAME_BOUGHT':
+                    # code...
+                    $this->gameBought($user, $payload);
+                    break;
 
-            case 'GAME_BOUGHT':
-                # code...
-                $this->gameBought($user, $payload);
-                break;
+                case 'BOOST_BOUGHT':
+                    # code...
+                    $this->boostBought($user, $payload);
+                    break;
 
-            case 'BOOST_BOUGHT':
-                # code...
-                $this->boostBought($user, $payload);
-                break;
+                case 'REFERRAL':
+                    # code...
+                    $this->referralKing($user);
+                    break;
 
-            case 'REFERRAL':
-                # code...
-                $this->referralKing($user);
-                break;
+                case 'CHALLENGE_STARTED':
+                    # code...
+                    $this->challengeStarted($user);
+                    break;
 
-            case 'CHALLENGE_STARTED':
-                # code...
-                $this->challengeStarted($user);
-                break;
+                case 'CHALLENGE_ACCEPTED':
+                    # code...
+                    $this->challengeAccepted($user);
+                    break;
 
-            case 'CHALLENGE_ACCEPTED':
-                # code...
-                $this->challengeAccepted($user);
-                break;
-
-            default:
-                # code...
-                break;
+                default:
+                    # code...
+                    break;
+            }
         }
     }
 
