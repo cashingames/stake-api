@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\ClientPlatform;
 use App\Models\UserNotification;
 use Illuminate\Http\Request;
-
 class NotificationController extends BaseController
 {
     /**
@@ -15,7 +14,7 @@ class NotificationController extends BaseController
     {
         $notifications = $this->user->notifications();
         if ($platform == ClientPlatform::StakingMobileWeb) {
-            $notifications->where('data->action_type','!=','CHALLENGE');
+            $notifications->where('type', 'NOT LIKE', '%challenge%');
         }
 
         return $this->sendResponse($notifications->paginate(20), "Notifications fetched successfully");
@@ -45,12 +44,12 @@ class NotificationController extends BaseController
     private function readAllNotifications(ClientPlatform $platform)
     {
 
+        $query = $this->user->unreadNotifications();
+
         if ($platform == ClientPlatform::StakingMobileWeb) {
-            $this->user->unreadNotifications()->where('data', 'not like', '%CHALLENGE%')->update(['read_at' => now()]);
-        } else {
-            $this->user->unreadNotifications()->update(['read_at' => now()]);
+            $query->where('type', 'NOT LIKE', '%challenge%');
         }
 
-        $this->user->unreadNotifications()->update(['read_at' => now()]);
+        $query->update(['read_at' => now()]);
     }
 }
