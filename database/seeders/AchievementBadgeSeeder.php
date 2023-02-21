@@ -402,8 +402,8 @@ class AchievementBadgeSeeder extends Seeder
                 'reward' => 250,
                 'reward_type' => "CASH",
                 'description' => "buy 5 time freeze",
-                'medal'=> 'achievements/conqueror_medal.png',
-                'quality_image'=> 'quality_achievement_image/conqueror_medal.png',
+                'medal'=> 'achievements/24.png',
+                'quality_image'=> 'quality_achievement_image/24.png',
                 'created_at'=> Carbon::now(),
                 'updated_at'=> Carbon::now()
             ]
