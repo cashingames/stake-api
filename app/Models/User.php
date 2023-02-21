@@ -12,6 +12,8 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Carbon\Carbon;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use App\Models\AchievementBadge;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -114,6 +116,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Achievement::class);
     }
 
+    public function userAchievementBadges()
+    {
+        return $this->belongsToMany(AchievementBadge::class, 'user_achievement_badges')->withPivot('id', 'count', 'is_claimed', 'is_rewarded', 'is_notified');
+    }
+
     public function plans()
     {
         return $this
@@ -124,9 +131,9 @@ class User extends Authenticatable implements JWTSubject
     public function scopeActivePlans()
     {
 
-        //a plan is active if 
+        //a plan is active if
         // - isactive is true and
-        // - games_count * plan_count> used_count and 
+        // - games_count * plan_count> used_count and
         // - expiry is greater than the current datetime or expiry is null
         return $this
             ->plans()
@@ -270,7 +277,7 @@ class User extends Authenticatable implements JWTSubject
     public function getRankAttribute()
     {
         $results = DB::select(
-            "select SUM(value) as score, user_id from user_points WHERE 
+            "select SUM(value) as score, user_id from user_points WHERE
             point_flow_type = 'POINTS_ADDED'
             group by user_id
             order by score desc
@@ -370,6 +377,18 @@ class User extends Authenticatable implements JWTSubject
             })->select('achievements.id', 'title', 'medal as logoUrl')->get();
     }
 
+    public function userAchievementBadge()
+    {
+        $db = AchievementBadge::join('user_achievement_badges', function ($join) {
+                $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
+            })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'milestone_count', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl')->get();
+
+        DB::table('user_achievement_badges')->where('user_id', $this->id)->where('is_claimed', 1)->update(array(
+            'is_notified' => 1
+        ));
+        return $db;
+    }
+
     public function userBoosts()
     {
         return DB::table('user_boosts')
@@ -388,7 +407,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function userChallenges()
     {
-        // return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges 
+        // return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges
         // INNER JOIN categories on categories.id = challenges.category_id
         // INNER JOIN users u on u.id = challenges.user_id
         // INNER JOIN users o on o.id = challenges.opponent_id

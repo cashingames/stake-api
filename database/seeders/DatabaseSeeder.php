@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             GameTypeSeeder::class,
             GameModeSeeder::class,
             AchievementSeeder::class,
+            AchievementBadgeSeeder::class,
             BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,
@@ -29,14 +30,13 @@ class DatabaseSeeder extends Seeder
             ContestSeeder::class,
             //ContestPrizePoolSeeder::class,
             TriviaSeeder::class,
-            NotificationSeeder::class,
-            WalletTransactionSeeder::class,
-            WalletSeeder::class,
-            ProfileSeeder::class,
-            // QuestionSeeder::class,
+            // WalletTransactionSeeder::class,
+            // WalletSeeder::class,
+            // ProfileSeeder::class,
+            QuestionSeeder::class,
             StakingSeeder::class,
             StakingOddSeeder::class,
-         
+
         ]);
     }
 }

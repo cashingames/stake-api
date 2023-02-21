@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use AchievementSeeder;
+use AchievementBadgeSeeder;
 use BoostSeeder;
 use UserSeeder;
 use PlanSeeder;
@@ -36,6 +37,7 @@ class StoreTest extends TestCase
     {
         parent::setUp();
         $this->seed(UserSeeder::class);
+        $this->seed(AchievementBadgeSeeder::class);
         $this->user = User::inRandomOrder()->first();
 
         $this->actingAs($this->user);
