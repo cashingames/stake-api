@@ -28,7 +28,8 @@ class UserNotificationFactory extends Factory
             'type' => 'App\Notifications\ChallengeReceivedNotification',
             'notifiable_type' => 'App\Models\User',
             'notifiable_id' => 1,
-            'data' => "{'title':'You have received a challenge invitation from Seyijay','action_type':'CHALLENGE','action_id':1}",
+            'data' => "{'title':'You have received a challenge invitation from Seyijay',
+                'action_type':'CHALLENGE','action_id':1}",
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

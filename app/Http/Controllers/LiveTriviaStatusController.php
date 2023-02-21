@@ -16,7 +16,7 @@ class LiveTriviaStatusController extends Controller
     {
         $liveTrivia = LiveTrivia::active()->with(['contest','contest.contestPrizePools'])->first();
 
-        if($liveTrivia === null){
+        if ($liveTrivia == null) {
             return null;
         }
 
