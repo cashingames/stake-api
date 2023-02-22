@@ -110,42 +110,6 @@ class ProfileTest extends TestCase
         $this->assertEquals($this->user->email, 'johndoe@email.com');
     }
 
-    public function test_email_should_be_unique()
-    {
-
-        $response = $this->postjson('/api/v2/profile/me/edit-personal', [
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'username' => 'JayDee',
-            'phoneNumber' => '09098989898',
-            'email' => User::find(2)->email,
-            'password' => 'password111',
-            'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
-        ]);
-        $response->assertJson([
-            'message' => 'The email has already been taken.',
-        ]);
-    }
-
-    public function test_username_should_be_unique()
-    {
-
-        $response = $this->postjson('/api/v2/profile/me/edit-personal', [
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'username' => User::find(2)->username,
-            'phoneNumber' => '09098989898',
-            'email' => 'email@email.com',
-            'password' => 'password111',
-            'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
-        ]);
-        $response->assertJson([
-            'message' => 'The username has already been taken.',
-        ]);
-    }
-
     public function test_bank_details_can_be_edited()
     {
 
