@@ -19,8 +19,8 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
-            'username' => ['nullable', 'string', 'max:20', 'unique:users'],
-            'email' => ['nullable', 'string', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'max:20', 'unique:users'],
+            'email' => ['required', 'string', 'max:255', 'unique:users'],
             // 'phoneNumber' => [
             //     'required','min:11','max:11',
             //     Rule::unique('users','phone_number')->ignore($this->user->id),
@@ -37,14 +37,9 @@ class ProfileController extends BaseController
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
 
-        if (isset($data['username']) &&  !is_null($data['username'])) {
-            $this->user->username = $data['username'];
-            $this->user->save();
-        }
-        if (isset($data['email']) &&  !is_null($data['email'])) {
-            $this->user->email = $data['email'];
-            $this->user->save();
-        }
+        $this->user->username = $data['username'];
+        $this->user->email = $data['email'];
+        $this->user->save();
 
         if (isset($data['gender']) &&  !is_null($data['gender'])) {
             $profile->gender =  $data['gender'];

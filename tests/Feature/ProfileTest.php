@@ -146,17 +146,6 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_personal_details_can_be_edited_with_nullable_fields_not_set()
-    {
-        $this->postjson('/api/v2/profile/me/edit-personal', [
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'phoneNumber' => '09098989898',
-            'password' => 'password111'
-        ]);
-        $this->assertEquals($this->user->profile->first_name, 'John');
-    }
-
     public function test_bank_details_can_be_edited()
     {
 
