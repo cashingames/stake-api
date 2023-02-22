@@ -20,7 +20,7 @@ class ProfileController extends BaseController
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
             'username' => ['nullable', 'string', 'max:20', 'unique:users'],
-            'email' => ['nullable', 'string', 'max:20', 'unique:users'],
+            'email' => ['nullable', 'string', 'max:255', 'unique:users'],
             // 'phoneNumber' => [
             //     'required','min:11','max:11',
             //     Rule::unique('users','phone_number')->ignore($this->user->id),
