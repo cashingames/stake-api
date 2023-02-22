@@ -21,9 +21,9 @@ class Staking extends Model
     return $this->belongsTo(User::class);
   }
 
-  public function exhibitionStakings()
+  public function exhibitionStaking()
   {
-    return $this->hasMany(ExhibitionStaking::class);
+    return $this->hasOne(ExhibitionStaking::class);
   }
 
   public function gameSessions()

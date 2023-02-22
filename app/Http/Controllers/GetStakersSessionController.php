@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\RecentStakersResponse;
-use App\Models\GameSession;
 use App\Models\Staking;
-use Illuminate\Http\Request;
 
 class GetStakersSessionController extends BaseController
 {
     public function __invoke()
     {
-        $sessions = Staking::whereHas('exhibitionStakings')
+        $sessions = Staking::whereHas('exhibitionStaking')
             ->join('users', 'users.id', '=', 'stakings.user_id')
             ->join('profiles', 'profiles.user_id', '=', 'users.id')
             ->join('exhibition_stakings', 'stakings.id', '=', 'exhibition_stakings.staking_id')

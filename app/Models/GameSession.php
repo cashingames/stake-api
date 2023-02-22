@@ -52,8 +52,8 @@ class GameSession extends Model
         return $this->hasMany(GameSessionOdd::class, 'game_session_id', 'id');
     }
 
-    public function exhibitionStakings()
+    public function exhibitionStaking()
     {
-      return $this->hasMany(ExhibitionStaking::class);
+        return $this->hasOne(ExhibitionStaking::class);
     }
 }

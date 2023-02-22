@@ -1,7 +1,10 @@
 <?php
 
 namespace Database\Factories;
-use App\Models\Trivia;
+
+use App\Models\Category;
+use App\Models\GameMode;
+use App\Models\GameType;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -10,24 +13,17 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class TriviaFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-
-    protected $model = Trivia::class;
 
     public function definition()
     {
         return [
             //
             'name' => $this->faker->word(),
-            'category_id' => $this->faker->randomElement(array(501,503,504)),
-            'game_mode_id' => 1,
-            'game_type_id'=>2,
-            'grand_price'=> 1000,
-            'point_eligibility'=>500,
+            'category_id' => Category::factory(),
+            'game_mode_id' => GameMode::factory(),
+            'game_type_id' => GameType::factory(),
+            'grand_price' => $this->faker->randomNumber(2),
+            'point_eligibility' => $this->faker->randomNumber(2),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addHour()
         ];
