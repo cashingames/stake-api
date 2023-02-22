@@ -430,7 +430,7 @@ class AchievementBadgeSeeder extends Seeder
             [
                 'id' => 25,
                 'title' => "referral king",
-                'milestone' => 5,
+                'milestone' => 30,
                 'milestone_count' => 1,
                 'milestone_type' => "REFERRAL",
                 'reward' => 300,
