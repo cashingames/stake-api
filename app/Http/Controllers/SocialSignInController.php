@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+
 class SocialSignInController extends BaseController
 {
     /**
@@ -137,12 +140,15 @@ class SocialSignInController extends BaseController
             isset($data['referrer'])
         ) {
             $referrerId = 0;
-            $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
-
-            if ($profileReferral === null) {
-                $referrerId = User::where('username', $data["referrer"])->first()->id;
-            } else {
-                $referrerId = $profileReferral->user_id;
+            // $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
+            // if ($profileReferral === null) {
+            //     $referrerId = User::where('username', $data["referrer"])->first()->id;
+            // } else {
+            //     $referrerId = $profileReferral->user_id;
+            // }
+            $profileReferral = User::where('username', $data["referrer"])->first();
+            if ($profileReferral != null) {
+                Event::dispatch(new AchievementBadgeEvent($profileReferral, "REFERRAL", null));
             }
 
             /** @TODO: this needs to be changed to plan */
