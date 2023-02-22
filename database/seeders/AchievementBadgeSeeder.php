@@ -95,7 +95,7 @@ class AchievementBadgeSeeder extends Seeder
                 'milestone_type' => "SCOREGAMES",
                 'reward' => 25,
                 'reward_type' => "POINTS",
-                'description' => "Score above 7 in 10 consecutive games in music",
+                'description' => "Score above 7 in 10 consecutive games in general knowledge",
                 'medal'=> 'achievements/5.png',
                 'quality_image'=> 'quality_achievement_image/5.png',
                 'created_at'=> Carbon::now(),
@@ -106,6 +106,23 @@ class AchievementBadgeSeeder extends Seeder
         DB::table('achievement_badges')->insert(
             [
                 'id' => 6,
+                'title' => "Muse",
+                'milestone' => 7,
+                'milestone_count' => 10,
+                'milestone_type' => "SCOREGAMES",
+                'reward' => 25,
+                'reward_type' => "POINTS",
+                'description' => "Score above 7 in 10 consecutive games in music",
+                'medal'=> 'achievements/6.png',
+                'quality_image'=> 'quality_achievement_image/6.png',
+                'created_at'=> Carbon::now(),
+                'updated_at'=> Carbon::now()
+            ]
+        );
+
+        DB::table('achievement_badges')->insert(
+            [
+                'id' => 7,
                 'title' => "Big Fan",
                 'milestone' => 7,
                 'milestone_count' => 10,
@@ -122,7 +139,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 7,
+                'id' => 8,
                 'title' => "Geek",
                 'milestone' => 7,
                 'milestone_count' => 50,
@@ -139,7 +156,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 8,
+                'id' => 9,
                 'title' => "maestro",
                 'milestone' => 7,
                 'milestone_count' => 50,
@@ -156,7 +173,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 9,
+                'id' => 10,
                 'title' => "pro fan",
                 'milestone' => 7,
                 'milestone_count' => 50,
@@ -173,7 +190,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 10,
+                'id' => 11,
                 'title' => "professor",
                 'milestone' => 100,
                 'milestone_count' => 1,
@@ -190,7 +207,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 11,
+                'id' => 12,
                 'title' => "music geek",
                 'milestone' => 100,
                 'milestone_count' => 1,
@@ -207,7 +224,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 12,
+                'id' => 13,
                 'title' => "football champ",
                 'milestone' => 100,
                 'milestone_count' => 1,
@@ -224,7 +241,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 13,
+                'id' => 14,
                 'title' => "sage",
                 'milestone' => 7,
                 'milestone_count' => 100,
@@ -241,7 +258,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 14,
+                'id' => 15,
                 'title' => "music enthusiast",
                 'milestone' => 7,
                 'milestone_count' => 100,
@@ -258,7 +275,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 15,
+                'id' => 16,
                 'title' => "ultimate fan",
                 'milestone' => 7,
                 'milestone_count' => 100,
@@ -275,7 +292,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 16,
+                'id' => 17,
                 'title' => "connector",
                 'milestone' => 10,
                 'milestone_count' => 1,
@@ -292,7 +309,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 17,
+                'id' => 18,
                 'title' => "engager",
                 'milestone' => 10,
                 'milestone_count' => 1,
@@ -309,7 +326,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 18,
+                'id' => 19,
                 'title' => "pro connector",
                 'milestone' => 20,
                 'milestone_count' => 1,
@@ -326,7 +343,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 19,
+                'id' => 20,
                 'title' => "good gamer",
                 'milestone' => 10,
                 'milestone_count' => 1,
@@ -343,14 +360,14 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 20,
+                'id' => 21,
                 'title' => "pro gamer",
                 'milestone' => 10,
                 'milestone_count' => 1,
                 'milestone_type' => "GAME_BOUGHT_DOUBLE",
                 'reward' => 500,
                 'reward_type' => "CASH",
-                'description' => "buy 10 least game plan",
+                'description' => "buy 10 double o game  plan",
                 'medal'=> 'achievements/21.png',
                 'quality_image'=> 'quality_achievement_image/21.png',
                 'created_at'=> Carbon::now(),
@@ -360,14 +377,14 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 21,
-                'title' => "more spender",
+                'id' => 22,
+                'title' => "Money spender",
                 'milestone' => 10,
                 'milestone_count' => 1,
                 'milestone_type' => "GAME_BOUGHT_ULTIMATE",
                 'reward' => 1000,
                 'reward_type' => "CASH",
-                'description' => "buy 10 least game plan",
+                'description' => "Buy 10 ultimate game plan",
                 'medal'=> 'achievements/22.png',
                 'quality_image'=> 'quality_achievement_image/22.png',
                 'created_at'=> Carbon::now(),
@@ -377,7 +394,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 22,
+                'id' => 23,
                 'title' => "smart gamer",
                 'milestone' => 5,
                 'milestone_count' => 1,
@@ -394,7 +411,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 23,
+                'id' => 24,
                 'title' => "wise gamer",
                 'milestone' => 5,
                 'milestone_count' => 1,
@@ -411,7 +428,7 @@ class AchievementBadgeSeeder extends Seeder
 
         DB::table('achievement_badges')->insert(
             [
-                'id' => 24,
+                'id' => 25,
                 'title' => "referral king",
                 'milestone' => 5,
                 'milestone_count' => 1,
