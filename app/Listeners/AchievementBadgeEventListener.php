@@ -98,12 +98,12 @@ class AchievementBadgeEventListener
 
             case 'Time Freeze':
                 # code for time freeze...
-                $this->BadgeStateLogic($user, 23, 5);
+                $this->BadgeStateLogic($user, 24, 5);
                 break;
 
             case 'Skip':
                 # code for skip...
-                $this->BadgeStateLogic($user, 22, 5);
+                $this->BadgeStateLogic($user, 23, 5);
                 break;
 
             default:
@@ -117,17 +117,17 @@ class AchievementBadgeEventListener
         switch ($payload->name) {
             case 'Least Plan':
                 # code for least p bought...
-                $this->BadgeStateLogic($user, 19, 10);
+                $this->BadgeStateLogic($user, 20, 10);
                 break;
 
             case 'Double O':
                 # code for double o bought...
-                $this->BadgeStateLogic($user, 20, 10);
+                $this->BadgeStateLogic($user, 21, 10);
                 break;
 
             case 'The Ultimate':
                 # code for ultimate bought...
-                $this->BadgeStateLogic($user, 21, 10);
+                $this->BadgeStateLogic($user, 22, 10);
                 break;
 
             default:
@@ -137,15 +137,15 @@ class AchievementBadgeEventListener
     }
 
     public function challengeStarted($user){
-        $this->BadgeStateLogic($user, 16);
-        $this->BadgeStateLogic($user, 18, 20);
+        $this->BadgeStateLogic($user, 17);
+        $this->BadgeStateLogic($user, 19, 20);
     }
     public function challengeAccepted($user){
-        $this->BadgeStateLogic($user, 17);
+        $this->BadgeStateLogic($user, 18);
     }
 
     public function referralKing($user){
-        $this->BadgeStateLogic($user, 24, 30);
+        $this->BadgeStateLogic($user, 25, 30);
     }
 
     public function gamePlayed($user, $payload){
@@ -166,28 +166,28 @@ class AchievementBadgeEventListener
             case 'football':
                 # code relating to football...
                 $this->NumberofGamePlayedLogic($user, $payload, 4);
+                $this->ScoringWithinARangeLogic($user, $payload, 7);
+                $this->ScoringWithinARangeLogic($user, $payload, 10);
+                $this->NumberofGamePlayedLogic($user, $payload, 13);
+                $this->ScoringWithinARangeLogic($user, $payload, 16);
+                break;
+
+            case 'music':
+                # code relating to music...
+                $this->NumberofGamePlayedLogic($user, $payload, 3);
                 $this->ScoringWithinARangeLogic($user, $payload, 6);
                 $this->ScoringWithinARangeLogic($user, $payload, 9);
                 $this->NumberofGamePlayedLogic($user, $payload, 12);
                 $this->ScoringWithinARangeLogic($user, $payload, 15);
                 break;
 
-            case 'music':
-                # code relating to music...
-                $this->NumberofGamePlayedLogic($user, $payload, 3);
+            case 'general':
+                # code relating to general...
+                $this->NumberofGamePlayedLogic($user, $payload, 2);
                 $this->ScoringWithinARangeLogic($user, $payload, 5);
                 $this->ScoringWithinARangeLogic($user, $payload, 8);
                 $this->NumberofGamePlayedLogic($user, $payload, 11);
                 $this->ScoringWithinARangeLogic($user, $payload, 14);
-                break;
-
-            case 'general':
-                # code relating to general...
-                $this->NumberofGamePlayedLogic($user, $payload, 2);
-                $this->ScoringWithinARangeLogic($user, $payload, 4);
-                $this->ScoringWithinARangeLogic($user, $payload, 7);
-                $this->NumberofGamePlayedLogic($user, $payload, 10);
-                $this->ScoringWithinARangeLogic($user, $payload, 13);
                 break;
 
             default:
