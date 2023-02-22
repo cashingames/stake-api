@@ -21,14 +21,4 @@ class GameType extends Model
     {
         return $this->hasMany(Question::class);
     }
-
-    // public function IsEnabled()
-    // {
-    //     $hasQuestions = Question::where('game_type_id', $this->id)->first();
-
-    //     if ($hasQuestions === null) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
 }

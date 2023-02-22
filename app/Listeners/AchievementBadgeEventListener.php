@@ -431,7 +431,7 @@ class AchievementBadgeEventListener
         }else{
             // check game count logic
 
-            if(($curGS->count + 1) >= ($achievement->milestone * $achievement->milestone_count)){
+            if(($curGS->count + $achievement->milestone) >= ($achievement->milestone * $achievement->milestone_count)){
                 $this->endSingleBadge($curGS, 70, $user->id, $aid, $achievement->milestone);
             }else{
                 $this->appendSingleBadge($curGS, $user->id, $aid, $achievement->milestone);

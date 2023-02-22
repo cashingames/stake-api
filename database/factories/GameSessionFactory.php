@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\GameMode;
 use App\Models\GameSession;
+use App\Models\GameType;
+use App\Models\Plan;
 use App\Models\User;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -27,11 +30,11 @@ class GameSessionFactory extends Factory
     {
         return [
             //
-            'user_id' => $this->faker->randomElement(array(1,2,3,4,5)),
-            'plan_id' => $this->faker->randomElement(array(1,2,3,4)),
-            'game_mode_id'=> 1,
-            'game_type_id' => 2,
-            'category_id' => $this->faker->randomElement(array(102,502)),
+            'user_id' => User::factory(),
+            'plan_id' => Plan::factory(),
+            'game_mode_id' => GameMode::factory(),
+            'game_type_id' => GameType::factory(),
+            'category_id' => Category::factory(),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addMinutes(1),
             'session_token' => Str::random(20),

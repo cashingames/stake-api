@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Plan;
 use App\Models\UserPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -26,7 +27,7 @@ class UserPlanFactory extends Factory
         return [
             //
             'user_id' => User::factory(),
-            'plan_id' => $this->faker->randomElement(array(1,2,3,4)),
+            'plan_id' => Plan::factory(),
             'is_active'=> true
         ];
     }
