@@ -15,7 +15,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        if ($user->username == 'HeneryJones') {
+        if ($user->username == 'HeneryJones' || $user->username == 'opetimistic') {
             return $this->getHardQuestions($user, $categoryId);
         }
 
@@ -49,6 +49,18 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->where('game_sessions.category_id', $categoryId)
             ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
+
+// private function calculateAmountWonToday($user)
+// {
+//     $amountWon = $user->exhibitionStakingsToday()->sum('amount_won') -
+//         $user->exhibitionStakingsToday()->sum('amount_staked');
+
+//     if ($amountWon < 0) {
+//         $amountWon = 0;
+//     }
+
+//     return $amountWon;
+// }
 
 }
 
