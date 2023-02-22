@@ -15,11 +15,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        if ($user->username == 'HeneryJones' || $user->username == 'opetimistic') {
-            return $this->getHardQuestions($user, $categoryId);
-        }
+        return $this->getHardQuestions($user, $categoryId);
 
-        return $this->getEasyQuestions($categoryId);
+        // return $this->getEasyQuestions($categoryId);
     }
 
     private function getEasyQuestions(string $categoryId): Collection
@@ -63,4 +61,3 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 // }
 
 }
-
