@@ -48,12 +48,12 @@ class ProfileTest extends TestCase
                 'email' =>  $this->user->email,
                 'lastName' =>  $this->user->profile->last_name,
                 'firstName' => $this->user->profile->first_name,
-                'countryCode'=>$this->user->country_code,
+                'countryCode' => $this->user->country_code,
                 'phoneNumber' =>  $this->user->phone_number,
                 'points' =>  $this->user->points(),
                 'walletBalance' => $this->user->wallet->non_withdrawable_balance,
                 'bookBalance' => $this->user->bookBalance(),
-                'withdrawableBalance'=> $this->user->wallet->withdrawable_balance,
+                'withdrawableBalance' => $this->user->wallet->withdrawable_balance,
                 'boosts' => [],
                 'achievements' => [],
                 'hasActivePlan' => false,
@@ -62,10 +62,10 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_personal_details_can_be_edited()
+    public function test_personal_details_can_be_edited_with_all_fields_set()
     {
 
-        $response = $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson('/api/v2/profile/me/edit-personal', [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -75,20 +75,61 @@ class ProfileTest extends TestCase
             'gender' => 'male',
             'dateOfBirth' => '23-09-1998'
         ]);
+        $this->assertEquals(($this->user->profile->first_name.' '.$this->user->profile->last_name), 'John Doe');
+    }
 
-        $response->assertStatus(200);
+    public function test_username_can_be_edited()
+    {
+
+        $this->postjson('/api/v2/profile/me/edit-personal', [
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'username' => 'JayDee',
+            'phoneNumber' => '09098989898',
+            'email' => 'johndoe@email.com',
+            'password' => 'password111',
+            'gender' => 'male',
+            'dateOfBirth' => '23-09-1998'
+        ]);
+        $this->assertEquals($this->user->username, 'JayDee');
+    }
+    
+    public function test_email_can_be_edited()
+    {
+
+        $this->postjson('/api/v2/profile/me/edit-personal', [
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'username' => 'JayDee',
+            'phoneNumber' => '09098989898',
+            'email' => 'johndoe@email.com',
+            'password' => 'password111',
+            'gender' => 'male',
+            'dateOfBirth' => '23-09-1998'
+        ]);
+        $this->assertEquals($this->user->email, 'johndoe@email.com');
+    }
+
+    public function test_personal_details_can_be_edited_with_nullable_fields_not_set()
+    {
+        $this->postjson('/api/v2/profile/me/edit-personal', [
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'phoneNumber' => '09098989898',
+            'password' => 'password111'
+        ]);
+        $this->assertEquals($this->user->profile->first_name, 'John');
     }
 
     public function test_bank_details_can_be_edited()
     {
 
-        $response = $this->postjson('/api/v2/profile/me/edit-bank', [
+        $this->postjson('/api/v2/profile/me/edit-bank', [
             'accountName' => 'John',
             'bankName' => 'Access bank',
             'accountNumber' => '09098989898',
         ]);
-
-        $response->assertStatus(200);
+        $this->assertEquals($this->user->profile->bank_name, 'Access bank');
     }
 
     public function test_profile_image_can_be_uploaded()
@@ -97,12 +138,13 @@ class ProfileTest extends TestCase
 
         $file = UploadedFile::fake()->image('avatar.jpg');
 
-        $response = $this->post('/api/v2/profile/me/picture', [
+        $this->post('/api/v2/profile/me/picture', [
             'avatar' => $file,
         ]);
 
+        $avatar = $this->user->profile->avatar;
 
-        $response->assertStatus(200);
+        $this->assertTrue(!is_null($avatar));
     }
 
     public function test_that_referrer_profile_returns_null_when_not_referrer_not_found()
@@ -175,7 +217,8 @@ class ProfileTest extends TestCase
         $this->assertEquals($response->first_name, $profile1->first_name);
     }
 
-    public function test_that_password_can_be_changed(){
+    public function test_that_password_can_be_changed()
+    {
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password',
             'new_password' => 'password123',
@@ -188,7 +231,8 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_that_old_password_must_be_correct_before_being_changed(){
+    public function test_that_old_password_must_be_correct_before_being_changed()
+    {
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password111',
             'new_password' => 'password123',
@@ -201,7 +245,8 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_that_old_password_must_differ_from_new_password(){
+    public function test_that_old_password_must_differ_from_new_password()
+    {
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password111',
             'new_password' => 'password111',
