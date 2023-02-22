@@ -44,7 +44,7 @@ class AchievementBadgeEventListener
             $AchievementType = $event->AchievementType;
 
             $user = null;
-            if(($AchievementType === "GAME_BOUGHT") || ($AchievementType === "BOOST_BOUGHT") ){
+            if(($AchievementType === "GAME_BOUGHT") || ($AchievementType === "BOOST_BOUGHT") || ($AchievementType === "REFERRAL") ){
                 $user = $event->request;
             }else{
                 $user = $event->request->user();
