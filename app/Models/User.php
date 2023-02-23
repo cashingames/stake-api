@@ -231,6 +231,13 @@ class User extends Authenticatable implements JWTSubject
             });
     }
 
+    public function exhibitionStakingsToday()
+    {
+        return $this->exhibitionStakings()
+            ->where('exhibition_stakings.created_at', '>=', now()->startOfDay())
+            ->where('exhibition_stakings.created_at', '<=', now()->endOfDay());
+    }
+
     public function points()
     {
         $pointsAdded = UserPoint::where('user_id', $this->id)

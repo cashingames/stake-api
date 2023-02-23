@@ -16,7 +16,6 @@ class RecentStakersResponse
     public $username;
     public $avatar;
     public $correctCount;
-    public $pointsGained;
     public $amountWon;
     public $amountStaked;
 

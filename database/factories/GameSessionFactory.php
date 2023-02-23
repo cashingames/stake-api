@@ -11,7 +11,6 @@ use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Factories\Sequence;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\GameSession>
@@ -30,7 +29,7 @@ class GameSessionFactory extends Factory
     {
         return [
             //
-            'user_id' => User::factory(),
+            'user_id' => User::factory()->hasProfile(1),
             'plan_id' => Plan::factory(),
             'game_mode_id' => GameMode::factory(),
             'game_type_id' => GameType::factory(),
@@ -40,10 +39,10 @@ class GameSessionFactory extends Factory
             'session_token' => Str::random(20),
             // 'trivia_id' => $this->faker->randomElement(array(1,2,3,4,5)),
             'state' => 'COMPLETED',
-            'correct_count' => $this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10)),
-            'wrong_count' => $this->faker->randomElement(array(1,2,3,4,5,6,7,8,9,10)),
+            'correct_count' => $this->faker->randomNumber(1),
+            'wrong_count' => $this->faker->randomNumber(1),
             'total_count' =>10,
-            'points_gained' => $this->faker->randomElement(array(5,10,15,20)),
+            'points_gained' => $this->faker->randomNumber(2),
             'created_at' => Carbon::today()->subDays(2),
             'updated_at' => Carbon::now()
         ];

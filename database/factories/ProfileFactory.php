@@ -20,8 +20,10 @@ class ProfileFactory extends Factory
             'user_id' => User::factory(),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
+            // 'phone_number' => $this->faker->phoneNumber,
+            'avatar' => $this->faker->imageUrl,
             'bank_name' => $this->faker->company,
-            'account_number' => $this->faker->bankAccountNumber,
+            'account_number' => $this->faker->iban('ng'),
             'account_name' => $this->faker->name,
             'referral_code' => function (array $attributes) {
                 return User::find($attributes['user_id'])->username;

@@ -2,7 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\ExhibitionStaking;
+use App\Models\GameSession;
+use App\Models\Staking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ExhibitionStakingFactory extends Factory
 {
-  protected $model = ExhibitionStaking::class;
 
   /**
    * Define the model's default state.
@@ -20,8 +20,8 @@ class ExhibitionStakingFactory extends Factory
   public function definition()
   {
     return [
-      'staking_id' => $this->faker->randomElement(array(1, 2, 3, 4, 5)),
-      'game_session_id' => $this->faker->randomElement(array(100, 200, 500, 1000)),
+      'staking_id' => Staking::factory(),
+      'game_session_id' => GameSession::factory(),
       'odds_applied' => $this->faker->randomElement(array(1, 2, 3, 4, 5)),
     ];
   }

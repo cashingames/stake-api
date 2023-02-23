@@ -3,32 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Http\ResponseHelpers\RecentStakersResponse;
+use App\Models\ExhibitionStaking;
 use App\Models\Staking;
+use Illuminate\Support\Facades\DB;
 
 class GetStakersSessionController extends BaseController
 {
     public function __invoke()
     {
-        $sessions = Staking::whereHas('exhibitionStaking')
-            ->join('users', 'users.id', '=', 'stakings.user_id')
-            ->join('profiles', 'profiles.user_id', '=', 'users.id')
-            ->join('exhibition_stakings', 'stakings.id', '=', 'exhibition_stakings.staking_id')
-            ->join('game_sessions', 'exhibition_stakings.game_session_id', '=', 'game_sessions.id')
+        $sessions = DB::table('exhibition_stakings')
+            ->join('stakings', 'stakings.id', '=', 'exhibition_stakings.staking_id')
+            ->join('game_sessions', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
+            ->join('users', 'users.id', '=', 'game_sessions.user_id')
+            ->leftJoin('profiles', 'profiles.user_id', '=', 'users.id')
             ->select(
-                'stakings.id',
-                'stakings.amount_won',
-                'stakings.amount_staked',
-                'users.username',
-                'profiles.avatar',
-                'game_sessions.correct_count',
-                'stakings.created_at'
+                'stakings.id as id',
+                'users.username as username',
+                'profiles.avatar as avatar',
+                'stakings.amount_won as amount_won',
+                'stakings.amount_staked as amount_staked',
+                'game_sessions.correct_count as correct_count',
+                'stakings.created_at as created_at',
             )
-            ->whereColumn('stakings.amount_won', '>', 'stakings.amount_staked')
-            ->where('game_sessions.points_gained', '>=', 5)
-            ->orderBy('game_sessions.created_at', 'DESC')
-            ->orderBy('stakings.amount_won', 'DESC')
-            ->groupBy('stakings.user_id')
-            ->limit(10)->get();
+            ->where('game_sessions.correct_count', '>=', 5)
+            ->whereColumn('stakings.amount_won', '>', DB::raw('stakings.amount_staked * 2'))
+            ->groupBy('users.id')
+            ->orderByDesc('game_sessions.created_at')
+            ->orderByDesc('game_sessions.created_at')
+            ->orderByDesc('stakings.amount_won')
+            ->limit(5)
+            ->get();
 
         return $sessions->map(function ($session) {
             return (new RecentStakersResponse())->transform($session);
