@@ -96,7 +96,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
-        Route::post('game/can-stake-in-game', [GameController::class, 'canPlayWithStaking']);
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);

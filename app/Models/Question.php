@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Database\Eloquent\Builder;
 class Question extends Model
 {
   use HasFactory, SoftDeletes;
@@ -20,11 +20,23 @@ class Question extends Model
    * @var array
    */
   protected $hidden = [
-    'game_id', 'created_at', 'updated_at'
+    'game_id',
+    'created_at',
+    'updated_at'
   ];
 
   protected $fillable = ['created_by', 'is_published'];
   //
+  /**
+   * The "booted" method of the model.
+   */
+  protected static function booted(): void
+  {
+    static::addGlobalScope('published', function (Builder $builder) {
+      $builder->where('is_published', true);
+    });
+  }
+
   public function options()
   {
     return $this->hasMany(Option::class)->inRandomOrder();
@@ -49,6 +61,22 @@ class Question extends Model
   {
     return base64_encode($value);
   }
+
+  public function scopeEasy()
+  {
+    return $this->whereLevel('easy');
+  }
+
+  public function scopeMedium()
+  {
+    return $this->whereLevel('medium');
+  }
+
+  public function scopeHard()
+  {
+    return $this->whereLevel('hard');
+  }
+
   public function getLevelAttribute($value)
   {
     return base64_encode($value);

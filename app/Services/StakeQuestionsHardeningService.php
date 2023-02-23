@@ -15,9 +15,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        $amountWonToday = $this->calculateAmountWonToday($user);
-
-        if ($amountWonToday > 1000) {
+        if ($this->calculateAmountWonToday($user) > 0) {
             return $this->getHardQuestions($user, $categoryId);
         } else {
             return $this->getEasyQuestions($categoryId);
@@ -26,9 +24,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
     private function getEasyQuestions(string $categoryId): Collection
     {
-        return Category::find($categoryId)->questions()
-            ->where('is_published', true)
-            ->where('level', 'easy')
+        return Category::find($categoryId)
+            ->questions()
+            ->easy()
             ->inRandomOrder()->take(20)->get();
     }
 
@@ -37,9 +35,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
         $recentQuestions = $this->previouslySeenQuestionsInCategory($user, $categoryId);
 
-        return Category::find($categoryId)->questions()
-            ->where('is_published', true)
-            ->where('level', 'hard')
+        return Category::find($categoryId)
+            ->questions()
+            ->hard()
             ->whereNotIn('questions.id', $recentQuestions)
             ->inRandomOrder()->take(20)->get();
     }
