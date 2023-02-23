@@ -29,9 +29,9 @@ class GetStakersSessionController extends BaseController
             ->whereColumn('stakings.amount_won', '>', DB::raw('stakings.amount_staked * 2'))
             ->groupBy('users.id')
             ->orderByDesc('game_sessions.created_at')
-            ->orderByDesc('game_sessions.created_at')
+            ->orderByDesc('game_sessions.correct_count')
             ->orderByDesc('stakings.amount_won')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         return $sessions->map(function ($session) {
