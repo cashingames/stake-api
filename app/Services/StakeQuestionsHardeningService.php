@@ -15,9 +15,13 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        return $this->getHardQuestions($user, $categoryId);
+        $amountWonToday = $this->calculateAmountWonToday($user);
 
-        // return $this->getEasyQuestions($categoryId);
+        if ($amountWonToday > 1000) {
+            return $this->getHardQuestions($user, $categoryId);
+        } else {
+            return $this->getEasyQuestions($categoryId);
+        }
     }
 
     private function getEasyQuestions(string $categoryId): Collection
@@ -48,16 +52,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
-// private function calculateAmountWonToday($user)
-// {
-//     $amountWon = $user->exhibitionStakingsToday()->sum('amount_won') -
-//         $user->exhibitionStakingsToday()->sum('amount_staked');
+    private function calculateAmountWonToday($user)
+    {
+        $todayStakes = $user->exhibitionStakingsToday();
 
-//     if ($amountWon < 0) {
-//         $amountWon = 0;
-//     }
-
-//     return $amountWon;
-// }
+        return $todayStakes->sum('amount_won') - $todayStakes->sum('amount_staked');
+    }
 
 }
