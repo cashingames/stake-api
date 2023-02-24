@@ -41,6 +41,8 @@ class UserController extends BaseController
         $result->gamesCount = $this->user->played_games_count;
         $result->walletBalance = $this->user->wallet->non_withdrawable_balance;
         $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
+        $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
+        $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->bookBalance = $this->user->bookBalance();
         $result->badge = $this->user->achievement;
         $result->winRate = $this->user->win_rate;
