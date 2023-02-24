@@ -9,18 +9,20 @@ use Illuminate\Foundation\Auth\User;
 use Carbon\Carbon;
 use App\Actions\SendPushNotification;
 
-class GiftReferrerOnFirstGameService
+class ReferralService
 {
 
-    private User $user;
+    private $user;
 
-    public function __construct()
-    {
-        $this->user = auth()->user();
-    }
+    // public function __construct()
+    // {
+    //     $this->user = auth()->user();
+    // }
 
     public function gift()
     {
+        $this->user = auth()->user();
+
         if (GameSession::where('user_id', $this->user->id)->count() > 1) {
             Log::info($this->user->username . ' has more than 1 game played already, so no referrer bonus check');
             return;
@@ -28,7 +30,7 @@ class GiftReferrerOnFirstGameService
 
         $referrerProfile = $this->user->profile->getReferrerProfile();
 
-        if ($referrerProfile === null) {
+        if ($referrerProfile == null) {
             Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
             return;
         }
