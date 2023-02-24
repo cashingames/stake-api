@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class StakersEmailOtpVerificationController extends BaseController
+class EmailOtpVerificationController extends BaseController
 {
     /**
      * Handle the incoming request.

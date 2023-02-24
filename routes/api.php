@@ -42,8 +42,8 @@ use App\Http\Controllers\GetStakersSessionController;
 use App\Http\Controllers\LiveTriviaEntrancePaymentController;
 use App\Http\Controllers\WithdrawWinningsController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
-use App\Http\Controllers\StakersSendOtpToEmailController;
-use App\Http\Controllers\StakersEmailOtpVerificationController;
+use App\Http\Controllers\SendOtpToEmailController;
+use App\Http\Controllers\EmailOtpVerificationController;
 use App\Http\Controllers\V3\GetGlobalLeaderboardController;
 
 Route::get('playground', PlayGroundController::class);
@@ -121,8 +121,8 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('contests', GetContestDetailsController::class);
         Route::get('contest/{id}', GetSingleContestController::class)->middleware(['cacheResponse:300']);
         Route::get('stakers/sessions/recent', GetStakersSessionController::class)->middleware(['cacheResponse:300']);
-        Route::post('stakers/email/verify', StakersEmailOtpVerificationController::class);
-        Route::post('stakers/otp/send', StakersSendOtpToEmailController::class);
+        Route::post('stakers/email/verify', EmailOtpVerificationController::class);
+        Route::post('stakers/otp/send', SendOtpToEmailController::class);
     }
 );
 

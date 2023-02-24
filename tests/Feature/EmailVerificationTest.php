@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Database\Seeders\UserSeeder;
 
-class StakersEmailVerificationTest extends TestCase
+class EmailVerificationTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -26,46 +26,46 @@ class StakersEmailVerificationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(UserSeeder::class);
+        User::factory()
+            ->count(1)
+            ->create(['email_verified_at' => null]);
         $this->user = User::first();
         $this->actingAs($this->user);
+        $this->withHeaders([
+            'x-brand-id' => 2
+        ]);
 
         Mail::fake();
     }
 
     public function test_stakers_email_verification_otp_can_be_sent()
     {
-        $this->withHeaders([
-            'x-brand-id' => 2
-        ])->post(self::SEND_TOKENL_URL);
+        $this->user->update(['otp_token' => null]);
+        $this->post(self::SEND_TOKENL_URL);
 
         Mail::assertSent(SendEmailOTP::class);
         $this->assertTrue(!is_null($this->user->otp_token));
     }
 
-    public function test_stakers_email_verification_can_be_verified()
-    {   
-        $this->user->update(['email_verified_at' => null]);
+    public function test_stakers_email_can_be_verified()
+    {
 
-        $this->withHeaders([
-            'x-brand-id' => 2
-        ])->postJson(self::VERIFY_TOKEN_URL,[
+        $this->postJson(self::VERIFY_TOKEN_URL, [
             'token' => $this->user->otp_token
         ]);
 
+        $this->user->refresh();
         $this->assertTrue(!is_null($this->user->email_verified_at));
     }
 
     public function test_stakers_email_verification_cannot_be_verified_with_wrong_otp()
-    {   
-        $this->user->update(['email_verified_at' => null]);
+    {
 
-        $this->withHeaders([
-            'x-brand-id' => 2
-        ])->postJson(self::VERIFY_TOKEN_URL,[
+        $this->postJson(self::VERIFY_TOKEN_URL, [
             'token' =>  mt_rand(10000, 99999)
         ]);
 
+        $this->user->refresh();
         $this->assertTrue(is_null($this->user->email_verified_at));
     }
 }
