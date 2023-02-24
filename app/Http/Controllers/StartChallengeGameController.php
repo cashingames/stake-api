@@ -76,8 +76,7 @@ class StartChallengeGameController extends  BaseController
     private function startFirstGame($category, $challengeId, $challengeGameSessionId)
     {
         $query = $category
-            ->questions()
-            ->where('is_published', true);
+            ->questions();
 
         $questions = $query->inRandomOrder()->take(10)->get()->shuffle();
         Log::info("About to log selected game questions for game session $challengeGameSessionId and user $this->user");

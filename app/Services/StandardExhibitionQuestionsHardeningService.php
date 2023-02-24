@@ -19,9 +19,9 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
     private function getEasyQuestions(string $categoryId): Collection
     {
 
-        return Category::find($categoryId)->questions()
-            ->where('is_published', true)
-            ->where('level', 'easy')
+        return Category::find($categoryId)
+            ->questions()
+            ->easy()
             ->inRandomOrder()->take(20)->get();
     }
 

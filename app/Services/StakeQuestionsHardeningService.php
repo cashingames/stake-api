@@ -15,16 +15,30 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        return $this->getHardQuestions($user, $categoryId);
+        $amountWonToday = $this->calculateAmountWonToday($user);
 
-        // return $this->getEasyQuestions($categoryId);
+        if ($amountWonToday > 2000) {
+            return $this->getHardQuestions($user, $categoryId);
+        } elseif ($amountWonToday > 500) {
+            return $this->getMediumQuestions($categoryId);
+        } else {
+            return $this->getEasyQuestions($categoryId);
+        }
     }
 
     private function getEasyQuestions(string $categoryId): Collection
     {
-        return Category::find($categoryId)->questions()
-            ->where('is_published', true)
-            ->where('level', 'easy')
+        return Category::find($categoryId)
+            ->questions()
+            ->easy()
+            ->inRandomOrder()->take(20)->get();
+    }
+
+    private function getMediumQuestions(string $categoryId): Collection
+    {
+        return Category::find($categoryId)
+            ->questions()
+            ->medium()
             ->inRandomOrder()->take(20)->get();
     }
 
@@ -33,9 +47,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
         $recentQuestions = $this->previouslySeenQuestionsInCategory($user, $categoryId);
 
-        return Category::find($categoryId)->questions()
-            ->where('is_published', true)
-            ->where('level', 'hard')
+        return Category::find($categoryId)
+            ->questions()
+            ->hard()
             ->whereNotIn('questions.id', $recentQuestions)
             ->inRandomOrder()->take(20)->get();
     }
@@ -48,16 +62,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
-// private function calculateAmountWonToday($user)
-// {
-//     $amountWon = $user->exhibitionStakingsToday()->sum('amount_won') -
-//         $user->exhibitionStakingsToday()->sum('amount_staked');
+    private function calculateAmountWonToday($user)
+    {
+        $todayStakes = $user->exhibitionStakingsToday();
 
-//     if ($amountWon < 0) {
-//         $amountWon = 0;
-//     }
-
-//     return $amountWon;
-// }
+        return $todayStakes->sum('amount_won') ?? 0 - $todayStakes->sum('amount_staked') ?? 0;
+    }
 
 }
