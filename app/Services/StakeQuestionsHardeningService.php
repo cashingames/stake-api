@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Determining Question Hardening odds of a user
@@ -16,6 +17,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $user = auth()->user();
 
         $amountWonToday = $this->calculateAmountWonToday($user);
+
+        Log::info('Amount won today: ' . $amountWonToday . ' for user: ' . $user->username);
 
         if ($amountWonToday > 2000) {
             return $this->getHardQuestions($user, $categoryId);
@@ -64,9 +67,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
     private function calculateAmountWonToday($user)
     {
-        $todayStakes = $user->exhibitionStakingsToday();
-
-        return $todayStakes->sum('amount_won') ?? 0 - $todayStakes->sum('amount_staked') ?? 0;
+        return $user->exhibitionStakingsToday()->sum('amount_won') -
+            $user->exhibitionStakingsToday()->sum('amount_staked');
     }
 
 }
