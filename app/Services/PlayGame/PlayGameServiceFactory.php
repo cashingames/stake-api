@@ -9,6 +9,7 @@ use App\Services\PlayGame\StakingChallengeGameService;
 use App\Services\PlayGame\StandardExhibitionGameService;
 use App\Services\PlayGame\LiveTriviaGameService;
 use App\Services\PlayGame\StandardChallengeGameService;
+use App\Services\PlayGame\GiftReferrerOnFirstGameService;
 
 class PlayGameServiceFactory
 {
@@ -56,6 +57,12 @@ class PlayGameServiceFactory
         $service = $this->getGame();
 
         return (object) $service->startGame($validatedRequest);
+    }
+
+    public function giftReferrerOnFirstGame()
+    {
+        $instance = new GiftReferrerOnFirstGameService();
+        $instance->gift();
     }
 
 }
