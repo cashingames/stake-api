@@ -28,7 +28,7 @@ class EmailVerificationTest extends TestCase
         parent::setUp();
         User::factory()
             ->count(1)
-            ->create(['email_verified_at' => null]);
+            ->create();
         $this->user = User::first();
         $this->actingAs($this->user);
         $this->withHeaders([
@@ -40,7 +40,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_stakers_email_verification_otp_can_be_sent()
     {
-        $this->user->update(['otp_token' => null]);
+        $this->user->update(['otp_token' => null, 'email_verified_at' => null]);
         $this->post(self::SEND_TOKENL_URL);
 
         Mail::assertSent(SendEmailOTP::class);
@@ -49,7 +49,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_stakers_email_can_be_verified()
     {
-
+        $this->user->update(['email_verified_at' => null]);
         $this->postJson(self::VERIFY_TOKEN_URL, [
             'token' => $this->user->otp_token
         ]);
@@ -60,7 +60,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_stakers_email_verification_cannot_be_verified_with_wrong_otp()
     {
-
+        $this->user->update(['email_verified_at' => null]);
         $this->postJson(self::VERIFY_TOKEN_URL, [
             'token' =>  mt_rand(10000, 99999)
         ]);
