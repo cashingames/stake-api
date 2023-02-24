@@ -63,6 +63,6 @@ class QuestionHardenerTest extends TestCase
 
             $this->assertEquals($this->category->id,  $questionCategory);
         }
-
     }
+   
 }
