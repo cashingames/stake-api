@@ -412,6 +412,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->transactions()->unsettled()->sum('amount');
     }
 
+    public function totalWithdrawals(){
+        return $this->transactions()->Withdrawals()->sum('amount');
+    }
+    
     public function userChallenges()
     {
         // return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges

@@ -44,6 +44,7 @@ class UserController extends BaseController
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->bookBalance = $this->user->bookBalance();
+        $result->totalWithdrawals = $this->user->totalWithdrawals();
         $result->badge = $this->user->achievement;
         $result->winRate = $this->user->win_rate;
         $result->totalChallenges = $this->user->challenges_played;
