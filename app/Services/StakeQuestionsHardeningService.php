@@ -15,8 +15,12 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        if ($this->calculateAmountWonToday($user) > 0) {
+        $amountWonToday = $this->calculateAmountWonToday($user);
+
+        if ($amountWonToday > 2000) {
             return $this->getHardQuestions($user, $categoryId);
+        } elseif ($amountWonToday > 500) {
+            return $this->getMediumQuestions($categoryId);
         } else {
             return $this->getEasyQuestions($categoryId);
         }
@@ -27,6 +31,14 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         return Category::find($categoryId)
             ->questions()
             ->easy()
+            ->inRandomOrder()->take(20)->get();
+    }
+
+    private function getMediumQuestions(string $categoryId): Collection
+    {
+        return Category::find($categoryId)
+            ->questions()
+            ->medium()
             ->inRandomOrder()->take(20)->get();
     }
 
@@ -54,7 +66,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $todayStakes = $user->exhibitionStakingsToday();
 
-        return $todayStakes->sum('amount_won') - $todayStakes->sum('amount_staked');
+        return $todayStakes->sum('amount_won') ?? 0 - $todayStakes->sum('amount_staked') ?? 0;
     }
 
 }
