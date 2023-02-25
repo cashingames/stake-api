@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Log;
 
 /**
  * Determining Question Hardening odds of a user
@@ -16,20 +16,33 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        $amountWonToday = $this->calculateAmountWonToday($user);
+        $percentWonToday = $this->getPercentageWonToday($user);
 
-        Log::info('Amount won today: ' . $amountWonToday . ' for user: ' . $user->username);
+        $questions = null;
 
-        if ($amountWonToday > 2000) {
-            return $this->getHardQuestions($user, $categoryId);
-        } elseif ($amountWonToday > 500) {
-            return $this->getMediumQuestions($categoryId);
+        if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
+            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        } elseif ($percentWonToday < 0.6) { //if user is losing 50% of the time
+            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        } elseif ($percentWonToday <= 1.1) { //if not really winning or losing (this handles new users)
+            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
+            $questions = $this->getEasyAndMediumRepeatedQuestions($user, $categoryId);
+        } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
+            $questions = $this->getNewMediumQuestions($user, $categoryId);
+        } elseif ($percentWonToday <= 2.1) { //if user is winning 100% of the time (if they have doubled their money)
+            $questions = $this->getNewHardQuestions($user, $categoryId);
+        } elseif ($percentWonToday > 2.1) { //if user is winning 200% of the time
+            $questions = $this->getImpossibleQuestions($user, $categoryId);
         } else {
-            return $this->getEasyQuestions($categoryId);
+            //notify admin
+            Log::info('No questions found for user: ' . $user->id);
         }
+
+        return $questions ?? $this->getEasyRepeatedQuestions($user, $categoryId);
     }
 
-    private function getEasyQuestions(string $categoryId): Collection
+    private function getRepeatedEasyQuestions(string $categoryId): Collection
     {
         return Category::find($categoryId)
             ->questions()
@@ -65,10 +78,16 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->latest('game_sessions.created_at')->take(1000)->pluck('question_id');
     }
 
-    private function calculateAmountWonToday($user)
+
+    private function getPercentageWonToday($user)
     {
-        return $user->exhibitionStakingsToday()->sum('amount_won') -
-            $user->exhibitionStakingsToday()->sum('amount_staked');
+        $todayStakes = $user->gameSessions()->exhibitionStaking()->today()->get();
+
+        $amountWon = $todayStakes->sum('amount_won') ?? 1;
+
+        $amountStaked = $todayStakes->sum('amount_staked') ?? 1;
+
+        return $amountWon / $amountStaked;
     }
 
 }
