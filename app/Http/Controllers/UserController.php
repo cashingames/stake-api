@@ -2,13 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
-use App\Models\UserQuiz;
-use App\Models\OnlineTimeline;
 use App\Models\User;
-use App\Models\WalletTransaction;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class UserController extends BaseController
@@ -16,9 +11,6 @@ class UserController extends BaseController
 
     public function profile()
     {
-
-        Log::info('Showing the user profile for user: ' . $this->user->username);
-
         $result = new stdClass;
         $result->username = $this->user->username;
         $result->email = $this->user->email;

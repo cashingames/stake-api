@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class LogLastActivityTime
 {
@@ -20,12 +19,11 @@ class LogLastActivityTime
         if (auth()->guest()){
             return $next($request);
         }
-        
-        // auth()->user()->update(['last_activity_time' => now()]);
+
         $user = auth()->user();
         $user->last_activity_time = now();
         $user->save();
-        Log::info("last user activity time for $user->username is: " . now());
+
         return $next($request);
         
     }

@@ -7,7 +7,6 @@ use App\Models\ExhibitionStaking;
 use App\Models\Staking;
 use App\Models\User;
 use App\Models\WalletTransaction;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -53,7 +52,6 @@ class StakingService
             'user_id' => $this->user->id //@TODO remove from exhibition staking, not in use
         ]);
 
-        Log::info($stakingAmount . ' staking made for ' . $this->user->username);
         return $staking->id;
     }
 

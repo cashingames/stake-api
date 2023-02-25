@@ -36,7 +36,7 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        Log::info("Response sent to Frontend for  "
+        Log::info("API Response success "
             . $this->user?->username . " from endpoint  "
             .  url()->current() . " response " . json_encode($result));
 
@@ -52,7 +52,7 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        Log::info("Response sent to Frontend for  "
+        Log::info("API Response error "
             .  $this->user?->username . " from endpoint  "
             . url()->current() . " response " . json_encode($errors));
 

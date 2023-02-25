@@ -15,7 +15,6 @@ class FrontEndLogsController extends BaseController
      */
     public function __invoke(Request $request)
     {
-        Log::channel('frontendLogs')->info($request->message, $request->data);
-        return $this->sendResponse('message logged', 'message logged');
+        Log::channel('frontendLogs')->info('Frontend received:' . $request->message, $request->data);
     }
 }

@@ -33,7 +33,6 @@ class TriggerLiveTriviaNotification extends Command
     public function handle()
     {
         
-        Log::info("called at " . now());
         $activeLiveTrivia = LiveTrivia::active()->first();
 
         if (is_null($activeLiveTrivia)) {

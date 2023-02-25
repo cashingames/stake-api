@@ -101,7 +101,6 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
             'user_id' => $this->user->id //@TODO remove from exhibition staking, not in use
         ]);
 
-        Log::info($stakingAmount . ' staking made for ' . $this->user->username);
         return $staking->id;
     }
 
