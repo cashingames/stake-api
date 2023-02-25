@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QuestionLevel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -65,17 +66,27 @@ class Question extends Model
 
   public function scopeEasy()
   {
-    return $this->whereLevel('easy');
+    return $this->whereLevel(QuestionLevel::Easy);
+  }
+
+  public function scopeEasyOrMedium()
+  {
+    return $this->whereLevel(QuestionLevel::Easy)->orWhere('level', QuestionLevel::Medium);
   }
 
   public function scopeMedium()
   {
-    return $this->whereLevel('medium');
+    return $this->whereLevel(QuestionLevel::Medium);
   }
 
   public function scopeHard()
   {
-    return $this->whereLevel('hard');
+    return $this->whereLevel(QuestionLevel::Hard);
+  }
+
+  public function scopeExpert()
+  {
+    return $this->whereLevel(QuestionLevel::Expert);
   }
 
   public function getLevelAttribute($value)

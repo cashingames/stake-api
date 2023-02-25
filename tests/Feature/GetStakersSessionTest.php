@@ -20,15 +20,7 @@ class GetStakersSessionTest extends TestCase
     {
         parent::setUp();
 
-        $profiles = Profile::factory()
-            ->count(4)
-            ->create();
-
-        $this->stakingSessionsSetup($profiles->find(1), 7, 50, 0); //less than staked
-        $this->stakingSessionsSetup($profiles->find(2), 7, 50, 150); //more than staked
-        $this->stakingSessionsSetup($profiles->find(3), 7, 50, 50); //equal to staked
-        $this->stakingSessionsSetup($profiles->find(4), 2, 50, 150); //more than staked and low score
-
+        
         config(['features.exhibition_game_staking.enabled' => true]);
     }
 
@@ -53,7 +45,18 @@ class GetStakersSessionTest extends TestCase
 
     public function test_recent_staking_winners_won_more_than_staked()
     {
-        $user = User::factory()->create();
+        Profile::factory()
+            ->count(4)
+            ->create();
+
+        $profiles = Profile::all();
+        $this->stakingSessionsSetup($profiles->find(1), 7, 50, 0); //less than staked
+        $this->stakingSessionsSetup($profiles->find(2), 7, 50, 150); //more than staked
+        $this->stakingSessionsSetup($profiles->find(3), 7, 50, 50); //equal to staked
+        $this->stakingSessionsSetup($profiles->find(4), 2, 50, 150); //more than staked and low score
+
+
+        $user = $profiles->first()->user;
         $response = $this->actingAs($user)->get('/api/v3/stakers/sessions/recent');
         $response->assertJsonCount(2, '*');
 
