@@ -55,6 +55,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
 
     protected $appends = [
@@ -79,6 +80,11 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function getIsAdminAttribute()
+    {
+        return $this->username == 'oyekunmi' || $this->username == 'zee';
     }
 
     public function profile()

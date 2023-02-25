@@ -8,6 +8,7 @@ use App\Services\SMS\TermiiService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Services\SMS\SMSProviderInterface;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,5 +37,13 @@ class AppServiceProvider extends ServiceProvider
             ClientPlatform::class,
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id'))
         );
+
+        LogViewer::auth(function ($request) {
+            if (auth()->guest()) {
+                return false;
+            }
+
+            return auth()->user()->is_admin;
+        });
     }
 }
