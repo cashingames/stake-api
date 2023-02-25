@@ -210,10 +210,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $todayStakes = $user->gameSessions()
             ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
+            ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
             ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
 
-        $amountStaked = $todayStakes->sum('amount_staked') ?? 1;
-        $amountWon = $todayStakes->sum('amount_won') ?? 1;
+        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 1;
+        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 1;
 
         if ($amountStaked == 0 || $amountWon == 0) {
             return 1;
