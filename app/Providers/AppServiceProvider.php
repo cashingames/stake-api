@@ -38,12 +38,12 @@ class AppServiceProvider extends ServiceProvider
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id'))
         );
 
-        LogViewer::auth(function ($request) {
-            if (auth()->guest()) {
-                return false;
-            }
-
-            return auth()->user()->is_admin;
-        });
+        // LogViewer::auth(function ($request) {
+        //     return $request->user()
+        //         && in_array($request->user()->email, [
+        //             'oyekunmi@gmail.com',
+        //             'zubbybrightson@gmail.com'
+        //         ]);
+        // });
     }
 }
