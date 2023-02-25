@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\GameSessionStatus;
 
 class GameSession extends Model
 {
@@ -44,11 +45,13 @@ class GameSession extends Model
         return $this->belongsTo(LiveTrivia::class, 'trivia_id');
     }
 
-    public function scopeCompleted($query){
-        return $query->where('state', 'COMPLETED');
+    public function scopeCompleted($query)
+    {
+        return $query->whereState(GameSessionStatus::COMPLETED);
     }
 
-    public function odds(){
+    public function odds()
+    {
         return $this->hasMany(GameSessionOdd::class, 'game_session_id', 'id');
     }
 

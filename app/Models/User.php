@@ -218,26 +218,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Challenge::class);
     }
 
-    public function stakings()
-    {
-        return $this->hasMany(Staking::class);
-    }
-
-    public function exhibitionStakings()
-    {
-        return DB::table('stakings')->where('user_id', $this->id)
-            ->join('exhibition_stakings', function ($join) {
-                $join->on('exhibition_stakings.staking_id', '=', 'stakings.id');
-            });
-    }
-
-    public function exhibitionStakingsToday()
-    {
-        return $this->exhibitionStakings()
-            ->where('exhibition_stakings.created_at', '>=', now()->startOfDay())
-            ->where('exhibition_stakings.created_at', '<=', now()->endOfDay());
-    }
-
     public function points()
     {
         $pointsAdded = UserPoint::where('user_id', $this->id)
@@ -418,15 +398,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function userChallenges()
     {
-        // return  DB::select('SELECT challenges.id, u.username, o.username as opponentUsername, categories.name, challenges.status, challenges.created_at FROM challenges
-        // INNER JOIN categories on categories.id = challenges.category_id
-        // INNER JOIN users u on u.id = challenges.user_id
-        // INNER JOIN users o on o.id = challenges.opponent_id
-        // WHERE u.id = ? or o.id = ?
-        // ORDER BY challenges.created_at DESC
-        // LIMIT 10
-
-        // ', [$this->id, $this->id]);
 
         return DB::table('challenges')
             ->join('categories', 'categories.id', '=', 'challenges.category_id')

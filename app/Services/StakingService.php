@@ -46,11 +46,11 @@ class StakingService
             $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
             $odd = $oddMultiplier['oddsMultiplier'];
         }
-       
+
         $staking = Staking::create([
-            'user_id' => $this->user->id,
             'amount_staked' => $stakingAmount,
-            'odd_applied_during_staking' => $odd
+            'odd_applied_during_staking' => $odd,
+            'user_id' => $this->user->id //@TODO remove from exhibition staking, not in use
         ]);
 
         Log::info($stakingAmount . ' staking made for ' . $this->user->username);
@@ -72,6 +72,10 @@ class StakingService
             'staking_id' => $stakingId,
             'user_id' => Staking::find($stakingId)->user_id
         ]);
+    }
+
+    public function getRecentStakingSessions()
+    {
     }
 
 }

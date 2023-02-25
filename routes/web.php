@@ -15,15 +15,6 @@ use App\Http\Controllers\RedirectUnverifiedUserController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/salient-testing', function () {
-    return view('welcome');
-});
-
-Route::get('/debug-sentry', function () {
-    throw new Exception('Sentry error!');
-});
-
 Route::get('/redirect-respond-to-challenge', function () {
     return view('redirectToRespondToChallenge');
 });

@@ -32,7 +32,7 @@ return [
     |
     */
 
-    'route_path' => 'logs',
+    'route_path' => 'vahsnascsasbkasakbsasbk',
 
     /*
     |--------------------------------------------------------------------------

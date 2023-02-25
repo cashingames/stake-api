@@ -2,10 +2,6 @@
 
 namespace App\Http\ResponseHelpers;
 
-use App\Enums\FeatureFlags;
-use App\Models\GameSession;
-use App\Services\FeatureFlag;
-use App\Models\ExhibitionStaking;
 use App\Traits\Utils\AvatarUtils;
 
 class RecentStakersResponse

@@ -14,7 +14,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class GetV3GlobalWeeklyLeaderboardTest extends TestCase
+class GetV3GlobalLeaderboardTest extends TestCase
 {
     use RefreshDatabase;
 

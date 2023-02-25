@@ -58,11 +58,12 @@ class QuestionHardenerTest extends TestCase
             $this->assertEmpty($questions);
         }
 
-        if (array_unique($questionCategories) === array($this->category->id)) {
+        if (array_unique($questionCategories) == array($this->category->id)) {
             $questionCategory = $this->category->id;
-
-            $this->assertEquals($this->category->id,  $questionCategory);
+            $this->assertEquals($this->category->id, $questionCategory);
         }
+
+        $this->assertNotEmpty($questionCategories);
     }
    
 }

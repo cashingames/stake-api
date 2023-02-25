@@ -27,6 +27,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
+        "brianium/paratest": "^6.8",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
@@ -62,6 +63,9 @@
         ],
         "local": [
             "@php artisan serve --host=0.0.0.0 --port=8000"
+        ],
+        "test": [
+            "php artisan test --parallel --recreate-databases --coverage"
         ]
     },
     "extra": {

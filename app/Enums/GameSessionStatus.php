@@ -9,4 +9,5 @@ enum GameSessionStatus: string
     case PENDING = 'PENDING';
     case DECLINED = 'DECLINED';
     case EXPIRED = 'EXPIRED';
+    case COMPLETED = 'COMPLETED';
 }

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\ResponseHelpers\RecentStakersResponse;
-use App\Models\ExhibitionStaking;
-use App\Models\Staking;
 use Illuminate\Support\Facades\DB;
 
 class GetStakersSessionController extends BaseController
@@ -25,8 +23,7 @@ class GetStakersSessionController extends BaseController
                 'game_sessions.correct_count as correct_count',
                 'stakings.created_at as created_at',
             )
-            ->where('game_sessions.correct_count', '>=', 5)
-            ->whereColumn('stakings.amount_won', '>', DB::raw('stakings.amount_staked * 2'))
+            ->whereColumn('stakings.amount_won', '>', 'stakings.amount_staked')
             ->groupBy('users.id')
             ->orderByDesc('game_sessions.created_at')
             ->orderByDesc('game_sessions.correct_count')

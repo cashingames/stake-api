@@ -20,29 +20,29 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
         $questions = null;
 
-        if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
-            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
-        } elseif ($percentWonToday < 0.6) { //if user is losing 50% of the time
-            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
-        } elseif ($percentWonToday <= 1.1) { //if not really winning or losing (this handles new users)
-            $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
-        } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
-            $questions = $this->getEasyAndMediumRepeatedQuestions($user, $categoryId);
-        } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
-            $questions = $this->getNewMediumQuestions($user, $categoryId);
-        } elseif ($percentWonToday <= 2.1) { //if user is winning 100% of the time (if they have doubled their money)
-            $questions = $this->getNewHardQuestions($user, $categoryId);
-        } elseif ($percentWonToday > 2.1) { //if user is winning 200% of the time
-            $questions = $this->getImpossibleQuestions($user, $categoryId);
-        } else {
-            //notify admin
-            Log::info('No questions found for user: ' . $user->id);
-        }
+        // if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
+        //     $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        // } elseif ($percentWonToday < 0.6) { //if user is losing 50% of the time
+        //     $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        // } elseif ($percentWonToday <= 1.1) { //if not really winning or losing (this handles new users)
+        //     $questions = $this->getEasyRepeatedQuestions($user, $categoryId);
+        // } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
+        //     $questions = $this->getEasyAndMediumRepeatedQuestions($user, $categoryId);
+        // } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
+        //     $questions = $this->getNewMediumQuestions($user, $categoryId);
+        // } elseif ($percentWonToday <= 2.1) { //if user is winning 100% of the time (if they have doubled their money)
+        //     $questions = $this->getNewHardQuestions($user, $categoryId);
+        // } elseif ($percentWonToday > 2.1) { //if user is winning 200% of the time
+        //     $questions = $this->getImpossibleQuestions($user, $categoryId);
+        // } else {
+        //     //notify admin
+        //     Log::info('No questions found for user: ' . $user->id);
+        // }
 
         return $questions ?? $this->getEasyRepeatedQuestions($user, $categoryId);
     }
 
-    private function getRepeatedEasyQuestions(string $categoryId): Collection
+    private function getEasyRepeatedQuestions($user, string $categoryId): Collection
     {
         return Category::find($categoryId)
             ->questions()
@@ -81,11 +81,16 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
     private function getPercentageWonToday($user)
     {
-        $todayStakes = $user->gameSessions()->exhibitionStaking()->today()->get();
-
-        $amountWon = $todayStakes->sum('amount_won') ?? 1;
+        $todayStakes = $user->gameSessions()
+            ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
+            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
 
         $amountStaked = $todayStakes->sum('amount_staked') ?? 1;
+        $amountWon = $todayStakes->sum('amount_won') ?? 1;
+
+        if ($amountStaked == 0 || $amountWon == 0) {
+            return 1;
+        }
 
         return $amountWon / $amountStaked;
     }
