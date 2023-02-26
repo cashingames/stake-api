@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\ClientPlatform;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 
 class ResetPasswordController extends BaseController
 {
@@ -22,15 +24,29 @@ class ResetPasswordController extends BaseController
 
     // use ResetsPasswords;
 
-    public function reset(Request $request)
+    public function reset(Request $request,  ClientPlatform $platform)
     {
 
         $data = $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'email' => ['email', 'required'],
+            'email' => ['email', Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))],
+            'phone' => ['string', Rule::requiredIf(fn () => ($platform == ClientPlatform::StakingMobileWeb))],
             'code' => ['string', 'required']
         ]);
 
+        if ($platform == ClientPlatform::StakingMobileWeb) {
+
+            $user = User::where('phone_number', $data['phone'])->first();
+
+            if (!is_null($user)) {
+             
+                $user->password = bcrypt($data['password']);
+                $user->save();
+
+                return $this->sendResponse("Password reset successful.", 'Password reset successful');
+            }
+            return $this->sendError("Phone number does not exist", "Phone number does not exist");
+        }
 
         $user = User::where('email', $data['email'])->first();
 
