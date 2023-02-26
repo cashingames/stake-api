@@ -86,7 +86,7 @@ class Question extends Model
 
   public function scopeExpert()
   {
-    return $this->whereLevel(QuestionLevel::Expert);
+    return $this->whereLevel(QuestionLevel::Hard);
   }
 
   public function getLevelAttribute($value)

@@ -91,7 +91,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
             $oddMultiplierComputer = new StakingOddsComputer();
-            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
+            $oddMultiplier = $oddMultiplierComputer->compute($this->user);
             $odd = $oddMultiplier['oddsMultiplier'];
         }
 

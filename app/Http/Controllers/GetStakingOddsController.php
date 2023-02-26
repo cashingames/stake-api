@@ -32,7 +32,7 @@ class GetStakingOddsController extends BaseController
 
         $allStakingOddsWithOddsMultiplierApplied = [];
         $oddMultiplierComputer = new StakingOddsComputer();
-        $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
+        $oddMultiplier = $oddMultiplierComputer->compute($this->user);
 
         foreach ($stakingOdds as $odd) {
             $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);

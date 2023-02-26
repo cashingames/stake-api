@@ -40,12 +40,6 @@ class StakingService
 
         $odd = 1;
 
-        if ($this->mode == 'exhibition') {
-            $oddMultiplierComputer = new StakingOddsComputer();
-            $oddMultiplier = $oddMultiplierComputer->compute($this->user, $this->user->getAverageStakingScore());
-            $odd = $oddMultiplier['oddsMultiplier'];
-        }
-
         $staking = Staking::create([
             'amount_staked' => $stakingAmount,
             'odd_applied_during_staking' => $odd,
@@ -55,14 +49,6 @@ class StakingService
         return $staking->id;
     }
 
-    public function createExhibitionStaking($stakingId, $gameSessionId)
-    {
-        return ExhibitionStaking::create([
-            'game_session_id' => $gameSessionId,
-            'staking_id' => $stakingId
-        ]);
-    }
-
     public function createChallengeStaking($stakingId, $challengeId)
     {
         return ChallengeStaking::create([
@@ -70,10 +56,6 @@ class StakingService
             'staking_id' => $stakingId,
             'user_id' => Staking::find($stakingId)->user_id
         ]);
-    }
-
-    public function getRecentStakingSessions()
-    {
     }
 
 }

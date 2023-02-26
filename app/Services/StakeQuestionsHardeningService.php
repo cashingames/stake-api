@@ -23,31 +23,25 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         // if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
         //     $questions = $this->getRepeatedEasyQuestions($user, $categoryId);
         // } else
-        if ($percentWonToday < 0.6) { //if user is losing 50% of the time
+        if ($percentWonToday < 0.6 || $this->isNewUser($user)) { //if user is losing 50% of the time
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
                 ['user' => $user->username, 'percentWonToday' => $percentWonToday]
             );
-        } elseif ($percentWonToday <= 1.1) { //if not really winning or losing (this handles new users)
-            $questions = $this->getNewAndRepeatedEasyQuestion($category);
-            Log::info(
-                'Serving getNewAndRepeatedEasyQuestion',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
-            );
-        } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
+        } elseif ($percentWonToday <= 1) { //if not really winning or losing
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
                 ['user' => $user->username, 'percentWonToday' => $percentWonToday]
             );
-        } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
+        } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
             $questions = $this->getMediumQuestions($user, $category);
             Log::info(
                 'Serving getMediumQuestions',
                 ['user' => $user->username, 'percentWonToday' => $percentWonToday]
             );
-        } elseif ($percentWonToday <= 2.1) { //if user is winning 100% of the time (if they have doubled their money)
+        } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
             $questions = $this->getHardQuestions($user, $category);
             Log::info(
                 'Serving getHardQuestions',
@@ -81,6 +75,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->inRandomOrder()
             ->take(20)
             ->get();
+    }
+
+    private function isNewUser($user): bool
+    {
+        return $user->gameSessions()->count() <= 3;
     }
 
 
@@ -178,7 +177,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
      */
     private function getExpertQuestions($user, Category $category): Collection
     {
-        $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Expert);
+        $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Hard);
 
         return $category
             ->questions()

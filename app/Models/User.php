@@ -314,15 +314,6 @@ class User extends Authenticatable implements JWTSubject
         return $lastTwoGamesAverage;
     }
 
-    public function getAverageStakingScore()
-    {
-        return $this->gameSessions()
-            ->completed()
-            ->latest()
-            ->limit(2)
-            ->get()
-            ->avg('correct_count');
-    }
 
     public function getWinRateAttribute()
     {
