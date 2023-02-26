@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Http\Requests\StartSinglePlayerRequest;
-use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
+use App\Models\GameSession;
 use App\Enums\GameType;
+use App\Http\Requests\StartSinglePlayerRequest;
 use App\Services\PlayGame\PlayGameServiceFactory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use stdClass;
 
@@ -33,9 +36,12 @@ class StartSinglePlayerGameController extends BaseController
             );
         }
 
+        // $gameService->giftReferrerOnFirstGame();
+
         $result = $this->formatResponse($startResponse->gameSession, $startResponse->questions);
         return $this->sendResponse($result, 'Game Started');
     }
+
 
     private function formatResponse($gameSession, $questions): array
     {

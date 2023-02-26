@@ -54,8 +54,6 @@ class PlayGameServiceFactory
     public function startGame(\stdClass $validatedRequest): \stdClass
     {
         $service = $this->getGame();
-
         return (object) $service->startGame($validatedRequest);
     }
-
 }

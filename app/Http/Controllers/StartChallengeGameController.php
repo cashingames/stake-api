@@ -23,7 +23,7 @@ class StartChallengeGameController extends  BaseController
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request)
-    {   
+    {
         $request->validate([
             'category' => ['required'],
             'type' => ['required'],
@@ -51,12 +51,12 @@ class StartChallengeGameController extends  BaseController
             $challengeGameSession->state = "ONGOING";
             $challengeGameSession->save();
         }
-        
+
 
         //check for questions if the questions has been added for that challengeid
         $findQuestions = ChallengeQuestion::where('challenge_id', $request->challenge_id);
         $questions = [];
-        
+
         if ($findQuestions->get()->isEmpty()) {
             $questions = $this->startFirstGame($category, $request->challenge_id, $challengeGameSession->id);
         } else {
@@ -101,7 +101,7 @@ class StartChallengeGameController extends  BaseController
     private function startSecondGame($category, $findQuestions, $challengeId, $challengeGameSessionId)
     {
         $qstArray = $findQuestions->pluck('question_id')->toArray();
-        //$unsortIds = implode(',', $qstArray); 
+        //$unsortIds = implode(',', $qstArray);
         Log::info("About to log selected game questions for game session $challengeGameSessionId and user $this->user");
         $data = [];
         foreach ($findQuestions->get() as $question) {
