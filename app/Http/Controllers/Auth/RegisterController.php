@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
@@ -67,18 +69,28 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+
+    protected function validator(array $data, $platform)
     {
         return Validator::make($data, [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string','alpha_num', 'max:255', 'unique:users'],
+
+            'first_name' => [
+                'string', 'string', 'max:255',
+                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+            ],
+            'last_name' => [
+                'string', 'string', 'max:255',
+                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+            ],
+            'username' => [
+                'string', 'string', 'alpha_num', 'max:255', 'unique:users',
+                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+            ],
             'country_code' => ['required', 'string', 'max:4'],
             'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username'],
-            // 'g-recaptcha-response' => 'required|recaptchav3:register_action,0.5'
+            'referrer' => ['nullable', 'string', 'exists:users,username']
         ]);
     }
 
@@ -88,14 +100,16 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \App\User
      */
-    protected function create(array $data)
+    protected function create(array $data, $platform)
     {
 
         //create the user
 
         $user =
             User::create([
-                'username' => $data['username'],
+                'username' => $platform !== ClientPlatform::StakingMobileWeb
+                    ? $data['username']
+                    : uniqid("CG-"),
                 'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
                 'email' => $data['email'],
@@ -109,9 +123,9 @@ class RegisterController extends BaseController
         $user
             ->profile()
             ->create([
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'referral_code' => $data['username'],
+                'first_name' =>  $data['first_name'] ?? null,
+                'last_name' => $data['last_name'] ?? null,
+                'referral_code' => $data['username'] ?? $user->username,
                 'referrer' => $data['referrer'] ?? null,
             ]);
 
@@ -169,23 +183,11 @@ class RegisterController extends BaseController
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
-            $referrerId = 0;
-            // $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
-
-            // if ($profileReferral == null) {
-            //     $profileReferral = User::where('username', $data["referrer"])->first();
-            //     $referrerId = $profileReferral->id;
-            // } else {
-            //     $referrerId = $profileReferral->user_id;
-            // }
 
             $profileReferral = User::where('username', $data["referrer"])->first();
             if ($profileReferral != null) {
                 Event::dispatch(new AchievementBadgeEvent($profileReferral, "REFERRAL", null));
             }
-
-            /** @TODO: this needs to be changed to plan */
-            // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
         return $user;
     }
@@ -197,8 +199,11 @@ class RegisterController extends BaseController
      * @param mixed $user
      * @return mixed
      */
-    protected function registered(Request $request, SMSProviderInterface $smsService, $user)
-    {
+    protected function registered(
+        Request $request,
+        SMSProviderInterface $smsService,
+        $user
+    ) {
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
             try {
                 $smsService->deliverOTP($user);
@@ -233,19 +238,24 @@ class RegisterController extends BaseController
         return $this->sendResponse($result, 'Account created successfully');
     }
 
-    public function register(Request $request, SMSProviderInterface $smsService)
-    {
-        $this->validator($request->all())->validate();
+    public function register(
+        Request $request,
+        SMSProviderInterface $smsService,
+        ClientPlatform $platform
+    ) {
+        $this->validator($request->all(), $platform)->validate();
 
-        $user = $this->create($request->all());
+        $user = $this->create($request->all(), $platform);
 
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
     }
 
-    public function resendOTP(Request $request, SMSProviderInterface $smsService)
-    {
+    public function resendOTP(
+        Request $request,
+        SMSProviderInterface $smsService
+    ) {
         $this->validate($request, [
             'username' => ['required', 'exists:users,username']
         ]);
