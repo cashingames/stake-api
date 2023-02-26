@@ -9,14 +9,13 @@ use App\Services\PlayGame\StakingChallengeGameService;
 use App\Services\PlayGame\StandardExhibitionGameService;
 use App\Services\PlayGame\LiveTriviaGameService;
 use App\Services\PlayGame\StandardChallengeGameService;
-use App\Services\PlayGame\ReferralService;
 
 class PlayGameServiceFactory
 {
 
     private GameType $gameType;
 
-    public function __construct(GameType $gameType, ReferralService $referralService)
+    public function __construct(GameType $gameType)
     {
         $this->gameType = $gameType;
     }
