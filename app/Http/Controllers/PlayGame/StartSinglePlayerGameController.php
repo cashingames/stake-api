@@ -36,8 +36,6 @@ class StartSinglePlayerGameController extends BaseController
             );
         }
 
-        // $gameService->giftReferrerOnFirstGame();
-
         $result = $this->formatResponse($startResponse->gameSession, $startResponse->questions);
         return $this->sendResponse($result, 'Game Started');
     }

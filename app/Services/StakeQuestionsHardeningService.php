@@ -39,31 +39,51 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
             );
         } elseif ($percentWonToday <= 1) { //if not really winning or losing
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
             );
         } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
             $questions = $this->getMediumQuestions($user, $category);
             Log::info(
                 'Serving getMediumQuestions',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
             );
         } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
             $questions = $this->getHardQuestions($user, $category);
             Log::info(
                 'Serving getHardQuestions',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
             );
         } elseif ($percentWonToday > 2.1) { //if user is winning 100% of the time
             $questions = $this->getExpertQuestions($user, $category);
             Log::info(
                 'Serving getExpertQuestions',
-                ['user' => $user->username, 'percentWonToday' => $percentWonToday]
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
             );
         } else {
             //notify admin
@@ -241,8 +261,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
         $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
-        if ($amountStaked == 0 || $amountWon == 0) {
-            return 0;
+        if ($amountStaked == 0) {
+            return 1;
         }
 
         return 1 - ($amountWon / $amountStaked);
