@@ -15,7 +15,6 @@ use App\Services\StakingOddsComputer;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class StakingExhibitionGameService implements PlayGameServiceInterface
@@ -89,6 +88,9 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         $odd = 1;
 
+        /**
+         * @TODO Rename to dynamic staking odds
+         */
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
             $oddMultiplierComputer = new StakingOddsComputer();
             $oddMultiplier = $oddMultiplierComputer->compute($this->user);

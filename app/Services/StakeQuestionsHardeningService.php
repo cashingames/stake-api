@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\QuestionLevel;
 use App\Models\Category;
+use App\Models\Staking;
 use Illuminate\Support\Collection;
 use Log;
 
@@ -17,9 +18,20 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
         $category = Category::find($categoryId);
-        $percentWonToday = $this->getPercentageWonToday($user);
+        $platformProfitToday = $this->getPlatformProfitToday();
         $questions = null;
 
+
+        if ($platformProfitToday < 0.2) { //if platform is not winning up to 20% of amount staked today
+            Log::info(
+                'Serving getHardQuestions',
+                ['user' => $user->username, 'platformProfitToday' => $platformProfitToday]
+            );
+            return $this->getHardQuestions($user, $category);
+        }
+
+
+        $percentWonToday = $this->getPercentageWonToday($user);
         // if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
         //     $questions = $this->getRepeatedEasyQuestions($user, $categoryId);
         // } else
@@ -47,7 +59,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'Serving getHardQuestions',
                 ['user' => $user->username, 'percentWonToday' => $percentWonToday]
             );
-        } elseif ($percentWonToday > 2.1) { //if user is winning 200% of the time
+        } elseif ($percentWonToday > 2.1) { //if user is winning 100% of the time
             $questions = $this->getExpertQuestions($user, $category);
             Log::info(
                 'Serving getExpertQuestions',
@@ -212,14 +224,28 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
             ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
 
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 1;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 1;
+        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
+        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
         if ($amountStaked == 0 || $amountWon == 0) {
             return 1;
         }
 
         return $amountWon / $amountStaked;
+    }
+
+    private function getPlatformProfitToday()
+    {
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'));
+
+        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
+        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
+
+        if ($amountStaked == 0 || $amountWon == 0) {
+            return 0;
+        }
+
+        return 1 - ($amountWon / $amountStaked);
     }
 
 }

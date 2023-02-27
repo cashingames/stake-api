@@ -209,10 +209,7 @@ class RegisterController extends BaseController
             try {
                 $smsService->deliverOTP($user);
             } catch (\Throwable $th) {
-                //throw $th;
-                //send mail to our admin to notify of inability to deliver SMS via OTP
                 Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                // return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
             }
         }
         if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
@@ -225,7 +222,6 @@ class RegisterController extends BaseController
 
                 return $this->sendResponse($token, 'Token');
             }
-            // return $this->sendResponse("Verification Email Sent", 'Verification Email Sent');
         }
 
 

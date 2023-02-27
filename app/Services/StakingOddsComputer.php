@@ -6,7 +6,6 @@ use App\Models\StakingOddsRule;
 use App\Models\User;
 use App\Traits\Utils\DateUtils;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class StakingOddsComputer
 {
