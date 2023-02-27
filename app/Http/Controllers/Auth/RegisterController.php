@@ -116,7 +116,8 @@ class RegisterController extends BaseController
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
                 'is_on_line' => true,
-                'country_code' => $data['country_code']
+                'country_code' => $data['country_code'],
+                'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
         //create the profile

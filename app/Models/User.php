@@ -33,7 +33,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp_token',
         'country_code',
-        'source',
+        'brand_id',
         'email_verified_at',
         'last_activity_time'
     ];
