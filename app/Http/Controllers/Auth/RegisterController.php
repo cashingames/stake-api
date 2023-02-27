@@ -109,7 +109,7 @@ class RegisterController extends BaseController
             User::create([
                 'username' => $platform !== ClientPlatform::StakingMobileWeb
                     ? $data['username']
-                    : uniqid("CG-"),
+                    :strstr($data['email'], '@', true). mt_rand(1000, 9999),
                 'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
                 'email' => $data['email'],
