@@ -271,4 +271,47 @@ class RegisterTest extends TestCase
             'country_code' => '+234',
         ]);
     }
+
+    public function test_test_brand_id_can_be_inserted_stakers_app()
+    {
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'country_code' => '+234',
+            'brand_id' => 2
+        ]);
+    }
+
+    public function test_test_brand_id_can_be_inserted_in_fun_app()
+    {
+
+        $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'janeDoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'country_code' => '+234',
+            'brand_id' => 1
+        ]);
+    }
 }
