@@ -39,7 +39,9 @@ class RegisterTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(UserSeeder::class);
+        User::factory()
+            ->count(1)
+            ->create();
         $this->seed(BoostSeeder::class);
         $this->user = User::first();
         Mail::fake();
@@ -121,25 +123,25 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
     }
 
-     /** @test */
-     public function username_cannot_contain_special_characters()
-     {
- 
-         $response = $this->postjson(self::REGISTER_URL, [
-             'first_name' => "New",
-             'last_name' => "User",
-             'username' => 'user@$*1',
-             'phone_number' => '88838383844',
-             'email' => 'email@user.com',
-             'password' => 'password',
-             'password_confirmation' => 'password',
-             'country_code' => '+234'
- 
-         ]);
+    /** @test */
+    public function username_cannot_contain_special_characters()
+    {
+
+        $response = $this->postjson(self::REGISTER_URL, [
+            'first_name' => "New",
+            'last_name' => "User",
+            'username' => 'user@$*1',
+            'phone_number' => '88838383844',
+            'email' => 'email@user.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'country_code' => '+234'
+
+        ]);
         $response->assertJsonFragment([
             'message' => 'The username must only contain letters and numbers.',
         ]);
-     }
+    }
 
     /** @test */
     public function a_user_cannot_register_with_existing_username_email_or_phone_number()
@@ -169,14 +171,14 @@ class RegisterTest extends TestCase
             'last_name' => 'Doe',
             'username' => 'jaydoe',
             'country_code' => '+234',
-            'phone_number' => '0'.$this->user->phone_number,
+            'phone_number' => '0' . $this->user->phone_number,
             'email' => 'email@email.com',
             'password' => 'password',
             'password_confirmation' => 'password'
 
         ]);
 
-        
+
 
         $response->assertJson([
             'message' => 'The phone number has been taken, contact support',
@@ -248,5 +250,68 @@ class RegisterTest extends TestCase
 
 
         $response->assertOk();
+    }
+
+    public function test_a_user_can_register_without_first_and_last_name_and_username_from_stakers_app()
+    {
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+
+        $this->assertDatabaseHas('users', [
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'country_code' => '+234',
+        ]);
+    }
+
+    public function test_test_brand_id_can_be_inserted_stakers_app()
+    {
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'country_code' => '+234',
+            'brand_id' => 2
+        ]);
+    }
+
+    public function test_test_brand_id_can_be_inserted_in_fun_app()
+    {
+
+        $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'janeDoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'country_code' => '+234',
+            'brand_id' => 1
+        ]);
     }
 }

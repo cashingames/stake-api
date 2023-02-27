@@ -25,6 +25,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\PlayGame\PlayGameServiceFactory;
+use App\Services\PlayGame\ReferralService;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
@@ -206,7 +208,7 @@ class GameController extends BaseController
         );
     }
 
-    public function endSingleGame(Request $request)
+    public function endSingleGame(Request $request, ReferralService $referralService)
     {
 
         Log::info($request->all());
@@ -345,6 +347,11 @@ class GameController extends BaseController
                 ]);
             }
         });
+
+        // call for referral logic
+        $referralService->gift();
+
+
 
         // call the event listener
         Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
