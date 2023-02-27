@@ -6,7 +6,7 @@ use App\Enums\FeatureFlags;
 use App\Models\StakingOdd;
 use App\Services\FeatureFlag;
 use App\Services\StakingOddsComputer;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class GetStakingOddsController extends BaseController
 {
@@ -16,18 +16,17 @@ class GetStakingOddsController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke()
+    public function __invoke(): JsonResponse
     {
-        $result = [];
         $message = 'staking odds fetched';
 
-        if (!FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            return $this->sendResponse($result, $message);
-        }
-
         $stakingOdds = StakingOdd::active()->orderBy('score', 'DESC')->get();
-        if ($stakingOdds->isEmpty()) {
-            return $this->sendResponse($result, $message);
+        /**
+         * This controls the dynamic odd feature
+         * @TODO Rename to TRIVIA_STAKING_WITH_DYNAMIC_ODDS
+         */
+        if (!FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+            return $this->sendResponse($stakingOdds, $message);
         }
 
         $allStakingOddsWithOddsMultiplierApplied = [];
