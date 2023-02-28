@@ -8,6 +8,7 @@ use App\Models\AchievementBadge;
 use App\Enums\FeatureFlags;
 use App\Services\AchievementBadgeEventService;
 use App\Services\FeatureFlag;
+use App\Enums\AchievementType;
 
 class AchievementBadgeEventListener
 {
@@ -31,7 +32,7 @@ class AchievementBadgeEventListener
             $AchievementType = $event->AchievementType;
 
             $user = null;
-            if(($AchievementType === "GAME_BOUGHT") || ($AchievementType === "BOOST_BOUGHT") || ($AchievementType === "REFERRAL") ){
+            if(($AchievementType === AchievementType::GAME_BOUGHT) || ($AchievementType === AchievementType::BOOST_BOUGHT) || ($AchievementType === AchievementType::REFERRAL) ){
                 $user = $event->request;
             }else{
                 $user = $event->request->user();
@@ -44,32 +45,32 @@ class AchievementBadgeEventListener
 
             // switch to determine
             switch ($AchievementType) {
-                case 'GAME_PLAYED':
+                case AchievementType::GAME_PLAYED:
                     # code...
                     $achievementBadgeService->gamePlayed($user, $payload);
                     break;
 
-                case 'GAME_BOUGHT':
+                case AchievementType::GAME_BOUGHT:
                     # code...
                     $achievementBadgeService->gameBought($user, $payload);
                     break;
 
-                case 'BOOST_BOUGHT':
+                case AchievementType::BOOST_BOUGHT:
                     # code...
                     $achievementBadgeService->boostBought($user, $payload);
                     break;
 
-                case 'REFERRAL':
+                case AchievementType::REFERRAL:
                     # code...
                     $achievementBadgeService->referralKing($user);
                     break;
 
-                case 'CHALLENGE_STARTED':
+                case AchievementType::CHALLENGE_STARTED:
                     # code...
                     $achievementBadgeService->challengeStarted($user);
                     break;
 
-                case 'CHALLENGE_ACCEPTED':
+                case AchievementType::CHALLENGE_ACCEPTED:
                     # code...
                     $achievementBadgeService->challengeAccepted($user);
                     break;

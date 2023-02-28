@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 class SendChallengeInviteController extends BaseController
 {
@@ -65,7 +66,7 @@ class SendChallengeInviteController extends BaseController
         }
 
         // call the event listener
-        Event::dispatch(new AchievementBadgeEvent($request, "CHALLENGE_STARTED", null));
+        Event::dispatch(new AchievementBadgeEvent($request, AchievementType::CHALLENGE_STARTED, null));
 
         return $this->sendResponse('Invite Sent', 'Invite Sent');
     }

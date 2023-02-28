@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 class RegisterController extends BaseController
 {
@@ -181,7 +182,7 @@ class RegisterController extends BaseController
 
             $profileReferral = User::where('username', $data["referrer"])->first();
             if ($profileReferral != null) {
-                Event::dispatch(new AchievementBadgeEvent($profileReferral, "REFERRAL", null));
+                Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
             }
 
             /** @TODO: this needs to be changed to plan */

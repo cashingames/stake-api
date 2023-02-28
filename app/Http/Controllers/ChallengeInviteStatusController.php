@@ -17,6 +17,7 @@ use App\Services\StakingService;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 class ChallengeInviteStatusController extends BaseController
 {
@@ -63,7 +64,7 @@ class ChallengeInviteStatusController extends BaseController
 
         if($status == "ACCEPTED"){
             // call the event listener
-        Event::dispatch(new AchievementBadgeEvent($request, "CHALLENGE_ACCEPTED", null));
+        Event::dispatch(new AchievementBadgeEvent($request, AchievementType::CHALLENGE_ACCEPTED, null));
         }
 
         return $this->sendResponse('Response email sent', 'Response email sent');

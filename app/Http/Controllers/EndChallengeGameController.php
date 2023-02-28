@@ -14,6 +14,7 @@ use App\Notifications\ChallengeStatusUpdateNotification;
 use App\Services\ChallengeGameService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 class EndChallengeGameController extends  BaseController
 {
@@ -92,7 +93,7 @@ class EndChallengeGameController extends  BaseController
         $game->minimum_boost_score = $this->MINIMUM_GAME_BOOST_SCORE;
 
         // call the event listener
-        Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
+        Event::dispatch(new AchievementBadgeEvent($request, AchievementType::GAME_PLAYED, $game));
 
         return $this->sendResponse($game, 'Challenge Game Ended');
     }
