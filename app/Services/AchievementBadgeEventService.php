@@ -131,7 +131,7 @@ class AchievementBadgeEventService{
     # generic functions
 
     public function getSingleAchievement($achievement_id){
-        $payload = (DB::table('achievement_badges')->where('id', $achievement_id)->get());
+        $payload = (AchievementBadge::where('id', $achievement_id)->get());
 
         if(count($payload) != 0){
 
@@ -234,7 +234,7 @@ class AchievementBadgeEventService{
         }
 
         // reward badge
-        $achievement = DB::table('achievement_badges')->where('id', $aid)->first();
+        $achievement = AchievementBadge::where('id', $aid)->first();
 
         if(is_null($achievement)){
             return null;
