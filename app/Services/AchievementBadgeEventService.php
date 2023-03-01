@@ -195,11 +195,6 @@ class AchievementBadgeEventService{
             $user = User::where('id', $uid)->first();
             $achievement = AchievementBadge::where('id', $aid)->first();
 
-
-            Log::info($achievement);
-            Log::info('aid'.$aid);
-
-
             $user->userAchievementBadges()->attach($achievement, [
                 'count' => $count,
                 'is_claimed' => 0,
