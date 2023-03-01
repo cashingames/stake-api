@@ -41,29 +41,31 @@ class QuestionHardenerTest extends TestCase
         );
     }
 
-    public function testAllQuestionsReturnedBelongToTheSameCategory()
-    {
-        Question::factory()
-            ->count(500)
-            ->create();
+//@TODO Delete question hardener totally
 
-        $questions = $this->questionHardener->determineQuestions(false);
-        $questionCategories = [];
-       
-        foreach ($questions as $q) {
-            $questionCategories[] = $q->category_id;
-        }
+// public function testAllQuestionsReturnedBelongToTheSameCategory()
+// {
+//     Question::factory()
+//         ->count(500)
+//         ->create();
 
-        if (empty($questionCategories)) {
-            $this->assertEmpty($questions);
-        }
+//     $questions = $this->questionHardener->determineQuestions(false);
+//     $questionCategories = [];
 
-        if (array_unique($questionCategories) == array($this->category->id)) {
-            $questionCategory = $this->category->id;
-            $this->assertEquals($this->category->id, $questionCategory);
-        }
+//     foreach ($questions as $q) {
+//         $questionCategories[] = $q->category_id;
+//     }
 
-        $this->assertNotEmpty($questionCategories);
-    }
+//     if (empty($questionCategories)) {
+//         $this->assertEmpty($questions);
+//     }
+
+//     if (array_unique($questionCategories) == array($this->category->id)) {
+//         $questionCategory = $this->category->id;
+//         $this->assertEquals($this->category->id, $questionCategory);
+//     }
+
+//     $this->assertNotEmpty($questionCategories);
+// }
    
 }

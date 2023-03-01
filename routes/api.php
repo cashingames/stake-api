@@ -82,7 +82,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('trivia/leaders/{triviaId}', [TriviaController::class, 'getLiveTriviaLeaderboard'])->middleware(['cacheResponse:300']);
         Route::get('live-trivia/{id}/leaderboard', GetLiveTriviaLeaderboardController::class)->middleware(['cacheResponse:300']);
         Route::get('live-trivia/{id}/get', GetSingleLiveTriviaController::class)->middleware(['cacheResponse:300']);
-        Route::get('live-trivia/status', LiveTriviaStatusController::class);
+        Route::get('live-trivia/status', LiveTriviaStatusController::class)->middleware(['cacheResponse:60']);
         Route::post('live-trivia/entrance/pay', LiveTriviaEntrancePaymentController::class);
         Route::get('live-trivia/{id}/status', LiveTriviaStatusController::class);
         Route::post('challenge/send-invite', SendChallengeInviteController::class);
