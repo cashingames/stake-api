@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\ChallengeStaking;
 use App\Models\ExhibitionStaking;
+use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -18,7 +20,7 @@ class StakingService
     private $user;
     private $mode;
 
-    public function __construct(User $user, $mode=null)
+    public function __construct(User $user, $mode = null)
     {
         $this->user = $user;
         $this->mode = $mode;
@@ -57,5 +59,6 @@ class StakingService
             'user_id' => Staking::find($stakingId)->user_id
         ]);
     }
+
 
 }
