@@ -165,15 +165,6 @@ class AchievementBadgeEventService{
                 'is_rewarded' => 0,
             ]);
 
-
-            // $badge = new UserAchievementBadge;
-            // $badge->user_id = $uid;
-            // $badge->achievement_badge_id = $aid;
-            // $badge->count = $count;
-            // $badge->is_claimed = 1;
-            // $badge->is_rewarded = 0;
-
-            // $badge->save();
         }else{
             // end
             DB::table('user_achievement_badges')->where('id', $curGS->id)->update(array(
@@ -201,15 +192,6 @@ class AchievementBadgeEventService{
                 'is_rewarded' => 0,
             ]);
 
-            // $badge->
-            // $badge = new UserAchievementBadge;
-            // $badge->user_id = $uid;
-            // $badge->achievement_badge_id = $aid;
-            // $badge->count = $count;
-            // $badge->is_claimed = 0;
-            // $badge->is_rewarded = 0;
-
-            // $badge->save();
         }else{
             // update
             DB::table('user_achievement_badges')->where('id', $curGS->id)->update(array(
