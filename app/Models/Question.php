@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\QuestionLevel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -44,9 +45,9 @@ class Question extends Model
     return $this->hasMany(Option::class)->inRandomOrder();
   }
 
-  public function categories()
+  public function categories(): BelongsToMany
   {
-    return $this->belongsToMany(Category::class, 'categories_questions')->withTimestamps();
+    return $this->belongsToMany(Category::class, 'categories_questions', 'question_id', 'category_id');
   }
 
   public function games()

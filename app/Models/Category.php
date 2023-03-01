@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
@@ -11,9 +12,9 @@ class Category extends Model
 
   protected $fillable = ['name', 'description', 'created_at', 'updated_at','is_enabled'];
 
-  public function questions()
+  public function questions(): BelongsToMany
   {
-    return $this->belongsToMany(Question::class, 'categories_questions')->withTimestamps();
+    return $this->belongsToMany(Question::class, 'categories_questions', 'category_id', 'question_id');
   }
 
   public function gameSessions()
