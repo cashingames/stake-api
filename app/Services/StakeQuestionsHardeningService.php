@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\QuestionLevel;
 use App\Models\Category;
+use App\Models\Question;
 use App\Models\Staking;
 use Illuminate\Support\Collection;
 use Log;
@@ -97,8 +98,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Easy);
 
-        return $category
-            ->questions()
+        // return Question::whereHas('category', function ($query) use ($category) {
+        //     $query->where('categories.id', $category->id);
+        // });
+
+        return Question::whereRelation('categories', 'id', $category->id)
             ->easy()
             //eveluate later if 50 is a good number
             ->when($recentQuestions->count() > 50, function ($query) use ($recentQuestions) { //
@@ -261,6 +265,10 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
         $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
+        /**
+         * If no stakes were made today, then the platform is neutral
+         * So first user should be lucky
+         */
         if ($amountStaked == 0) {
             return 1;
         }
