@@ -65,31 +65,30 @@ class Question extends Model
     return base64_encode($value);
   }
 
-  public function scopeEasy()
+  public function scopeEasy($query)
   {
-    return $this->whereLevel(QuestionLevel::Easy);
+    return $query->whereLevel(QuestionLevel::Easy);
+  }
+  public function scopeEasyOrMedium($query)
+  {
+    return $query->whereLevel(QuestionLevel::Easy)->orWhere('level', QuestionLevel::Medium);
   }
 
-  public function scopeEasyOrMedium()
+  public function scopeMedium($query)
   {
-    return $this->whereLevel(QuestionLevel::Easy)->orWhere('level', QuestionLevel::Medium);
+    return $query->whereLevel(QuestionLevel::Medium);
   }
 
-  public function scopeMedium()
+  public function scopeHard($query)
   {
-    return $this->whereLevel(QuestionLevel::Medium);
+    return $query->whereLevel(QuestionLevel::Hard);
   }
 
-  public function scopeHard()
+  public function scopeExpert($query)
   {
-    return $this->whereLevel(QuestionLevel::Hard);
+    return $query->whereLevel(QuestionLevel::Expert);
   }
-
-  public function scopeExpert()
-  {
-    return $this->whereLevel(QuestionLevel::Hard);
-  }
-
+  
   public function getLevelAttribute($value)
   {
     return base64_encode($value);

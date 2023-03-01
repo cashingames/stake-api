@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\QuestionLevel;
 use App\Models\Category;
-use App\Models\Question;
 use App\Models\Staking;
 use Illuminate\Support\Collection;
 use Log;
@@ -98,11 +97,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Easy);
 
-        // return Question::whereHas('category', function ($query) use ($category) {
-        //     $query->where('categories.id', $category->id);
-        // });
-
-        return Question::whereRelation('categories', 'id', $category->id)
+        return $category
+            ->questions()
             ->easy()
             //eveluate later if 50 is a good number
             ->when($recentQuestions->count() > 50, function ($query) use ($recentQuestions) { //
