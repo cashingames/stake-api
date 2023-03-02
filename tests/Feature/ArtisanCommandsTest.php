@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Mail\DailyReportEmail;
+use App\Mail\WeeklyReportEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use UserSeeder;
 use PlanSeeder;
@@ -53,6 +56,25 @@ class ArtisanCommandsTest extends TestCase
     public function test_boost_reminder_notifications()
     {
         $this->artisan('boosts:send-notification')->assertExitCode(0);
+    }
+
+    public function test_that_daily_automated_report_command_runs()
+    {   
+        Mail::fake();
+
+        $this->artisan('daily-report:send')->assertExitCode(0);
+
+        Mail::assertSent(DailyReportEmail::class);
+
+    }
+
+    public function test_that_weekly_automated_report_command_runs()
+    {   
+        Mail::fake();
+
+        $this->artisan('weekly-report:send')->assertExitCode(0);
+
+        Mail::assertSent(WeeklyReportEmail::class);
     }
   
 }

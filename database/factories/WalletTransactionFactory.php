@@ -28,10 +28,9 @@ class WalletTransactionFactory extends Factory
             //
             'wallet_id' => Wallet::factory(),
             "transaction_type" => $this->faker->randomElement(['CREDIT', 'DEBIT']),
-            // "wallet_kind" => $this->faker->randomElement(['CREDITS', 'WINNINGS']),
-            "amount" => $this->faker->randomElement([150.00, 800.00,450.00,2000.00,2500.00]),
-            "description" => $this->faker->sentence(),
-            "reference" => Str::random(10)
+            "reference" => Str::random(10),
+            "amount" => $this->faker->randomElement([150.00, 800.00, 450.00, 2000.00, 2500.00]),
+            "description" => $this->faker->randomElement(['Fund Wallet', 'Winnings Withdrawal Made', 'Winnings Withdrawal Reversed']),
 
         ];
     }

@@ -20,7 +20,8 @@ class StakingFactory extends Factory
     return [
       'user_id' => User::factory(),
       'amount_staked' => $this->faker->randomNumber(2),
-      'odd_applied_during_staking' => 1
+      'odd_applied_during_staking' => 1,
+      'amount_won' => $this->faker->randomNumber(2)
     ];
   }
 }
