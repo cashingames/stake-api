@@ -98,89 +98,26 @@ class AchievementBadgeTest extends TestCase
         $this->assertTrue($has);
     }
 
-    public function test_exhibition_game_can_be_started()
-    {
-        $questions = Question::factory()
-            ->hasOptions(4)
-            ->count(250)
-            ->create();
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-        $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 500
-        ]);
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
-    }
-
-    public function test_end_exhibition_game_to_trigger_event()
+    public function test_achievement_has_been_claimed()
     {
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::enable(FeatureFlags::ACHIEVEMENT_BADGES);
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
 
-        $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => [],
             "consumedBoosts" => []
         ]);
-        $response->assertJson([
-            'message' => 'Game Ended',
-        ]);
-    }
 
-    public function test_achievement_has_been_claimed()
-    {
         $achievement = DB::table('user_achievement_badges')
             ->where('user_id', $this->user->id)
             ->where('is_claimed', true)
             ->first();
 
-        $awarded = (is_null($achievement)) ? true : false;
-
-        $this->assertTrue($awarded);
-    }
-
-    public function test_achievement_has_been_rewarded()
-    {
-        $achievement = DB::table('user_achievement_badges')
-            ->where('user_id', $this->user->id)
-            ->where('is_claimed', true)
-            ->where('is_rewarded', true)
-            ->first();
-
-        $awarded = (is_null($achievement)) ? true : false;
+        $awarded = (!is_null($achievement)) ? true : false;
 
         $this->assertTrue($awarded);
     }

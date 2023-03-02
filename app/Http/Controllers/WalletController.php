@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Yabacon\Paystack\Event as PaystackEvent;
 use Yabacon\Paystack;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
+use App\Enums\AchievementType;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
@@ -298,7 +299,7 @@ class WalletController extends BaseController
         }
 
         // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, "BOOST_BOUGHT", $boost));
+        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
 
         return $this->sendResponse($points - $boost->point_value, 'Boost Bought');
     }
@@ -344,7 +345,7 @@ class WalletController extends BaseController
         }
 
         // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, "BOOST_BOUGHT", $boost));
+        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
 
         return $this->sendResponse($wallet->non_withdrawable_balance, 'Boost Bought');
     }
@@ -391,7 +392,7 @@ class WalletController extends BaseController
         ]);
 
         // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, "GAME_BOUGHT", $plan));
+        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::GAME_BOUGHT, $plan));
 
         return $this->sendResponse(
             'You have successfully bought ' . $plan->game_count . ' games',

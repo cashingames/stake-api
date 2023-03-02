@@ -30,6 +30,7 @@ use App\Services\PlayGame\ReferralService;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 use stdClass;
 
@@ -354,7 +355,7 @@ class GameController extends BaseController
 
 
         // call the event listener
-        Event::dispatch(new AchievementBadgeEvent($request, "GAME_PLAYED", $game));
+        Event::dispatch(new AchievementBadgeEvent($request, AchievementType::GAME_PLAYED, $game));
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
