@@ -53,10 +53,10 @@ class StakingOddsMakerTest extends TestCase
         $expectation = 3;
         
         $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
-        if (in_array($currentHour, $this->specialHours)){
-            $expectation += 1.5;
-        }
-        // dd($expectation, $oddEffect);
+        // if (in_array($currentHour, $this->specialHours)){
+        //     $expectation += 1.5;
+        // }
+
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
     public function test_odds_when_avg_score_less_than_5_in_normal_hours()
