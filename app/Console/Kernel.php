@@ -38,6 +38,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')
             ->dailyAt('00:03');
 
+        $schedule->command('daily-report:send')
+            ->dailyAt('01:00');
+        $schedule->command('weekly-report:send')
+            ->weekly();
+
         $schedule->command('challenge:staking-refund')->hourly();
 
         if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {

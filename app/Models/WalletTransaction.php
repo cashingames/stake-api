@@ -53,4 +53,9 @@ class WalletTransaction extends Model
         return $query->where('transaction_type', 'DEBIT')
         ->where('description','Winnings Withdrawal Made');
     }
+
+    public function scopeTotalFundings($query){
+        return $query->where('transaction_type', 'CREDIT')
+        ->where('description','Fund Wallet');
+    }
 }
