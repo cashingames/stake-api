@@ -51,3 +51,4 @@ Route::get('test-fcm', function(){
     ->send();
     return $res;
 });
+

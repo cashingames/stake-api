@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Services\StakingService;
 use App\Traits\Utils\DateUtils;
+use Illuminate\Support\Facades\DB;
 
 class AutomatedReportsService
 {
@@ -53,7 +54,7 @@ class AutomatedReportsService
             ->sum('amount_staked');
 
         $data = [
-            'netProfitAndLoss' => $this->netProfit,
+            'netProfit' => $this->netProfit,
             'totalFundedAmount' => $this->totalFundedAmount,
             'totalWithdrawals' => $this->totalWithdrawals,
             'totalAmountWon' => $this->totalAmountWon,
@@ -86,7 +87,7 @@ class AutomatedReportsService
         $this->completedStakingSessionsCount = $this->getCompletedStakingSessionsCount($startDate, $endDate);
 
         $data = [
-            'netProfitAndLoss' => $this->netProfit,
+            'netProfit' => $this->netProfit,
             'stakers' => $this->stakers,
             'totalFundedAmount' => $this->totalFundedAmount,
             'totalWithdrawals' => $this->totalWithdrawals,
@@ -107,27 +108,29 @@ class AutomatedReportsService
         $amountWon = $stakes->sum('stakings.amount_won') ?? 0;
 
         if ($amountStaked == 0) {
-            return 1;
+            return 0;
         }
 
-        return 1 - ($amountWon / $amountStaked);
+        return $amountStaked - $amountWon;
     }
 
     private function getStakers($startDate, $endDate)
     {
-        $stakers =  GameSession::select(
-            "users.email",
-            "stakings.amount_won",
-            "stakings.amount_staked",
-            "users.username",
-            "users.phone_number",
-            "game_sessions.created_at"
-        )
+
+        $stakers =  DB::table('game_sessions')
+            ->select(
+                "stakings.amount_won",
+                "stakings.amount_staked",
+                "users.username",
+                DB::raw('SUM(stakings.amount_won) AS amount_won'),
+                DB::raw('SUM(stakings.amount_staked) AS amount_staked')
+            )
             ->where('game_sessions.created_at', '>=', $startDate)
             ->where('game_sessions.created_at', '<=', $endDate)
             ->join("exhibition_stakings", "exhibition_stakings.game_session_id", "=", "game_sessions.id")
             ->join("stakings", "stakings.id", "=", "exhibition_stakings.staking_id")
-            ->join("users", "users.id", "=", "game_sessions.user_id")->orderBy('stakings.amount_won');
+            ->join("users", "users.id", "=", "game_sessions.user_id")
+            ->groupBy('game_sessions.user_id')->orderBy('stakings.amount_won')->limit(10);
         return $stakers;
     }
 

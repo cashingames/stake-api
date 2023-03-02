@@ -22,13 +22,20 @@
             .button {
                 width: 100% !important;
             }
-            
+
         }
 
         table {
-            font-family: arial, sans-serif;
             border-collapse: collapse;
-            width: 100%;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        thead tr {
+            color: #ffffff;
+            text-align: left;
         }
 
         td,
@@ -36,6 +43,16 @@
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
+        }
+
+        thead th {
+            width: 25%;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;  
         }
 
         tr:nth-child(even) {
@@ -46,33 +63,44 @@
             text-align: center;
             padding-top: 2rem;
         }
-        
+
         h3 {
             text-align: center;
             padding-top: 2rem;
         }
-        
+
+        div {
+            padding: 20px;
+            background-color: #e6ffff;
+            overflow-x:auto;
+        }
     </style>
 
-    <h1>Daily Report ({{$todaysDate}})</h1>
-    
-    <table>
-        <tr>
-            <th>Net Platform Gain</th>
-            <th>Total Fundings</th>
-            <th>Total Withdrawals</th>
-            <th>Total Staked Amount</th>
-            <th>Total Amount Won</th>
-        </tr>
-        <tr>
-            <td>{{$data['netProfitAndLoss']}}</td>
-            <td>{{$data['totalFundedAmount']}}</td>
-            <td>{{$data['totalWithdrawals']}}</td>
-            <td>{{$data['totalStakedAmount']}}</td>
-            <td>{{$data['totalAmountWon']}}</td>
-        </tr>
-      
-    </table>
+    <h1> Daily Report ({{$todaysDate}}) </h1>
+    <div>
+        <table style="width:100%">
+            <tr>
+                <th>Net Platform Gain</th>
+                <td>{{$data['netProfit']}}</td>
+            </tr>
+            <tr>
+                <th>Total Fundings</th>
+                <td>{{$data['totalFundedAmount']}}</td>
+            </tr>
+            <tr>
+                <th>Total Withdrawals</th>
+                <td>{{$data['totalWithdrawals']}}</td>
+            </tr>
+            <tr>
+                <th>Total Staked Amount</th>
+                <td>{{$data['totalStakedAmount']}}</td>
+            </tr>
+            <tr>
+                <th>Total Amount Won</th>
+                <td>{{$data['totalAmountWon']}}</td>
+            </tr>
+        </table>
+    </div>
 </body>
 
 </html>
