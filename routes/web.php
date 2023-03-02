@@ -51,3 +51,7 @@ Route::get('test-fcm', function(){
     ->send();
     return $res;
 });
+
+Route::get('/test', function () {
+    return view('emails.dailyReports');
+});

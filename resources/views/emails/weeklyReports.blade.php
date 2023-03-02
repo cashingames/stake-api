@@ -25,10 +25,18 @@
 
         }
 
-        table {
-            font-family: arial, sans-serif;
+        .reports,
+        .stakers {
             border-collapse: collapse;
-            width: 100%;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        thead tr {
+            color: #ffffff;
+            text-align: left;
         }
 
         td,
@@ -36,6 +44,16 @@
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
+        }
+
+        thead th {
+            width: 25%;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
         }
 
         tr:nth-child(even) {
@@ -51,52 +69,64 @@
             text-align: center;
             padding-top: 2rem;
         }
+
+        div {
+            padding: 20px;
+            background-color: #e6ffff;
+            overflow-x: auto;
+        }
     </style>
 
     <h1>Weekly Report</h1>
 
-    <table>
-        <tr>
-            <th>Net Platform Gain</th>
-            <th>Total Fundings</th>
-            <th>Total Withdrawals</th>
-            <th>Total Staked Amount</th>
-            <th>Total Amount Won</th>
-            <th>Completed Staking Sessions</th>
-        </tr>
-        <tr>
-            <td>{{$data['netProfitAndLoss']}}</td>
-            <td>{{$data['totalFundedAmount']}}</td>
-            <td>{{$data['totalWithdrawals']}}</td>
-            <td>{{$data['totalStakedamount']}}</td>
-            <td>{{$data['totalAmountWon']}}</td>
-            <td>{{$data['completedStakingSessionsCount']}}</td>
-        </tr>
+    <div>
+        <table class="reports">
+            <tr>
+                <th>Net Platform Gain</th>
+                <td>{{$data['netProfit']}}</td>
+            </tr>
+            <tr>
+                <th>Total Fundings</th>
+                <td>{{$data['totalFundedAmount']}}</td>
+            </tr>
+            <tr>
+                <th>Total Withdrawals</th>
+                <td>{{$data['totalWithdrawals']}}</td>
+            </tr>
+            <tr>
+                <th>Total Staked Amount</th>
+                <td>{{$data['totalStakedamount']}}</td>
+            </tr>
+            <tr>
+                <th>Total Amount Won</th>
+                <td>{{$data['totalAmountWon']}}</td>
+            </tr>
+            <tr>
+                <th>Completed Staking Sessions</th>
+                <td>{{$data['completedStakingSessionsCount']}}</td>
+            </tr>
 
-    </table>
+        </table>
+    </div>
     <h3>Stakers</h3>
-    <table>
-        <tr>
-            <th>#</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Amount Staked</th>
-            <th>Amount Won</th>
-            <th>Played At</th>
-        </tr>
-        @foreach($data['stakers'] as $key=>$data)
-        <tr>
-            <td>{{$key + 1}}</td>
-            <td>{{$data['username']}}</td>
-            <td>{{$data['email']}}</td>
-            <td>{{$data['phone_number']}}</td>
-            <td>{{$data['amount_staked']}}</td>
-            <td>{{$data['amount_won']}}</td>
-            <td>{{$data['created_at']}}</td>
-        </tr>
-        @endforeach
-    </table>
+    <div>
+        <table class="stakers">
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Amount Staked</th>
+                <th>Amount Won</th>
+            </tr>
+            @foreach($data['stakers'] as $key=>$data)
+            <tr>
+                <td>{{$key + 1}}</td>
+                <td>{{$data->username}}</td>
+                <td>{{$data->amount_staked}}</td>
+                <td>{{$data->amount_won}}</td>
+            </tr>
+            @endforeach
+        </table>
+    </div>
 </body>
 
 </html>
