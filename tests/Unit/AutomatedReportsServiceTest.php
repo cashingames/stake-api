@@ -57,7 +57,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertEquals(1000, $dailyReports['totalWithdrawals']);
+        $this->assertEquals('1,000', $dailyReports['totalWithdrawals']);
     }
 
     public function test_that_daily_reports_correct_total_fundings_amount()
@@ -70,7 +70,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertEquals(1000, $dailyReports['totalFundedAmount']);
+        $this->assertEquals('1,000', $dailyReports['totalFundedAmount']);
     }
 
     public function test_that_daily_reports_correct_total_staked_amount()
@@ -81,7 +81,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertEquals(1000, $dailyReports['totalStakedAmount']);
+        $this->assertEquals('1,000', $dailyReports['totalStakedAmount']);
     }
 
     public function test_that_daily_reports_correct_total_amount_won()
@@ -92,7 +92,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertEquals(1000, $dailyReports['totalAmountWon']);
+        $this->assertEquals('1,000', $dailyReports['totalAmountWon']);
     }
 
     public function test_that_weekly_reports_returns_data()
@@ -109,7 +109,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertEquals(2000, $weeklyReports['totalAmountWon']);
+        $this->assertEquals('2,000', $weeklyReports['totalAmountWon']);
     }
 
     public function test_that_weekly_reports_correct_total_staked_amount()
@@ -120,7 +120,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertEquals(4000, $weeklyReports['totalStakedamount']);
+        $this->assertEquals('4,000', $weeklyReports['totalStakedamount']);
     }
 
     public function test_that_weekly_reports_correct_total_withdrawal_amount()
@@ -133,7 +133,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertEquals(1000, $weeklyReports['totalWithdrawals']);
+        $this->assertEquals('1,000', $weeklyReports['totalWithdrawals']);
     }
 
     public function test_that_weekly_reports_correct_total_funding_amount()
@@ -146,7 +146,7 @@ class AutomatedReportsServiceTest extends TestCase
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertEquals(1000, $weeklyReports['totalFundedAmount']);
+        $this->assertEquals('1,000', $weeklyReports['totalFundedAmount']);
     }
 
     public function test_that_weekly_reports_returns_stakers()
