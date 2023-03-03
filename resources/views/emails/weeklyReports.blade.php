@@ -24,105 +24,54 @@
             }
 
         }
-
-        .reports,
-        .stakers {
-            border-collapse: collapse;
-            font-size: 0.9em;
-            font-family: sans-serif;
-            min-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        }
-
-        thead tr {
-            color: #ffffff;
-            text-align: left;
-        }
-
-        td,
-        th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        thead th {
-            width: 25%;
-        }
-
-        th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-        }
-
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
-
-        h1 {
-            text-align: center;
-            padding-top: 2rem;
-        }
-
-        h3 {
-            text-align: center;
-            padding-top: 2rem;
-        }
-
-        div {
-            padding: 20px;
-            background-color: #e6ffff;
-            overflow-x: auto;
-        }
     </style>
 
-    <h1>Weekly Report</h1>
+    <h1 style="text-align: center; padding-top: 2rem;">Weekly Report</h1>
 
-    <div>
-        <table class="reports">
-            <tr>
-                <th>Net Platform Gain</th>
-                <td>{{$data['netProfit']}}</td>
+    <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Net Platform Gain</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['netProfit']}}</td>
             </tr>
-            <tr>
-                <th>Total Fundings</th>
-                <td>{{$data['totalFundedAmount']}}</td>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Fundings</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalFundedAmount']}}</td>
             </tr>
-            <tr>
-                <th>Total Withdrawals</th>
-                <td>{{$data['totalWithdrawals']}}</td>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Withdrawals</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalWithdrawals']}}</td>
             </tr>
-            <tr>
-                <th>Total Staked Amount</th>
-                <td>{{$data['totalStakedamount']}}</td>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Staked Amount</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalStakedamount']}}</td>
             </tr>
-            <tr>
-                <th>Total Amount Won</th>
-                <td>{{$data['totalAmountWon']}}</td>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Amount Won</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalAmountWon']}}</td>
             </tr>
-            <tr>
-                <th>Completed Staking Sessions</th>
-                <td>{{$data['completedStakingSessionsCount']}}</td>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Completed Staking Sessions</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['completedStakingSessionsCount']}}</td>
             </tr>
 
         </table>
     </div>
-    <h3>Stakers</h3>
-    <div>
-        <table class="stakers">
-            <tr>
-                <th>#</th>
-                <th>Username</th>
-                <th>Amount Staked</th>
-                <th>Amount Won</th>
+    <h3 style="text-align: center;padding-top: 2rem;"> Top {{count($data['stakers'])}} Stakers  </h3>
+    <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">#</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Username</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Staked</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Won</th>
             </tr>
             @foreach($data['stakers'] as $key=>$data)
-            <tr>
-                <td>{{$key + 1}}</td>
-                <td>{{$data->username}}</td>
-                <td>{{$data->amount_staked}}</td>
-                <td>{{$data->amount_won}}</td>
+            <tr style=" color: gray;text-align: left;">
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$key + 1}}</td>
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->username}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_staked)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_won)}}</td>
             </tr>
             @endforeach
         </table>

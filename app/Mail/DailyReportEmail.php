@@ -52,7 +52,7 @@ class DailyReportEmail extends Mailable
         return new Content(
             view: 'emails.dailyReports',
             with: [
-                'todaysDate' => Carbon::now()->toFormattedDateString(),
+                'todaysDate' => Carbon::yesterday()->toFormattedDateString(),
             ],
         );
     }
