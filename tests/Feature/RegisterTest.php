@@ -8,6 +8,7 @@ use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
 use App\Mail\VerifyEmail;
+use App\Models\Boost;
 use App\Services\FeatureFlag;
 use Mockery\MockInterface;
 use Database\Seeders\DatabaseSeeder;
@@ -272,7 +273,7 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_test_brand_id_can_be_inserted_stakers_app()
+    public function test_brand_id_can_be_inserted_stakers_app()
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
@@ -292,7 +293,7 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_test_brand_id_can_be_inserted_in_fun_app()
+    public function test_brand_id_can_be_inserted_in_fun_app()
     {
 
         $this->postjson(self::REGISTER_URL, [
@@ -312,6 +313,110 @@ class RegisterTest extends TestCase
             'email' => 'email@email.com',
             'country_code' => '+234',
             'brand_id' => 1
+        ]);
+    }
+
+    public function test_new_user_gets_400_naira_bonus_in_stakers_app()
+    {
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $user->id,
+            'non_withdrawable_balance' => 400.00,
+        ]);
+    }
+
+    public function test_new_user_gets_50_naira_bonus_in_fun_app()
+    {
+
+        $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'janeDoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $user->id,
+            'non_withdrawable_balance' => 50.00,
+        ]);
+    }
+
+    public function test_new_user_gets_boost_bonus_in_stakers_app()
+    {
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('user_boosts', [
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+
+        $this->assertDatabaseHas('user_boosts', [
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Skip')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+    }
+
+    public function test_new_user_gets_boost_bonus_in_fun_app()
+    {
+
+        $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'janeDoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('user_boosts', [
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+
+        $this->assertDatabaseHas('user_boosts', [
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Skip')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
         ]);
     }
 }
