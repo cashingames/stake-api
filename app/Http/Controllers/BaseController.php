@@ -36,9 +36,9 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        Log::info("API Response success "
-            . $this->user?->username . " from endpoint  "
-            .  url()->current() . " response " . json_encode($result));
+        // Log::info("API Response success "
+        //     . $this->user?->username . " from endpoint  "
+        //     .  url()->current() . " response " . json_encode($result));
 
 
         return response()->json($response, 200);
@@ -52,9 +52,9 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        Log::info("API Response error "
-            .  $this->user?->username . " from endpoint  "
-            . url()->current() . " response " . json_encode($errors));
+        // Log::info("API Response error "
+        //     .  $this->user?->username . " from endpoint  "
+        //     . url()->current() . " response " . json_encode($errors));
 
 
         return response()->json($response, 400);
