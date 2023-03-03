@@ -110,7 +110,7 @@ class RegisterController extends BaseController
             User::create([
                 'username' => $platform !== ClientPlatform::StakingMobileWeb
                     ? $data['username']
-                    :strstr($data['email'], '@', true). mt_rand(10, 99),
+                    : strstr($data['email'], '@', true) . mt_rand(10, 99),
                 'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
                 'email' => $data['email'],
@@ -152,18 +152,22 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $user->wallet->non_withdrawable_balance += 50;
+            $isStakeApp = $platform == ClientPlatform::StakingMobileWeb ? true : false;
 
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => 50,
-                'balance' => $user->wallet->non_withdrawable_balance,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-            ]);
+            DB::transaction(function () use ($user, $isStakeApp) {
+                
+                $user->wallet->non_withdrawable_balance += ($isStakeApp ? 400 : 50);
 
-            $user->wallet->save();
+                WalletTransaction::create([
+                    'wallet_id' => $user->wallet->id,
+                    'transaction_type' => 'CREDIT',
+                    'amount' => $isStakeApp ? 400 : 50,
+                    'balance' => $user->wallet->non_withdrawable_balance,
+                    'description' => 'Sign Up Bonus',
+                    'reference' => Str::random(10),
+                ]);
+                $user->wallet->save();
+            });
 
             $user->boosts()->create([
                 'user_id' => $user->id,
