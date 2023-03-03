@@ -54,11 +54,11 @@ class AutomatedReportsService
             ->sum('amount_staked');
 
         $data = [
-            'netProfit' => $this->netProfit,
-            'totalFundedAmount' => $this->totalFundedAmount,
-            'totalWithdrawals' => $this->totalWithdrawals,
-            'totalAmountWon' => $this->totalAmountWon,
-            'totalStakedAmount' => $this->totalStakedamount
+            'netProfit' => number_format($this->netProfit),
+            'totalFundedAmount' => number_format($this->totalFundedAmount),
+            'totalWithdrawals' => number_format($this->totalWithdrawals),
+            'totalAmountWon' => number_format($this->totalAmountWon),
+            'totalStakedAmount' => number_format($this->totalStakedamount)
         ];
 
         return $data;
@@ -87,14 +87,14 @@ class AutomatedReportsService
         $this->completedStakingSessionsCount = $this->getCompletedStakingSessionsCount($startDate, $endDate);
 
         $data = [
-            'netProfit' => $this->netProfit,
+            'netProfit' => number_format($this->netProfit),
             'stakers' => $this->stakers,
-            'totalFundedAmount' => $this->totalFundedAmount,
-            'totalWithdrawals' => $this->totalWithdrawals,
+            'totalFundedAmount' => number_format($this->totalFundedAmount),
+            'totalWithdrawals' => number_format($this->totalWithdrawals),
             'completedStakingSessionsCount' => $this->completedStakingSessionsCount,
             'numberOfStakers' => $this->stakers->count(),
-            'totalAmountWon' => $this->totalAmountWon,
-            'totalStakedamount' => $this->totalStakedamount
+            'totalAmountWon' => number_format($this->totalAmountWon),
+            'totalStakedamount' => number_format($this->totalStakedamount)
         ];
 
         return $data;

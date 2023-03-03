@@ -24,80 +24,30 @@
             }
 
         }
-
-        table {
-            border-collapse: collapse;
-            font-size: 0.9em;
-            font-family: sans-serif;
-            min-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        }
-
-        thead tr {
-            color: #ffffff;
-            text-align: left;
-        }
-
-        td,
-        th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        thead th {
-            width: 25%;
-        }
-
-        th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;  
-        }
-
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
-
-        h1 {
-            text-align: center;
-            padding-top: 2rem;
-        }
-
-        h3 {
-            text-align: center;
-            padding-top: 2rem;
-        }
-
-        div {
-            padding: 20px;
-            background-color: #e6ffff;
-            overflow-x:auto;
-        }
     </style>
 
-    <h1> Daily Report ({{$todaysDate}}) </h1>
-    <div>
-        <table style="width:100%">
-            <tr>
-                <th>Net Platform Gain</th>
-                <td>{{$data['netProfit']}}</td>
+    <h1 style = "text-align: center; padding-top: 2rem;"> Daily Report ({{$todaysDate}}) </h1>
+    <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Net Platform Gain</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['netProfit']}}</td>
             </tr>
-            <tr>
-                <th>Total Fundings</th>
-                <td>{{$data['totalFundedAmount']}}</td>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;" >Total Fundings</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalFundedAmount']}}</td>
             </tr>
-            <tr>
-                <th>Total Withdrawals</th>
-                <td>{{$data['totalWithdrawals']}}</td>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Withdrawals</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalWithdrawals']}}</td>
             </tr>
-            <tr>
-                <th>Total Staked Amount</th>
-                <td>{{$data['totalStakedAmount']}}</td>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Staked Amount</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalStakedAmount']}}</td>
             </tr>
-            <tr>
-                <th>Total Amount Won</th>
-                <td>{{$data['totalAmountWon']}}</td>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Amount Won</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalAmountWon']}}</td>
             </tr>
         </table>
     </div>
