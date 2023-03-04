@@ -24,7 +24,7 @@ class AutomatedReportsService
 
     public function getDailyReports()
     {
-        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->endOfDay());
+        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->startOfDay());
         $endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->endOfDay());
 
 

@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\WalletTransaction;
 use App\Services\AutomatedReportsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AutomatedReportsServiceTest extends TestCase
@@ -52,7 +51,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'DEBIT',
             'description' => 'Winnings Withdrawal Made',
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount' => 100
         ]);
 
@@ -65,7 +64,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'CREDIT',
             'description' => 'Fund Wallet',
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount' => 100
         ]);
 
@@ -76,7 +75,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_correct_total_staked_amount()
     {
         Staking::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount_staked' => 100
         ]);
 
@@ -87,7 +86,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_correct_total_amount_won()
     {
         Staking::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount_won' => 100
         ]);
 
@@ -104,7 +103,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_correct_total_amount_won()
     {
         Staking::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount_won' => 200
         ]);
 
@@ -115,7 +114,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_correct_total_staked_amount()
     {
         Staking::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount_staked' => 400
         ]);
 
@@ -128,7 +127,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'DEBIT',
             'description' => 'Winnings Withdrawal Made',
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount' => 100
         ]);
 
@@ -141,7 +140,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'CREDIT',
             'description' => 'Fund Wallet',
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
             'amount' => 100
         ]);
 
@@ -156,7 +155,7 @@ class AutomatedReportsServiceTest extends TestCase
             ->create();
 
         GameSession::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->subDays(1),
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
