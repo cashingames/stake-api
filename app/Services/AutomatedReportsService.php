@@ -2,17 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Category;
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Contest;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\WalletTransaction;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use App\Services\StakingService;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Facades\DB;
 
@@ -31,8 +24,8 @@ class AutomatedReportsService
 
     public function getDailyReports()
     {
-        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->startOfDay());
-        $endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::today()->endOfDay());
+        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->endOfDay());
+        $endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->endOfDay());
 
 
         $this->netProfit = $this->getPlatformProfit($startDate, $endDate);
@@ -66,8 +59,8 @@ class AutomatedReportsService
 
     public function getWeeklyReports()
     {
-        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::now()->startOfWeek());
-        $endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::now()->endOfWeek());
+        $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->startOfWeek());
+        $endDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->endOfWeek());
 
         $this->totalAmountWon = Staking::where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)

@@ -6,7 +6,6 @@ use App\Mail\DailyReportEmail;
 use App\Services\AutomatedReportsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use App\Services\StakingService;
 
 class SendAutomatedDailyReportEmail extends Command
 {
@@ -30,9 +29,9 @@ class SendAutomatedDailyReportEmail extends Command
      * @return int
      */
 
-   
-    public function handle()
-    {   
+
+    public function handle(): void
+    {
         $reportsService = new AutomatedReportsService();
 
         $data = $reportsService->getDailyReports();
