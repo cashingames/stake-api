@@ -42,11 +42,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')->withoutOverlapping()
             ->dailyAt('00:03');
 
-        $schedule->command('daily-report:send')
-            ->dailyAt('01:00');
-        $schedule->command('weekly-report:send')
-            ->dailyAt('01:00');
-
+        if (FeatureFlag::isEnabled(FeatureFlags::SEND_AUTOMATED_REPORTS)) {
+            $schedule->command('daily-report:send')
+                ->dailyAt('01:00');
+            $schedule->command('weekly-report:send')
+                ->dailyAt('01:00');
+        }
         $schedule->command('challenge:staking-refund')->withoutOverlapping()->hourly();
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
