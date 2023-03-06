@@ -17,11 +17,11 @@ enum ClientPlatform
         switch ($brandId) {
             case 2:
                 return self::StakingMobileWeb;
+            case 10:
+                return self::GameArkMobile;
             case 1 || 3:
             default:
                 return self::CashingamesMobile;
-            case 10:
-                return self::GameArkMobile;
         }
 
     }
