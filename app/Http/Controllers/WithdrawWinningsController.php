@@ -22,11 +22,11 @@ class WithdrawWinningsController extends BaseController
         }
 
         //@TODO Uncomment when the frontend is ready
-        $todaysWithdrawals = $this->user->transactions()->withdrawals()->where('wallet_transactions.created_at', '>=', now()->startOfDay())->sum('amount');
+        // $todaysWithdrawals = $this->user->transactions()->withdrawals()->where('wallet_transactions.created_at', '>=', now()->startOfDay())->sum('amount');
         
-        if (is_null($this->user->email_verified_at) && $todaysWithdrawals > config('trivia.max_withdrawal_amount')) {
-            return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        }
+        // if (is_null($this->user->email_verified_at) && $todaysWithdrawals > config('trivia.max_withdrawal_amount')) {
+        //     return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
+        // }
 
         // if (is_null($this->user->phone_verified_at)) {
         //     return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');
