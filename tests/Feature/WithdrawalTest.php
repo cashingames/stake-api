@@ -73,7 +73,7 @@ class WithdrawalTest extends TestCase
         $response = $this->withHeaders(['x-brand-id' => 2])->post(self::WITHDRAWAL_URL);
         
         $response->assertJsonFragment([
-            'shouldForceVerify' => true,
+            'verifyEmailNavigation' => true,
         ]);
     }
 

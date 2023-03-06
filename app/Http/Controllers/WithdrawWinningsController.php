@@ -23,10 +23,10 @@ class WithdrawWinningsController extends BaseController
         }
 
         if ($platform == ClientPlatform::StakingMobileWeb) {
-            $todaysWithdrawals = $this->user->transactions()->withdrawals()->where('wallet_transactions.created_at', '>=', now()->startOfDay())->sum('amount');
-            if (is_null($this->user->email_verified_at) && $todaysWithdrawals > config('trivia.max_withdrawal_amount')) {
+            $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
+            if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.max_withdrawal_amount')) {
                 $data = [
-                    'shouldForceVerify' => true,
+                    'verifyEmailNavigation' => true,
                 ];
                 return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
             }
