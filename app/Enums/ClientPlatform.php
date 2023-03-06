@@ -10,6 +10,7 @@ enum ClientPlatform
     case StakingMobileApp;
     case CashingamesMobile;
     case CashingamesWeb;
+    case GameArkMobile;
 
     public static function detect($brandId): self
     {
@@ -19,6 +20,8 @@ enum ClientPlatform
             case 1 || 3:
             default:
                 return self::CashingamesMobile;
+            case 10:
+                return self::GameArkMobile;
         }
 
     }

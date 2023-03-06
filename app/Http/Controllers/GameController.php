@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Contest\PrizeType;
+use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Models\GameMode;
@@ -36,7 +37,7 @@ use stdClass;
 
 class GameController extends BaseController
 {
-    public function getCommonData(Request $request)
+    public function getCommonData(Request $request, ClientPlatform $platform)
     {
         $result = new stdClass;
 
@@ -140,8 +141,16 @@ class GameController extends BaseController
         }
 
         $result->gameTypes = $toReturnTypes;
+
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce = config('trivia.min_version_force');
+
+        switch ($platform) {
+            case ClientPlatform::GameArkMobile:
+                $result->minVersionCode = config('trivia.min_version_code_gameark');
+                $result->minVersionForce = config('trivia.min_version_force_gameark');
+                break;
+        }
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
