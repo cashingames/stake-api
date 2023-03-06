@@ -22,7 +22,9 @@ class WithdrawWinningsController extends BaseController
         }
 
         //@TODO Uncomment when the frontend is ready
-        // if (is_null($this->user->email_verified_at)) {
+        // $todaysWithdrawals = $this->user->transactions()->withdrawals()->where('wallet_transactions.created_at', '>=', now()->startOfDay())->sum('amount');
+        
+        // if (is_null($this->user->email_verified_at) && $todaysWithdrawals > config('trivia.max_withdrawal_amount')) {
         //     return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
         // }
 
@@ -35,7 +37,7 @@ class WithdrawWinningsController extends BaseController
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
         }
-        
+
         if ($debitAmount < config('trivia.min_withdrawal_amount')) {
             return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount'));
         }
