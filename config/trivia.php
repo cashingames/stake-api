@@ -38,6 +38,8 @@ return [
   'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
   'minimum_game_boost_score' => env("MINIMUM_GAME_BOOST_SCORE", 4),
   'min_version_force' => env('MIN_VERSION_FORCE', false),
+  'min_version_code_gameark' => env('MIN_CODE_VERSION_GAMEARK', '1.1.11'),
+  'min_version_force_gameark' => env('MIN_VERSION_FORCE_GAMEARK', false),
   'payment_key' => env('PAYSTACK_KEY', null),
   'use_lite_client' => env('USE_LITE_FRONTEND', true),
   'admin_withdrawal_request_email'=>env('ADMIN_MAIL_ADDRESS','hello@cashingames.com' ),
