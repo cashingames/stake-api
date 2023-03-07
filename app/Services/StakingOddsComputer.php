@@ -45,33 +45,10 @@ class StakingOddsComputer
             $oddsCondition = $highScoreRulesAndConditions->display_name;
         }
 
-        if ($this->isFirstGameAfterFunding($user)) {
-            $fundingWalletRulesAndConditions =
-                $stakingOddsRule->where('rule', 'FIRST_TIME_GAME_AFTER_FUNDING')->first();
-            $oddsMultiplier += $fundingWalletRulesAndConditions->odds_benefit;
-            $oddsCondition .= "_and_" . $fundingWalletRulesAndConditions->display_name;
-        }
         return [
             'oddsMultiplier' => $oddsMultiplier,
             'oddsCondition' => $oddsCondition
         ];
-    }
-
-    public function isFirstGameAfterFunding(User $user)
-    {
-        /**
-         * @TODO Convert this one to one query most likely in a query scope
-         */
-        $lastFund = $user->transactions()
-            ->where('transaction_type', 'CREDIT')
-            ->where('description', 'like', "fund%")
-            ->latest()->first();
-        $lastGame = $user->gameSessions()->latest()->first();
-        if (is_null($lastFund) || is_null($lastGame)) {
-            return false;
-        }
-
-        return Carbon::createFromDate($lastFund->created_at)->gt(Carbon::createFromDate($lastGame->created_at));
     }
 
     private function getTodaysData($user): array
