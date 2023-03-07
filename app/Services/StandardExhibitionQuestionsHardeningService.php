@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Enums\ClientPlatform;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,6 +12,13 @@ use Illuminate\Support\Collection;
 
 class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningServiceInterface
 {
+    private ClientPlatform $clientPlatform;
+
+    public function __construct(ClientPlatform $clientPlatform)
+    {
+        $this->clientPlatform = $clientPlatform;
+    }
+
     public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection
     {
         return $this->getEasyQuestions($categoryId);
@@ -18,11 +26,22 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
 
     private function getEasyQuestions(string $categoryId): Collection
     {
+        if($this->clientPlatform != ClientPlatform::GameArkMobile){
 
-        return Category::find($categoryId)
-            ->questions()
-            ->easy()
-            ->inRandomOrder()->take(20)->get();
+            $value = Category::find($categoryId)
+                        ->questions()
+                        ->easy()
+                        ->inRandomOrder()
+                        ->take(20)
+                        ->get()
+                        ->makeVisible('is_correct');
+            return $value;
+        }else{
+            return Category::find($categoryId)
+                ->questions()
+                ->easy()
+                ->inRandomOrder()->take(20)->get();
+        }
     }
 
 }
