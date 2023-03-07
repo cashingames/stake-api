@@ -6,6 +6,7 @@ use App\Models\StakingOddsRule;
 use App\Models\User;
 use App\Traits\Utils\DateUtils;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class StakingOddsComputer
 {
@@ -16,36 +17,33 @@ class StakingOddsComputer
     {
         $percentWonToday = $this->getPercentageWonToday($user);
 
+        $stakingOddsRule = Cache::remember('staking-odds', 60*60, fn () => StakingOddsRule::all());
+
         $oddsMultiplier = 1;
         $oddsCondition = "no_matching_condition";
 
         if ($this->isNewPlayer($user)) {
-            $newUserRulesAndConditions = StakingOddsRule::where('rule', 'GAME_COUNT_LESS_THAN_5')->first();
+            $newUserRulesAndConditions = $stakingOddsRule->where('rule', 'GAME_COUNT_LESS_THAN_5')->first();
             $oddsMultiplier = $newUserRulesAndConditions->odds_benefit;
             $oddsCondition = $newUserRulesAndConditions->display_name;
         } elseif ($percentWonToday <= 0.5) {
-            $lowScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_LESS_THAN_5')->first();
+            $lowScoreRulesAndConditions = $stakingOddsRule->where('rule', 'AVERAGE_SCORE_LESS_THAN_5')->first();
             $oddsMultiplier = $lowScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $lowScoreRulesAndConditions->display_name;
         } elseif ($percentWonToday <= 1) {
-            $moderateScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_BETWEEN_5_AND_7')->first();
+            $moderateScoreRulesAndConditions =
+                $stakingOddsRule->where('rule', 'AVERAGE_SCORE_BETWEEN_5_AND_7')->first();
             $oddsMultiplier = $moderateScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $moderateScoreRulesAndConditions->display_name;
         } elseif ($percentWonToday > 1) {
-            $highScoreRulesAndConditions = StakingOddsRule::where('rule', 'AVERAGE_SCORE_GREATER_THAN_7')->first();
+            $highScoreRulesAndConditions = $stakingOddsRule->where('rule', 'AVERAGE_SCORE_GREATER_THAN_7')->first();
             $oddsMultiplier = $highScoreRulesAndConditions->odds_benefit;
             $oddsCondition = $highScoreRulesAndConditions->display_name;
         }
 
-        if ($this->currentTimeIsInSpecialHours() && $percentWonToday <= 0.5) {
-
-            $specialHourRulesAndConditions = StakingOddsRule::where('rule', 'AT_SPECIAL_HOUR')->first();
-            $oddsMultiplier += $specialHourRulesAndConditions->odds_benefit;
-            $oddsCondition .= "_and_" . $specialHourRulesAndConditions->display_name;
-        }
         if ($this->isFirstGameAfterFunding($user)) {
-
-            $fundingWalletRulesAndConditions = StakingOddsRule::where('rule', 'FIRST_TIME_GAME_AFTER_FUNDING')->first();
+            $fundingWalletRulesAndConditions =
+                $stakingOddsRule->where('rule', 'FIRST_TIME_GAME_AFTER_FUNDING')->first();
             $oddsMultiplier += $fundingWalletRulesAndConditions->odds_benefit;
             $oddsCondition .= "_and_" . $fundingWalletRulesAndConditions->display_name;
         }
@@ -55,26 +53,21 @@ class StakingOddsComputer
         ];
     }
 
-    public function currentTimeIsInSpecialHours()
-    {
-        $now = date("H");
-        $now = $this->toNigeriaTimeZoneFromUtc(date("Y-m-d H:i:s"))->format("H");
-        $now .= ":00";
-
-        $specialHours = config('odds.special_hours');
-
-        return in_array($now, $specialHours);
-    }
-
     public function isFirstGameAfterFunding(User $user)
     {
-        $last_funding = $user->transactions()->where('transaction_type', 'CREDIT')->where('description', 'like', "fund%")->latest()->first();
-        $last_game = $user->gameSessions()->latest()->first();
-        if (is_null($last_funding) || is_null($last_game)) {
+        /**
+         * @TODO Convert this one to one query most likely in a query scope
+         */
+        $lastFund = $user->transactions()
+            ->where('transaction_type', 'CREDIT')
+            ->where('description', 'like', "fund%")
+            ->latest()->first();
+        $lastGame = $user->gameSessions()->latest()->first();
+        if (is_null($lastFund) || is_null($lastGame)) {
             return false;
         }
 
-        return Carbon::createFromDate($last_funding->created_at)->gt(Carbon::createFromDate($last_game->created_at));
+        return Carbon::createFromDate($lastFund->created_at)->gt(Carbon::createFromDate($lastGame->created_at));
     }
 
     public function isNewPlayer(User $user)
