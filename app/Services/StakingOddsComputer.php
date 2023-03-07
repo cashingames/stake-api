@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Traits\Utils\DateUtils;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class StakingOddsComputer
 {
@@ -81,10 +82,13 @@ class StakingOddsComputer
         $todayStakes = $user->gameSessions()
             ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
             ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
-            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
+            ->select(DB::raw('sum(stakings.amount_staked) as amount_staked, sum(stakings.amount_won) as amount_won'))
+            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'))
+            ->first();
 
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 1;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 1;
+
+        $amountStaked = $todayStakes?->amount_staked ?? 1;
+        $amountWon = $todayStakes?->amount_amount_won ?? 1;
 
         if ($amountStaked == 0 || $amountWon == 0) {
             return 1;
