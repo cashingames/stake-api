@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\WalletTransaction;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
@@ -14,19 +15,22 @@ class WithdrawWinningsController extends BaseController
 {
     //
     //@TODO - enforce hours between which withdrawals can be made
-    public function __invoke(Request $request, PaystackService $withdrawalService)
+    public function __invoke(ClientPlatform $platform, PaystackService $withdrawalService)
     {
 
         if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
             return $this->sendError(false, 'Please update your profile with your bank details');
         }
 
-        //@TODO Uncomment when the frontend is ready
-        // $todaysWithdrawals = $this->user->transactions()->withdrawals()->where('wallet_transactions.created_at', '>=', now()->startOfDay())->sum('amount');
-        
-        // if (is_null($this->user->email_verified_at) && $todaysWithdrawals > config('trivia.max_withdrawal_amount')) {
-        //     return $this->sendError(false, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        // }
+        if ($platform == ClientPlatform::StakingMobileWeb) {
+            $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
+            if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.max_withdrawal_amount')) {
+                $data = [
+                    'verifyEmailNavigation' => true,
+                ];
+                return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
+            }
+        }
 
         // if (is_null($this->user->phone_verified_at)) {
         //     return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');

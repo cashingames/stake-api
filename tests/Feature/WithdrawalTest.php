@@ -52,29 +52,30 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
-    // public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded(){
+    public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded(){
 
-    //     Config::set('trivia.max_withdrawal_amount', 10000);
-    //     $this->user->update(['email_verified_at' => null]);
+        Config::set('trivia.max_withdrawal_amount', 10000);
+        $this->user->update(['email_verified_at' => null]);
     
-    //     $this->user->wallet->withdrawable_balance = 20000;
-    //     $this->user->wallet->save();
+        $this->user->wallet->withdrawable_balance = 20000;
+        $this->user->wallet->save();
        
-    //     WalletTransaction::create([
-    //         'wallet_id' => $this->user->wallet->id,
-    //         'transaction_type' => 'DEBIT',
-    //         'amount' => 15000,
-    //         'balance' => $this->user->wallet->withdrawable_balance,
-    //         'description' => 'Winnings Withdrawal Made',
-    //         'reference' => Str::random(10),
-    //         'created_at' => now()->subHours(3)
-    //     ]);
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => 15000,
+            'balance' => $this->user->wallet->withdrawable_balance,
+            'description' => 'Winnings Withdrawal Made',
+            'reference' => Str::random(10),
+            'created_at' => now()->subHours(3)
+        ]);
     
-    //     $response = $this->post(self::WITHDRAWAL_URL);
-    //     $response->assertJson([
-    //         'message' => 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com',
-    //     ]);
-    // }
+        $response = $this->withHeaders(['x-brand-id' => 2])->post(self::WITHDRAWAL_URL);
+        
+        $response->assertJsonFragment([
+            'verifyEmailNavigation' => true,
+        ]);
+    }
 
     public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount(){
         Config::set('trivia.staking.min_withdrawal_amount', 500);
