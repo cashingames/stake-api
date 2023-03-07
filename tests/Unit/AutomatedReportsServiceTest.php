@@ -30,6 +30,10 @@ class AutomatedReportsServiceTest extends TestCase
         Staking::factory()
             ->count(10)
             ->create();
+        GameSession::factory()
+            ->count(10)
+            ->create(['created_at'=>now()]);
+
         $this->user = User::inRandomOrder()->first();
         $this->reportsService = new AutomatedReportsService();
     }
@@ -37,7 +41,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(5, $dailyReports);
+        $this->assertCount(10, $dailyReports);
     }
 
     public function test_that_daily_reports_returns_net_profit()
@@ -97,7 +101,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(8, $weeklyReports);
+        $this->assertCount(18, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()

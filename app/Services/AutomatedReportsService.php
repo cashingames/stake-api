@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ExhibitionStaking;
 use Carbon\Carbon;
 use App\Models\GameSession;
 use App\Models\Staking;
@@ -30,6 +31,10 @@ class AutomatedReportsService
     public $timeFreezeboostBoughtAmount;
     public $skipBoostBoughtAmount;
     public $skipBoostBoughtCount;
+    public $averageStakesPerStaker;
+    public $averageBoostUsedPerGameSession;
+    public $totalGameSessions;
+    public $totalStakes;
 
     public function getDailyReports()
     {
@@ -90,7 +95,7 @@ class AutomatedReportsService
             ->where('created_at', '<=', $endDate)
             ->sum('amount_staked');
         $this->netProfit = $this->getPlatformProfit($startDate, $endDate);
-        $this->stakers = $this->getStakers($startDate, $endDate)->get();
+        $this->stakers = $this->getTopStakers($startDate, $endDate)->get();
         $this->totalFundedAmount = WalletTransaction::where('transaction_type', 'CREDIT')
             ->where('description', 'Fund Wallet')->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
@@ -107,6 +112,12 @@ class AutomatedReportsService
         $this->timeFreezeboostBoughtCount = $this->getTimeFreezePurchasedBoostsCount($startDate, $endDate);
         $this->skipBoostBoughtAmount = $this->getSkipPurchasedBoostsAmount($startDate, $endDate);
         $this->skipBoostBoughtCount = $this->getSkipPurchasedBoostsCount($startDate, $endDate);
+        $this->totalPurchasedBoostAmount = $this->getTotalPurchasedBoostAmount($startDate, $endDate);
+        $this->totalGameSessions = $this->getTotalGameSessions($startDate, $endDate);
+        $this->totalStakes = $this->getTotalStakes($startDate, $endDate) ;
+        // dd($this->totalGameSessions );
+        $this->averageBoostUsedPerGameSession = $this->totalUsedBoostCount/$this->totalGameSessions;
+        $this->averageStakesPerStaker = $this->uniqueStakersCount/$this->totalStakes ;
 
         $data = [
             'netProfit' => number_format($this->netProfit),
@@ -124,7 +135,9 @@ class AutomatedReportsService
             'timeFreezeboostBoughtAmount' => number_format($this->timeFreezeboostBoughtAmount),
             'timeFreezeboostBoughtCount' => $this->timeFreezeboostBoughtCount,
             'skipBoostBoughtAmount' => number_format($this->skipBoostBoughtAmount),
-            'skipBoostBoughtCount' => $this->skipBoostBoughtCount
+            'skipBoostBoughtCount' => $this->skipBoostBoughtCount,
+            'averageStakesPerStaker' => round($this->averageStakesPerStaker, 3),
+            'averageBoostUsedPerGameSession' => round($this->averageBoostUsedPerGameSession, 3),
         ];
 
         return $data;
@@ -144,7 +157,7 @@ class AutomatedReportsService
         return $amountStaked - $amountWon;
     }
 
-    private function getStakers($startDate, $endDate)
+    private function getTopStakers($startDate, $endDate)
     {
 
         $stakers =  DB::table('game_sessions')
@@ -182,8 +195,9 @@ class AutomatedReportsService
             ->where('created_at', '<=', $endDate)->count();
     }
     private function getTotalPurchasedBoostsCount($startDate, $endDate){
-        return DB::table('user_boosts')->where('boost_id','>',1)->where('created_at', '>=', $startDate)
-        ->where('created_at', '<=', $endDate)->groupBy('boost_id')->count();
+       return WalletTransaction::where('description','LIKE','Bought TIME FEEZE boosts')
+        ->orWhere('description','LIKE','Bought SKIP boosts')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->count();
     }
 
     private function getTotalNumberOfUniqueStakers($startDate, $endDate){
@@ -191,25 +205,35 @@ class AutomatedReportsService
         ->where('created_at', '<=', $endDate)->groupBy('user_id')->count();
     }
     private function getTotalPurchasedBoostAmount($startDate, $endDate){
-        return WalletTransaction::where('description','LIKE','%bought boosts%')->where('created_at', '>=', $startDate)
+        return WalletTransaction::where('description','LIKE','Bought TIME FEEZE boosts')
+        ->orWhere('description','LIKE','bought SKIP boosts')->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->sum('amount');
     }
 
     private function getTimeFreezePurchasedBoostsCount($startDate, $endDate){
-        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        return WalletTransaction::where('description','LIKE','Bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->count();
     }
 
     private function getTimeFreezePurchasedBoostsAmount($startDate, $endDate){
-        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        return WalletTransaction::where('description','LIKE','Bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->sum('amount');
     }
     private function getSkipPurchasedBoostsAmount($startDate, $endDate){
-        return WalletTransaction::where('description','LIKE','bought SKIP boosts')->where('created_at', '>=', $startDate)
+        return WalletTransaction::where('description','LIKE','Bought SKIP boosts')->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->sum('amount');
     }
     private function getSkipPurchasedBoostsCount($startDate, $endDate){
-        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        return WalletTransaction::where('description','LIKE','Bought SKIP boosts')->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->count();
+    }
+
+    private function getTotalStakes($startDate, $endDate){
+        return Staking::where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->count();
+    }
+
+    private function getTotalGameSessions($startDate, $endDate){
+        return GameSession::where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
     }
 }
