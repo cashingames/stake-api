@@ -25,6 +25,11 @@ class AutomatedReportsService
     public $totalUsedBoostCount;
     public $totalPurchasedBoostCount;
     public $uniqueStakersCount;
+    public $totalPurchasedBoostAmount;
+    public $timeFreezeboostBoughtCount;
+    public $timeFreezeboostBoughtAmount;
+    public $skipBoostBoughtAmount;
+    public $skipBoostBoughtCount;
 
     public function getDailyReports()
     {
@@ -98,6 +103,10 @@ class AutomatedReportsService
         $this->totalUsedBoostCount = $this->getTotalUsedBoostCount($startDate, $endDate);
         $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
         $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakers($startDate, $endDate);
+        $this->timeFreezeboostBoughtAmount = $this->getTimeFreezePurchasedBoostsAmount($startDate, $endDate);
+        $this->timeFreezeboostBoughtCount = $this->getTimeFreezePurchasedBoostsCount($startDate, $endDate);
+        $this->skipBoostBoughtAmount = $this->getSkipPurchasedBoostsAmount($startDate, $endDate);
+        $this->skipBoostBoughtCount = $this->getSkipPurchasedBoostsCount($startDate, $endDate);
 
         $data = [
             'netProfit' => number_format($this->netProfit),
@@ -105,13 +114,17 @@ class AutomatedReportsService
             'totalFundedAmount' => number_format($this->totalFundedAmount),
             'totalWithdrawals' => number_format($this->totalWithdrawals),
             'completedStakingSessionsCount' => $this->completedStakingSessionsCount,
-            'numberOfStakers' => $this->stakers->count(),
             'totalAmountWon' => number_format($this->totalAmountWon),
             'totalStakedamount' => number_format($this->totalStakedamount),
             'incompleteStakingSessionsCount' => $this->incompleteStakingSessionsCount,
             'totalUsedBoostCount' => $this->totalUsedBoostCount,
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
-            'uniqueStakersCount' => $this->uniqueStakersCount
+            'uniqueStakersCount' => $this->uniqueStakersCount,
+            'totalPurchasedBoostAmount' => number_format($this->totalPurchasedBoostAmount),
+            'timeFreezeboostBoughtAmount' => number_format($this->timeFreezeboostBoughtAmount),
+            'timeFreezeboostBoughtCount' => $this->timeFreezeboostBoughtCount,
+            'skipBoostBoughtAmount' => number_format($this->skipBoostBoughtAmount),
+            'skipBoostBoughtCount' => $this->skipBoostBoughtCount
         ];
 
         return $data;
@@ -176,5 +189,27 @@ class AutomatedReportsService
     private function getTotalNumberOfUniqueStakers($startDate, $endDate){
         return Staking::where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)->groupBy('user_id')->count();
+    }
+    private function getTotalPurchasedBoostAmount($startDate, $endDate){
+        return WalletTransaction::where('description','LIKE','%bought boosts%')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->sum('amount');
+    }
+
+    private function getTimeFreezePurchasedBoostsCount($startDate, $endDate){
+        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->count();
+    }
+
+    private function getTimeFreezePurchasedBoostsAmount($startDate, $endDate){
+        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->sum('amount');
+    }
+    private function getSkipPurchasedBoostsAmount($startDate, $endDate){
+        return WalletTransaction::where('description','LIKE','bought SKIP boosts')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->sum('amount');
+    }
+    private function getSkipPurchasedBoostsCount($startDate, $endDate){
+        return WalletTransaction::where('description','LIKE','bought TIME FEEZE boosts')->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->count();
     }
 }
