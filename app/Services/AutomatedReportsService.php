@@ -21,6 +21,10 @@ class AutomatedReportsService
     public $completedStakingSessionCount;
     public $totalWithdrawals;
     public $completedStakingSessionsCount;
+    public $incompleteStakingSessionsCount;
+    public $totalUsedBoostCount;
+    public $totalPurchasedBoostCount;
+    public $uniqueStakersCount;
 
     public function getDailyReports()
     {
@@ -46,12 +50,24 @@ class AutomatedReportsService
             ->where('created_at', '<=', $endDate)
             ->sum('amount_staked');
 
+        $this->completedStakingSessionsCount = $this->getCompletedStakingSessionsCount($startDate, $endDate);
+
+        $this->incompleteStakingSessionsCount = $this->getIcompleteStakingSessionsCount($startDate, $endDate);
+        $this->totalUsedBoostCount = $this->getTotalUsedBoostCount($startDate, $endDate);
+        $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
+        $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakers($startDate, $endDate);
+
         $data = [
             'netProfit' => number_format($this->netProfit),
             'totalFundedAmount' => number_format($this->totalFundedAmount),
             'totalWithdrawals' => number_format($this->totalWithdrawals),
             'totalAmountWon' => number_format($this->totalAmountWon),
-            'totalStakedAmount' => number_format($this->totalStakedamount)
+            'totalStakedAmount' => number_format($this->totalStakedamount),
+            'completedStakingSessionsCount' => $this->completedStakingSessionsCount,
+            'incompleteStakingSessionsCount' => $this->incompleteStakingSessionsCount,
+            'totalUsedBoostCount' => $this->totalUsedBoostCount,
+            'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
+            'uniqueStakersCount' => $this->uniqueStakersCount
         ];
 
         return $data;
@@ -78,6 +94,10 @@ class AutomatedReportsService
             ->where('description', 'Winnings Withdrawal Made')->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)->sum('amount');
         $this->completedStakingSessionsCount = $this->getCompletedStakingSessionsCount($startDate, $endDate);
+        $this->incompleteStakingSessionsCount = $this->getIcompleteStakingSessionsCount($startDate, $endDate);
+        $this->totalUsedBoostCount = $this->getTotalUsedBoostCount($startDate, $endDate);
+        $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
+        $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakers($startDate, $endDate);
 
         $data = [
             'netProfit' => number_format($this->netProfit),
@@ -87,7 +107,11 @@ class AutomatedReportsService
             'completedStakingSessionsCount' => $this->completedStakingSessionsCount,
             'numberOfStakers' => $this->stakers->count(),
             'totalAmountWon' => number_format($this->totalAmountWon),
-            'totalStakedamount' => number_format($this->totalStakedamount)
+            'totalStakedamount' => number_format($this->totalStakedamount),
+            'incompleteStakingSessionsCount' => $this->incompleteStakingSessionsCount,
+            'totalUsedBoostCount' => $this->totalUsedBoostCount,
+            'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
+            'uniqueStakersCount' => $this->uniqueStakersCount
         ];
 
         return $data;
@@ -131,5 +155,26 @@ class AutomatedReportsService
     {
         return GameSession::whereHas('exhibitionStaking')->where('state', 'COMPLETED')
             ->where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
+    }
+
+    private function getIcompleteStakingSessionsCount($startDate, $endDate)
+    {
+        return GameSession::whereHas('exhibitionStaking')->where('state', 'ONGOING')
+            ->where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
+    }
+
+    private function getTotalUsedBoostCount($startDate, $endDate)
+    {
+        return DB::table('exhibition_boosts')->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $endDate)->count();
+    }
+    private function getTotalPurchasedBoostsCount($startDate, $endDate){
+        return DB::table('user_boosts')->where('boost_id','>',1)->where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->groupBy('boost_id')->count();
+    }
+
+    private function getTotalNumberOfUniqueStakers($startDate, $endDate){
+        return Staking::where('created_at', '>=', $startDate)
+        ->where('created_at', '<=', $endDate)->groupBy('user_id')->count();
     }
 }
