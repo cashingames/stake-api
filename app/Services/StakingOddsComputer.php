@@ -17,7 +17,7 @@ class StakingOddsComputer
     {
         $percentWonToday = $this->getPercentageWonToday($user);
 
-        $stakingOddsRule = Cache::remember('staking-odds', 60*60, fn () => StakingOddsRule::all());
+        $stakingOddsRule = Cache::remember('staking-odds-rule', 60 * 60, fn() => StakingOddsRule::get());
 
         $oddsMultiplier = 1;
         $oddsCondition = "no_matching_condition";

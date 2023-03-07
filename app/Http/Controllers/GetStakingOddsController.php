@@ -7,6 +7,7 @@ use App\Models\StakingOdd;
 use App\Services\FeatureFlag;
 use App\Services\StakingOddsComputer;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class GetStakingOddsController extends BaseController
 {
@@ -16,11 +17,16 @@ class GetStakingOddsController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(): JsonResponse
+    public function __invoke(StakingOddsComputer $oddsComputer): JsonResponse
     {
         $message = 'staking odds fetched';
 
-        $stakingOdds = StakingOdd::active()->orderBy('score', 'DESC')->get();
+        $stakingOdds = Cache::remember(
+            'staking-odds',
+            60 * 60,
+            fn() => StakingOdd::active()->orderBy('score', 'DESC')->get()
+        );
+
         /**
          * This controls the dynamic odd feature
          * @TODO Rename to TRIVIA_STAKING_WITH_DYNAMIC_ODDS
@@ -30,8 +36,7 @@ class GetStakingOddsController extends BaseController
         }
 
         $allStakingOddsWithOddsMultiplierApplied = [];
-        $oddMultiplierComputer = new StakingOddsComputer();
-        $oddMultiplier = $oddMultiplierComputer->compute($this->user);
+        $oddMultiplier = $oddsComputer->compute($this->user);
 
         foreach ($stakingOdds as $odd) {
             $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);
@@ -39,6 +44,6 @@ class GetStakingOddsController extends BaseController
         }
 
         return $this->sendResponse($allStakingOddsWithOddsMultiplierApplied, $message);
-       
+
     }
 }
