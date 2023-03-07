@@ -54,7 +54,50 @@
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Completed Staking Sessions</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['completedStakingSessionsCount']}}</td>
             </tr>
-
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Incomplete Staking Sessions</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['incompleteStakingSessionsCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Used Boosts Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalUsedBoostCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalPurchasedBoostCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Unique Stakers Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['uniqueStakersCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Amount</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalPurchasedBoostAmount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Time Freeze Purchased Boosts Amount</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['timeFreezeboostBoughtAmount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Skip Purchased Boosts Amount</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['skipBoostBoughtAmount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Time Freeze Purchased Boosts Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['timeFreezeboostBoughtCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Skip Purchased Boosts Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['skipBoostBoughtCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Average Stake Per Staker</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['averageStakesPerStaker']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Average Boost Used Per Game Session</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['averageBoostUsedPerGameSession']}}</td>
+            </tr>
         </table>
     </div>
     <h3 style="text-align: center;padding-top: 2rem;"> Top {{count($data['stakers'])}} Stakers  </h3>

@@ -49,6 +49,26 @@
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Amount Won</th>
                 <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalAmountWon']}}</td>
             </tr>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Completed Stake Sessions Count</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['completedStakingSessionsCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Incomplete Stake Sessions Count</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['incompleteStakingSessionsCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Used Boosts Count</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalUsedBoostCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Count</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalPurchasedBoostCount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Unique Stakers Count</th>
+                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['uniqueStakersCount']}}</td>
+            </tr>
         </table>
     </div>
 </body>

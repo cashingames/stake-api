@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Mail\DailyReportEmail;
 use App\Mail\WeeklyReportEmail;
+use App\Models\GameSession;
+use App\Models\Staking;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
@@ -12,7 +14,8 @@ use UserSeeder;
 use PlanSeeder;
 
 class ArtisanCommandsTest extends TestCase
-{
+{   
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      *
@@ -69,7 +72,15 @@ class ArtisanCommandsTest extends TestCase
     }
 
     public function test_that_weekly_automated_report_command_runs()
-    {   
+    {  
+        GameSession::factory()
+        ->count(5)
+        ->create(['created_at'=>now()]);
+
+        Staking::factory()
+        ->count(5)
+        ->create(['created_at'=>now()]);
+
         Mail::fake();
 
         $this->artisan('weekly-report:send')->assertExitCode(0);
