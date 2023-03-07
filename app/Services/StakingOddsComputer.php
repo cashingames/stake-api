@@ -16,14 +16,17 @@ class StakingOddsComputer
 
     public function compute(User $user): array
     {
-        $percentWonToday = $this->getPercentageWonToday($user);
+        $todaysData = $this->getTodaysData($user);
+
+        $percentWonToday = $todaysData['percentWonToday'];
+        $gameCount = $todaysData['gameCount'];
 
         $stakingOddsRule = Cache::remember('staking-odds-rule', 60 * 60, fn() => StakingOddsRule::get());
 
         $oddsMultiplier = 1;
         $oddsCondition = "no_matching_condition";
 
-        if ($this->isNewPlayer($user)) {
+        if ($gameCount <= 3) {
             $newUserRulesAndConditions = $stakingOddsRule->where('rule', 'GAME_COUNT_LESS_THAN_5')->first();
             $oddsMultiplier = $newUserRulesAndConditions->odds_benefit;
             $oddsCondition = $newUserRulesAndConditions->display_name;
@@ -71,18 +74,18 @@ class StakingOddsComputer
         return Carbon::createFromDate($lastFund->created_at)->gt(Carbon::createFromDate($lastGame->created_at));
     }
 
-    public function isNewPlayer(User $user)
-    {
-        return $user->gameSessions()->count() <= 3;
-    }
-
-
-    private function getPercentageWonToday($user): float
+    private function getTodaysData($user): array
     {
         $todayStakes = $user->gameSessions()
             ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
             ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
-            ->select(DB::raw('sum(stakings.amount_staked) as amount_staked, sum(stakings.amount_won) as amount_won'))
+            ->select(
+                DB::raw(
+                    'sum(stakings.amount_staked) as amount_staked,
+                sum(stakings.amount_won) as amount_won,
+                count(stakings.id) as count'
+                )
+            )
             ->whereDate('game_sessions.created_at', '=', date('Y-m-d'))
             ->first();
 
@@ -91,10 +94,10 @@ class StakingOddsComputer
         $amountWon = $todayStakes?->amount_amount_won ?? 1;
 
         if ($amountStaked == 0 || $amountWon == 0) {
-            return 1;
+            return ['percentWonToday' => 1, 'gameCount' => 0];
         }
 
-        return $amountWon / $amountStaked;
+        return ['percentWonToday' => $amountWon / $amountStaked, 'gameCount' => $todayStakes?->count ?? 0];
     }
 
 }

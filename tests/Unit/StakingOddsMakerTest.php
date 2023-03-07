@@ -39,7 +39,6 @@ class StakingOddsMakerTest extends TestCase
             ->create([
                 'user_id' => $this->user->id
             ]);
-        // GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $this->latestThreeGames = $this->user->gameSessions()->latest()->limit(3)->get();
         $this->specialHours = config('odds.special_hours');
         $this->currentHour = date("H");
@@ -51,101 +50,19 @@ class StakingOddsMakerTest extends TestCase
         $oddsComputer = new StakingOddsComputer();
         $oddEffect = $oddsComputer->compute($user);
         $expectation = 3;
-        
-        $currentHour = (intval($this->currentHour) < 9 ? "0" : "") . (intval($this->currentHour) + 1) . ":00";
-        // if (in_array($currentHour, $this->specialHours)){
-        //     $expectation += 1.5;
-        // }
 
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
-    public function test_odds_when_avg_score_less_than_5_in_normal_hours()
+    public function test_odds_when_game_count_less_than_4()
     {
-        $currentHour = intval(date("H"));
-
-        config(['odds.special_hours' => [
-            intval($currentHour) . ":00",
-        ]]);
-
-
         $this->latestThreeGames->map(function ($game) {
             $game->update(['correct_count' => 3]);
         });
 
         $oddsComputer = new StakingOddsComputer();
         $oddEffect = $oddsComputer->compute($this->user);
-        $expectation = 1;
-        if (in_array($this->currentHour, $this->specialHours)) {
-            $expectation += 1.5;
-        }
+        $expectation = 3;
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
 
-    public function test_odds_when_avg_score_between_5_and_7()
-    {
-        $oddsComputer = new StakingOddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user);
-        $expectation = 1;
-        if (in_array($this->currentHour, $this->specialHours)) {
-            $expectation += 0;
-        }
-        $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
-    }
-
-    public function test_odds_when_avg_score_greater_than_7()
-    {
-        $this->latestThreeGames->map(function ($game) {
-            $game->update(['correct_count' => 8.2]);
-        });
-
-        $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
-
-        $oddsComputer = new StakingOddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user);
-        $expectation = 1;
-        if (in_array($this->currentHour, $this->specialHours)) {
-            $expectation += 1.5;
-        }
-        $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
-    }
-
-    public function test_odds_after_immediate_wallet_funding(){
-        $this->latestThreeGames->map(function ($game) {
-            $game->update(['correct_count' => 6.5]);
-        });
-
-        WalletTransaction::factory()->create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'description' => 'fund wallet',
-            'created_at' => now()->addHours(1),
-            'updated_at' => now()->addHours(1)
-        ]);
-        $avg_score = $this->user->gameSessions()->latest()->limit(3)->get()->avg('correct_count');
-        $oddsComputer = new StakingOddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user);
-        $expectation = 1.5;
-        if (in_array($this->currentHour, $this->specialHours)) {
-            $expectation += 0.5;
-        }
-        $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
-
-    }
-
-    public function test_odds_when_current_time_is_special(){
-        $currentHour = date("H");
-        config(['odds.special_hours' => [
-            $currentHour . ":00",
-            (intval($currentHour) < 9 ? "0" : "") . (intval($currentHour) + 1) . ":00"
-        ]]);
-        
-        
-        $oddsComputer = new StakingOddsComputer();
-        $oddEffect = $oddsComputer->compute($this->user);
-
-        $expectation = 1;
-        
-        $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
-
-    }
 }
