@@ -26,7 +26,7 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
 
     private function getEasyQuestions(string $categoryId): Collection
     {
-        if($this->clientPlatform != ClientPlatform::GameArkMobile){
+        if($this->clientPlatform == ClientPlatform::GameArkMobile){
 
             $value = Category::find($categoryId)
                         ->questions()
