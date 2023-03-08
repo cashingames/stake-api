@@ -24,9 +24,16 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
                 ->easy()
                 ->inRandomOrder()
                 ->take(20)
-                ->get()
+                ->get();
 
-                ->makeVisible(['is_correct']);
+        $value = $value->each(function ($i, $k) {
+
+            $i->options->each(function($ib, $kb){
+                $ib->makeVisible(['is_correct']);
+            });
+
+        });
+
 
 
         return $value;
