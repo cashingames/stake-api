@@ -51,6 +51,10 @@ class WeeklyReportEmail extends Mailable
     {
         return new Content(
             view: 'emails.weeklyReports',
+            with: [
+                'startDate' => Carbon::yesterday()->startOfWeek()->toFormattedDateString(),
+                'endDate' => Carbon::yesterday()->endOfWeek()->toFormattedDateString(),
+            ],
         );
     }
 
