@@ -6,7 +6,7 @@ use App\Enums\QuestionLevel;
 use App\Models\Category;
 use App\Models\Staking;
 use Illuminate\Support\Collection;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Determining Question Hardening odds of a user
@@ -20,32 +20,43 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $category = Category::find($categoryId);
         $platformProfitToday = $this->getPlatformProfitToday();
         $questions = null;
+        $percentWonToday = $this->getPercentageWonToday($user);
 
+        $isNewUser = $this->isNewUser($user);
 
-        if ($platformProfitToday < 0.2) { //if platform is not winning up to 20% of amount staked today
+        if ($platformProfitToday < 30 & !$isNewUser) {
             Log::info(
-                'Serving getHardQuestions',
-                ['user' => $user->username, 'platformProfitToday' => $platformProfitToday]
+                'Serving getHardQuestions due to platform not meeting KPI',
+                [
+                    'user' => $user->username,
+                    'userProfitToday' => $percentWonToday.'%',
+                    'platformProfitToday' => $platformProfitToday.'%'
+                ]
             );
             return $this->getHardQuestions($user, $category);
         }
 
-
-        $percentWonToday = $this->getPercentageWonToday($user);
-        // if ($percentWonToday <= 0.2) { //if user is losing 80% of the time
-        //     $questions = $this->getRepeatedEasyQuestions($user, $categoryId);
-        // } else
-        if ($percentWonToday < 0.6 || $this->isNewUser($user)) { //if user is losing 50% of the time
+        if ($isNewUser) {
+            $questions = $this->getRepeatedEasyQuestions($user, $category);
+            Log::info(
+                'Serving getRepeatedEasyQuestions for new users',
+                [
+                    'user' => $user->username,
+                    'userProfitToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%'
+                ]
+            );
+        } elseif ($percentWonToday < -50 ) { //if user is losing 50% of the time
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
                 [
                     'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
+                    'userProfitToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-        } elseif ($percentWonToday <= 1) { //if not really winning or losing
+        } elseif ($percentWonToday < 100) {
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
@@ -55,7 +66,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } elseif ($percentWonToday <= 1.3) { //if user is winning 20% of the time
+        } elseif ($percentWonToday < 200 ) {
             $questions = $this->getMediumQuestions($user, $category);
             Log::info(
                 'Serving getMediumQuestions',
@@ -65,7 +76,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } elseif ($percentWonToday <= 1.6) { //if user is winning 50% of the time
+        } elseif ($percentWonToday < 600) { //if user is winning 50% of the time
             $questions = $this->getHardQuestions($user, $category);
             Log::info(
                 'Serving getHardQuestions',
@@ -75,7 +86,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } elseif ($percentWonToday > 2.1) { //if user is winning 100% of the time
+        } elseif ($percentWonToday > 1000) { //if user is winning 100% of the time
             $questions = $this->getExpertQuestions($user, $category);
             Log::info(
                 'Serving getExpertQuestions',
@@ -114,24 +125,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         return $user->gameSessions()->count() <= 3;
     }
 
-
-    /**
-     * Though we said new, it also includes repeated questions, probability of repeated questions is low though
-     *
-     * @param mixed $user
-     * @param string $categoryId
-     * @return Collection
-     */
-    private function getNewAndRepeatedEasyQuestion(Category $category): Collection
-    {
-        return $category
-            ->questions()
-            ->easy()
-            ->inRandomOrder()
-            ->take(20)
-            ->get();
-    }
-
     /**
      * This includes both new and repeated questions as we are not sure if the
      * user will always win
@@ -142,14 +135,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
      */
     private function getEasyAndMediumQuestions(Category $category): Collection
     {
-        // $recentQuestions = $this->previouslySeenQuestions($user, $categoryId, QuestionLevel::Medium);
-
         return $category
             ->questions()
             ->easyOrMedium()
-            // ->when($recentQuestions->count() > 20, function ($query) use ($recentQuestions) {
-            //     return $query->whereIn('questions.id', $recentQuestions);
-            // })
             ->inRandomOrder()
             ->take(20)
             ->get();
@@ -247,11 +235,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
         $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
-        if ($amountStaked == 0 || $amountWon == 0) {
-            return 1;
+        if ($amountStaked == 0) {
+            return 0;
         }
 
-        return $amountWon / $amountStaked;
+        return (($amountWon / $amountStaked) - 1) * 100;
     }
 
     private function getPlatformProfitToday()
@@ -266,10 +254,10 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
          * So first user should be lucky
          */
         if ($amountStaked == 0) {
-            return 1;
+            return 0;
         }
 
-        return 1 - ($amountWon / $amountStaked);
+        return (($amountStaked / $amountWon) - 1) * 100;
     }
 
 }
