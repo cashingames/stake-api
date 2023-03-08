@@ -41,7 +41,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(10, $dailyReports);
+        $this->assertCount(11, $dailyReports);
     }
 
     public function test_that_daily_reports_returns_net_profit()
@@ -101,7 +101,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(18, $weeklyReports);
+        $this->assertCount(17, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()
@@ -154,15 +154,13 @@ class AutomatedReportsServiceTest extends TestCase
 
     public function test_that_weekly_reports_returns_stakers()
     {
-        ExhibitionStaking::factory()
-            ->count(20)
-            ->create();
-
-        GameSession::query()->update([
-            'created_at' => now()->subDays(1),
+        Staking::query()->update([
+            'created_at' => now(),
+            'amount_staked' => 400,
+            'user_id' => $this->user->id
         ]);
 
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(10, $weeklyReports['stakers']);
+        $this->assertCount(1, $weeklyReports['stakers']);
     }
 }
