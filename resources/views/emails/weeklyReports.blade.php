@@ -26,7 +26,7 @@
         }
     </style>
 
-    <h1 style="text-align: center; padding-top: 2rem;">Weekly Report</h1>
+    <h1 style="text-align: center; padding-top: 2rem;">Weekly Report ({{$startDate}}) to ({{$endDate}})</h1>
 
     <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
         <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
@@ -115,6 +115,7 @@
                 <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->username}}</td>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_staked)}}</td>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_won)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->game_session_count)}}</td>
             </tr>
             @endforeach
         </table>

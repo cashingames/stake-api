@@ -162,18 +162,17 @@ class AutomatedReportsService
 
         $stakers =  DB::table('game_sessions')
             ->select(
-                "stakings.amount_won",
-                "stakings.amount_staked",
                 "users.username",
                 DB::raw('SUM(stakings.amount_won) AS amount_won'),
-                DB::raw('SUM(stakings.amount_staked) AS amount_staked')
+                DB::raw('SUM(stakings.amount_staked) AS amount_staked'),
+                DB::raw('COUNT(game_sessions.id) AS game_session_count')
             )
             ->where('game_sessions.created_at', '>=', $startDate)
             ->where('game_sessions.created_at', '<=', $endDate)
             ->join("exhibition_stakings", "exhibition_stakings.game_session_id", "=", "game_sessions.id")
             ->join("stakings", "stakings.id", "=", "exhibition_stakings.staking_id")
             ->join("users", "users.id", "=", "game_sessions.user_id")
-            ->groupBy('game_sessions.user_id')->orderBy('stakings.amount_won')->limit(10);
+            ->groupBy('game_sessions.user_id')->orderBy('amount_won','DESC')->limit(10);
         return $stakers;
     }
 
