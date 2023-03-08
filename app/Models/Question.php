@@ -88,7 +88,7 @@ class Question extends Model
   {
     return $query->whereLevel(QuestionLevel::Expert);
   }
-  
+
   public function getLevelAttribute($value)
   {
     return base64_encode($value);

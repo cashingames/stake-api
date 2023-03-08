@@ -726,8 +726,19 @@ class GameTest extends TestCase
             "type" => 2
         ]);
 
-        $response->assertJson([
-            'message' => 'Game Started',
+        $response->assertJsonStructure([
+            "message",
+            "data" => [
+                "questions" => [
+                    [
+                        "options" => [
+                            [
+                                "is_correct"
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ]);
     }
 }
