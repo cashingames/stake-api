@@ -25,7 +25,9 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
                 ->inRandomOrder()
                 ->take(20)
                 ->get()
-                ->makeVisible(['is_correct'])->toArray();
+
+                ->makeVisible(['is_correct']);
+
 
         return $value;
 
