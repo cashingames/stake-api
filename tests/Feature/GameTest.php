@@ -685,7 +685,7 @@ class GameTest extends TestCase
 
     }
 
-    public function test_gameark_game_can_be_started()
+    public function test_gameark_game_options_is_recieved_with_approach_answers()
     {
         $questions = Question::factory()
             ->count(250)
