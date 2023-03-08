@@ -25,9 +25,9 @@ class StandardExhibitionGameService implements PlayGameServiceInterface
 
     private QuestionsHardeningServiceInterface $questionsHardeningService;
 
-    public function __construct($clientPlatform)
+    public function __construct()
     {
-        $this->questionsHardeningService = new StandardExhibitionQuestionsHardeningService($clientPlatform);
+        $this->questionsHardeningService = new StandardExhibitionQuestionsHardeningService();
         $this->user = auth()->user();
     }
 

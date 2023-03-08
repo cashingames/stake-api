@@ -36,18 +36,4 @@ class Option extends Model
   {
     return base64_encode(str_replace('"', '', $value));
   }
-
-  public function makeVisible($attributes)
-  {
-    $this->hidden = array_diff($this->hidden, (array) $attributes);
-
-    return $this;
-  }
-
-  public function makeHidden($attributes)
-  {
-    $this->hidden = array_merge($this->hidden, (array) $attributes);
-
-    return $this;
-  }
 }

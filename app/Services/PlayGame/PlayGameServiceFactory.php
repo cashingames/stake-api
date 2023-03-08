@@ -3,7 +3,6 @@
 namespace App\Services\PlayGame;
 
 use App\Enums\GameType;
-use App\Enums\ClientPlatform;
 use App\Services\PlayGame\StakingExhibitionGameService;
 use App\Services\PlayGame\StakingLiveTriviaGameService;
 use App\Services\PlayGame\StakingChallengeGameService;
@@ -15,12 +14,10 @@ class PlayGameServiceFactory
 {
 
     private GameType $gameType;
-    private ClientPlatform $clientPlatform;
 
-    public function __construct(GameType $gameType, ClientPlatform $clientPlatform)
+    public function __construct(GameType $gameType)
     {
         $this->gameType = $gameType;
-        $this->clientPlatform = $clientPlatform;
     }
 
     public function getGame(): PlayGameServiceInterface
@@ -30,7 +27,7 @@ class PlayGameServiceFactory
 
         switch ($this->gameType) {
             case GameType::StandardExhibition:
-                $result = new StandardExhibitionGameService($this->clientPlatform);
+                $result = new StandardExhibitionGameService();
                 break;
             case GameType::StakingExhibition:
                 $result = new StakingExhibitionGameService();
