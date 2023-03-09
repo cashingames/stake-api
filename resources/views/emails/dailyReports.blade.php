@@ -62,13 +62,38 @@
                 <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalUsedBoostCount']}}</td>
             </tr>
             <tr style=" color: gray;text-align: left;">
-                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Count</th>
-                <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalPurchasedBoostCount']}}</td>
-            </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Unique Stakers Count</th>
                 <td style = "border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['uniqueStakersCount']}}</td>
             </tr>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Count</th>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['totalPurchasedBoostCount']}}</td>
+            </tr>
+        </table>
+    </div>
+    <h3 style="text-align: center;padding-top: 2rem;"> Top {{count($data['stakers'])}} Stakers  </h3>
+    <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">#</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Username</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Email</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Staked</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Won</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Profit</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Profit Percentage</th>
+            </tr>
+            @foreach($data['stakers'] as $key=>$data)
+            <tr style=" color: gray;text-align: left;">
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$key + 1}}</td>
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->username}}</td>
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->email}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->staked)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->won)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->profit)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->profit_perc)}}</td>
+            </tr>
+            @endforeach
         </table>
     </div>
 </body>

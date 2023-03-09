@@ -70,31 +70,27 @@
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Unique Stakers Count</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['uniqueStakersCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; ">
-                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Amount</th>
-                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['totalPurchasedBoostAmount']}}</td>
-            </tr>
-            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Time Freeze Purchased Boosts Amount</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['timeFreezeboostBoughtAmount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; ">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Skip Purchased Boosts Amount</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{$data['skipBoostBoughtAmount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Time Freeze Purchased Boosts Count</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['timeFreezeboostBoughtCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; ">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Skip Purchased Boosts Count</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['skipBoostBoughtCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Average Stake Per Staker</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['averageStakesPerStaker']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; ">
+            <tr style=" color: gray;text-align: left;background-color: #dddddd; ">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Average Boost Used Per Game Session</th>
                 <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{$data['averageBoostUsedPerGameSession']}}</td>
             </tr>
@@ -106,16 +102,21 @@
             <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">#</th>
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Username</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Email</th>
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Staked</th>
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Amount Won</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Profit</th>
+                <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Profit Percentage</th>
             </tr>
             @foreach($data['stakers'] as $key=>$data)
             <tr style=" color: gray;text-align: left;">
                 <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$key + 1}}</td>
                 <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->username}}</td>
-                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_staked)}}</td>
-                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->amount_won)}}</td>
-                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->game_session_count)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data->email}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->staked)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">₦{{number_format($data->won)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->profit)}}</td>
+                <td style="border: 1px solid #dddddd;text-align: right;padding: 8px;">{{number_format($data->profit_perc)}}</td>
             </tr>
             @endforeach
         </table>

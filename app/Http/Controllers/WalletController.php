@@ -333,7 +333,7 @@ class WalletController extends BaseController
 
         $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
 
-        if ($userBoost === null) {
+        if ($userBoost == null) {
             $this->user->boosts()->create([
                 'user_id' => $this->user->id,
                 'boost_id' => $boostId,
