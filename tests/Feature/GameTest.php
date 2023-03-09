@@ -684,4 +684,61 @@ class GameTest extends TestCase
         ]);
 
     }
+
+    public function test_gameark_game_options_is_recieved_with_approach_answers()
+    {
+        $questions = Question::factory()
+            ->count(250)
+            ->hasOptions(4)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+
+        UserPlan::create([
+            'plan_id' => $this->plan->id,
+            'user_id' => $this->user->id,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'is_active' => true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+
+        $this->withHeaders([
+            'x-brand-id' => 10,
+        ]);
+
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2
+        ]);
+
+        $response->assertJsonStructure([
+            "message",
+            "data" => [
+                "questions" => [
+                    [
+                        "options" => [
+                            [
+                                "is_correct"
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
 }
