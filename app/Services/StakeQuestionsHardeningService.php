@@ -24,20 +24,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
         $isNewUser = $this->isNewUser($user);
 
-        if ($platformProfitToday < 30 & !$isNewUser) {
-            Log::info(
-                'Serving getHardQuestions due to platform not meeting KPI',
-                [
-                    'user' => $user->username,
-                    'userProfitToday' => $percentWonToday.'%',
-                    'platformProfitToday' => $platformProfitToday.'%'
-                ]
-            );
-            return $this->getHardQuestions($user, $category);
-        }
-
         if ($isNewUser) {
-            $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions for new users',
                 [
@@ -46,7 +33,32 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-        } elseif ($percentWonToday < -50 ) { //if user is losing 50% of the time
+            return $this->getRepeatedEasyQuestions($user, $category);
+        } elseif ($percentWonToday > 200) {
+            Log::info(
+                'Serving no question',
+                [
+                    'user' => $user->username,
+                    'percentWonToday' => $percentWonToday,
+                    'platformProfitToday' => $platformProfitToday
+                ]
+            );
+            return collect([]);
+        }
+
+        if ($platformProfitToday < 30) {
+            Log::info(
+                'Serving getHardQuestions due to platform not meeting KPI',
+                [
+                    'user' => $user->username,
+                    'userProfitToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%'
+                ]
+            );
+            return $this->getHardQuestions($user, $category);
+        }
+
+        if ($percentWonToday < -10) { //if user is losing 50% of the time
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
@@ -56,7 +68,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-        } elseif ($percentWonToday < 100) {
+        } elseif ($percentWonToday < 30) {
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
@@ -66,17 +78,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } elseif ($percentWonToday < 200 ) {
-            $questions = $this->getMediumQuestions($user, $category);
-            Log::info(
-                'Serving getMediumQuestions',
-                [
-                    'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
-                ]
-            );
-        } elseif ($percentWonToday < 600) { //if user is winning 50% of the time
+        } elseif ($percentWonToday < 200) { //if user is winning 50% of the time
             $questions = $this->getHardQuestions($user, $category);
             Log::info(
                 'Serving getHardQuestions',
@@ -86,19 +88,17 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } elseif ($percentWonToday > 1000) { //if user is winning 100% of the time
-            $questions = $this->getExpertQuestions($user, $category);
+        } else {
+            //notify admin
             Log::info(
-                'Serving getExpertQuestions',
+                'SERVING_NO_QUESTION',
                 [
                     'user' => $user->username,
                     'percentWonToday' => $percentWonToday,
                     'platformProfitToday' => $platformProfitToday
                 ]
             );
-        } else {
-            //notify admin
-            Log::info('No questions found for user: ' . $user->id);
+            return collect([]);
         }
 
         return $questions;
