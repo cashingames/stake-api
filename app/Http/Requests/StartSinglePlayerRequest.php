@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\GameType;
 use App\Models\LiveTrivia;
+use App\Models\Staking;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StartSinglePlayerRequest extends FormRequest
@@ -101,6 +102,33 @@ class StartSinglePlayerRequest extends FormRequest
             $validator->errors()->add('staking_amount', 'Insufficient funds');
         }
 
+        $userProfit = $this->getUserProfitToday(auth()->user());
+        if ($userProfit > 300) {
+            $validator->errors()->add(
+                'staking_amount',
+                'You are a genius!, please try again tomorrow'
+            );
+        }
+
+        $platformProfit = $this->getPlatformProfitToday();
+        if ($platformProfit < 30 && $userProfit > 100) {
+            $validator->errors()->add(
+                'staking_amount',
+                'You are a genius!, please try again later'
+            );
+        }
+
+        //if total session is greater than 10
+        $totalSession = Staking::where('user_id', auth()->id())
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
+        if ($totalSession > 10) {
+            $validator->errors()->add(
+                'staking_amount',
+                'You have reached your daily limit of 10 games, please try again tomorrow'
+            );
+        }
+
     }
 
     private function validateLiveTrivia($validator)
@@ -141,6 +169,40 @@ class StartSinglePlayerRequest extends FormRequest
         }
     }
 
+    private function getPlatformProfitToday()
+    {
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'));
+
+        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
+        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
+
+        /**
+         * If no stakes were made today, then the platform is neutral
+         * So first user should be lucky
+         */
+        if ($amountWon == 0) {
+            return 0;
+        }
+
+        return (($amountStaked / $amountWon) - 1) * 100;
+    }
+
+    private function getUserProfitToday($user): float
+    {
+        $todayStakes = $user->gameSessions()
+            ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
+            ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
+            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
+
+        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
+        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
+
+        if ($amountStaked == 0) {
+            return 0;
+        }
+
+        return (($amountWon / $amountStaked) - 1) * 100;
+    }
 
 
 }

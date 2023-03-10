@@ -19,7 +19,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $user = auth()->user();
         $category = Category::find($categoryId);
         $platformProfitToday = $this->getPlatformProfitToday();
-        $questions = null;
+        $questions = collect([]);
         $percentWonToday = $this->getPercentageWonToday($user);
 
         $isNewUser = $this->isNewUser($user);
@@ -34,16 +34,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 ]
             );
             return $this->getRepeatedEasyQuestions($user, $category);
-        } elseif ($percentWonToday > 200) {
-            Log::info(
-                'Serving no question',
-                [
-                    'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
-                ]
-            );
-            return collect([]);
         }
 
         if ($platformProfitToday < 30) {
@@ -68,7 +58,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-        } elseif ($percentWonToday < 30) {
+        } elseif ($percentWonToday > 30) {
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
@@ -91,7 +81,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         } else {
             //notify admin
             Log::info(
-                'SERVING_NO_QUESTION',
+                'SERVING_NO_QUESTIONS',
                 [
                     'user' => $user->username,
                     'percentWonToday' => $percentWonToday,
