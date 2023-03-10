@@ -256,6 +256,54 @@ class ChallengeGameTest extends TestCase
         Notification::assertSentTo($opponent, ChallengeCompletedNotification::class);
     }
 
+    public function test_challenge_game_ends_for_first_player_successfully_on_gameark()
+    {
+        Notification::fake();
+        $this->mock(SendPushNotification::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendChallengeCompletedNotification')->once();
+        });
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(10)
+            ->create();
+        $chosenOptions = [];
+        foreach ($questions as $question) {
+            $chosenOptions[] = $question->options()->inRandomOrder()->first();
+        }
+
+        $creator = $this->user;
+        $opponent = User::where('id', '<>', $this->user->id)->first();
+        $category = $this->category;
+
+        $challenge = Challenge::create([
+            'user_id' => $creator->id,
+            'opponent_id' => $opponent->id,
+            'category_id' => $category->id,
+            'status' => 'PENDING'
+        ]);
+
+        $this->withHeaders([
+            'x-brand-id' => 10,
+        ]);
+
+        $startGameResponse = $this->postJson(self::START_CHALLENGE_GAME_URL, [
+            'challenge_id' => $challenge->id,
+            'category' => $category->id,
+            'type' => 2
+        ])->assertOk();
+
+        $gameSession = $this->user->challengeGameSessions()->first();
+
+
+        $this->postjson(self::END_CHALLENGE_URL, [
+            "token" => $gameSession->session_token,
+            "chosenOptions" => $chosenOptions,
+            "consumedBoosts" => []
+        ]);
+
+        Notification::assertSentTo($opponent, ChallengeCompletedNotification::class);
+    }
+
     public function test_challenge_winner_takes_twice_stake_amount()
     {
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
