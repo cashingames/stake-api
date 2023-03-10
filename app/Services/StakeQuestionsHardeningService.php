@@ -253,7 +253,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
          * If no stakes were made today, then the platform is neutral
          * So first user should be lucky
          */
-        if ($amountStaked == 0) {
+        if ($amountWon == 0) {
             return 0;
         }
 

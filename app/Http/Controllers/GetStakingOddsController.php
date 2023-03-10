@@ -34,7 +34,7 @@ class GetStakingOddsController extends BaseController
          */
         if (!FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
             Log::info(
-                'Get Odds applied',
+                'GET_ODDS_COMPUTED',
                 [
                     'user' => auth()->user()->username,
                     'staking_with_odds' => false,
@@ -53,7 +53,7 @@ class GetStakingOddsController extends BaseController
         }
 
         Log::info(
-            'Get Odds applied',
+            'GET_ODDS_COMPUTED',
             [
                 'user' => auth()->user()->username,
                 'staking_with_odds' => true,
