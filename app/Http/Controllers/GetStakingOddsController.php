@@ -8,6 +8,7 @@ use App\Services\FeatureFlag;
 use App\Services\StakingOddsComputer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class GetStakingOddsController extends BaseController
 {
@@ -32,18 +33,36 @@ class GetStakingOddsController extends BaseController
          * @TODO Rename to TRIVIA_STAKING_WITH_DYNAMIC_ODDS
          */
         if (!FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
+            Log::info(
+                'Get Odds applied',
+                [
+                    'user' => auth()->user()->username,
+                    'staking_with_odds' => false,
+                    'staking_session_odds' => $stakingOdds
+                ]
+            );
             return $this->sendResponse($stakingOdds, $message);
         }
 
-        $allStakingOddsWithOddsMultiplierApplied = [];
+        $result = [];
         $oddMultiplier = $oddsComputer->compute($this->user);
 
         foreach ($stakingOdds as $odd) {
             $odd->odd = round(($odd->odd * $oddMultiplier['oddsMultiplier']), 2);
-            $allStakingOddsWithOddsMultiplierApplied[] = $odd;
+            $result[] = $odd;
         }
 
-        return $this->sendResponse($allStakingOddsWithOddsMultiplierApplied, $message);
+        Log::info(
+            'Get Odds applied',
+            [
+                'user' => auth()->user()->username,
+                'staking_with_odds' => true,
+                'staking_odds_multiplier' => $oddMultiplier,
+                'staking_session_odds' => $result
+            ]
+        );
+
+        return $this->sendResponse($result, $message);
 
     }
 }
