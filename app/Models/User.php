@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use stdClass;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Carbon\Carbon;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use App\Models\AchievementBadge;
 
 class User extends Authenticatable implements JWTSubject
@@ -226,13 +223,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function points()
     {
-        $pointsAdded = UserPoint::where('user_id', $this->id)
+        return UserPoint::where('user_id', $this->id)
             ->where('point_flow_type', 'POINTS_ADDED')
             ->sum('value');
-        $pointsSubtracted = UserPoint::where('user_id', $this->id)
-            ->where('point_flow_type', 'POINTS_SUBTRACTED')
-            ->sum('value');
-        return $pointsAdded -  $pointsSubtracted;
     }
 
     public function todaysPoints()
@@ -243,13 +236,11 @@ class User extends Authenticatable implements JWTSubject
         $now = $this->toNigeriaTimeZoneFromUtc(now());
         $startOfToday = $this->toUtcFromNigeriaTimeZone($now->startOfDay());
         $endOfToday = $this->toUtcFromNigeriaTimeZone($now->endOfDay());
-        $pointsAdded = $this->userPoints()
+        return $this->userPoints()
             ->addedBetween(
                 $startOfToday,
                 $endOfToday
             )->sum('value');
-
-        return $pointsAdded;
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use stdClass;
@@ -9,7 +10,7 @@ use stdClass;
 class UserController extends BaseController
 {
 
-    public function profile()
+    public function profile(ClientPlatform $clientPlatform)
     {
         $result = new stdClass;
         $result->username = $this->user->username;
@@ -27,24 +28,29 @@ class UserController extends BaseController
         $result->gender = $this->user->profile->gender;
         $result->avatar = $this->user->profile->avatar;
         $result->referralCode = $this->user->username;
-        $result->points = $this->user->points();
-        $result->todaysPoints = $this->user->todaysPoints();
-        $result->globalRank = $this->user->rank;
-        $result->gamesCount = $this->user->played_games_count;
         $result->walletBalance = $this->user->wallet->non_withdrawable_balance;
         $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
-        $result->bookBalance = $this->user->bookBalance();
-        $result->totalWithdrawals = $this->user->totalWithdrawals();
-        $result->badge = $this->user->achievement;
-        $result->winRate = $this->user->win_rate;
-        $result->totalChallenges = $this->user->challenges_played;
         $result->boosts = $this->user->userBoosts();
-        $result->achievements = $this->user->userAchievements();
-        $result->hasActivePlan = $this->user->hasActivePlan();
-        $result->activePlans = $this->composeUserPlans();
         $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
+
+        if (ClientPlatform::GameArkMobile == $clientPlatform) {
+            $result->points = $this->user->points();
+            $result->todaysPoints = $this->user->todaysPoints();
+            $result->globalRank = $this->user->rank;
+            $result->gamesCount = $this->user->played_games_count;
+            $result->totalChallenges = $this->user->challenges_played;
+            $result->winRate = $this->user->win_rate;
+            $result->badge = $this->user->achievement;
+            $result->achievements = $this->user->userAchievements();
+            $result->activePlans = $this->composeUserPlans();
+            $result->hasActivePlan = $this->user->hasActivePlan();
+            // $result->bookBalance = $this->user->bookBalance();
+            // $result->totalWithdrawals = $this->user->totalWithdrawals();
+        }
+
+
 
         return $this->sendResponse($result, 'User details');
     }
@@ -98,7 +104,7 @@ class UserController extends BaseController
         if(is_null($user)){
             return $this->sendResponse('Your Account has been deleted', 'Your Account has been deleted');
         }
-        
+
         $user->delete();
         auth()->logout(true);
 
