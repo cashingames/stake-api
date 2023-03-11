@@ -155,13 +155,12 @@ class RegisterController extends BaseController
             $isStakeApp = $platform == ClientPlatform::StakingMobileWeb ? true : false;
 
             DB::transaction(function () use ($user, $isStakeApp) {
-                
                 $user->wallet->non_withdrawable_balance += ($isStakeApp ? 400 : 50);
 
                 WalletTransaction::create([
                     'wallet_id' => $user->wallet->id,
                     'transaction_type' => 'CREDIT',
-                    'amount' => $isStakeApp ? 400 : 50,
+                    'amount' => $isStakeApp ? 200 : 50,
                     'balance' => $user->wallet->non_withdrawable_balance,
                     'description' => 'Sign Up Bonus',
                     'reference' => Str::random(10),
