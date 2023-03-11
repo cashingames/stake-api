@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\Category;
 use App\Models\ChallengeGameSession;
 use App\Models\ChallengeQuestion;
@@ -22,13 +23,16 @@ class StartChallengeGameController extends  BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public ClientPlatform $clientPlatform;
+
+    public function __invoke(Request $request, ClientPlatform $clientPlatform)
     {
         $request->validate([
             'category' => ['required'],
             'type' => ['required'],
             'challenge_id' => ['required']
         ]);
+        $this->clientPlatform = $clientPlatform;
 
         $category = Cache::rememberForever("category_$request->category", fn () => Category::find($request->category));
         $type = Cache::rememberForever("gametype_$request->type", fn () => GameType::find($request->type));
@@ -79,6 +83,17 @@ class StartChallengeGameController extends  BaseController
             ->questions();
 
         $questions = $query->inRandomOrder()->take(10)->get()->shuffle();
+
+        // check if platform is GameArk and add answers to option
+        if($this->clientPlatform == ClientPlatform::GameArkMobile){
+            $questions = $questions->each(function ($i, $k) {
+
+                $i->options->each(function($ib, $kb){
+                    $ib->makeVisible(['is_correct']);
+                });
+
+            });
+        }
         Log::info("About to log selected game questions for game session $challengeGameSessionId and user $this->user");
 
         $data = [];
@@ -116,6 +131,18 @@ class StartChallengeGameController extends  BaseController
         $questions = $category->questions()
             ->whereIn('question_id', $qstArray)
             ->get();
+
+        // check if platform is GameArk and add answers to option
+        if($this->clientPlatform == ClientPlatform::GameArkMobile){
+            $questions = $questions->each(function ($i, $k) {
+
+                $i->options->each(function($ib, $kb){
+                    $ib->makeVisible(['is_correct']);
+                });
+
+            });
+        }
+
         // ->orderByRaw(DB::raw("FIELD(id, $unsortIds)"))
         DB::table('challenge_questions')->insert($data);
         Log::info("questions logged for game session $challengeGameSessionId and user $this->user");
