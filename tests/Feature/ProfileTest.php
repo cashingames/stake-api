@@ -41,16 +41,19 @@ class ProfileTest extends TestCase
 
     public function test_relevant_user_profile_can_be_retrieved_with_data()
     {
-        $response = $this->get(self::PROFILE_DATA_URL);
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->get(self::PROFILE_DATA_URL);
+
         $response->assertJson([
             'data' => [
                 'username' => $this->user->username,
-                'email' =>  $this->user->email,
-                'lastName' =>  $this->user->profile->last_name,
+                'email' => $this->user->email,
+                'lastName' => $this->user->profile->last_name,
                 'firstName' => $this->user->profile->first_name,
                 'countryCode' => $this->user->country_code,
-                'phoneNumber' =>  $this->user->phone_number,
-                'points' =>  $this->user->points(),
+                'phoneNumber' => $this->user->phone_number,
+                'points' => $this->user->points(),
                 'walletBalance' => $this->user->wallet->non_withdrawable_balance,
                 'bookBalance' => $this->user->bookBalance(),
                 'withdrawableBalance' => $this->user->wallet->withdrawable_balance,
@@ -75,7 +78,7 @@ class ProfileTest extends TestCase
             'gender' => 'male',
             'dateOfBirth' => '23-09-1998'
         ]);
-        $this->assertEquals(($this->user->profile->first_name.' '.$this->user->profile->last_name), 'John Doe');
+        $this->assertEquals(($this->user->profile->first_name . ' ' . $this->user->profile->last_name), 'John Doe');
     }
 
     public function test_username_can_be_edited()

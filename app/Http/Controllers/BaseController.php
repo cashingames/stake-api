@@ -14,7 +14,7 @@ class BaseController extends Controller
 
     function __construct()
     {
-        $this->user = auth()->user();
+        $this->user = auth()->user()->load(['profile', 'wallet', 'boosts']);
         if ($this->user && $this->user->trashed()) {
             auth()->logout(true);
         }
@@ -36,11 +36,6 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        // Log::info("API Response success "
-        //     . $this->user?->username . " from endpoint  "
-        //     .  url()->current() . " response " . json_encode($result));
-
-
         return response()->json($response, 200);
     }
 
@@ -51,11 +46,6 @@ class BaseController extends Controller
             'errors'    => $errors,
             'message' => $message,
         ];
-
-        // Log::info("API Response error "
-        //     .  $this->user?->username . " from endpoint  "
-        //     . url()->current() . " response " . json_encode($errors));
-
 
         return response()->json($response, 400);
     }
@@ -69,18 +59,6 @@ class BaseController extends Controller
             'value' => $points,
             'description' => $description,
             'point_flow_type' => 'POINTS_ADDED'
-        ]);
-    }
-
-    public function subtractPoints($userId, $points, $description)
-    {
-
-        //create point traffic log
-        UserPoint::create([
-            'user_id' => $userId,
-            'value' => $points,
-            'description' => $description,
-            'point_flow_type' => 'POINTS_SUBTRACTED'
         ]);
     }
 }

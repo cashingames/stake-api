@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Enums\FeatureFlags;
-use UserSeeder;
 use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
@@ -11,11 +10,8 @@ use App\Mail\VerifyEmail;
 use App\Models\Boost;
 use App\Services\FeatureFlag;
 use Mockery\MockInterface;
-use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Cache;
 use App\Services\SMS\SMSProviderInterface;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterTest extends TestCase

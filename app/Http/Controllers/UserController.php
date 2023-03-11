@@ -34,6 +34,7 @@ class UserController extends BaseController
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->boosts = $this->user->userBoosts();
         $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
+        $result->bookBalance = $this->user->bookBalance();
 
         if (ClientPlatform::GameArkMobile == $clientPlatform) {
             $result->points = $this->user->points();
@@ -46,12 +47,8 @@ class UserController extends BaseController
             $result->achievements = $this->user->userAchievements();
             $result->activePlans = $this->composeUserPlans();
             $result->hasActivePlan = $this->user->hasActivePlan();
-            // $result->bookBalance = $this->user->bookBalance();
             // $result->totalWithdrawals = $this->user->totalWithdrawals();
         }
-
-
-
         return $this->sendResponse($result, 'User details');
     }
 
