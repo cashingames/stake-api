@@ -36,7 +36,7 @@ class UserController extends BaseController
         $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
         $result->bookBalance = $this->user->bookBalance();
 
-        if (ClientPlatform::GameArkMobile == $clientPlatform) {
+        if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
             $result->points = $this->user->points();
             $result->todaysPoints = $this->user->todaysPoints();
             $result->globalRank = $this->user->rank;
@@ -47,8 +47,8 @@ class UserController extends BaseController
             $result->achievements = $this->user->userAchievements();
             $result->activePlans = $this->composeUserPlans();
             $result->hasActivePlan = $this->user->hasActivePlan();
-            // $result->totalWithdrawals = $this->user->totalWithdrawals();
         }
+
         return $this->sendResponse($result, 'User details');
     }
 
