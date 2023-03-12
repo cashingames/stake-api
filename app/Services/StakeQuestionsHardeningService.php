@@ -6,6 +6,7 @@ use App\Enums\QuestionLevel;
 use App\Models\Category;
 use App\Models\Staking;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -20,10 +21,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $category = Category::find($categoryId);
         $platformProfitToday = $this->getPlatformProfitToday();
         $percentWonToday = $this->getUserProfitToday($user);
-        $questions = null;
 
 
-        if ($platformProfitToday < 50) {
+        if ($platformProfitToday < config('trivia.platform_target')) {
             Log::info(
                 'Serving getHardQuestions due to platform not meeting KPI',
                 [
@@ -35,6 +35,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return $this->getHardQuestions($user, $category);
         }
 
+        $questions = null;
         $isNewUser = $this->isNewUser($user);
         if ($isNewUser) {
             Log::info(
@@ -45,10 +46,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-            return $this->getRepeatedEasyQuestions($user, $category);
-        }
-
-        if ($percentWonToday < -50) { //if user is losing 50% of the time
+            $questions = $this->getRepeatedEasyQuestions($user, $category);
+        } elseif ($percentWonToday < -50) { //if user is losing 50% of the time
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
@@ -64,8 +63,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'Serving getEasyAndMediumQuestions',
                 [
                     'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
+                    'percentWonToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
         } elseif ($percentWonToday < 200) { //if user is winning 50% of the time
@@ -74,8 +73,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'Serving getHardQuestions',
                 [
                     'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
+                    'percentWonToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
         } else {
@@ -84,8 +83,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'SERVING_NO_QUESTIONS',
                 [
                     'user' => $user->username,
-                    'percentWonToday' => $percentWonToday,
-                    'platformProfitToday' => $platformProfitToday
+                    'percentWonToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
             return collect([]);
@@ -134,28 +133,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     }
 
     /**
-     * For medium and hard questions, never repeat.
-     *
-     * @param mixed $user
-     * @param string $categoryId
-     * @return Collection
-     */
-    private function getMediumQuestions($user, Category $category): Collection
-    {
-        $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Medium);
-
-        return $category
-            ->questions()
-            ->medium()
-            ->when($recentQuestions->isNotEmpty(), function ($query) use ($recentQuestions) {
-                return $query->whereNotIn('questions.id', $recentQuestions);
-            })
-            ->inRandomOrder()
-            ->take(20)
-            ->get();
-    }
-
-    /**
      *  Never to be repeated
      *
      * @param mixed $user
@@ -170,28 +147,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         return $category
             ->questions()
             ->hard()
-            ->when($recentQuestions->count() > 20, function ($query) use ($recentQuestions) {
-                return $query->whereNotIn('questions.id', $recentQuestions);
-            })
-            ->inRandomOrder()
-            ->take(20)
-            ->get();
-    }
-
-    /**
-     *  Never to be repeated
-     *
-     * @param mixed $user
-     * @param string $categoryId
-     * @return Collection
-     */
-    private function getExpertQuestions($user, Category $category): Collection
-    {
-        $recentQuestions = $this->previouslySeenQuestions($user, $category->id, QuestionLevel::Hard);
-
-        return $category
-            ->questions()
-            ->expert()
             ->when($recentQuestions->count() > 20, function ($query) use ($recentQuestions) {
                 return $query->whereNotIn('questions.id', $recentQuestions);
             })
@@ -215,22 +170,22 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     }
 
     /**
-    * To calculate the percentage profit, you need to calculate the difference between the amount received
-    * and the initial stake, and then divide by the initial stake and multiply by 100.
-    * e.g I staked with 100 and got 15 back how much did I profit in percentage
-    * In this case, the amount received was 15 and the initial stake was 100. So the profit would be:
-    * (15 – 100) / 100 = -85%
-    * Note that the result is negative, which means that there was a loss rather than a profit.
-    *
-    * If the amount received was greater than the initial stake, the result would be positive.
-    * e.g I staked with 100 and got 150 back how much did I profit in percentage
-    * In this case, the amount received was 150 and the initial stake was 100. So the profit would be:
-    * (150 – 100) / 100 = 50%
-    * Note that the result is positive, which means that there was a profit rather than a loss.
-    *
-    * @param mixed $user
-    * @return float
-    */
+     * To calculate the percentage profit, you need to calculate the difference between the amount received
+     * and the initial stake, and then divide by the initial stake and multiply by 100.
+     * e.g I staked with 100 and got 15 back how much did I profit in percentage
+     * In this case, the amount received was 15 and the initial stake was 100. So the profit would be:
+     * (15 – 100) / 100 = -85%
+     * Note that the result is negative, which means that there was a loss rather than a profit.
+     *
+     * If the amount received was greater than the initial stake, the result would be positive.
+     * e.g I staked with 100 and got 150 back how much did I profit in percentage
+     * In this case, the amount received was 150 and the initial stake was 100. So the profit would be:
+     * (150 – 100) / 100 = 50%
+     * Note that the result is positive, which means that there was a profit rather than a loss.
+     *
+     * @param mixed $user
+     * @return float
+     */
 
     private function getUserProfitToday($user): float
     {
@@ -249,7 +204,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return -100;
         }
 
-        return (($amountWon - $amountStaked) / $amountStaked)*100;
+        return (($amountWon - $amountStaked) / $amountStaked) * 100;
     }
 
     /**
@@ -258,11 +213,15 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
      *
      * @return float|int
      */
-    private function getPlatformProfitToday()
+    private function getPlatformProfitToday(): float|int
     {
-        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
-            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-            ->first();
+        $todayStakes = Cache::remember(
+            "today_stakes",
+            60,
+            fn() => Staking::whereDate('created_at', '=', date('Y-m-d'))
+                ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+                ->first()
+        );
         $amountStaked = $todayStakes?->amount_staked ?? 0;
         $amountWon = $todayStakes?->amount_won ?? 0;
 
@@ -279,7 +238,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return 0;
         }
 
-        return (($amountWon - $amountStaked) / $amountStaked)* -100;
+        return (($amountWon - $amountStaked) / $amountStaked) * -100;
     }
 
 }

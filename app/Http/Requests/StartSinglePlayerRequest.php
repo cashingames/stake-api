@@ -6,6 +6,7 @@ use App\Enums\GameType;
 use App\Models\LiveTrivia;
 use App\Models\Staking;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Cache;
 
 class StartSinglePlayerRequest extends FormRequest
 {
@@ -184,10 +185,10 @@ class StartSinglePlayerRequest extends FormRequest
      * Note that the result is positive, which means that there was a profit rather than a loss.
      *
      * @param mixed $user
-     * @return float
+     * @return float | int
      */
 
-    private function getUserProfitToday($user): float
+    private function getUserProfitToday($user): float|int
     {
         $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
             ->where('user_id', $user->id)
@@ -213,11 +214,15 @@ class StartSinglePlayerRequest extends FormRequest
      *
      * @return float|int
      */
-    private function getPlatformProfitToday()
+    private function getPlatformProfitToday(): float|int
     {
-        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
-            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-            ->first();
+        $todayStakes = Cache::remember(
+            "today_stakes",
+            60,
+            fn() => Staking::whereDate('created_at', '=', date('Y-m-d'))
+                ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+                ->first()
+        );
         $amountStaked = $todayStakes?->amount_staked ?? 0;
         $amountWon = $todayStakes?->amount_won ?? 0;
 
@@ -234,8 +239,6 @@ class StartSinglePlayerRequest extends FormRequest
             return 0;
         }
 
-        return (($amountWon - $amountStaked) / $amountStaked) * 100;
+        return (($amountWon - $amountStaked) / $amountStaked) * -100;
     }
-
-
 }

@@ -364,6 +364,10 @@ class User extends Authenticatable implements JWTSubject
         return $db;
     }
 
+    /**
+     * @TODO eradicate this method
+     * @return \Illuminate\Support\Collection
+     */
     public function userBoosts()
     {
         return DB::table('user_boosts')

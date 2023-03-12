@@ -11,7 +11,7 @@ use App\Models\WalletTransaction;
 use App\Services\FeatureFlag;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
-use App\Services\StakingOddsComputer;
+use App\Services\TriviaStaking\OddsService;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -92,8 +92,8 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
          * @TODO Rename to dynamic staking odds
          */
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            $oddMultiplierComputer = new StakingOddsComputer();
-            $oddMultiplier = $oddMultiplierComputer->compute($this->user);
+            $oddMultiplierComputer = new OddsService();
+            $oddMultiplier = $oddMultiplierComputer->computeDynamicOdds($this->user);
             $odd = $oddMultiplier['oddsMultiplier'];
         }
 

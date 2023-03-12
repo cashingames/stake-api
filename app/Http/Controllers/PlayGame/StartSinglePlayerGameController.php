@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Controllers\BaseController;
-use App\Models\GameSession;
 use App\Enums\GameType;
 use App\Http\Requests\StartSinglePlayerRequest;
 use App\Services\PlayGame\PlayGameServiceFactory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class StartSinglePlayerGameController extends BaseController
@@ -26,10 +24,19 @@ class StartSinglePlayerGameController extends BaseController
         $validated = $reqeuestModel->validated();
         $validatedRequest = (object) $validated;
 
+        Log::info('START_SINGLE_PLAYER_PROCESS', [
+            'user' => $request->user()->username,
+            'validatedRequest' => $validatedRequest,
+            'gameType' => $customType
+        ]);
+
         $startResponse = $gameService->startGame($validatedRequest);
 
         //@TODO: Handle business error states in the services
         if (count($startResponse->questions) < 10 && $customType != GameType::LiveTrivia) {
+            Log::info('SSTART_SINGLE_PLAYER_CANNOT_START', [
+                'user' => $request->user()->username,
+            ]);
             return $this->sendError(
                 'Category not available for now, try again later',
                 'Category not available for now, try again later'

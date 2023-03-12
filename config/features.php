@@ -38,11 +38,11 @@ return [
         'activate_on' => null
     ],
     'withdrawable_wallet' => [
-        'enabled' => env('FEATURE_FLAG_WITHDRAWABLE_WALLET_ENABLED', true),
+        'enabled' => env('FEATURE_FLAG_WITHDRAWABLE_WALLET_ENABLED', false),
         'activate_on' => null
     ],
     'challenge_game_staking' => [
-        'enabled' => env('FEATURE_FLAG_CHALLENGE_GAME_STAKING_ENABLED', true),
+        'enabled' => env('FEATURE_FLAG_CHALLENGE_GAME_STAKING_ENABLED', false),
         'activate_on' => null
     ],
     'staking_with_odds' => [
@@ -50,11 +50,11 @@ return [
         'activate_on' => null
     ],
     'in_app_activities_push_notification' => [
-        'enabled' => env('FEATURE_FLAG_IN_APP_ACTIVITIES_PUSH_NOTIFICATION_ENABLED', true),
+        'enabled' => env('FEATURE_FLAG_IN_APP_ACTIVITIES_PUSH_NOTIFICATION_ENABLED', false),
         'activate_on' => null
     ],
     'send_automated_reports' => [
-        'enabled' => env('FEATURE_FLAG_SEND_AUTOMATED_REPORTS_ENABLED', true),
+        'enabled' => env('FEATURE_FLAG_SEND_AUTOMATED_REPORTS_ENABLED', false),
         'activate_on' => null
     ]
 ];
