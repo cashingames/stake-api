@@ -169,6 +169,24 @@ class StartSinglePlayerRequest extends FormRequest
         }
     }
 
+    /**
+     * To calculate the percentage profit, you need to calculate the difference between the amount received
+     * and the initial stake, and then divide by the initial stake and multiply by 100.
+     * e.g I staked with 100 and got 15 back how much did I profit in percentage
+     * In this case, the amount received was 15 and the initial stake was 100. So the profit would be:
+     * (15 – 100) / 100 = -85%
+     * Note that the result is negative, which means that there was a loss rather than a profit.
+     *
+     * If the amount received was greater than the initial stake, the result would be positive.
+     * e.g I staked with 100 and got 150 back how much did I profit in percentage
+     * In this case, the amount received was 150 and the initial stake was 100. So the profit would be:
+     * (150 – 100) / 100 = 50%
+     * Note that the result is positive, which means that there was a profit rather than a loss.
+     *
+     * @param mixed $user
+     * @return float
+     */
+
     private function getUserProfitToday($user): float
     {
         $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
@@ -186,14 +204,20 @@ class StartSinglePlayerRequest extends FormRequest
             return -100;
         }
 
-        return (($amountWon / $amountStaked) - 1) * 100;
+        return ($amountWon - $amountStaked) / $amountStaked;
     }
 
+    /**
+     * Platform profit is the opposite of total users profit
+     * e,g if users profit is 10%, then platform profit is -10%
+     *
+     * @return float|int
+     */
     private function getPlatformProfitToday()
     {
         $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
-                        ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-                        ->first();
+            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+            ->first();
         $amountStaked = $todayStakes?->amount_staked ?? 0;
         $amountWon = $todayStakes?->amount_won ?? 0;
 
@@ -210,7 +234,7 @@ class StartSinglePlayerRequest extends FormRequest
             return 0;
         }
 
-        return (($amountStaked / $amountWon) - 1) * 100;
+        return -(($amountWon - $amountStaked) / $amountStaked);
     }
 
 
