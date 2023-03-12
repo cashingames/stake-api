@@ -169,39 +169,48 @@ class StartSinglePlayerRequest extends FormRequest
         }
     }
 
+    private function getUserProfitToday($user): float
+    {
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
+            ->where('user_id', $user->id)
+            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+            ->first();
+        $amountStaked = $todayStakes?->amount_staked ?? 0;
+        $amountWon = $todayStakes?->amount_won ?? 0;
+
+        if ($amountStaked == 0) {
+            return 0;
+        }
+
+        if ($amountWon == 0) {
+            return -100;
+        }
+
+        return (($amountWon / $amountStaked) - 1) * 100;
+    }
+
     private function getPlatformProfitToday()
     {
-        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'));
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
+                        ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+                        ->first();
+        $amountStaked = $todayStakes?->amount_staked ?? 0;
+        $amountWon = $todayStakes?->amount_won ?? 0;
 
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
         /**
          * If no stakes were made today, then the platform is neutral
          * So first user should be lucky
          */
         if ($amountWon == 0) {
-            return 0;
+            return 100;
         }
-
-        return (($amountStaked / $amountWon) - 1) * 100;
-    }
-
-    private function getUserProfitToday($user): float
-    {
-        $todayStakes = $user->gameSessions()
-            ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
-            ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
-            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
-
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
         if ($amountStaked == 0) {
             return 0;
         }
 
-        return (($amountWon / $amountStaked) - 1) * 100;
+        return (($amountStaked / $amountWon) - 1) * 100;
     }
 
 

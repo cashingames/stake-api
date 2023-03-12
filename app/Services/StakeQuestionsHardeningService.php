@@ -19,11 +19,23 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
         $user = auth()->user();
         $category = Category::find($categoryId);
         $platformProfitToday = $this->getPlatformProfitToday();
-        $questions = collect([]);
-        $percentWonToday = $this->getPercentageWonToday($user);
+        $percentWonToday = $this->getUserProfitToday($user);
+        $questions = null;
+
+
+        if ($platformProfitToday < 50) {
+            Log::info(
+                'Serving getHardQuestions due to platform not meeting KPI',
+                [
+                    'user' => $user->username,
+                    'userProfitToday' => $percentWonToday . '%',
+                    'platformProfitToday' => $platformProfitToday . '%'
+                ]
+            );
+            return $this->getHardQuestions($user, $category);
+        }
 
         $isNewUser = $this->isNewUser($user);
-
         if ($isNewUser) {
             Log::info(
                 'Serving getRepeatedEasyQuestions for new users',
@@ -36,19 +48,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return $this->getRepeatedEasyQuestions($user, $category);
         }
 
-        if ($platformProfitToday < 30) {
-            Log::info(
-                'Serving getHardQuestions due to platform not meeting KPI',
-                [
-                    'user' => $user->username,
-                    'userProfitToday' => $percentWonToday . '%',
-                    'platformProfitToday' => $platformProfitToday . '%'
-                ]
-            );
-            return $this->getHardQuestions($user, $category);
-        }
-
-        if ($percentWonToday < -10) { //if user is losing 50% of the time
+        if ($percentWonToday < -50) { //if user is losing 50% of the time
             $questions = $this->getRepeatedEasyQuestions($user, $category);
             Log::info(
                 'Serving getRepeatedEasyQuestions',
@@ -58,7 +58,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-        } elseif ($percentWonToday > 30) {
+        } elseif ($percentWonToday < 30) {
             $questions = $this->getEasyAndMediumQuestions($category);
             Log::info(
                 'Serving getEasyAndMediumQuestions',
@@ -215,18 +215,21 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     }
 
 
-    private function getPercentageWonToday($user): float
+    private function getUserProfitToday($user): float
     {
-        $todayStakes = $user->gameSessions()
-            ->join('exhibition_stakings', 'game_sessions.id', '=', 'exhibition_stakings.game_session_id')
-            ->join('stakings', 'exhibition_stakings.staking_id', '=', 'stakings.id')
-            ->whereDate('game_sessions.created_at', '=', date('Y-m-d'));
-
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
+            ->where('user_id', $user->id)
+            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+            ->first();
+        $amountStaked = $todayStakes?->amount_staked ?? 0;
+        $amountWon = $todayStakes?->amount_won ?? 0;
 
         if ($amountStaked == 0) {
             return 0;
+        }
+
+        if ($amountWon == 0) {
+            return -100;
         }
 
         return (($amountWon / $amountStaked) - 1) * 100;
@@ -234,16 +237,22 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
     private function getPlatformProfitToday()
     {
-        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'));
+        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
+            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+            ->first();
+        $amountStaked = $todayStakes?->amount_staked ?? 0;
+        $amountWon = $todayStakes?->amount_won ?? 0;
 
-        $amountStaked = $todayStakes->sum('stakings.amount_staked') ?? 0;
-        $amountWon = $todayStakes->sum('stakings.amount_won') ?? 0;
 
         /**
          * If no stakes were made today, then the platform is neutral
          * So first user should be lucky
          */
         if ($amountWon == 0) {
+            return 100;
+        }
+
+        if ($amountStaked == 0) {
             return 0;
         }
 
