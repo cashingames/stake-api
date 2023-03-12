@@ -14,7 +14,7 @@ class BaseController extends Controller
 
     function __construct()
     {
-        $this->user = auth()->user()?->load(['profile', 'wallet', 'boosts']);
+        $this->user = auth()->user();
         if ($this->user && $this->user->trashed()) {
             auth()->logout(true);
         }

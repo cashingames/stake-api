@@ -204,7 +204,7 @@ class StartSinglePlayerRequest extends FormRequest
             return -100;
         }
 
-        return ($amountWon - $amountStaked) / $amountStaked;
+        return (($amountWon - $amountStaked) / $amountStaked) * 100;
     }
 
     /**
@@ -234,7 +234,7 @@ class StartSinglePlayerRequest extends FormRequest
             return 0;
         }
 
-        return -(($amountWon - $amountStaked) / $amountStaked);
+        return (($amountWon - $amountStaked) / $amountStaked) * 100;
     }
 
 

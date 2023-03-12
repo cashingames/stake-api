@@ -249,7 +249,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return -100;
         }
 
-        return ($amountWon - $amountStaked) / $amountStaked;
+        return (($amountWon - $amountStaked) / $amountStaked)*100;
     }
 
     /**
@@ -279,7 +279,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             return 0;
         }
 
-        return -(($amountWon - $amountStaked) / $amountStaked);
+        return (($amountWon - $amountStaked) / $amountStaked)* -100;
     }
 
 }
