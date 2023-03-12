@@ -12,7 +12,7 @@ class UserController extends BaseController
 
     public function profile(ClientPlatform $clientPlatform)
     {
-        $this->user()->load(['profile', 'wallet']);
+        $this->user->load(['profile', 'wallet']);
 
         $result = new stdClass;
         $result->username = $this->user->username;
