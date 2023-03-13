@@ -312,7 +312,7 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_new_user_gets_400_naira_bonus_in_stakers_app()
+    public function test_new_user_gets_200_naira_bonus_in_stakers_app()
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
@@ -328,7 +328,7 @@ class RegisterTest extends TestCase
 
         $this->assertDatabaseHas('wallets', [
             'user_id' => $user->id,
-            'non_withdrawable_balance' => 400.00,
+            'non_withdrawable_balance' => 200.00,
         ]);
     }
 
