@@ -14,7 +14,7 @@ use UserSeeder;
 use PlanSeeder;
 
 class ArtisanCommandsTest extends TestCase
-{   
+{
     use RefreshDatabase;
     /**
      * A basic feature test example.
@@ -62,7 +62,7 @@ class ArtisanCommandsTest extends TestCase
     }
 
     public function test_that_daily_automated_report_command_runs()
-    {   
+    {
         Mail::fake();
 
         $this->artisan('daily-report:send')->assertExitCode(0);
@@ -72,14 +72,14 @@ class ArtisanCommandsTest extends TestCase
     }
 
     public function test_that_weekly_automated_report_command_runs()
-    {  
+    {
         GameSession::factory()
         ->count(5)
-        ->create(['created_at'=>now()]);
+            ->create(['created_at' => now()->yesterday()]);
 
         Staking::factory()
         ->count(5)
-        ->create(['created_at'=>now()]);
+            ->create(['created_at' => now()->yesterday()]);
 
         Mail::fake();
 
@@ -87,5 +87,5 @@ class ArtisanCommandsTest extends TestCase
 
         Mail::assertSent(WeeklyReportEmail::class);
     }
-  
+
 }
