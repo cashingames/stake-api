@@ -59,7 +59,10 @@ class OddsService
 
         //if platform is not making up to 30% profit
         // and if user is not new, return half odds (0.5)
-        if ($this->getPlatformProfitToday() < config('trivia.platform_target')) {
+        $platformProfit = $this->getPlatformProfitToday();
+        $platformTarget = config('trivia.platform_target');
+
+        if ($platformProfit < $platformTarget) {
             $rule = $stakingOddsRule->firstWhere('rule', 'LESS_THAN_TARGET_PLATFORM_INCOME') ?? $placeHolder;
             return [
                 'oddsMultiplier' => $rule->odds_benefit,

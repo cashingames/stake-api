@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\FeatureFlags;
+use App\Models\Staking;
 use App\Models\StakingOdd;
 use App\Models\StakingOddsRule;
 use App\Models\User;
@@ -24,7 +25,7 @@ class GetStakingOddsTest extends TestCase
     public function test_that_odds_are_halved_when_platform_target_is_not_met_when_staking_odds_is_on()
     {
         FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);
-
+        config(['trivia.platform_target' => 30]);
         $expectedData = [
             [
                 "id" => 1,
@@ -43,6 +44,12 @@ class GetStakingOddsTest extends TestCase
         StakingOdd::factory()->create([
             'score' => 10,
             'odd' => 10
+        ]);
+
+        Staking::factory()->create([
+            'user_id' => 1,
+            'amount_staked' => 10,
+            'amount_won' => 100,
         ]);
 
 
