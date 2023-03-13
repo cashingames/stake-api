@@ -23,16 +23,16 @@ class AutomatedReportsServiceTest extends TestCase
         parent::setUp();
         User::factory()
             ->count(10)
-            ->create();
+            ->create(['created_at' => now()->yesterday()]);
         WalletTransaction::factory()
             ->count(10)
-            ->create();
+            ->create(['created_at' => now()->yesterday()]);
         Staking::factory()
             ->count(10)
-            ->create();
+            ->create(['created_at' => now()->yesterday()]);
         GameSession::factory()
             ->count(10)
-            ->create(['created_at'=>now()]);
+            ->create(['created_at' => now()->yesterday()]);
 
         $this->user = User::inRandomOrder()->first();
         $this->reportsService = new AutomatedReportsService();
@@ -155,7 +155,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_stakers()
     {
         Staking::query()->update([
-            'created_at' => now(),
+            'created_at' => now()->yesterday(),
             'amount_staked' => 400,
             'user_id' => $this->user->id
         ]);
