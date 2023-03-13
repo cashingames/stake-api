@@ -148,14 +148,15 @@ class RegisterController extends BaseController
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
             $isStakeApp = $platform == ClientPlatform::StakingMobileWeb ? true : false;
+            $bonusAmount = $isStakeApp ? 200 : 50;
 
-            DB::transaction(function () use ($user, $isStakeApp) {
-                $user->wallet->non_withdrawable_balance += ($isStakeApp ? 400 : 50);
+            DB::transaction(function () use ($user, $bonusAmount) {
+                $user->wallet->non_withdrawable_balance += $bonusAmount;
 
                 WalletTransaction::create([
                     'wallet_id' => $user->wallet->id,
                     'transaction_type' => 'CREDIT',
-                    'amount' => $isStakeApp ? 200 : 50,
+                    'amount' => $bonusAmount,
                     'balance' => $user->wallet->non_withdrawable_balance,
                     'description' => 'Sign Up Bonus',
                     'reference' => Str::random(10),
