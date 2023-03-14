@@ -91,7 +91,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
          * @TODO Rename to dynamic staking odds
          */
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            $oddMultiplierComputer = new OddsService();
+            $oddMultiplierComputer = app(OddsService::class);
             $oddMultiplier = $oddMultiplierComputer->computeDynamicOdds($this->user);
             $odd = $oddMultiplier['oddsMultiplier'];
         }
