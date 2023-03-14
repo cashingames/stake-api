@@ -30,7 +30,7 @@ class PlayGameServiceFactory
                 $result = new StandardExhibitionGameService();
                 break;
             case GameType::StakingExhibition:
-                $result = new StakingExhibitionGameService();
+                $result = app(StakingExhibitionGameService::class);
                 break;
             case GameType::LiveTrivia:
                 $result = new LiveTriviaGameService();
