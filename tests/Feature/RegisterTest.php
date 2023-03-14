@@ -312,25 +312,25 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_new_user_gets_200_naira_bonus_in_stakers_app()
-    {
+    // public function test_new_user_gets_200_naira_bonus_in_stakers_app()
+    // {
 
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
+    //     $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+    //         'country_code' => '+234',
+    //         'phone_number' => '7098498884',
+    //         'email' => 'email@email.com',
+    //         'password' => 'password',
+    //         'password_confirmation' => 'password'
 
-        ]);
+    //     ]);
 
-        $user = User::where('email', 'email@email.com' )->first();
+    //     $user = User::where('email', 'email@email.com' )->first();
 
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable_balance' => 200.00,
-        ]);
-    }
+    //     $this->assertDatabaseHas('wallets', [
+    //         'user_id' => $user->id,
+    //         'non_withdrawable_balance' => 200.00,
+    //     ]);
+    // }
 
     public function test_new_user_gets_50_naira_bonus_in_fun_app()
     {
