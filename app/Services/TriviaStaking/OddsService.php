@@ -2,15 +2,15 @@
 
 namespace App\Services\TriviaStaking;
 
-use App\Enums\FeatureFlags;
-use App\Models\StakingOdd;
-use App\Models\StakingOddsRule;
 use App\Models\User;
-use App\Repositories\Cashingames\WalletRepository;
+use App\Models\StakingOdd;
+use App\Enums\FeatureFlags;
 use App\Services\FeatureFlag;
+use App\Models\StakingOddsRule;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\Cashingames\WalletRepository;
 
 class OddsService
 {
@@ -59,9 +59,6 @@ class OddsService
          * @var \Illuminate\Support\Collection $stakingOddsRule
          */
         $stakingOddsRule = collect(Cache::remember('staking-odds-rule', 60 * 60, fn() => StakingOddsRule::get()));
-        $placeHolder = new \stdClass();
-        $placeHolder->odds_benefit = 1;
-        $placeHolder->display_name = 'LESS_THAN_TARGET_PLATFORM_INCOME';
 
         //if platform is not making up to 30% profit
         // and if user is not new, return half odds (0.5)
@@ -70,15 +67,21 @@ class OddsService
             60*3,
             fn() => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
         );
-        $platformTarget = config('trivia.platform_target');
 
+        $platformTarget = config('trivia.platform_target');
         if ($platformProfit < $platformTarget) {
+            $placeHolder = new \stdClass();
+            $placeHolder->odds_benefit = 0.5;
+            $placeHolder->display_name = 'LESS_THAN_TARGET_PLATFORM_INCOME';
             $rule = $stakingOddsRule->firstWhere('rule', 'LESS_THAN_TARGET_PLATFORM_INCOME') ?? $placeHolder;
             return [
                 'oddsMultiplier' => $rule->odds_benefit,
                 'oddsCondition' => $rule->display_name
             ];
         }
+
+        //if user is new, return double odds (2)
+
 
         return [
             'oddsMultiplier' => 1,

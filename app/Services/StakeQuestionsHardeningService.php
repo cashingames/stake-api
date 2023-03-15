@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\QuestionLevel;
 use App\Models\Category;
+use App\Models\Staking;
 use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -26,9 +27,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        $category = Category::find($categoryId);
+        $category = Cache::rememberForever('categories', fn() => Category::all())->firstWhere('id', $categoryId);
 
-        $platformProfitToday = Cache::remember('today_stakes', 60, function () {
+        $platformProfitToday = Cache::remember('platform-profit-today', 60 * 3, function () {
             return $this
                 ->walletRepository
                 ->getPlatformProfitPercentageOnStakingToday();
@@ -36,7 +37,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 
         $percentWonToday = $this->walletRepository
                                      ->getUserProfitPercentageOnStakingToday($user->id);
-
 
         if ($platformProfitToday < config('trivia.platform_target')) {
             Log::info(
@@ -124,11 +124,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->get();
     }
 
-    private function isNewUser($user): bool
-    {
-        return $user->gameSessions()->count() <= 3;
-    }
-
     /**
      * This includes both new and repeated questions as we are not sure if the
      * user will always win
@@ -184,6 +179,10 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->pluck('question_id');
     }
 
+    private function isNewUser($user): bool
+    {
+        return Staking::firstWhere('user_id', $user->id) == null;
+    }
 
 
 }
