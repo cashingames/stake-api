@@ -114,21 +114,19 @@ class StartSinglePlayerRequest extends FormRequest
 
         if (auth()->user()->wallet->non_withdrawable_balance < $stakingAmount) {
 
-            $validator->errors()->add('staking_amount', 'Insufficient funds');
+            return $validator->errors()->add('staking_amount', 'Insufficient funds');
         }
 
         $totalSessions = Staking::where('user_id', auth()->id())->count();
 
         if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
-            $validator->errors()->add(
+            return $validator->errors()->add(
                 'staking_amount',
                 'You can only make a first time stake of '
                 . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
             );
-        }
-
-        if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
-            $validator->errors()->add(
+        } elseif ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
+            return $validator->errors()->add(
                 'staking_amount',
                 'First stake cannot be less than  '
                 . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
@@ -137,7 +135,7 @@ class StartSinglePlayerRequest extends FormRequest
 
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
         if ($userProfit > 300) {
-            $validator->errors()->add(
+            return $validator->errors()->add(
                 'staking_amount',
                 'You are a genius!, please try again tomorrow'
             );
@@ -150,7 +148,7 @@ class StartSinglePlayerRequest extends FormRequest
         );
 
         if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
-            $validator->errors()->add(
+            return $validator->errors()->add(
                 'staking_amount',
                 'You are a genius!, please try again later'
             );
@@ -161,7 +159,7 @@ class StartSinglePlayerRequest extends FormRequest
             ->whereDate('created_at', now()->toDateString())
             ->count();
         if ( $todaysSessions > 10) {
-            $validator->errors()->add(
+            return $validator->errors()->add(
                 'staking_amount',
                 'You have reached your daily limit of 10 games, please try again tomorrow'
             );

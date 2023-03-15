@@ -334,7 +334,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
 
         /**
@@ -401,7 +401,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
     }
@@ -444,7 +444,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
         $response->assertOk();
     }
@@ -742,7 +742,7 @@ class GameTest extends TestCase
     }
 
     public function test_new_user_cannot_stake_more_than_bonus_amount_on_first_stake()
-    {   
+    {
         config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
         $questions = Question::factory()
             ->hasOptions(4)
@@ -762,7 +762,7 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-    
+
         $this->user->wallet->update([
             'non_withdrawable_balance' => 400
         ]);
