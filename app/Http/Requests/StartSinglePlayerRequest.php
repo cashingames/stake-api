@@ -120,12 +120,12 @@ class StartSinglePlayerRequest extends FormRequest
 
         $totalSessions = Staking::where('user_id', auth()->id())->count();
 
-        if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.amount')) {
-            $validator->errors()->add('staking_amount', 'You can only make a first time stake of '.config('trivia.bonus.signup.amount'). ' naira');
+        if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $validator->errors()->add('staking_amount', 'You can only make a first time stake of '.config('trivia.bonus.signup.stakers_bonus_amount'). ' naira');
         }
 
-        if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.amount')) {
-            $stakingAmount = config('trivia.bonus.signup.amount');
+        if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $stakingAmount = config('trivia.bonus.signup.stakers_bonus_amount');
         }
 
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
