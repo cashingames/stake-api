@@ -146,7 +146,7 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            $platform == ClientPlatform::StakingMobileWeb ? $this->stakingMobileWebSignUpBonus($user) : $this->GamearkSingUpBonus($user);
+            $platform == ClientPlatform::StakingMobileWeb ? $this->cashingamesSignupBonus($user) : $this->GamearkSingUpBonus($user);
         //credit referrer with points
         if (
             config('trivia.bonus.enabled') &&
@@ -164,7 +164,7 @@ class RegisterController extends BaseController
         return $user;
     }
 
-    protected function stakingMobileWebSignUpBonus($user)
+    protected function cashingamesSignupBonus($user)
     {
         $bonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
         DB::transaction(function () use ($user, $bonusAmount) {
