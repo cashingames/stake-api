@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\QuestionLevel;
 use App\Models\Category;
+use App\Models\Staking;
 use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -26,16 +27,13 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
         $user = auth()->user();
 
-        $category = Category::find($categoryId);
+        $category = Cache::rememberForever('categories', fn() => Category::all())->firstWhere('id', $categoryId);
 
-        $platformProfitToday = Cache::remember('today_stakes', 60, function () {
+        $platformProfitToday = Cache::remember('platform-profit-today', 60 * 3, function () {
             return $this
                 ->walletRepository
                 ->getPlatformProfitPercentageOnStakingToday();
         });
-
-        $percentWonToday = $this->walletRepository
-                                     ->getUserProfitPercentageOnStakingToday($user->id);
 
 
         if ($platformProfitToday < config('trivia.platform_target')) {
@@ -43,13 +41,11 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'Serving getHardQuestions due to platform not meeting KPI',
                 [
                     'user' => $user->username,
-                    'userProfitToday' => $percentWonToday . '%',
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
             return $this->getHardQuestions($user, $category);
         }
-
         $questions = null;
         $isNewUser = $this->isNewUser($user);
         if ($isNewUser) {
@@ -57,18 +53,27 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 'Serving getRepeatedEasyQuestions for new users',
                 [
                     'user' => $user->username,
-                    'userProfitToday' => $percentWonToday . '%',
+                    'userProfitToday' => '0%',
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
-            $questions = $this->getRepeatedEasyQuestions($user, $category);
-        } elseif ($percentWonToday < -50) { //if user is losing 50% of the time
-            $questions = $this->getRepeatedEasyQuestions($user, $category);
+            return $this->getRepeatedEasyQuestions($user, $category);
+        }
+
+        $percentWonToday = $this->walletRepository
+            ->getUserProfitPercentageOnStakingToday($user->id);
+
+        $percentWonThisYear = $this->walletRepository
+            ->getUserProfitPercentageOnStakingThisYear($user->id);
+
+        if ($percentWonThisYear > 30) { //if user is losing 50% of the time
+            $questions = $this->getHardQuestions($user, $category);
             Log::info(
-                'Serving getRepeatedEasyQuestions',
+                'Serving getHardQuestions because percentage won this year is greater than 50%',
                 [
                     'user' => $user->username,
                     'userProfitToday' => $percentWonToday . '%',
+                    'percentWonThisYear' => $percentWonThisYear . '%',
                     'platformProfitToday' => $platformProfitToday . '%'
                 ]
             );
@@ -82,7 +87,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                     'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
-        } elseif ($percentWonToday < 200) { //if user is winning 50% of the time
+        } elseif ($percentWonToday <= 50) { //if user is winning 50% of the time
             $questions = $this->getHardQuestions($user, $category);
             Log::info(
                 'Serving getHardQuestions',
@@ -122,11 +127,6 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->inRandomOrder()
             ->take(20)
             ->get();
-    }
-
-    private function isNewUser($user): bool
-    {
-        return $user->gameSessions()->count() <= 3;
     }
 
     /**
@@ -184,6 +184,10 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
             ->pluck('question_id');
     }
 
+    private function isNewUser($user): bool
+    {
+        return Staking::firstWhere('user_id', $user->id) == null;
+    }
 
 
 }

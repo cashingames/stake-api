@@ -40,10 +40,6 @@ class WalletRepository
             return 0;
         }
 
-        if ($amountWon == 0) {
-            return -100;
-        }
-
         return (($amountWon - $amountStaked) / $amountStaked) * 100;
     }
 
@@ -67,9 +63,6 @@ class WalletRepository
          * If no stakes were made today, then the platform is neutral
          * So first user should be lucky
          */
-        if ($amountWon == 0) {
-            return 100;
-        }
 
         if ($amountStaked == 0) {
             return 0;
@@ -88,6 +81,11 @@ class WalletRepository
     public function getUserProfitPercentageOnStakingToday(int $userId): int | float
     {
         return $this->getUserProfitPercentageOnStaking($userId, now()->startOfDay(), now()->endOfDay());
+    }
+
+    public function getUserProfitPercentageOnStakingThisYear(int $userId): int|float
+    {
+        return $this->getUserProfitPercentageOnStaking($userId, now()->startOfYear(), now());
     }
 
     //get platform profit on staking today
