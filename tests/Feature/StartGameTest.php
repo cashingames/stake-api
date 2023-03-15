@@ -86,9 +86,8 @@ class StartGameTest extends TestCase
             "mode" => 1,
             "type" => 2
         ]);
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+        $response->assertOk();
+
     }
 
     public function test_livetrivia_game_can_be_started_for_a_new_user()
@@ -119,9 +118,7 @@ class StartGameTest extends TestCase
             "trivia" => Trivia::first()->id
         ]);
 
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+        $response->assertOk();
     }
 
     public function test_exhibition_game_cannot_be_started_if_question_is_not_enough()

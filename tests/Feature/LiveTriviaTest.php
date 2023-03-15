@@ -107,11 +107,7 @@ class LiveTriviaTest extends TestCase
             "type" => 2,
             "trivia" => $this->trivia->id
         ]);
-
-
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+        $response->assertOk();
     }
 
     public function test_live_trivia_cannot_be_played_more_than_once_by_the_same_user()

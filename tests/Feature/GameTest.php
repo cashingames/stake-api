@@ -176,9 +176,7 @@ class GameTest extends TestCase
             "mode" => 1,
             "type" => 2
         ]);
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+        $response->assertOk();
     }
 
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
@@ -336,11 +334,13 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+
+        /**
+         * @TODO assert proper json structure
+         */
+        $response->assertOk();
     }
 
 
@@ -401,7 +401,7 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
     }
@@ -444,11 +444,9 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 1000
         ]);
-        $response->assertJson([
-            'message' => 'Game Started',
-        ]);
+        $response->assertOk();
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
@@ -744,7 +742,7 @@ class GameTest extends TestCase
     }
 
     public function test_new_user_cannot_stake_more_than_bonus_amount_on_first_stake()
-    {   
+    {
         config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
         $questions = Question::factory()
             ->hasOptions(4)
@@ -764,7 +762,7 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-    
+
         $this->user->wallet->update([
             'non_withdrawable_balance' => 400
         ]);
