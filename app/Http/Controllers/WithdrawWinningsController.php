@@ -24,7 +24,7 @@ class WithdrawWinningsController extends BaseController
 
         if ($platform == ClientPlatform::StakingMobileWeb) {
             $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
-            if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.total_withdrawal_amount')) {
+            if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.total_withdrawal_limit')) {
                 $data = [
                     'verifyEmailNavigation' => true,
                 ];
