@@ -98,8 +98,7 @@ class RegisterController extends BaseController
      */
     protected function create(array $data, $platform)
     {
-
-        //create the user
+      //create the user
 
         $user =
             User::create([
@@ -147,36 +146,7 @@ class RegisterController extends BaseController
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
 
-            // $isStakeApp = $platform == ClientPlatform::StakingMobileWeb ? true : false;
-            $bonusAmount = 50;
-
-            DB::transaction(function () use ($user, $bonusAmount) {
-                $user->wallet->non_withdrawable_balance += $bonusAmount;
-
-                WalletTransaction::create([
-                    'wallet_id' => $user->wallet->id,
-                    'transaction_type' => 'CREDIT',
-                    'amount' => $bonusAmount,
-                    'balance' => $user->wallet->non_withdrawable_balance,
-                    'description' => 'Sign Up Bonus',
-                    'reference' => Str::random(10),
-                ]);
-                $user->wallet->save();
-            });
-
-            $user->boosts()->create([
-                'user_id' => $user->id,
-                'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-                'boost_count' => 3,
-                'used_count' => 0
-            ]);
-            $user->boosts()->create([
-                'user_id' => $user->id,
-                'boost_id' => Boost::where('name', 'Skip')->first()->id,
-                'boost_count' => 3,
-                'used_count' => 0
-            ]);
-        }
+            $platform == ClientPlatform::StakingMobileWeb ? $this->cashingamesSignupBonus($user) : $this->GamearkSingUpBonus($user);
         //credit referrer with points
         if (
             config('trivia.bonus.enabled') &&
@@ -190,7 +160,70 @@ class RegisterController extends BaseController
                 Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
             }
         }
+    }
         return $user;
+    }
+
+    protected function cashingamesSignupBonus($user)
+    {
+        $bonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
+        DB::transaction(function () use ($user, $bonusAmount) {
+            $user->wallet->non_withdrawable_balance += $bonusAmount;
+
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $bonusAmount,
+                'balance' => $user->wallet->non_withdrawable_balance,
+                'description' => 'Sign Up Bonus',
+                'reference' => Str::random(10),
+            ]);
+            $user->wallet->save();
+        });
+
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Skip')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+    }
+
+    protected function GamearkSingUpBonus($user)
+    {
+        $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
+        DB::transaction(function () use ($user, $bonusAmount) {
+            $user->wallet->non_withdrawable_balance += $bonusAmount;
+
+            WalletTransaction::create([
+                'wallet_id' => $user->wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $bonusAmount,
+                'balance' => $user->wallet->non_withdrawable_balance,
+                'description' => 'Sign Up Bonus',
+                'reference' => Str::random(10),
+            ]);
+            $user->wallet->save();
+        });
+
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Skip')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
     }
 
     /**

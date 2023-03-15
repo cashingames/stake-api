@@ -312,28 +312,30 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    // public function test_new_user_gets_200_naira_bonus_in_stakers_app()
-    // {
-
-    //     $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-    //         'country_code' => '+234',
-    //         'phone_number' => '7098498884',
-    //         'email' => 'email@email.com',
-    //         'password' => 'password',
-    //         'password_confirmation' => 'password'
-
-    //     ]);
-
-    //     $user = User::where('email', 'email@email.com' )->first();
-
-    //     $this->assertDatabaseHas('wallets', [
-    //         'user_id' => $user->id,
-    //         'non_withdrawable_balance' => 200.00,
-    //     ]);
-    // }
-
-    public function test_new_user_gets_50_naira_bonus_in_fun_app()
+    public function test_new_user_gets_configurable_bonus_in_stakers_app()
     {
+        config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $user->id,
+            'non_withdrawable_balance' => 200.00,
+        ]);
+    }
+
+    public function test_new_user_gets_configurable_bonus_in_fun_app()
+    {
+        config(['trivia.bonus.signup.general_bonus_amount' => 50]);
 
         $this->postjson(self::REGISTER_URL, [
             'first_name' => 'Jane',
@@ -357,7 +359,6 @@ class RegisterTest extends TestCase
 
     public function test_new_user_gets_boost_bonus_in_stakers_app()
     {
-
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
             'country_code' => '+234',
             'phone_number' => '7098498884',
@@ -386,7 +387,6 @@ class RegisterTest extends TestCase
 
     public function test_new_user_gets_boost_bonus_in_fun_app()
     {
-
         $this->postjson(self::REGISTER_URL, [
             'first_name' => 'Jane',
             'last_name' => 'Doe',
