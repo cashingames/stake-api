@@ -71,7 +71,7 @@ class GameTest extends TestCase
         $this->seed(PlanSeeder::class);
         $this->seed(StakingOddSeeder::class);
         $this->seed(StakingOddsRulesSeeder::class);
-        $this->seed(AchievementBadgeSeeder::Class);
+        $this->seed(AchievementBadgeSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -82,6 +82,7 @@ class GameTest extends TestCase
         FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
         config(['odds.maximum_exhibition_staking_amount' => 1000]);
+        config(['trivia.bonus.signup.stakers_bonus_amount' => 1000]);
     }
 
     public function test_common_data_can_be_retrieved()
@@ -739,6 +740,43 @@ class GameTest extends TestCase
                     ]
                 ]
             ]
+        ]);
+    }
+
+    public function test_new_user_cannot_stake_more_than_bonus_amount_on_first_stake()
+    {   
+        config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(250)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+
+    
+        $this->user->wallet->update([
+            'non_withdrawable_balance' => 400
+        ]);
+
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 400
+        ]);
+        $response->assertJson([
+            'message' => 'You can only make a first time stake of 200 naira',
         ]);
     }
 }

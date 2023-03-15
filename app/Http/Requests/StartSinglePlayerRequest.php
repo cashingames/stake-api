@@ -82,7 +82,8 @@ class StartSinglePlayerRequest extends FormRequest
     }
 
     private function validateStartGame($validator)
-    {
+    {   
+       
         $gameType = GameType::detect($this->all());
 
         if (!$gameType) {
@@ -109,10 +110,22 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateStakingExhibition($validator)
     {
+        
         $stakingAmount = $this->input('staking_amount');
-
+        
         if (auth()->user()->wallet->non_withdrawable_balance < $stakingAmount) {
+           
             $validator->errors()->add('staking_amount', 'Insufficient funds');
+        }
+
+        $totalSessions = Staking::where('user_id', auth()->id())->count();
+
+        if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $validator->errors()->add('staking_amount', 'You can only make a first time stake of '.config('trivia.bonus.signup.stakers_bonus_amount'). ' naira');
+        }
+
+        if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $stakingAmount = config('trivia.bonus.signup.stakers_bonus_amount');
         }
 
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
@@ -137,10 +150,10 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         //if total session is greater than 10
-        $totalSession = Staking::where('user_id', auth()->id())
+        $todaysSessions = Staking::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
             ->count();
-        if ($totalSession > 10) {
+        if ( $todaysSessions > 10) {
             $validator->errors()->add(
                 'staking_amount',
                 'You have reached your daily limit of 10 games, please try again tomorrow'
