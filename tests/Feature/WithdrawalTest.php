@@ -54,7 +54,7 @@ class WithdrawalTest extends TestCase
 
     public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded(){
 
-        Config::set('email_verification_limit_threshold', 10000);
+        Config::set('trivia.email_verification_limit_threshold', 10000);
         $this->user->update(['email_verified_at' => null]);
     
         $this->user->wallet->withdrawable_balance = 20000;
