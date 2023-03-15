@@ -84,6 +84,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 [
                     'user' => $user->username,
                     'percentWonToday' => $percentWonToday . '%',
+                    'percentWonThisYear' => $percentWonThisYear . '%',
                     'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
@@ -94,6 +95,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 [
                     'user' => $user->username,
                     'percentWonToday' => $percentWonToday . '%',
+                    'percentWonThisYear' => $percentWonThisYear . '%',
                     'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );
@@ -104,6 +106,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
                 [
                     'user' => $user->username,
                     'percentWonToday' => $percentWonToday . '%',
+                    'percentWonThisYear' => $percentWonThisYear . '%',
                     'platformProfitToday' => $platformProfitToday . '%',
                 ]
             );

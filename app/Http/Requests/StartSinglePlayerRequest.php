@@ -82,8 +82,7 @@ class StartSinglePlayerRequest extends FormRequest
     }
 
     private function validateStartGame($validator)
-    {   
-       
+    {
         $gameType = GameType::detect($this->all());
 
         if (!$gameType) {
@@ -110,22 +109,30 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateStakingExhibition($validator)
     {
-        
+
         $stakingAmount = $this->input('staking_amount');
-        
+
         if (auth()->user()->wallet->non_withdrawable_balance < $stakingAmount) {
-           
+
             $validator->errors()->add('staking_amount', 'Insufficient funds');
         }
 
         $totalSessions = Staking::where('user_id', auth()->id())->count();
 
         if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
-            $validator->errors()->add('staking_amount', 'You can only make a first time stake of '.config('trivia.bonus.signup.stakers_bonus_amount'). ' naira');
+            $validator->errors()->add(
+                'staking_amount',
+                'You can only make a first time stake of '
+                . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+            );
         }
 
         if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
-            $stakingAmount = config('trivia.bonus.signup.stakers_bonus_amount');
+            $validator->errors()->add(
+                'staking_amount',
+                'First stake cannot be less than  '
+                . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+            );
         }
 
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());

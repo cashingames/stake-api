@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Http\Controllers\BaseController;
 use App\Enums\GameType;
 use App\Http\Requests\StartSinglePlayerRequest;
+use App\Http\ResponseHelpers\ResponseHelper;
 use App\Services\PlayGame\PlayGameServiceFactory;
 use Illuminate\Http\Request;
 
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
-class StartSinglePlayerGameController extends BaseController
+class StartSinglePlayerGameController extends Controller
 {
 
     public function __invoke(
@@ -37,18 +38,15 @@ class StartSinglePlayerGameController extends BaseController
             Log::info('SSTART_SINGLE_PLAYER_CANNOT_START', [
                 'user' => $request->user()->username,
             ]);
-            return $this->sendError(
-                'Category not available for now, try again later',
-                'Category not available for now, try again later'
-            );
+            return ResponseHelper::error('Category not available for now, try again later', 400);
         }
 
-        $result = $this->formatResponse($startResponse->gameSession, $startResponse->questions);
-        return $this->sendResponse($result, 'Game Started');
+        $result = $this->prepare($startResponse->gameSession, $startResponse->questions);
+        return ResponseHelper::success($result);
     }
 
 
-    private function formatResponse($gameSession, $questions): array
+    private function prepare($gameSession, $questions): array
     {
         $gameInfo = new stdClass;
         $gameInfo->token = $gameSession->session_token;
