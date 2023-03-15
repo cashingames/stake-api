@@ -23,6 +23,8 @@ class AssignRequestId
             'request-id' => $requestId
         ]);
 
-        return $next($request)->header('Request-Id', $requestId);
+        $request->headers->set('X-Request-Id', $requestId);
+
+        return $next($request);
     }
 }

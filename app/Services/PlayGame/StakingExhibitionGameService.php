@@ -24,11 +24,10 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     private User $user;
 
-    private QuestionsHardeningServiceInterface $questionsHardeningService;
-
-    public function __construct()
+    public function __construct(
+        private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
+    )
     {
-        $this->questionsHardeningService = new StakeQuestionsHardeningService();
         $this->user = auth()->user();
     }
 
@@ -36,7 +35,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
     {
         $this->validatedRequest = $validatedRequest;
 
-        $questions = $this->questionsHardeningService
+        $questions = $this->stakeQuestionsHardeningService
             ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
 
         DB::beginTransaction();
@@ -92,7 +91,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
          * @TODO Rename to dynamic staking odds
          */
         if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            $oddMultiplierComputer = new OddsService();
+            $oddMultiplierComputer = app(OddsService::class);
             $oddMultiplier = $oddMultiplierComputer->computeDynamicOdds($this->user);
             $odd = $oddMultiplier['oddsMultiplier'];
         }

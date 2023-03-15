@@ -162,10 +162,10 @@ class AutomatedReportsService
 
     private function getTopDailyStakers(Carbon $startDate)
     {
-        $stakers = DB::select("select 
+        $stakers = DB::select("select
             sum(amount_staked) staked, sum(amount_won) won,
             (sum(amount_staked) - sum(amount_won)) profit, ((sum(amount_staked)/sum(amount_won))-1)*100 profit_perc,
-            users.username, users.email 
+            users.username, users.email
             from stakings
             left join users on users.id = stakings.user_id
             where date(stakings.created_at) = '{$startDate->toDateString()}'
@@ -178,10 +178,10 @@ class AutomatedReportsService
 
     private function getTopWeeklyStakers(Carbon $startDate, Carbon $endDate)
     {
-        $stakers = DB::select("select 
+        $stakers = DB::select("select
             sum(amount_staked) staked, sum(amount_won) won,
             (sum(amount_staked) - sum(amount_won)) profit, ((sum(amount_staked)/sum(amount_won))-1)*100 profit_perc,
-            users.username, users.email 
+            users.username, users.email
             from stakings
             left join users on users.id = stakings.user_id
             where date(stakings.created_at) BETWEEN '{$startDate->toDateString()}'
@@ -258,12 +258,15 @@ class AutomatedReportsService
 
     private function getTotalStakes($startDate, $endDate)
     {
-        return Staking::where('created_at', '>=', $startDate)
+        $value = Staking::where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)->count();
+        return $value == 0 ? 1 : $value;
+
     }
 
     private function getTotalGameSessions($startDate, $endDate)
     {
-        return GameSession::where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
+        $value = GameSession::where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
+        return $value == 0 ? 1 : $value;
     }
 }

@@ -6,10 +6,22 @@ use App\Enums\GameType;
 use App\Models\LiveTrivia;
 use App\Models\Staking;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Support\Facades\Cache;
 
 class StartSinglePlayerRequest extends FormRequest
 {
+
+    public function __construct(
+        private WalletRepository $walletRepository
+    )
+    {
+    }
+    /**
+     * Summary of walletRepository
+     * @var
+     */
+
     /**
      * Indicates if the validator should stop on the first rule failure.
      *
@@ -97,13 +109,33 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateStakingExhibition($validator)
     {
+
         $stakingAmount = $this->input('staking_amount');
 
         if (auth()->user()->wallet->non_withdrawable_balance < $stakingAmount) {
+
             $validator->errors()->add('staking_amount', 'Insufficient funds');
         }
 
-        $userProfit = $this->getUserProfitToday(auth()->user());
+        $totalSessions = Staking::where('user_id', auth()->id())->count();
+
+        if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $validator->errors()->add(
+                'staking_amount',
+                'You can only make a first time stake of '
+                . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+            );
+        }
+
+        if ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
+            $validator->errors()->add(
+                'staking_amount',
+                'First stake cannot be less than  '
+                . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+            );
+        }
+
+        $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
         if ($userProfit > 300) {
             $validator->errors()->add(
                 'staking_amount',
@@ -111,8 +143,13 @@ class StartSinglePlayerRequest extends FormRequest
             );
         }
 
-        $platformProfit = $this->getPlatformProfitToday();
-        if ($platformProfit < 30 && $userProfit > 100) {
+        $platformProfit = Cache::remember(
+            'platform-profit-today',
+            60 * 3,
+            fn() => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
+        );
+
+        if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
             $validator->errors()->add(
                 'staking_amount',
                 'You are a genius!, please try again later'
@@ -120,10 +157,10 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         //if total session is greater than 10
-        $totalSession = Staking::where('user_id', auth()->id())
+        $todaysSessions = Staking::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
             ->count();
-        if ($totalSession > 10) {
+        if ( $todaysSessions > 10) {
             $validator->errors()->add(
                 'staking_amount',
                 'You have reached your daily limit of 10 games, please try again tomorrow'
@@ -170,75 +207,4 @@ class StartSinglePlayerRequest extends FormRequest
         }
     }
 
-    /**
-     * To calculate the percentage profit, you need to calculate the difference between the amount received
-     * and the initial stake, and then divide by the initial stake and multiply by 100.
-     * e.g I staked with 100 and got 15 back how much did I profit in percentage
-     * In this case, the amount received was 15 and the initial stake was 100. So the profit would be:
-     * (15 – 100) / 100 = -85%
-     * Note that the result is negative, which means that there was a loss rather than a profit.
-     *
-     * If the amount received was greater than the initial stake, the result would be positive.
-     * e.g I staked with 100 and got 150 back how much did I profit in percentage
-     * In this case, the amount received was 150 and the initial stake was 100. So the profit would be:
-     * (150 – 100) / 100 = 50%
-     * Note that the result is positive, which means that there was a profit rather than a loss.
-     *
-     * @param mixed $user
-     * @return float | int
-     */
-
-    private function getUserProfitToday($user): float|int
-    {
-        $todayStakes = Staking::whereDate('created_at', '=', date('Y-m-d'))
-            ->where('user_id', $user->id)
-            ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-            ->first();
-        $amountStaked = $todayStakes?->amount_staked ?? 0;
-        $amountWon = $todayStakes?->amount_won ?? 0;
-
-        if ($amountStaked == 0) {
-            return 0;
-        }
-
-        if ($amountWon == 0) {
-            return -100;
-        }
-
-        return (($amountWon - $amountStaked) / $amountStaked) * 100;
-    }
-
-    /**
-     * Platform profit is the opposite of total users profit
-     * e,g if users profit is 10%, then platform profit is -10%
-     *
-     * @return float|int
-     */
-    private function getPlatformProfitToday(): float|int
-    {
-        $todayStakes = Cache::remember(
-            "today_stakes",
-            60,
-            fn() => Staking::whereDate('created_at', '=', date('Y-m-d'))
-                ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-                ->first()
-        );
-        $amountStaked = $todayStakes?->amount_staked ?? 0;
-        $amountWon = $todayStakes?->amount_won ?? 0;
-
-
-        /**
-         * If no stakes were made today, then the platform is neutral
-         * So first user should be lucky
-         */
-        if ($amountWon == 0) {
-            return 100;
-        }
-
-        if ($amountStaked == 0) {
-            return 0;
-        }
-
-        return (($amountWon - $amountStaked) / $amountStaked) * -100;
-    }
 }

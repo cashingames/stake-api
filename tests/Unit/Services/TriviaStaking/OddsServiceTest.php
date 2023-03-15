@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services\TriviaStaking;
 
+use App\Repositories\Cashingames\WalletRepository;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\StakingOdd;
@@ -22,7 +23,7 @@ class OddsServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->oddsService = new OddsService();
+        $this->oddsService = new OddsService(new WalletRepository);
     }
 
     public function test_first_time_user_should_get_static_odds()
@@ -88,9 +89,9 @@ class OddsServiceTest extends TestCase
             );
 
         Cache::shouldReceive('remember')->withSomeOfArgs(
-            "today_stakes",
+            "platform-profit-today",
         )->andReturn(
-                (object) ["amount_staked" => 100, "amount_won" => 90]
+                30
             );
 
         $odds = $this->oddsService->getOdds(User::make());
@@ -99,7 +100,6 @@ class OddsServiceTest extends TestCase
             collect(
                 [
                     StakingOdd::make([
-                        'id' => 1,
                         'score' => 10,
                         'odd' => 5 //got halved because of the odds_benefit
                     ])

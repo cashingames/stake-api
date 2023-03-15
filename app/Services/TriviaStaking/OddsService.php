@@ -2,20 +2,26 @@
 
 namespace App\Services\TriviaStaking;
 
-use App\Enums\FeatureFlags;
-use App\Models\Staking;
-use App\Models\StakingOdd;
-use App\Models\StakingOddsRule;
 use App\Models\User;
+use App\Models\StakingOdd;
+use App\Enums\FeatureFlags;
 use App\Services\FeatureFlag;
+use App\Models\StakingOddsRule;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\Cashingames\WalletRepository;
 
 class OddsService
 {
 
     use DateUtils;
+
+    public function __construct(
+        private WalletRepository $walletRepository
+    )
+    {
+    }
 
     public function getOdds($user)
     {
@@ -53,16 +59,20 @@ class OddsService
          * @var \Illuminate\Support\Collection $stakingOddsRule
          */
         $stakingOddsRule = collect(Cache::remember('staking-odds-rule', 60 * 60, fn() => StakingOddsRule::get()));
-        $placeHolder = new \stdClass();
-        $placeHolder->odds_benefit = 1;
-        $placeHolder->display_name = 'LESS_THAN_TARGET_PLATFORM_INCOME';
 
         //if platform is not making up to 30% profit
         // and if user is not new, return half odds (0.5)
-        $platformProfit = $this->getPlatformProfitToday();
-        $platformTarget = config('trivia.platform_target');
+        $platformProfit = Cache::remember(
+            'platform-profit-today',
+            60*3,
+            fn() => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
+        );
 
+        $platformTarget = config('trivia.platform_target');
         if ($platformProfit < $platformTarget) {
+            $placeHolder = new \stdClass();
+            $placeHolder->odds_benefit = 0.5;
+            $placeHolder->display_name = 'LESS_THAN_TARGET_PLATFORM_INCOME';
             $rule = $stakingOddsRule->firstWhere('rule', 'LESS_THAN_TARGET_PLATFORM_INCOME') ?? $placeHolder;
             return [
                 'oddsMultiplier' => $rule->odds_benefit,
@@ -70,44 +80,13 @@ class OddsService
             ];
         }
 
+        //if user is new, return double odds (2)
+
+
         return [
             'oddsMultiplier' => 1,
             'oddsCondition' => 'no_matching_condition'
         ];
-    }
-
-    /**
-     * Platform profit is the opposite of total users profit
-     * e,g if users profit is 10%, then platform profit is -10%
-     *
-     * @return float|int
-     */
-    private function getPlatformProfitToday(): float|int
-    {
-        $todayStakes = Cache::remember(
-            "today_stakes",
-            60,
-            fn() => Staking::whereDate('created_at', '=', date('Y-m-d'))
-                ->selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-                ->first()
-        );
-        $amountStaked = $todayStakes?->amount_staked ?? 0;
-        $amountWon = $todayStakes?->amount_won ?? 0;
-
-
-        /**
-         * If no stakes were made today, then the platform is neutral
-         * So first user should be lucky
-         */
-        if ($amountWon == 0) {
-            return 100;
-        }
-
-        if ($amountStaked == 0) {
-            return 0;
-        }
-
-        return (($amountWon - $amountStaked) / $amountStaked) * -100;
     }
 
 }
