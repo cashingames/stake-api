@@ -35,10 +35,10 @@ class SendInAppActivityUpdates extends Command
             foreach ($users as $user){
                 $activities = json_decode(file_get_contents(storage_path() . "/appActivities.json"), true);
                 $key = array_rand($activities);
-               
+
                 $user->notify(new InAppActivityNotification($activities[$key]["Message"]));
-                (new SendPushNotification())->sendInAppActivityNotification($user, $activities[$key]["Message"]);
-                
+                (new SendPushNotification(null))->sendInAppActivityNotification($user, $activities[$key]["Message"]);
+
             }
             Log::info("Attempting to send app activity updates to 500 users");
         });

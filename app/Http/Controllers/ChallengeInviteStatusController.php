@@ -54,8 +54,7 @@ class ChallengeInviteStatusController extends BaseController
 
         Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-
-        $pushAction = new SendPushNotification();
+        $pushAction = new SendPushNotification($request->header('x-brand-id'));
         $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
 
         $player->notify(new ChallengeStatusUpdateNotification($updatedChallenge, $status));

@@ -52,7 +52,7 @@ class RefundExpiredChallengeStakingAmount extends Command
                                 'reference' => Str::random(10),
                             ]);
 
-                            (new SendPushNotification())->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge);
+                            (new SendPushNotification(null))->sendChallengeStakingRefundNotification($challengeStakingRecord->user, $challenge);
                         }
                     }
                     $challenge->update(['expired_at' => now()]);

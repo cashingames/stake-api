@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\ClientPlatform;
 use App\Enums\PushNotificationType;
 use App\Models\FcmPushSubscription;
 use App\Models\LiveTrivia;
@@ -18,9 +19,22 @@ class SendPushNotification
      */
     public $pushService;
 
-    public function __construct()
+    public function __construct($brandId)
     {
-        $this->pushService = new CloudMessagingService(config('services.firebase.server_key'));
+        $clientPlatform = ClientPlatform::detect($brandId);
+        $fcm;
+        switch ($clientPlatform) {
+            case ClientPlatform::GameArkMobile :
+                $fcm = config('services.firebase.gameark_server_key');
+                break;
+
+            case ClientPlatform::CashingamesMobile :
+            default:
+                $fcm = config('services.firebase.server_key');
+                break;
+        }
+
+        $this->pushService = new CloudMessagingService($fcm);
     }
 
     public function sendChallengeInviteNotification($sender, $opponent, $challenge)

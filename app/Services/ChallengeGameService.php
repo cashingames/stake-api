@@ -20,12 +20,12 @@ class ChallengeGameService
 
     /**
      * Create a new challenge and send invite notification to the opponent(s)
-     * 
+     *
      * @param App\User $creator
-     * 
+     *
      * @param mixed $opponent
      * $opponent can either be a single id, or an array of ids. If an array of ids is supplied, notification will be sent to all opponents involved
-     * 
+     *
      * @param int $categoryId
      */
     public function createChallenge(User $creator, $opponents, $categoryId)
@@ -58,7 +58,7 @@ class ChallengeGameService
 
             //push notification
             dispatch(function () use ($creator, $opponent, $challenge) {
-                $pushAction = new SendPushNotification();
+                $pushAction = new SendPushNotification(null);
                 $pushAction->sendChallengeInviteNotification($creator, $opponent, $challenge);
             });
 
