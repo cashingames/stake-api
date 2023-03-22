@@ -35,6 +35,8 @@ class AutomatedReportsService
     public $averageBoostUsedPerGameSession;
     public $totalGameSessions;
     public $totalStakes;
+    public $totalBonusStakesAmount;
+    public $totalBonusWinningsAmount;
 
     public function getDailyReports()
     {
@@ -51,7 +53,7 @@ class AutomatedReportsService
         $this->totalWithdrawals = WalletTransaction::where('transaction_type', 'DEBIT')
             ->where('description', 'Winnings Withdrawal Made')->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)->sum('amount');
-      
+
         $this->totalAmountWon = Staking::where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
             ->sum('amount_won');
@@ -67,6 +69,8 @@ class AutomatedReportsService
         $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
         $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakersInADay($startDate);
         $this->stakers = $this->getTopDailyStakers($startDate);
+        $this->totalBonusStakesAmount = $this->getTotalBonusStakeAmount($startDate, $endDate);
+        $this->totalBonusWinningsAmount = $this->getTotalBonusWinningsAmount($startDate, $endDate);
 
         $data = [
             'netProfit' => number_format($this->netProfit),
@@ -74,6 +78,8 @@ class AutomatedReportsService
             'totalWithdrawals' => number_format($this->totalWithdrawals),
             'totalAmountWon' => number_format($this->totalAmountWon),
             'totalStakedAmount' => number_format($this->totalStakedamount),
+            'totalBonusStakesAmount' => number_format($this->totalBonusStakesAmount),
+            'totalBonusWinningsAmount' => number_format($this->totalBonusWinningsAmount),
             'completedStakingSessionsCount' => $this->completedStakingSessionsCount,
             'incompleteStakingSessionsCount' => $this->incompleteStakingSessionsCount,
             'totalUsedBoostCount' => $this->totalUsedBoostCount,
@@ -121,6 +127,8 @@ class AutomatedReportsService
         // dd($this->totalGameSessions );
         $this->averageBoostUsedPerGameSession = $this->totalUsedBoostCount / $this->totalGameSessions;
         $this->averageStakesPerStaker = $this->uniqueStakersCount / $this->totalStakes;
+        $this->totalBonusStakesAmount = $this->getTotalBonusStakeAmount($startDate, $endDate);
+        $this->totalBonusWinningsAmount = $this->getTotalBonusWinningsAmount($startDate, $endDate);
 
         $data = [
             'netProfit' => number_format($this->netProfit),
@@ -134,6 +142,8 @@ class AutomatedReportsService
             'totalUsedBoostCount' => $this->totalUsedBoostCount,
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
             'uniqueStakersCount' => $this->uniqueStakersCount,
+            'totalBonusStakesAmount' => number_format($this->totalBonusStakesAmount),
+            'totalBonusWinningsAmount' => number_format($this->totalBonusWinningsAmount),
             // 'totalPurchasedBoostAmount' => number_format($this->totalPurchasedBoostAmount),
             'timeFreezeboostBoughtAmount' => number_format($this->timeFreezeboostBoughtAmount),
             'timeFreezeboostBoughtCount' => $this->timeFreezeboostBoughtCount,
@@ -210,10 +220,11 @@ class AutomatedReportsService
         return DB::table('exhibition_boosts')->whereBetween('created_at', [$startDate->toDateString(), $endDate->toDateString()])->count();
     }
 
-    private function getTotalPurchasedBoostsCount($startDate, $endDate){
-       return WalletTransaction::where('description','LIKE','Bought TIME FEEZE boosts')
-        ->orWhere('description','LIKE','Bought SKIP boosts')->where('created_at', '>=', $startDate)
-        ->where('created_at', '<=', $endDate)->count();
+    private function getTotalPurchasedBoostsCount($startDate, $endDate)
+    {
+        return WalletTransaction::where('description', 'LIKE', 'Bought TIME FEEZE boosts')
+            ->orWhere('description', 'LIKE', 'Bought SKIP boosts')->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $endDate)->count();
     }
 
     private function getTotalNumberOfUniqueStakersInADay(Carbon $date)
@@ -261,12 +272,33 @@ class AutomatedReportsService
         $value = Staking::where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)->count();
         return $value == 0 ? 1 : $value;
-
     }
 
     private function getTotalGameSessions($startDate, $endDate)
     {
         $value = GameSession::where('created_at', '>=', $startDate)->where('created_at', '<=', $endDate)->count();
         return $value == 0 ? 1 : $value;
+    }
+
+    private function getTotalBonusStakeAmount($startDate, $endDate)
+    {
+        $platformBonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
+        $bonusStakeAmount = DB::select("
+                SELECT SUM(amount_staked) as totalAmountStaked from (SELECT MIN(created_at) , amount_staked, 
+                user_id FROM stakings WHERE stakings.amount_staked = '{$platformBonusAmount}' 
+                AND stakings.created_at BETWEEN '{$startDate->toDateString()}' 
+                AND '{$endDate->toDateString()}' GROUP BY user_id ) As bonusStakes");
+        return $bonusStakeAmount[0]->totalAmountStaked;
+    }
+
+    private function getTotalBonusWinningsAmount($startDate, $endDate)
+    {
+        $platformBonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
+        $bonusWinningsAmount = DB::select("
+                SELECT SUM(amount_won) as totalAmountWon from (SELECT MIN(created_at) , amount_won ,
+                user_id FROM stakings WHERE stakings.amount_staked = '{$platformBonusAmount}' 
+                AND stakings.created_at BETWEEN '{$startDate->toDateString()}' 
+                AND '{$endDate->toDateString()}' GROUP BY user_id ) As bonusWins");
+        return $bonusWinningsAmount[0]->totalAmountWon;
     }
 }

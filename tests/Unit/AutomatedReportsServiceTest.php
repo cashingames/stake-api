@@ -41,7 +41,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(11, $dailyReports);
+        $this->assertCount(13, $dailyReports);
     }
 
     public function test_that_daily_reports_returns_net_profit()
@@ -102,7 +102,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(17, $weeklyReports);
+        $this->assertCount(19, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()
