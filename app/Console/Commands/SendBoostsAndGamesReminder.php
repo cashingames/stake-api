@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Actions\SendPushNotification;
 use App\Models\User;
+use App\Models\FcmPushSubscription;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -28,13 +29,19 @@ class SendBoostsAndGamesReminder extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
-        User::chunk(500, function($users){
+        User::chunk(500, function($users) use ($pushNotification){
+            $allTokens = [];
             foreach ($users as $user){
-                (new SendPushNotification())->sendBoostsReminderNotification($user);
+                $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+                if (!is_null($device_token)) {
+                    $allTokens[] = $device_token->device_token;
+                }
 
+                // $pushNotification->sendBoostsReminderNotification($user);
             }
+            $pushNotification->sendBoostsReminderNotification($allTokens, true);
             Log::info("Attempting to send boosts notification to 500 users");
         });
     }

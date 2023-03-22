@@ -125,14 +125,10 @@ class SendPushNotification
         Log::info("Challenge invitation push notification sent to: " . $recipient->username . " from " . $user->username);
     }
 
-    public function sendSpecialHourOddsNotification($user)
+    public function sendSpecialHourOddsNotification($user, $hasMany = false)
     {
-        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-        if (is_null($device_token)) {
-            return;
-        }
 
-        $this->pushService->setNotification(
+        $instance = $this->pushService->setNotification(
             [
                 'title' => "Special Hour: Play now and win more",
                 'body' => "Play a game now and increase your odds of winning by x1.5"
@@ -147,14 +143,26 @@ class SendPushNotification
                     'action_id' => "#"
 
                 ]
-            )
-            ->setTo($device_token->device_token)
+            );
+
+        if($hasMany){
+            $instance->setTo($user)
+            ->sendToMany();
+        }else{
+            $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+            if (is_null($device_token)) {
+                return;
+            }
+
+            $instance->setTo($device_token->device_token)
             ->send();
+
+        }
     }
 
-    public function sendliveTriviaNotification($device, $time)
+    public function sendliveTriviaNotification($device, $time, $hasMany = false)
     {
-        $this->pushService->setNotification(
+        $instance = $this->pushService->setNotification(
             [
                 'title' => "Live Trivia Alert ! : Play $time !",
                 'body' => "Play this live trivia and stand a chance to win cash!"
@@ -169,9 +177,15 @@ class SendPushNotification
                     'action_id' => "#"
 
                 ]
-            )
-            ->setTo($device->device_token)
+            );
+
+        if($hasMany){
+            $instance->setTo($device)
+            ->sendToMany();
+        }else{
+            $instance->setTo($device->device_token)
             ->send();
+        }
     }
 
     public function sendChallengeStakingRefundNotification($player, $challenge)
@@ -201,9 +215,9 @@ class SendPushNotification
         Log::info("Challenge staking refund push notification sent to: " . $player->username );
     }
 
-    public function sendDailyBonusGamesNotification($device)
+    public function sendDailyBonusGamesNotification($device, $hasMany = false)
     {
-        $this->pushService->setNotification(
+        $instance = $this->pushService->setNotification(
             [
                 'title' => "You have been awarded free games!",
                 'body' => "Play now and stand a chance to win cash!"
@@ -218,19 +232,18 @@ class SendPushNotification
                     'action_id' => "#"
 
                 ]
-            )
-            ->setTo($device->device_token)
-            ->send();
+            );
+
+            if($hasMany){
+                $instance->setTo($device)->sendToMany();
+            }else{
+                $instance->setTo($device->device_token)->send();
+            }
     }
 
-    public function sendBoostsReminderNotification($user)
+    public function sendBoostsReminderNotification($user, $hasMany)
     {
-        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-        if (is_null($device_token)) {
-            return;
-        }
-
-        $this->pushService->setNotification(
+        $instance = $this->pushService->setNotification(
             [
                 'title' => "Your boosts are your super powers!",
                 'body' => "Use boosts to stand a better chance at winning!"
@@ -245,9 +258,19 @@ class SendPushNotification
                     'action_id' => "#"
 
                 ]
-            )
-            ->setTo($device_token->device_token)
-            ->send();
+            );
+
+        if($hasMany){
+            $instance->setTo($user)->sendToMany();
+        }else{
+            $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+            if (is_null($device_token)) {
+                return;
+            }
+
+            $instance->setTo($device_token->device_token)->send();
+        }
+
     }
 
     public function sendInAppActivityNotification($user, $message)

@@ -29,15 +29,15 @@ class SendInAppActivityUpdates extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
-        User::chunk(500, function($users){
+        User::chunk(500, function($users) use($pushNotification){
             foreach ($users as $user){
                 $activities = json_decode(file_get_contents(storage_path() . "/appActivities.json"), true);
                 $key = array_rand($activities);
 
                 $user->notify(new InAppActivityNotification($activities[$key]["Message"]));
-                (new SendPushNotification())->sendInAppActivityNotification($user, $activities[$key]["Message"]);
+                $pushNotification->sendInAppActivityNotification($user, $activities[$key]["Message"]);
 
             }
             Log::info("Attempting to send app activity updates to 500 users");
