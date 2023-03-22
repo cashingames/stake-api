@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\Boost;
 use App\Models\Profile;
 use App\Models\User;
@@ -24,11 +25,34 @@ class SocialSignInController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function authenticateUser(Request $request)
+    public function authenticateUser(Request $request, ClientPlatform $clientPlatform)
     {
         $returningUser = User::where('email', $request->email)->first();
         if ($returningUser != null) {
             $token = auth()->tokenById($returningUser->id);
+
+            $data = [
+                'token' => $token,
+                'isFirstTime' => false,
+
+            ];
+            return $this->sendResponse($data, 'Returning user token');
+        }
+
+        if($clientPlatform == ClientPlatform::GameArkMobile){
+            // automatically create this user
+
+            $payload = [
+                'email' => $request->email,
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'username' => $request->email,
+                'country_code' => '',
+                'phone_number' => '',
+                'referrer' => null
+            ];
+
+            $token = $this->createAction($payload);
 
             $data = [
                 'token' => $token,
@@ -63,6 +87,12 @@ class SocialSignInController extends BaseController
             'referrer' => ['nullable', 'string', 'exists:users,username']
         ]);
 
+        $token = $this->createAction($data);
+
+        return $this->sendResponse($token, 'Token');
+    }
+
+    public function createAction($data){
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
@@ -155,8 +185,7 @@ class SocialSignInController extends BaseController
             /** @TODO: this needs to be changed to plan */
             // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
-        $token = auth()->tokenById($user->id);
+        return auth()->tokenById($user->id);
 
-        return $this->sendResponse($token, 'Token');
     }
 }
