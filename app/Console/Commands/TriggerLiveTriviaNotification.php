@@ -49,7 +49,7 @@ class TriggerLiveTriviaNotification extends Command
             DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     dispatch(function() use($device){
-                        (new SendPushNotification(null))->sendliveTriviaNotification($device, "in 1 hour");
+                        (new SendPushNotification())->sendliveTriviaNotification($device, "in 1 hour");
                     });
 
                 }
@@ -63,7 +63,7 @@ class TriggerLiveTriviaNotification extends Command
             DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     dispatch(function() use($device){
-                        (new SendPushNotification(null))->sendliveTriviaNotification($device, "in 30 minutes");
+                        (new SendPushNotification())->sendliveTriviaNotification($device, "in 30 minutes");
                     });
 
                 }
@@ -78,7 +78,7 @@ class TriggerLiveTriviaNotification extends Command
             DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
                     dispatch(function() use($device){
-                        (new SendPushNotification(null))->sendliveTriviaNotification($device, "now");
+                        (new SendPushNotification())->sendliveTriviaNotification($device, "now");
                     });
 
                 }

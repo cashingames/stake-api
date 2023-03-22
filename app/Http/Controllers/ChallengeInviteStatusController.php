@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\User;
 use App\Models\Challenge;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class ChallengeInviteStatusController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, ClientPlatform $clientPlatform)
     {
         if (!$request->has('challenge_id')) {
             return $this->sendError('Challenge info not found', 'Challenge info not found');
@@ -54,7 +55,7 @@ class ChallengeInviteStatusController extends BaseController
 
         Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
-        $pushAction = new SendPushNotification($request->header('x-brand-id'));
+        $pushAction = new SendPushNotification($clientPlatform);
         $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);
 
         $player->notify(new ChallengeStatusUpdateNotification($updatedChallenge, $status));

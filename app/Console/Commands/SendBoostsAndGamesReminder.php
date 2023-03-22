@@ -32,7 +32,7 @@ class SendBoostsAndGamesReminder extends Command
     {
         User::chunk(500, function($users){
             foreach ($users as $user){
-                (new SendPushNotification(null))->sendBoostsReminderNotification($user);
+                (new SendPushNotification())->sendBoostsReminderNotification($user);
 
             }
             Log::info("Attempting to send boosts notification to 500 users");

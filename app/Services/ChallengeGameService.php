@@ -58,7 +58,7 @@ class ChallengeGameService
 
             //push notification
             dispatch(function () use ($creator, $opponent, $challenge) {
-                $pushAction = new SendPushNotification(null);
+                $pushAction = new SendPushNotification();
                 $pushAction->sendChallengeInviteNotification($creator, $opponent, $challenge);
             });
 

@@ -19,9 +19,8 @@ class SendPushNotification
      */
     public $pushService;
 
-    public function __construct($brandId)
+    public function __construct(ClientPlatform $clientPlatform = ClientPlatform::CashingamesMobile)
     {
-        $clientPlatform = ClientPlatform::detect($brandId);
         $fcm;
         switch ($clientPlatform) {
             case ClientPlatform::GameArkMobile :

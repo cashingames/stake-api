@@ -46,6 +46,7 @@ class GiveDailyBonusGames extends Command
     public function handle()
     {
         $freePlan = Plan::where('is_free', true)->first();
+        $pushNotification = new SendPushNotification();
 
         User::all()->map(function ($user) use ($freePlan) {
 
@@ -64,7 +65,7 @@ class GiveDailyBonusGames extends Command
         if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
             DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
                 foreach ($devices as $device) {
-                    (new SendPushNotification(null))->sendDailyBonusGamesNotification($device);
+                    $pushNotification->sendDailyBonusGamesNotification($device);
                 }
             });
         }

@@ -37,7 +37,7 @@ class SendInAppActivityUpdates extends Command
                 $key = array_rand($activities);
 
                 $user->notify(new InAppActivityNotification($activities[$key]["Message"]));
-                (new SendPushNotification(null))->sendInAppActivityNotification($user, $activities[$key]["Message"]);
+                (new SendPushNotification())->sendInAppActivityNotification($user, $activities[$key]["Message"]);
 
             }
             Log::info("Attempting to send app activity updates to 500 users");

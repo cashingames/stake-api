@@ -60,7 +60,7 @@ class ReferralService
             ]);
 
             // send push notification ot user
-            (new SendPushNotification(null))->sendReferralBonusNotification($referrerProfile, $plan_count);
+            (new SendPushNotification())->sendReferralBonusNotification($referrerProfile, $plan_count);
         }
     }
 }
