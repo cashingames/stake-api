@@ -51,7 +51,7 @@ class AutomatedReportsService
         $this->totalWithdrawals = WalletTransaction::where('transaction_type', 'DEBIT')
             ->where('description', 'Winnings Withdrawal Made')->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)->sum('amount');
-
+      
         $this->totalAmountWon = Staking::where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
             ->sum('amount_won');
