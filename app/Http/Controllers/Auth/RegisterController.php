@@ -19,10 +19,8 @@ use App\Rules\UniquePhoneNumberRule;
 use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
-use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
-
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
@@ -39,8 +37,6 @@ class RegisterController extends BaseController
     | provide this functionality without requiring any additional code.
     |
     */
-
-    use RegistersUsers;
 
     /**
      * Where to redirect users after registration.
