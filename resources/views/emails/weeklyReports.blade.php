@@ -94,6 +94,14 @@
                 <th style="padding-top: 12px; padding-bottom: 12px;text-align: left;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Average Boost Used Per Game Session</th>
                 <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['averageBoostUsedPerGameSession']}}</td>
             </tr>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Bonus Stakes Amount</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalBonusStakesAmount']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Bonus Winnings Amount</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalBonusWinningsAmount']}}</td>
+            </tr>
         </table>
     </div>
     <h3 style="text-align: center;padding-top: 2rem;"> Top {{count($data['stakers'])}} Stakers  </h3>
