@@ -15,7 +15,11 @@
         "opcodesio/log-viewer": "^2.3",
         "php-open-source-saver/jwt-auth": "^2.1",
         "sentry/sentry-laravel": "^3.3",
-        "spatie/laravel-responsecache": "^7.4"
+        "spatie/laravel-responsecache": "^7.4",
+        "google/apiclient": "^2.12",
+        "phpoffice/phpspreadsheet": "^1.18",
+        "predis/predis": "~1.0",
+        "yabacon/paystack-php": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -24,7 +28,10 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.0",
-        "spatie/laravel-ignition": "^2.0"
+        "spatie/laravel-ignition": "^2.0",
+        "barryvdh/laravel-debugbar": "^3.6",
+        "brianium/paratest": "^6.8"
+      
     },
     "autoload": {
         "psr-4": {
