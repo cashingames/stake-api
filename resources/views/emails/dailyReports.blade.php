@@ -30,8 +30,12 @@
     <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
         <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <tr style=" color: gray;text-align: left;">
-                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Net Platform Gain</th>
-                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['netProfit']}}</td>
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Bogus Net Platform Gain (with bonuses)</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['bogusNetProfit']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Bogus Net Platform Gain (with bonuses)</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['trueNetProfit']}}</td>
             </tr>
             <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;" >Total Fundings</th>
