@@ -72,18 +72,25 @@ class RegisterController extends BaseController
 
             'first_name' => [
                 'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
             ],
             'last_name' => [
                 'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
             ],
             'username' => [
                 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
             ],
-            'country_code' => ['required', 'string', 'max:4'],
-            'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule],
+            'country_code' => [
+                'string', 'max:4',
+                Rule::requiredIf(fn () => ($platform != ClientPlatform::GameArkMobile ))
+            ],
+            'phone_number' => [
+                'numeric',
+                new UniquePhoneNumberRule,
+                Rule::requiredIf(fn () => ($platform != ClientPlatform::GameArkMobile ))
+            ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username']
@@ -105,13 +112,14 @@ class RegisterController extends BaseController
                 'username' => $platform !== ClientPlatform::StakingMobileWeb
                     ? $data['username']
                     : strstr($data['email'], '@', true) . mt_rand(10, 99),
-                'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
-                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
+                'phone_number' =>  ( ($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
+                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
+                'email_verified_at' =>  (($platform == ClientPlatform::GameArkMobile) ? now() : null),
                 'is_on_line' => true,
-                'country_code' => $data['country_code'],
+                'country_code' => ( ($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
@@ -276,6 +284,17 @@ class RegisterController extends BaseController
         $this->validator($request->all(), $platform)->validate();
 
         $user = $this->create($request->all(), $platform);
+
+        if($platform == ClientPlatform::GameArkMobile){
+            $token = auth()->login($user);
+
+            $result = [
+                'username' => $user->username,
+                'email' => $user->email,
+                'token' => $token,
+            ];
+            return $this->sendResponse($result, 'Account created successfully');
+        }
 
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;

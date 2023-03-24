@@ -431,4 +431,26 @@ class RegisterTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /** @test */
+    public function gameark_user_can_register_without_otp()
+    {
+
+        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::REGISTER_URL, [
+            'username' => 'username',
+            'email' => 'tester@gmail.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        // $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            "message",
+            "data" => [
+                "token"
+            ]
+        ]);
+    }
 }

@@ -56,7 +56,7 @@ class SocialSignInController extends BaseController
 
             $data = [
                 'token' => $token,
-                'isFirstTime' => false,
+                'isFirstTime' => true,
 
             ];
             return $this->sendResponse($data, 'Returning user token');
