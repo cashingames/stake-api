@@ -41,13 +41,18 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(13, $dailyReports);
+        $this->assertCount(14, $dailyReports);
     }
 
-    public function test_that_daily_reports_returns_net_profit()
+    public function test_that_daily_reports_returns_bogus_net_profit()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertArrayHasKey('netProfit', $dailyReports);
+        $this->assertArrayHasKey('bogusNetProfit', $dailyReports);
+    }
+    public function test_that_daily_reports_returns_true_net_profit()
+    {
+        $dailyReports = $this->reportsService->getDailyReports();
+        $this->assertArrayHasKey('trueNetProfit', $dailyReports);
     }
 
     public function test_that_daily_reports_correct_total_withdrawal_amount()
@@ -102,7 +107,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(19, $weeklyReports);
+        $this->assertCount(20, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()
