@@ -17,3 +17,30 @@ Stage 1.1
       x - Client can send a request, disconnects and keep polling the server every x seconds to know if a match was found
     - If found, server sends a message to both clients to start the game
     - If not found, server sends a message to the user to start game with a bot
+
+Backend table structure
+- realtime challenge requests
+  id
+  documentId
+  userId
+  userName
+  amount
+  category
+
+- challenge information
+  id
+  first_user_id
+  second_user_id
+  first_user_documentId
+  second_user_documentId
+  amount
+  category
+  status
+  startTime
+  endTime
+
+- challenge_session_questions
+  id
+  challenge_id
+  question_id
+  status (correct, incorrect)
