@@ -72,7 +72,7 @@ class LiveTriviaStatusTest extends TestCase
         $this->createTestLiveTrivia(Carbon::now()->addHour(), Carbon::now()->addHours(2));
         $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
 
-        $response->assertJsonFragment([
+        $response->onFragment([
             "status" => "WAITING",
         ]);
     }

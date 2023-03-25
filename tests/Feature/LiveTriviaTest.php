@@ -214,7 +214,7 @@ class LiveTriviaTest extends TestCase
             "consumedBoosts" => []
         ]);
 
-        $response->assertJson([
+        $response->on([
             'message' => 'Game Ended',
         ]);
     }

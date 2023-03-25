@@ -34,6 +34,7 @@ use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\ChallengeGlobalLeadersController;
+use App\Http\Controllers\CreateRealTimeChallengeFirebaseDocument;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetContestDetailsController;
 use App\Http\Controllers\GetSingleContestController;
@@ -122,6 +123,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('stakers/sessions/recent', GetStakersSessionController::class)->middleware(['cacheResponse:300']);
         Route::post('stakers/email/verify', EmailOtpVerificationController::class);
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
+        Route::post('firestore/document/create', CreateRealTimeChallengeFirebaseDocument::class);
     }
 );
 
