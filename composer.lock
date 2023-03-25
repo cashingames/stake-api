@@ -27,7 +27,7 @@
             "provide": {
                 "psr/clock-implementation": "1.0"
             },
-            "require-dev": {e
+            "require-dev": {
                 "phpstan/extension-installer": "^1.2",
                 "phpstan/phpstan": "^1.9.1",
                 "phpstan/phpstan-phpunit": "^1.2.2",
