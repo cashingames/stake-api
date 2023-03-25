@@ -30,50 +30,54 @@
     <div style="padding: 20px;background-color: #e6ffff;overflow-x:auto;">
         <table style="width:100%; border-collapse: collapse; font-size: 0.9em;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <tr style=" color: gray;text-align: left;">
-                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Net Platform Gain</th>
-                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['netProfit']}}</td>
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Bogus Net Platform Gain (with bonuses)</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['bogusNetProfit']}}</td>
             </tr>
             <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">True Net Platform Gain (without bonuses)</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['trueNetProfit']}}</td>
+            </tr>
+            <tr style=" color: gray;text-align: left; ">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;" >Total Fundings</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalFundedAmount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;">
+            <tr style=" color: gray;text-align: left;background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Withdrawals</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalWithdrawals']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left; ">
                 <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Staked Amount</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalStakedAmount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Amount Won</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalAmountWon']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Completed Stake Sessions Count</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['completedStakingSessionsCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Incomplete Stake Sessions Count</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['incompleteStakingSessionsCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Used Boosts Count</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['totalUsedBoostCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Unique Stakers Count</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['uniqueStakersCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Purchased Boosts Count</th>
                 <td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['totalPurchasedBoostCount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left;">
+            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Bonus Stakes Amount</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalBonusStakesAmount']}}</td>
             </tr>
-            <tr style=" color: gray;text-align: left; background-color: #dddddd;">
+            <tr style=" color: gray;text-align: left;">
                 <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Bonus Winnings Amount</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">₦{{$data['totalBonusWinningsAmount']}}</td>
             </tr>
