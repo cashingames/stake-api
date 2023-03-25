@@ -25,6 +25,7 @@
         "spatie/laravel-responsecache": "^7.4",
         "yabacon/paystack-php": "^2.2"
     },
+    "provide": { "ext-grpc": "*" },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
         "brianium/paratest": "^7.1",
