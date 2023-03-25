@@ -71,16 +71,13 @@ class RegisterController extends BaseController
         return Validator::make($data, [
 
             'first_name' => [
-                'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
+                'string', 'max:255',
             ],
             'last_name' => [
-                'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
+                'string', 'max:255',
             ],
             'username' => [
                 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-                Rule::requiredIf(fn () => !( ($platform == ClientPlatform::StakingMobileWeb) || ($platform == ClientPlatform::GameArkMobile) ))
             ],
             'country_code' => [
                 'string', 'max:4',
