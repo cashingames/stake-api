@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ClientPlatform;
-use App\Enums\ItemType;
+use App\Enums\UserAssetType;
 use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Models\WalletTransaction;
 use App\Models\Plan;
@@ -412,7 +412,7 @@ class WalletController extends BaseController
             'item_id' => ['required']
         ]);
 
-        if ($data['type'] == ItemType::BOOST) {
+        if ($data['type'] == UserAssetType::BOOST) {
             $boostId = $data['item_id'];
             $boost = Boost::find($boostId);
 

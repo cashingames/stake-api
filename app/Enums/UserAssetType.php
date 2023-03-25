@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ItemType : string {
+enum UserAssetType : string {
     case BOOST = "BOOST";
     case PLAN = "PLAN";
 }
