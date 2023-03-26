@@ -9,7 +9,7 @@ class ChallengeRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['document_id', 'user_id', 'amount','category_id'];
+    protected $fillable = ['challenge_request_id', 'user_id','username','amount','category_id'];
 
     public function user()
     {
