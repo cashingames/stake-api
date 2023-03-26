@@ -119,6 +119,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Achievement::class);
     }
 
+    public function challengeRequests(){
+        return $this->hasMany(ChallengeRequest::class);
+    }
+
     public function userAchievementBadges()
     {
         return $this->belongsToMany(AchievementBadge::class, 'user_achievement_badges')->withPivot('id', 'count', 'is_claimed', 'is_rewarded', 'is_notified');
