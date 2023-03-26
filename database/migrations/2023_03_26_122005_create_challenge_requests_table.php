@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('challenge_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('document_id');
+            $table->string('challenge_request_id');
             $table->foreignId('user_id');
+            $table->string('username');
             $table->decimal('amount', 10, 2);
             $table->foreignId('category_id');
             $table->timestamps();

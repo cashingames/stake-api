@@ -24,7 +24,8 @@ class ChallengeRequestFactory extends Factory
         return [
             'user_id' => User::factory()->hasProfile(1)->hasWallet(1),
             'category_id' => Category::factory(),
-            'document_id' => Str::random(20),
+            'challenge_request_id' => Str::random(20),
+            'username' => $this->faker->userName,
             'amount' => $this->faker->numberBetween(100, 1000),
         ];
     }
