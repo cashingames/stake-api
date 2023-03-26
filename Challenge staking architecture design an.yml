@@ -4,6 +4,8 @@ Stage 1 - Start Game Flow
 Stage 1.1
  - User requests to be matched with someone to play a game
     - Client sends a request to the server
+      - /api/v3/challenges/create (post, payload: [category, amount])
+      - response : [ data: challengeRequestId]
     - Client shows a loading screen
     - Server looks for someone else requesting a match at that moment for the same amount and category
       x - Client can maintain a persistent connection (websocket) with the server while waiting for a match
