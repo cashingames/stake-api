@@ -19,7 +19,6 @@ class ChallengeRequestFactory extends Factory
      * @return array<string, mixed>
      */
 
-    protected $model = ChallengeRequest::class;
     public function definition(): array
     {
         return [
