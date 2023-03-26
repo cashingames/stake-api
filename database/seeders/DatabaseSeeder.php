@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             QuestionSeeder::class,
             StakingSeeder::class,
             StakingOddSeeder::class,
+            ChallengeRequestSeeder::class
 
         ]);
     }
