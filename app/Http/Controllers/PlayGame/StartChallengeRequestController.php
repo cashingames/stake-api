@@ -36,6 +36,7 @@ class StartChallengeRequestController extends Controller
             $user->wallet->save();
         });
 
+        
         return ResponseHelper::success($challenge_request_id);
     }
 }
