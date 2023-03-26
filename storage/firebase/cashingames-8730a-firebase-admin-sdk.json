@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "cashingames-8730a",
+  "private_key_id": "89a86c140d5ecd3230b5161a7071a00268687bad",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDgGQOQZeF4jozu\ncMF/Jyr+DbYWsQSlKdxY/hqn+ce8GqBgljTxQ0oubcPrLsLwxLFcggpRXyd2eSzc\n9Dg9wdRut9XXcl8BOGOtT5sJK47oS5Xq00KwWg68EgFiXOSYlpBsIIVwLfXS8vTH\n4XWTSSzvxHxCz3TMYQ2Cq6Nm1vLkLyjddafvRyZMB8ZFhliFgHfyu9OaJgU/ysy9\n16OUyZxBTXprOEro0CY1cudEvywIkcI1B46/d7vm03/zR8IrnA6PtJkvQ/N/CAxA\nqLJYM8VizctdamAFpfTB7MnrKvkXnVxwHYVEWzzM6UUKDbsupknJlLprnKxRwCi8\nMoZF/ntfAgMBAAECggEAEnyIb7wH1T3P4HJKyWYoxMZ1c/psYKz1sXMHgz3hZ+IR\nGDFWnWR9/8XW+Kq7MsjMZ3jkHaxU1rrOTvfn6n2ikZ5MCgw0TCcjtI4G7cMQdJdE\n/xcoaYs0VfgXnHlUnkXQFNYQoUgZVFVDM3ik416Q/MKKYani1Q1Yjk6sbx+3mnJ7\nTGHdWRRnmCCgaxRMG12LqwIB9JEqWPjR/CK2/z08kbUeFRLphiGkpzfR172tD0zF\nc9ar9BAaNf+wbswbUkC+VsDPDFwbc4TwxkFtFLU9w5y26SPaRYxdJ7Hnl0jufQEK\nOE0ZFyNDk+OoOFa+Ncf2ce//VeAM342WOwQRiG/duQKBgQD1Bu1c2aW5/caZdvRd\ncB0rvw/0OUZHRcy4I/ee8VdKo13QwjKHGjExlMVjps9/N5OK6lbtl7YWBMgjtJ11\nJh8+UB0pUO2+qcNWJB8+MbLSbJCFTj5XoUDz2tFnJai9lNj0Rzl/Y/4ICYUyrKFP\nqjIbVLFhJbNn37rPyEWNFJS5LQKBgQDqIiVHC+NF/RVBBjjfHVPwM9g2IaNDE33O\naXLFZPJiFQ6Hw1WqoS/QralQDkcUjLg50eOzUcVMARynpz1u7JPQciP8mychvIQy\nQkBHda0zYhWRazQkW67rBf5MWW1QTSPPbw0XDdIlqqFrNoiZlOySHwiySOxnjUog\n4B5R09vGOwKBgQDBJ8/QBScW4o4/hj2Gtw3X4YsjHE9heg2zD29xlZEZnoUjPyNz\ny1sCWePs9Z/XCqm9tZQHQjRhUS2wr/38TqwMhD0ox8pTJiJ9coZKkgUEyl53J8IP\ndGfulA3FQTOvF3qbvtX9rYahMVgWJW4YjfNoBjC6g2zVMtJiX98sIxBGlQKBgFUY\nIepHdMu8JtxiMYtNsnMrtJo/8YFwdRnvE0qQ3NMvCf/ny5vfR2yVoWK6PbVHS7Gg\nChzjTEzKXqrESryk+TgaM+AcV8WYKYfGsmwGZfO141bd2q6YL+O1Yu5G1kcIMkqy\n9tP5LvaHpHE9+bmv+adF5jg97sXYASgfrIVa9ZZ/AoGADPLUYKqbvbYJmZzZCQxs\n/wjZlPHaCOhhgr9e6GolxpOmLd7reFEQLqoSpZzAVCcbOSc4ZNaaGG51tQMhmpIw\nZVQxM849cWLL+K2mA/PxbZTukrOvdk2wG2BhdzT+kQ5B6P+WVbSUAnueg7r6TvRz\nqcuhjuTJCjt6zPRbojYo5Ds=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-skfhz@cashingames-8730a.iam.gserviceaccount.com",
+  "client_id": "109205986366249157437",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-skfhz%40cashingames-8730a.iam.gserviceaccount.com"
+}
