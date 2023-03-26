@@ -49,17 +49,20 @@ class ChallengeLeaderboardTest extends TestCase
         $this->user = User::first();
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->challenge = Challenge::first();
-        $this->userChallengeGameSession = ChallengeGameSession::inRandomOrder()->first();
+        $this->userChallengeGameSession = ChallengeGameSession::first();
         $this->userChallengeGameSession->update([
             'user_id' => $this->user->id,
             'challenge_id' => $this->challenge->id
         ]);
-        $this->opponentChallengeGameSession = ChallengeGameSession::where('user_id', '!=', $this->user->id)->inRandomOrder()->first();
+        $this->opponent =  User::skip(2)->first();
+
+        $this->opponentChallengeGameSession = ChallengeGameSession::skip(2)->first();
 
         $this->opponentChallengeGameSession->update([
+            'user_id' =>  $this->opponent->id,
             'challenge_id' => $this->challenge->id
         ]);
-        $this->opponent =  User::find($this->opponentChallengeGameSession->user_id);
+       
         $this->challenge->update([
             'user_id' => $this->user->id,
             'opponent_id' =>  $this->opponent->id
