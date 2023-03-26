@@ -8,54 +8,59 @@ use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-
 class StartChallengeRequestTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     */
-
-
-    private $wallet;
-    private $category;
-    private $user;
+    const API_URL = '/api/v3/challenges/create';
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->wallet = Wallet::factory()->create();
-        $this->category = Category::factory()->create();
-        $this->user =  User::first();
-        $this->wallet->non_withdrawable_balance += 1000;
-        $this->wallet->save();
-        $this->actingAs($this->user);
     }
 
-    public function test_challenge_request_returns_request_id(): void
+    public function test_challenge_request_returns_sucess(): void
     {
+        $user = User::factory()->create();
+        $category = Category::factory()->create();
 
-        $response = $this->post('/api/v3/challenges/create', [
-            'category' => $this->category->id,
-            'amount' => 500
-        ]);
+        Wallet::factory()
+            ->for($user)
+            ->create([
+                'non_withdrawable_balance' => 1000
+            ]);
+
+        $response = $this->actingAs($user)
+            ->post(self::API_URL, [
+                'category' => $category->id,
+                'amount' => 500
+            ]);
 
         $response->assertStatus(200);
+
+        $this->assertDatabaseHas('challenge_requests', [
+            'category_id' => $category->id,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'username' => $user->username
+        ]);
     }
 
-    public function test_that_a_challenge_request_record_is_created(): void
+    public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
     {
+        $user = User::factory()->create();
 
-        $response = $this->post('/api/v3/challenges/create', [
-            'category' => $this->category->id,
-            'amount' => 500
-        ]);
+        Wallet::factory()
+            ->for($user)
+            ->create([
+                'non_withdrawable_balance' => 1000
+            ]);
 
-        $this->assertDatabaseHas('challenge_requests',[
-            'category_id' => $this->category->id,
-            'amount' => 500,
-            'user_id' => $this->user->id,
-            'username' => $this->user->username
-        ]);
+        $response = $this->actingAs($user)
+            ->postJson(self::API_URL, [
+                'category' => 4567,
+                'amount' => 150000
+            ]);
+
+        $response->assertStatus(422);
     }
 }
