@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
             ClientPlatform::class,
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id'))
         );
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google_application_credential.json'));
 
         // LogViewer::auth(function ($request) {
         //     return $request->user()
