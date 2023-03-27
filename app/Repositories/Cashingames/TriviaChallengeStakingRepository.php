@@ -20,6 +20,7 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
+            'status' => 'MATCHING',
         ]);
     }
 

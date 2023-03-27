@@ -20,9 +20,8 @@ class StartChallengeRequestController extends Controller
             'amount' => ['required', 'numeric', 'max:' . $user->wallet->non_withdrawable_balance],
         ]);
 
-        $requestId = $triviaChallengeService->create($user, $data);
+        $result = $triviaChallengeService->create($user, $data);
 
-
-        return ResponseHelper::success($requestId);
+        return ResponseHelper::success($result);
     }
 }
