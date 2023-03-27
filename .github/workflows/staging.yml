@@ -18,6 +18,8 @@ jobs:
           php-version: "8.1"
           coverage: xdebug
       - name: Install PHP extensions
+        run: apt-get install autoconf zlib1g-dev php-dev php-pear
+      - name: Install PHP extensions
         run: pecl install grpc
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
