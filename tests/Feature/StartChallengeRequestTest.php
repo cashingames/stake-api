@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 use App\Services\Firebase\FirestoreService;
+use Google\Cloud\Firestore\FirestoreClient;
 
 class StartChallengeRequestTest extends TestCase
 {
@@ -18,6 +19,11 @@ class StartChallengeRequestTest extends TestCase
 
     public function test_challenge_request_returns_sucess(): void
     {
+        $this->instance(
+            FirestoreClient::class,
+            Mockery::mock(FirestoreClient::class)
+        );
+
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
