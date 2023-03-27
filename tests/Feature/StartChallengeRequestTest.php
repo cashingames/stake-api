@@ -6,7 +6,10 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
+use App\Services\Firebase\FirestoreService;
 
 class StartChallengeRequestTest extends TestCase
 {
@@ -15,6 +18,13 @@ class StartChallengeRequestTest extends TestCase
 
     public function test_challenge_request_returns_sucess(): void
     {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('setDocument')->once();
+            })
+        );
+
         $user = User::factory()->create();
         $category = Category::factory()->create();
 
