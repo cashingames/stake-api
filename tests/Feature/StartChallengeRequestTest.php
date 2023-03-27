@@ -13,11 +13,6 @@ class StartChallengeRequestTest extends TestCase
     use RefreshDatabase;
     const API_URL = '/api/v3/challenges/create';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function test_challenge_request_returns_sucess(): void
     {
         $user = User::factory()->create();
@@ -42,6 +37,16 @@ class StartChallengeRequestTest extends TestCase
             'amount' => 500,
             'user_id' => $user->id,
             'username' => $user->username
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $user->id,
+            'non_withdrawable_balance' => 500,
+        ]);
+
+        $this->assertDatabaseHas('wallet_transactions', [
+            'wallet_id' => $user->wallet->id,
+            'amount' => 500,
         ]);
     }
 
