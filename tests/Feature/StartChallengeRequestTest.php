@@ -17,13 +17,21 @@ class StartChallengeRequestTest extends TestCase
     use RefreshDatabase;
     const API_URL = '/api/v3/challenges/create';
 
-    public function test_challenge_request_returns_sucess(): void
+    public function setUp(): void
     {
+        parent::setUp();
+        // $this->withoutExceptionHandling();
+
         $this->instance(
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
         );
 
+
+    }
+
+    public function test_challenge_request_returns_sucess(): void
+    {
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
