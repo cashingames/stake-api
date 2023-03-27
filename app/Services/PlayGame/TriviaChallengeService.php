@@ -2,41 +2,33 @@
 
 namespace App\Services\PlayGame;
 
-use App\Actions\Wallet\DebitWalletAction;
 use App\Models\ChallengeRequest;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Foundation\Auth\User;
+use App\Actions\Wallet\DebitWalletAction;
+use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
 class TriviaChallengeService
 {
 
     public function __construct(
-        private readonly DebitWalletAction $debitWalletAction
+        private readonly DebitWalletAction $debitWalletAction,
+        private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository
     ) {
     }
 
     public function create(User $user, array $data): string
     {
-
-        $requestId = Str::random(20);
-
-        DB::transaction(function () use ($user, $data, $requestId) {
+        $response = ChallengeRequest::factory()->make();
+        DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute($user->wallet, $data['amount'], 'Trivia challenge staking request');
-            $this->createChallengeRequest($user, $data, $requestId);
+            $response = $this
+                ->triviaChallengeStakingRepository
+                ->createForMatching($user, $data['amount'], $data['category']);
         });
 
-        return $requestId;
+        return $response->challenge_request_id;
     }
 
-    private function createChallengeRequest(User $user, array $data, string $requestId): void
-    {
-        ChallengeRequest::create([
-            'challenge_request_id' => $requestId,
-            'user_id' => $user->id,
-            'username' => $user->username,
-            'amount' => $data['amount'],
-            'category_id' => $data['category'],
-        ]);
-    }
+
 }

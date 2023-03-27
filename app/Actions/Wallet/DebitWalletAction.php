@@ -9,6 +9,11 @@ use Illuminate\Support\Str;
 
 class DebitWalletAction
 {
+    public function __construct(
+        private readonly DebitWalletAction $debitWalletAction
+    ) {
+    }
+
     public function execute(Wallet $wallet, float $amount, string $description): void
     {
         DB::transaction(function () use ($wallet, $amount, $description) {

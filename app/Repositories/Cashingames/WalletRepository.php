@@ -3,7 +3,11 @@
 namespace App\Repositories\Cashingames;
 
 use App\Models\Staking;
+use App\Models\Wallet;
+use App\Models\WalletTransaction;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WalletRepository
 {
@@ -92,6 +96,31 @@ class WalletRepository
     public function getPlatformProfitPercentageOnStakingToday(): int | float
     {
             return $this->getPlatformProfitPercentageOnStaking(now()->startOfDay(), now()->endOfDay());
+    }
+
+    public function credit(Wallet $wallet, float $amount, string $description, string $reference = null): void
+    {
+        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
+
+            $wallet->update([
+                'non_withdrawable_balance' => $wallet->non_withdrawable_balance - $amount
+            ]);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $amount,
+                'balance' => $wallet->non_withdrawable_balance,
+                'description' => $description,
+                'reference' => $reference ?? Str::random(10),
+            ]);
+
+        });
+    }
+
+    public function debit(): int|float
+    {
+        return 1;
     }
 
 
