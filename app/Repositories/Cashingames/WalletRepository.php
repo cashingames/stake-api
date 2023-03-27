@@ -103,7 +103,7 @@ class WalletRepository
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
             $wallet->update([
-                'non_withdrawable_balance' => $wallet->non_withdrawable_balance - $amount
+                'non_withdrawable_balance' => $wallet->non_withdrawable_balance + $amount
             ]);
 
             WalletTransaction::create([
@@ -118,10 +118,24 @@ class WalletRepository
         });
     }
 
-    public function debit(): int|float
+    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null): void
     {
-        return 1;
-    }
+        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
+            $wallet->update([
+                'non_withdrawable_balance' => $wallet->non_withdrawable_balance - $amount
+            ]);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $amount,
+                'balance' => $wallet->non_withdrawable_balance,
+                'description' => $description,
+                'reference' => $reference ?? Str::random(10),
+            ]);
+
+        });
+    }
 
 }
