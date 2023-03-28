@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Question;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -115,9 +117,24 @@ class StartChallengeRequestTest extends TestCase
         );
 
         $category = Category::factory()->create();
-        $this->prepareMatchRequest($category, 500);
-        $this->prepareMatchRequest($category, 500);
+        $questions = Question::factory()
+            ->hasOptions(4)
+            ->count(250)
+            ->create();
 
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $category->id
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+
+        $this->prepareMatchRequest($category, 500);
+        $this->prepareMatchRequest($category, 500);
 
         $this->assertDatabaseEmpty('challenge_requests');
 

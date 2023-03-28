@@ -42,9 +42,9 @@ class MatchRequestAction
             'trivia-challenge-requests',
             $challengeRequest->challenge_request_id,
             [
-                ['path' => 'status', 'value' => 'MATCHED'],
-                // 'questions' => $questions,
-                // 'opponent' => $matchedRequest,
+                'status' => 'MATCHED',
+                'questions' => $questions,
+                'opponent' => $matchedRequest->toArray(),
             ]
         );
 
@@ -52,9 +52,9 @@ class MatchRequestAction
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [
-                ['path' => 'status', 'value' => 'MATCHED'],
-                // 'questions' => $questions,
-                // 'opponent' => $challengeRequest,
+                'status' => 'MATCHED',
+                'questions' => $questions,
+                'opponent' => $challengeRequest->toArray(),
             ]
         );
     }

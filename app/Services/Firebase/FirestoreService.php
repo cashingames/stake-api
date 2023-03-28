@@ -18,7 +18,7 @@ class FirestoreService
 
     public function updateDocument(string $collection, string $document, array $data): void
     {
-        $this->firestore->document($collection . '/' . $document)->update($data);
+        $this->firestore->document($collection . '/' . $document)->set($data, ['merge' => true]);
     }
 
     public function getDocument(string $collection, string $document): array
