@@ -35,25 +35,26 @@ class MatchRequestAction
     {
         $questions = $this
             ->triviaQuestionRepository
-            ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
+            ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id)
+            ->toArray();
 
-        $this->firestoreService->setDocument(
+        $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
             $challengeRequest->challenge_request_id,
             [
-                'status' => 'MATCHED',
-                'questions' => $questions,
-                'opponent' => $matchedRequest,
+                ['path' => 'status', 'value' => 'MATCHED'],
+                // 'questions' => $questions,
+                // 'opponent' => $matchedRequest,
             ]
         );
 
-        $this->firestoreService->setDocument(
+        $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [
-                'status' => 'MATCHED',
-                'questions' => $questions,
-                'opponent' => $challengeRequest,
+                ['path' => 'status', 'value' => 'MATCHED'],
+                // 'questions' => $questions,
+                // 'opponent' => $challengeRequest,
             ]
         );
     }

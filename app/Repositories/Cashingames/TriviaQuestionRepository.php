@@ -18,10 +18,10 @@ class TriviaQuestionRepository
             ->get();
     }
 
-    public function getRandomEasyQuestionsWithCategoryId(Category $category): Collection
+    public function getRandomEasyQuestionsWithCategoryId(int $categoryId): Collection
     {
 
-        return Category::find($category->id)
+        return Category::find($categoryId)
             ->questions()
             ->easy()
             ->inRandomOrder()

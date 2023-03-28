@@ -22,7 +22,7 @@ class ChallengeRequestFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory()->hasProfile(1)->hasWallet(1),
+            'user_id' => User::factory(),
             'category_id' => Category::factory(),
             'challenge_request_id' => Str::random(20),
             'username' => $this->faker->userName,

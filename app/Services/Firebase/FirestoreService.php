@@ -11,10 +11,16 @@ class FirestoreService
     ) {
     }
 
-    public function setDocument(string $collection, string $document, array $data): void
+    public function createDocument(string $collection, string $document, array $data): void
     {
         $doc = $this->firestore->collection($collection)->document($document);
         $doc->set($data);
+    }
+
+    public function updateDocument(string $collection, string $document, array $data): void
+    {
+        $doc = $this->firestore->collection($collection)->document($document);
+        $doc->update($data);
     }
 
     public function getDocument(string $collection, string $document): array

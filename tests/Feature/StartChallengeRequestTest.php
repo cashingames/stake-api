@@ -10,7 +10,6 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 use App\Services\Firebase\FirestoreService;
-use Google\Cloud\Firestore\FirestoreClient;
 
 class StartChallengeRequestTest extends TestCase
 {
@@ -26,8 +25,6 @@ class StartChallengeRequestTest extends TestCase
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
         );
-
-
     }
 
     public function test_challenge_request_returns_sucess(): void
@@ -77,19 +74,53 @@ class StartChallengeRequestTest extends TestCase
     public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
     {
         $user = User::factory()->create();
+        $category = Category::factory()->create();
 
+        Wallet::factory()
+            ->for($user)
+            ->create([
+                'non_withdrawable_balance' => 0
+            ]);
+
+        $response = $this->actingAs($user)
+            ->postJson(self::API_URL, [
+                'category' => $category->id,
+                'amount' => 1000
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_challenge_request_found_match()
+    {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->times(2);
+                $mock->shouldReceive('updateDocument')->times(2);
+            })
+        );
+
+        $category = Category::factory()->create();
+        $this->prepareMatchRequest($category, 500);
+        $this->prepareMatchRequest($category, 500);
+
+
+        $this->assertDatabaseEmpty('challenge_requests');
+
+    }
+    private function prepareMatchRequest($category, $amount): void
+    {
+        $user = User::factory()->create();
         Wallet::factory()
             ->for($user)
             ->create([
                 'non_withdrawable_balance' => 1000
             ]);
-
-        $response = $this->actingAs($user)
-            ->postJson(self::API_URL, [
-                'category' => 4567,
-                'amount' => 150000
+        $this->actingAs($user)
+            ->post(self::API_URL, [
+                'category' => $category->id,
+                'amount' => $amount
             ]);
-
-        $response->assertStatus(422);
     }
 }

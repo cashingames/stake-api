@@ -18,9 +18,9 @@ class StakingChallengeGameService
         private readonly FirestoreService $firestoreService
     ) {
     }
-    public function create(User $user, array $data): ChallengeRequest
+    public function create(User $user, array $data): ChallengeRequest|null
     {
-        $response = ChallengeRequest::factory()->make();
+        $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute($user->wallet, $data['amount'], 'Trivia challenge staking request');
             $response = $this
@@ -28,7 +28,11 @@ class StakingChallengeGameService
                 ->createForMatching($user, $data['amount'], $data['category']);
         });
 
-        $this->firestoreService->setDocument(
+        if (!$response) {
+            return null;
+        }
+
+        $this->firestoreService->createDocument(
             'trivia-challenge-requests',
             $response->challenge_request_id,
             $response->toArray()
