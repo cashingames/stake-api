@@ -5,10 +5,10 @@ namespace App\Providers;
 use App\Enums\ClientPlatform;
 
 use App\Services\SMS\TermiiService;
+use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Services\SMS\SMSProviderInterface;
-use Opcodes\LogViewer\Facades\LogViewer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,5 +36,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(
             ClientPlatform::class,
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id')));
+        EnvironmentUtils::setGoogleCredentials();
     }
 }
