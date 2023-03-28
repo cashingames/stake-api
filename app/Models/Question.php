@@ -60,11 +60,6 @@ class Question extends Model
         return $this->hasMany(TriviaQuestion::class);
     }
 
-    public function getLabelAttribute($value)
-    {
-        return base64_encode($value);
-    }
-
     public function scopeEasy($query)
     {
         return $query->whereLevel(QuestionLevel::Easy);
