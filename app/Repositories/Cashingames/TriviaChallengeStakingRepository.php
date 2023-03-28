@@ -24,4 +24,19 @@ class TriviaChallengeStakingRepository
         ]);
     }
 
+    public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest
+    {
+        return ChallengeRequest::where('category_id', $challengeRequest->category_id)
+            ->where('status', 'MATCHING')
+            ->where('challenge_request_id', '!=', $challengeRequest->challenge_request_id)
+            ->where('amount', $challengeRequest->amount)
+            ->where('user_id', '!=', $challengeRequest->user_id)
+            ->first();
+    }
+
+    public function removeFromMatching(ChallengeRequest $challengeRequest): void
+    {
+        $challengeRequest->delete();
+    }
+
 }

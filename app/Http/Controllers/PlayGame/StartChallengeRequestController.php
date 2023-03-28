@@ -4,14 +4,14 @@ namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Services\PlayGame\TriviaChallengeService;
+use App\Services\PlayGame\StakingChallengeGameService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class StartChallengeRequestController extends Controller
 {
 
-    public function __invoke(Request $request, TriviaChallengeService $triviaChallengeService): JsonResponse
+    public function __invoke(Request $request, StakingChallengeGameService $triviaChallengeService): JsonResponse
     {
         $user = $request->user();
 
