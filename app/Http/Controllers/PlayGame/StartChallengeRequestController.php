@@ -27,7 +27,7 @@ class StartChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->create($user, $data);
 
-        ChallengeRequestMatch::dispatch($result);//@TODO dispatch to process in the background
+        ChallengeRequestMatch::dispatch($result);
 
         return ResponseHelper::success($this->transformResponse($result));
     }
