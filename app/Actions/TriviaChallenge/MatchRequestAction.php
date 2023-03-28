@@ -7,7 +7,7 @@ use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Services\Firebase\FirestoreService;
 
-class MatchRequest
+class MatchRequestAction
 {
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,

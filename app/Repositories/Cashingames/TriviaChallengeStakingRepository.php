@@ -24,7 +24,7 @@ class TriviaChallengeStakingRepository
         ]);
     }
 
-    public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest
+    public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
         return ChallengeRequest::where('category_id', $challengeRequest->category_id)
             ->where('status', 'MATCHING')
