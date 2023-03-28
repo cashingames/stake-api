@@ -92,7 +92,7 @@ class LiveTriviaStatusTest extends TestCase
         Config::set('trivia.live_trivia.display_shelf_life', 1);
 
         $this->createTestLiveTrivia(Carbon::now()->subHour(), Carbon::now());
-        $response = $this->get(self::LIVE_TRIVIA_STATUS_URL);
+        $response = $this->getJson(self::LIVE_TRIVIA_STATUS_URL);
 
         $response->assertJsonFragment([
             "status" => "CLOSED",
