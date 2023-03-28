@@ -20,6 +20,7 @@ class MatchRequestAction
     {
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
         if (!$matchedRequest) {
+            echo 'no match';
             return null;
         }
 
@@ -27,6 +28,7 @@ class MatchRequestAction
 
         $this->removeFromMatching($challengeRequest, $matchedRequest);
 
+        echo 'done';
         return $matchedRequest;
     }
 

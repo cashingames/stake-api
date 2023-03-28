@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Actions\TriviaChallenge\MatchRequestAction;
+use App\Jobs\ChallengeRequestMatch;
 use App\Services\PlayGame\StakingChallengeGameService;
 
 class StartChallengeRequestController extends Controller
@@ -15,7 +15,7 @@ class StartChallengeRequestController extends Controller
     public function __invoke(
         Request $request,
         StakingChallengeGameService $triviaChallengeService,
-        MatchRequestAction $matchAction
+       
     ): JsonResponse
     {
         $user = $request->user();
@@ -27,7 +27,7 @@ class StartChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->create($user, $data);
 
-        $matchAction->execute($result); //@TODO dispatch to process in the background
+        ChallengeRequestMatch::dispatch($result);
 
         return ResponseHelper::success($this->transformResponse($result));
     }
