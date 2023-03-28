@@ -13,25 +13,22 @@ class FirestoreService
 
     public function createDocument(string $collection, string $document, array $data): void
     {
-        $doc = $this->firestore->collection($collection)->document($document);
-        $doc->set($data);
+        $this->firestore->document($collection . '/' . $document)->set($data);
     }
 
     public function updateDocument(string $collection, string $document, array $data): void
     {
-        $doc = $this->firestore->collection($collection)->document($document);
-        $doc->update($data);
+        $this->firestore->document($collection . '/' . $document)->update($data);
     }
 
     public function getDocument(string $collection, string $document): array
     {
-        $doc = $this->firestore->collection($collection)->document($document);
-        return $doc->snapshot()->data();
+        return $this->firestore->document($collection . '/' . $document)->snapshot()->data();
     }
 
     public function deleteDocument(string $collection, string $document): void
     {
-        $doc = $this->firestore->collection($collection)->document($document);
-        $doc->delete();
+        $this->firestore->document($collection . '/' . $document)->delete();
     }
+
 }

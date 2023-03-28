@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\PlayGame;
 
+use App\Models\ChallengeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -28,6 +29,13 @@ class StartChallengeRequestController extends Controller
 
         $matchAction->execute($result); //@TODO dispatch to process in the background
 
-        return ResponseHelper::success($result);
+        return ResponseHelper::success($this->transformResponse($result));
+    }
+
+    private function transformResponse(ChallengeRequest $challengeRequest): object
+    {
+        return (object) [
+            'challenge_request_id' => 'trivia-challenge-requests/' . $challengeRequest->challenge_request_id
+        ];
     }
 }
