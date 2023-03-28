@@ -32,7 +32,7 @@ class StartChallengeRequestTest extends TestCase
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('setDocument')->once();
+                $mock->shouldReceive('createDocument')->once();
             })
         );
 
