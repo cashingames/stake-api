@@ -73,6 +73,19 @@ class StartChallengeRequestTest extends TestCase
 
     public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
     {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class)
+        );
+
+        $this->instance(
+            StakingChallengeGameService::class,
+            Mockery::mock(StakingChallengeGameService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->never();
+            })
+        );
+
+
         $user = User::factory()->create();
         $category = Category::factory()->create();
 
