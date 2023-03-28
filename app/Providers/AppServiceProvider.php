@@ -35,17 +35,6 @@ class AppServiceProvider extends ServiceProvider
         );
         $this->app->scoped(
             ClientPlatform::class,
-            fn() => ClientPlatform::detect($this->app->request->header('x-brand-id'))
-        );
-
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google_application_credential.json'));
-
-        // LogViewer::auth(function ($request) {
-        //     return $request->user()
-        //         && in_array($request->user()->email, [
-        //             'oyekunmi@gmail.com',
-        //             'zubbybrightson@gmail.com'
-        //         ]);
-        // });
+            fn() => ClientPlatform::detect($this->app->request->header('x-brand-id')));
     }
 }

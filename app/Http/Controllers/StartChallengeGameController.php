@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ChallengeGameSession;
 use App\Models\ChallengeQuestion;
 use App\Models\GameType;
+use App\Traits\Utils\EnvironmentUtils;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,9 @@ use stdClass;
 
 class StartChallengeGameController extends  BaseController
 {
+
+    use EnvironmentUtils;
+
     /**
      * Handle the incoming request.
      *
@@ -24,6 +28,12 @@ class StartChallengeGameController extends  BaseController
      * @return \Illuminate\Http\Response
      */
     public ClientPlatform $clientPlatform;
+
+    public function __construct()
+    {
+        parent::__construct();
+        EnvironmentUtils::setGoogleCredentials();
+    }
 
     public function __invoke(Request $request, ClientPlatform $clientPlatform)
     {
