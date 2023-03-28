@@ -7,16 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Jobs\MatchChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
-class StartChallengeRequestController extends Controller
+class EndChallengeGameController extends Controller
 {
     public function __invoke(
         Request $request,
         StakingChallengeGameService $triviaChallengeService,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $user = $request->user();
 
         $data = $request->validate([
@@ -24,10 +22,7 @@ class StartChallengeRequestController extends Controller
             'amount' => ['required', 'numeric', 'max:' . $user->wallet->non_withdrawable_balance],
         ]);
 
-        $result = $triviaChallengeService->create($user, $data);
-
-        //non blocking job
-        MatchChallengeRequest::dispatch($result);
+        $result = $triviaChallengeService->calculateScore($user, $data);
 
         return ResponseHelper::success($this->transformResponse($result));
     }
