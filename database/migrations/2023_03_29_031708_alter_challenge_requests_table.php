@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('challenge_requests', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->change();
-            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete()->change();
+            $table->bigInteger('user_id')->constrained('users')->cascadeOnDelete()->change();
+            $table->bigInteger('category_id')->constrained('categories')->cascadeOnDelete()->change();
             $table->decimal('amount_won', 10, 2)->default(0);
             $table->tinyInteger('score')->default(0);
             $table->string('status')->default('MATCHING');
@@ -30,11 +30,24 @@ return new class extends Migration {
     {
         Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('amount_won');
+        });
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('score');
+        });
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('status');
+        });
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('session_token');
+        });
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('started_at');
+        });
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->dropColumn('ended_at');
+        });
+
+        Schema::table('challenge_requests', function (Blueprint $table) {
             $table->foreignId('user_id')->change();
             $table->foreignId('category_id')->change();
         });
