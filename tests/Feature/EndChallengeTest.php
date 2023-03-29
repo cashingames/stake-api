@@ -6,12 +6,13 @@ use App\Models\Category;
 use App\Models\ChallengeRequest;
 use App\Models\Question;
 use App\Models\User;
-use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use App\Services\Firebase\FirestoreService;
+
 
 class EndChallengeTest extends TestCase
 {
@@ -26,12 +27,22 @@ class EndChallengeTest extends TestCase
 
         $this->instance(
             FirestoreClient::class,
-            Mockery::mock(FirestoreClient::class)
+            Mockery::mock(FirestoreClient::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->never();
+            })
         );
+
     }
 
     public function test_challenge_scores_computation(): void
     {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->never();
+            })
+        );
+
         $category = Category::factory()->create();
         $this->seedQuestions($category);
 
