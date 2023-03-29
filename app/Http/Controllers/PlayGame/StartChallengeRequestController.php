@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Models\ChallengeRequest;
 use Illuminate\Http\Request;
+use App\Models\ChallengeRequest;
 use Illuminate\Http\JsonResponse;
+use App\Jobs\MatchChallengeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Jobs\MatchChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
 class StartChallengeRequestController extends Controller
