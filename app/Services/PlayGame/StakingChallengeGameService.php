@@ -55,9 +55,17 @@ class StakingChallengeGameService
 
         $score = $this->calculateScore($user, $challengeRequest);
 
-        return $this
+        $request = $this
             ->triviaChallengeStakingRepository
             ->updateSubmission($requestId, $score);
+
+        $this->firestoreService->updateDocument(
+            'trivia-challenge-requests',
+            $requestId,
+            $request->toArray()
+        );
+
+        return $request;
     }
 
     public function calculateScore(User $user, ChallengeRequest $request): int|float
