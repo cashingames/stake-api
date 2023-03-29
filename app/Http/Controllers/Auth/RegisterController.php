@@ -132,7 +132,7 @@ class RegisterController extends BaseController
             'description' => "Registration Daily bonus plan for " . $user->username,
             'is_active' => true,
             'used_count' => 0,
-            'plan_count' => 5,
+            'plan_count' => 15,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'expire_at' => Carbon::now()->endOfDay()
