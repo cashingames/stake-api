@@ -265,7 +265,7 @@ class GameController extends BaseController
         $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
 
         foreach ($chosenOptions as $a) {
-            $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', base64_encode(true))->first();
+            $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', true)->first();
 
             if ($isCorect != null) {
                 $points = $points + 1;
