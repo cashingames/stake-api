@@ -88,4 +88,9 @@ class ArtisanCommandsTest extends TestCase
         Mail::assertSent(WeeklyReportEmail::class);
     }
 
+    public function test_refresh_daily_bonus_command()
+    {
+        $this->artisan('bonus:hourly-refresh')->assertExitCode(0);
+    }
+
 }
