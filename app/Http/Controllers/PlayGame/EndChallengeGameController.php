@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Models\ChallengeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -18,19 +17,16 @@ class EndChallengeGameController extends Controller
         $user = $request->user();
 
         $data = $request->validate([
-            'category' => ['required', 'numeric', 'exists:categories,id'],
-            'amount' => ['required', 'numeric', 'max:' . $user->wallet->non_withdrawable_balance],
+            'challenge_request_id' => ['required'],
+            'selected_options' => ['required'],
         ]);
 
-        $result = $triviaChallengeService->calculateScore($user, $data);
+        $result = $triviaChallengeService->submit($user, $data);
+        if (!$result) {
+            return ResponseHelper::error('Unable to submit challenge');
+        }
 
-        return ResponseHelper::success($this->transformResponse($result));
+        return ResponseHelper::success((object) ['score' => $result->score]);
     }
 
-    private function transformResponse(ChallengeRequest $challengeRequest): object
-    {
-        return (object) [
-            'challenge_request_id' => 'trivia-challenge-requests/' . $challengeRequest->challenge_request_id
-        ];
-    }
 }

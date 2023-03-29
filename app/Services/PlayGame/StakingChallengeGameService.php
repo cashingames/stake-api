@@ -41,5 +41,40 @@ class StakingChallengeGameService
         return $response;
     }
 
+    public function submit(User $user, array $data): ChallengeRequest|null
+    {
+
+        $requestId = $data['challenge_request_id'];
+        $selectedOptions = $data['selected_options'];
+
+        $challengeRequest = $this->triviaChallengeStakingRepository->getRequestById($requestId);
+
+        if (!$challengeRequest) {
+            return null;
+        }
+
+        $score = $this->calculateScore($user, $challengeRequest);
+
+        return $this
+            ->triviaChallengeStakingRepository
+            ->updateSubmission($requestId, $score);
+    }
+
+    public function calculateScore(User $user, ChallengeRequest $request): int|float
+    {
+        // $questions = $challengeRequest->questions;
+        // foreach of the questions find if the selected option is correct
+        // $correctAnswers = 0;
+        // foreach ($questions as $question) {
+        //     $correctOption = $question->options->where('is_correct', true)->first();
+        //     $selectedOption = $selectedOptions->where('question_id', $question->id)->first();
+        //     if ($correctOption->id === $selectedOption['option_id']) {
+        //         $correctAnswers++;
+        //     }
+        // }
+
+        return 100;
+    }
+
 
 }

@@ -46,9 +46,6 @@ class TriviaChallengeStakingRepository
                 $opponentRequest->challenge_request_id
             ]
         );
-
-        // $challengeRequest->refresh();
-        // $opponentRequest->refresh();
     }
 
     public function logQuestions(
@@ -68,6 +65,22 @@ class TriviaChallengeStakingRepository
         TriviaChallengeQuestion::insert($result);
     }
 
+    public function getRequestById(string $requestId): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('challenge_request_id', $requestId)->first();
+    }
+
+    public function updateSubmission(string $requestId, float $score): ChallengeRequest|null
+    {
+        ChallengeRequest::where('challenge_request_id', $requestId)
+            ->update([
+                'status' => 'COMPLETED',
+                'score' => $score,
+            ]);
+
+        return $this->getRequestById($requestId);
+    }
+
 
     private function prepareQuestionForLog(array $question, ChallengeRequest $challengeRequest): array
     {
@@ -77,5 +90,7 @@ class TriviaChallengeStakingRepository
             'question_label' => $question['label']
         ];
     }
+
+
 
 }
