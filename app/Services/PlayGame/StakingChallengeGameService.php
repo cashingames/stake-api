@@ -3,9 +3,9 @@
 namespace App\Services\PlayGame;
 
 use App\Models\ChallengeRequest;
-use App\Services\Firebase\FirestoreService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
+use App\Services\Firebase\FirestoreService;
 use App\Actions\Wallet\DebitWalletAction;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
@@ -41,7 +41,7 @@ class StakingChallengeGameService
         return $response;
     }
 
-    public function submit(User $user, array $data): ChallengeRequest|null
+    public function submit(array $data): ChallengeRequest|null
     {
 
         $requestId = $data['challenge_request_id'];
@@ -53,11 +53,9 @@ class StakingChallengeGameService
             return null;
         }
 
-        $score = $this->calculateScore($user, $challengeRequest);
-
         $request = $this
             ->triviaChallengeStakingRepository
-            ->updateSubmission($requestId, $score);
+            ->updateSubmission($requestId, $selectedOptions);
 
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
@@ -66,22 +64,6 @@ class StakingChallengeGameService
         );
 
         return $request;
-    }
-
-    public function calculateScore(User $user, ChallengeRequest $request): int|float
-    {
-        // $questions = $challengeRequest->questions;
-        // foreach of the questions find if the selected option is correct
-        // $correctAnswers = 0;
-        // foreach ($questions as $question) {
-        //     $correctOption = $question->options->where('is_correct', true)->first();
-        //     $selectedOption = $selectedOptions->where('question_id', $question->id)->first();
-        //     if ($correctOption->id === $selectedOption['option_id']) {
-        //         $correctAnswers++;
-        //     }
-        // }
-
-        return 100;
     }
 
 

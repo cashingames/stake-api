@@ -3,6 +3,7 @@
 namespace App\Repositories\Cashingames;
 
 use App\Models\ChallengeRequest;
+use App\Models\Option;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -70,12 +71,31 @@ class TriviaChallengeStakingRepository
         return ChallengeRequest::where('challenge_request_id', $requestId)->first();
     }
 
-    public function updateSubmission(string $requestId, float $score): ChallengeRequest|null
+    public function updateSubmission(string $requestId, mixed $selectedOptions): ChallengeRequest|null
     {
+        $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'id'))
+            ->where('is_correct', true)
+            ->get();
+
+        DB::transaction(function () use ($requestId, $selectedOptions, $correctOptions) {
+            foreach ($correctOptions as $option) {
+                DB::update(
+                    'UPDATE trivia_challenge_questions SET is_correct = ?
+                     WHERE challenge_request_id = ? AND question_id = ?',
+                    [
+                        true,
+                        $requestId,
+                        $option['question_id']
+                    ]
+                );
+            }
+        });
+
+
         ChallengeRequest::where('challenge_request_id', $requestId)
             ->update([
                 'status' => 'COMPLETED',
-                'score' => $score,
+                'score' => $correctOptions->count(),
             ]);
 
         return $this->getRequestById($requestId);

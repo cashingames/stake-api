@@ -14,14 +14,13 @@ class EndChallengeGameController extends Controller
         Request $request,
         StakingChallengeGameService $triviaChallengeService,
     ): JsonResponse {
-        $user = $request->user();
 
         $data = $request->validate([
             'challenge_request_id' => ['required'],
             'selected_options' => ['required'],
         ]);
 
-        $result = $triviaChallengeService->submit($user, $data);
+        $result = $triviaChallengeService->submit($data);
         if (!$result) {
             return ResponseHelper::error('Unable to submit challenge');
         }
