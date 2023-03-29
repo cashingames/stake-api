@@ -141,7 +141,7 @@ class StartChallengeRequestTest extends TestCase
         $this->assertDatabaseHas('challenge_requests', [
             'status' => 'MATCHED',
         ]);
-
+        $this->assertDatabaseCount('trivia_challenge_questions', 20);
 
     }
     private function prepareMatchRequest($category, $amount): void
