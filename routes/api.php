@@ -124,6 +124,8 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('stakers/email/verify', EmailOtpVerificationController::class);
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
         Route::post('challenges/create', StartChallengeRequestController::class);
+        Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
+
     }
 );
 
