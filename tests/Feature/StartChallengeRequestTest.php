@@ -59,7 +59,8 @@ class StartChallengeRequestTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'user_id' => $user->id,
-            'username' => $user->username
+            'username' => $user->username,
+            'status' => 'MATCHING',
         ]);
 
         $this->assertDatabaseHas('wallets', [
@@ -136,7 +137,11 @@ class StartChallengeRequestTest extends TestCase
         $this->prepareMatchRequest($category, 500);
         $this->prepareMatchRequest($category, 500);
 
-        $this->assertDatabaseEmpty('challenge_requests');
+        $this->assertDatabaseCount('challenge_requests', 2);
+        $this->assertDatabaseHas('challenge_requests', [
+            'status' => 'MATCHED',
+        ]);
+
 
     }
     private function prepareMatchRequest($category, $amount): void

@@ -25,7 +25,9 @@ class MatchRequestAction
 
         $this->updateFirestore($challengeRequest, $matchedRequest);
 
-        $this->removeFromMatching($challengeRequest, $matchedRequest);
+        $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
+
+        // $this->triviaQuestionRepository
 
         return $matchedRequest;
     }
@@ -58,11 +60,4 @@ class MatchRequestAction
             ]
         );
     }
-
-    private function removeFromMatching(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): void
-    {
-        $this->triviaChallengeStakingRepository->removeFromMatching($challengeRequest);
-        $this->triviaChallengeStakingRepository->removeFromMatching($matchedRequest);
-    }
-
 }
