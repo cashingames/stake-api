@@ -7,28 +7,23 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-
-class TokenGenerated extends Mailable implements ShouldQueue
+class TokenGenerated extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $token;
     private $user;
     public $appType;
-
     /**
      * Create a new message instance.
-     *
-     * @return void
      */
     public function __construct(string $token, User $user, string $appType)
     {
-
         $this->token = $token;
         $this->user = $user;
         $this->appType = $appType;
@@ -36,19 +31,19 @@ class TokenGenerated extends Mailable implements ShouldQueue
 
     /**
      * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
      */
-
-    public function envelope()
+    public function envelope(): Envelope
     {
-        return new Envelope(
+         return new Envelope(
             from: new Address('noreply@thegameark.com', $this->appType),
             subject: "$this->appType: Reset Password",
         );
     }
 
-    public function content()
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
     {
         return new Content(
             view: 'emails.users.token',
@@ -62,12 +57,10 @@ class TokenGenerated extends Mailable implements ShouldQueue
     /**
      * Get the attachments for the message.
      *
-     * @return array
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
-    public function attachments()
+    public function attachments(): array
     {
         return [];
     }
-
- 
 }

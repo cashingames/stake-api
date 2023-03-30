@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\ClientPlatform;
 use App\Http\Controllers\BaseController;
-use App\Mail\okenGenerated;
 use App\Mail\TokenGenerated;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -68,7 +67,7 @@ class ForgotPasswordController extends BaseController
         $token = mt_rand(10000, 99999);
         $appType = "GameArk";
         
-        Mail::to($user->email)->send(new okenGenerated($token, $user, $appType));
+        Mail::to($user->email)->send(new TokenGenerated($token, $user, $appType));
 
         // update user's password token and token expiry time
         $now = Carbon::now();

@@ -44,7 +44,7 @@ class ForgotPasswordTest extends TestCase
             "email" => $this->user->email,
         ]);
 
-        Mail::assertQueued(TokenGenerated::class);
+        Mail::assertSent(TokenGenerated::class);
         $response->assertStatus(200);
     }
 
@@ -54,7 +54,7 @@ class ForgotPasswordTest extends TestCase
             "email" => $this->user->email,
         ]);
 
-        Mail::assertQueued(TokenGenerated::class);
+        Mail::assertSent(TokenGenerated::class);
         $response->assertStatus(200);
     }
 
