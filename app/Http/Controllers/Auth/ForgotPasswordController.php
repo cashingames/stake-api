@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\ClientPlatform;
 use App\Http\Controllers\BaseController;
+use App\Mail\okenGenerated;
 use App\Mail\TokenGenerated;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -28,19 +29,18 @@ class ForgotPasswordController extends BaseController
     */
 
     // use SendsPasswordResetEmails;
-
     public function sendEmail(
         Request $request,
         ClientPlatform $platform,
         SMSProviderInterface $smsService
     ) {
+
         if ($platform == ClientPlatform::StakingMobileWeb) {
 
             $data = $request->validate([
                 'country_code' => ['required', 'string', 'max:4'],
                 'phone_number' => ['required', 'numeric'],
             ]);
-
             $user = User::where('phone_number', $data['phone_number'])->first();
 
             if (!is_null($user)) {
@@ -59,14 +59,16 @@ class ForgotPasswordController extends BaseController
             'email' => ['required', 'string', 'email']
         ]);
 
+     
         $user = User::where('email', $data['email'])->first();
         if (!$user) {
             return $this->sendResponse(true, 'Email sent');
         }
 
-        $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
         $token = mt_rand(10000, 99999);
-        Mail::send(new TokenGenerated($token, $user, $appType));
+        $appType = "GameArk";
+        
+        Mail::to($user->email)->send(new okenGenerated($token, $user, $appType));
 
         // update user's password token and token expiry time
         $now = Carbon::now();
