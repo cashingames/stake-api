@@ -15,16 +15,18 @@ class TokenGenerated extends Mailable implements ShouldQueue
 
     public $token;
     private $user;
+    public $appType;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(string $token, User $user)
+    public function __construct(string $token, User $user, string $appType = 'Cashingames')
     {
         $this->token = $token;
         $this->user = $user;
+        $this->appType = $appType;
     }
 
     /**
@@ -36,7 +38,7 @@ class TokenGenerated extends Mailable implements ShouldQueue
     {
         return $this->to($this->user->email, $this->user->username)
             ->from('noreply@cashingames.com')
-            ->subject('Cashingames: Reset Password')
+            ->subject("$this->appType: Reset Password")
             ->view('emails.users.token')
             ->with([
                 'username' => $this->user->username,

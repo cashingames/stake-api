@@ -11,21 +11,22 @@ class Feedback extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $first_name, $last_name ,$email, $message_body;
+    public $first_name, $last_name ,$email, $message_body, $appType;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($first_name,$last_name,$email,$message_body)
+    public function __construct($first_name,$last_name,$email,$message_body, $appType)
     {
         //
-        
+
         $this->first_name = $first_name;
         $this->last_name = $last_name;
         $this->email = $email;
         $this->message_body = $message_body;
+        $this->appType = $appType;
     }
     /**
      * Build the message.
@@ -33,7 +34,7 @@ class Feedback extends Mailable implements ShouldQueue
      * @return $this
      */
     public function build()
-    {   
+    {
         return $this->to(config('app.admin_email'))
         ->from('noreply@cashingames.com')
         ->subject('User Feedback')

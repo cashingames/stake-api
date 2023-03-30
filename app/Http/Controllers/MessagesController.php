@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Feedback;
@@ -17,7 +18,7 @@ class MessagesController extends BaseController
 {
     //
 
-    public function feedback(Request $request, SupportTicketService $ticketService)
+    public function feedback(Request $request, SupportTicketService $ticketService, ClientPlatform $platform)
     {
         $data = $request->validate([
             'first_name' => ['nullable', 'string'],
@@ -38,7 +39,8 @@ class MessagesController extends BaseController
             $lastName =  $data["last_name"];
         }
 
-        Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"]));
+        $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
+        Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"], $appType));
 
         //create automated ticket for support
 
@@ -62,7 +64,7 @@ class MessagesController extends BaseController
         return $this->sendResponse($faqs, 'data fetched');
     }
 
-  
+
     public function fetchFirstTimeBonus()
     {
 

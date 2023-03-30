@@ -64,8 +64,9 @@ class ForgotPasswordController extends BaseController
             return $this->sendResponse(true, 'Email sent');
         }
 
+        $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
         $token = mt_rand(10000, 99999);
-        Mail::send(new TokenGenerated($token, $user));
+        Mail::send(new TokenGenerated($token, $user, $appType));
 
         // update user's password token and token expiry time
         $now = Carbon::now();
@@ -96,7 +97,7 @@ class ForgotPasswordController extends BaseController
 
             if (!is_null($user)) {
                 $user->update(['otp_token' => null]);
-               
+
                 return $this->sendResponse("Verification successful", 'Verification successful');
             }
             return $this->sendError("Invalid verification code", "Invalid verification code");
