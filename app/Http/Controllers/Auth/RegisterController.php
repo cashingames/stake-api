@@ -242,7 +242,7 @@ class RegisterController extends BaseController
             }
         }
         if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
-            Mail::send(new VerifyEmail($user));
+            Mail::to($user->email)->send(new VerifyEmail($user));
 
             Log::info("Email verification sent to " . $user->email);
             if ($request->hasHeader('X-App-Source')) {
