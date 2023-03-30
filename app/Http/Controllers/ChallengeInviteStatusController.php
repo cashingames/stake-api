@@ -53,7 +53,7 @@ class ChallengeInviteStatusController extends BaseController
 
         Log::info("Challenge with ID: " . $request->challenge_id . "  has been " . $status . " by " . $this->user->username);
 
-        Mail::send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
+        Mail::to($player->email)->send(new RespondToChallengeInvite($status, $player, $request->challenge_id));
 
         $pushAction = new SendPushNotification($clientPlatform);
         $pushAction->sendChallengeStatusChangeNotification($player, $this->user, $updatedChallenge, $status);

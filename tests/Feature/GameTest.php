@@ -291,7 +291,7 @@ class GameTest extends TestCase
             'user_id' => $player->id,
             'opponent_id' => $opponent->id
         ]);
-        Mail::assertQueued(ChallengeInvite::class);
+        Mail::assertSent(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
     }

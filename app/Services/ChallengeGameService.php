@@ -54,7 +54,7 @@ class ChallengeGameService
             $opponent->notify(new ChallengeReceivedNotification($challenge, $creator));
 
             //email notification
-            Mail::send(new ChallengeInvite($opponent, $challenge));
+            Mail::to($opponent->email)->send(new ChallengeInvite($opponent, $challenge));
 
             //push notification
             dispatch(function () use ($creator, $opponent, $challenge) {

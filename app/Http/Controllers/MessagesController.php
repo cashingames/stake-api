@@ -38,7 +38,7 @@ class MessagesController extends BaseController
             $lastName =  $data["last_name"];
         }
 
-        Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"]));
+        Mail::to(config('app.admin_email'))->send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"]));
 
         //create automated ticket for support
 
