@@ -43,7 +43,7 @@ class GiveDailyBonusGames extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
         $freePlan = Plan::where('is_free', true)->first();
 
@@ -62,10 +62,12 @@ class GiveDailyBonusGames extends Command
             ]);
         });
         if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification){
+                $allTokens = [];
                 foreach ($devices as $device) {
-                    (new SendPushNotification())->sendDailyBonusGamesNotification($device);
+                    $allTokens[] = $device->device_token;
                 }
+                $pushNotification->sendDailyBonusGamesNotification($allTokens, true);
             });
         }
     }
