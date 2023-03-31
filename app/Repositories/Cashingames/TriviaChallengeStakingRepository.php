@@ -34,17 +34,26 @@ class TriviaChallengeStakingRepository
             ->first();
     }
 
+    public function getMatchedRequest(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('session_token', $challengeRequest->session_token)
+            ->where('challenge_request_id', '!=', $challengeRequest->challenge_request_id)
+            ->first();
+    }
+
     public function updateAsMatched(ChallengeRequest $challengeRequest, ChallengeRequest $opponentRequest): void
     {
         $token = Str::uuid()->toString();
         DB::update(
-            'UPDATE challenge_requests SET session_token = ?, status = ?
+            'UPDATE challenge_requests SET session_token = ?, status = ?, started_at = ?
              WHERE challenge_request_id IN (?, ?)',
             [
                 $token,
                 'MATCHED',
+                now(),
                 $challengeRequest->challenge_request_id,
-                $opponentRequest->challenge_request_id
+                $opponentRequest->challenge_request_id,
+
             ]
         );
     }
@@ -73,7 +82,7 @@ class TriviaChallengeStakingRepository
 
     public function updateSubmission(string $requestId, mixed $selectedOptions): ChallengeRequest|null
     {
-        $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'id'))
+        $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'option_id'))
             ->where('is_correct', true)
             ->get();
 
@@ -91,11 +100,12 @@ class TriviaChallengeStakingRepository
             }
         });
 
-
+        //@TODO compute winner by checking opponent ended at
         ChallengeRequest::where('challenge_request_id', $requestId)
             ->update([
                 'status' => 'COMPLETED',
                 'score' => $correctOptions->count(),
+                'ended_at' => now(),
             ]);
 
         return $this->getRequestById($requestId);

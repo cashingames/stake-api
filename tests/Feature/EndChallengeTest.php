@@ -51,7 +51,8 @@ class EndChallengeTest extends TestCase
             'challenge_request_id' => '456',
             'status' => 'MATCHED',
             'category_id' => $category->id,
-            'amount' => 500
+            'amount' => 500,
+            'started_at' => now(),
         ]);
 
         ChallengeRequest::factory()->create([
@@ -59,7 +60,8 @@ class EndChallengeTest extends TestCase
             'challenge_request_id' => '123',
             'status' => 'MATCHED',
             'category_id' => $category->id,
-            'amount' => 500
+            'amount' => 500,
+            'started_at' => now()
         ]);
 
 

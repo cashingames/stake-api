@@ -59,12 +59,17 @@ class StakingChallengeGameService
 
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
-            $requestId,
-            $request->toArray()
+            $challengeRequest->challenge_request_id,
+            [
+                ...$request->toArray(),
+                'opponent' => $this
+                    ->triviaChallengeStakingRepository
+                    ->getMatchedRequest($challengeRequest)
+                    ->toArray(),
+            ]
         );
 
         return $request;
     }
-
 
 }

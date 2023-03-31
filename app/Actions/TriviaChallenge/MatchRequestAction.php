@@ -27,7 +27,7 @@ class MatchRequestAction
 
         $questions = $this->processQuestions($challengeRequest, $matchedRequest);
 
-        $this->updateFirestore($challengeRequest, $matchedRequest, $questions);
+        $this->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
 
         return $matchedRequest;
     }
@@ -55,6 +55,7 @@ class MatchRequestAction
             'trivia-challenge-requests',
             $challengeRequest->challenge_request_id,
             [
+                ...$challengeRequest->toArray(),
                 'status' => 'MATCHED',
                 'questions' => $questions,
                 'opponent' => $matchedRequest->toArray(),
@@ -65,6 +66,7 @@ class MatchRequestAction
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [
+                ...$matchedRequest->toArray(),
                 'status' => 'MATCHED',
                 'questions' => $questions,
                 'opponent' => $challengeRequest->toArray(),
