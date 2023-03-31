@@ -28,19 +28,18 @@ class ForgotPasswordController extends BaseController
     */
 
     // use SendsPasswordResetEmails;
-
     public function sendEmail(
         Request $request,
         ClientPlatform $platform,
         SMSProviderInterface $smsService
     ) {
+
         if ($platform == ClientPlatform::StakingMobileWeb) {
 
             $data = $request->validate([
                 'country_code' => ['required', 'string', 'max:4'],
                 'phone_number' => ['required', 'numeric'],
             ]);
-
             $user = User::where('phone_number', $data['phone_number'])->first();
 
             if (!is_null($user)) {
@@ -59,13 +58,16 @@ class ForgotPasswordController extends BaseController
             'email' => ['required', 'string', 'email']
         ]);
 
+     
         $user = User::where('email', $data['email'])->first();
         if (!$user) {
             return $this->sendResponse(true, 'Email sent');
         }
 
         $token = mt_rand(10000, 99999);
-        Mail::send(new TokenGenerated($token, $user));
+        $appType = "GameArk";
+        
+        Mail::to($user->email)->send(new TokenGenerated($token, $user, $appType));
 
         // update user's password token and token expiry time
         $now = Carbon::now();
@@ -96,7 +98,7 @@ class ForgotPasswordController extends BaseController
 
             if (!is_null($user)) {
                 $user->update(['otp_token' => null]);
-               
+
                 return $this->sendResponse("Verification successful", 'Verification successful');
             }
             return $this->sendError("Invalid verification code", "Invalid verification code");

@@ -14,16 +14,21 @@ class Feedback extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $first_name, $last_name, $email, $message_body;
+    public $first_name, $last_name ,$email, $message_body, $appType;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($first_name, $last_name, $email, $message_body)
+
+    public function __construct($first_name,$last_name,$email,$message_body, $appType)
     {
+        //
+
         $this->first_name = $first_name;
         $this->last_name = $last_name;
         $this->email = $email;
         $this->message_body = $message_body;
+        $this->appType = $appType;
     }
 
     /**
@@ -57,6 +62,7 @@ class Feedback extends Mailable
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
+
     public function attachments(): array
     {
         return [];
