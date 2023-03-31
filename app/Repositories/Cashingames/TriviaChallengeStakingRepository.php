@@ -87,7 +87,7 @@ class TriviaChallengeStakingRepository
             ->where('is_correct', true)
             ->get();
 
-        DB::transaction(function () use ($requestId, $selectedOptions, $correctOptions) {
+        DB::transaction(function () use ($requestId, $correctOptions) {
             foreach ($correctOptions as $option) {
                 DB::update(
                     'UPDATE trivia_challenge_questions SET is_correct = ?
