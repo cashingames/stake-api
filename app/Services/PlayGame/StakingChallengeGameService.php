@@ -48,7 +48,6 @@ class StakingChallengeGameService
         $selectedOptions = $data['selected_options'];
 
         $challengeRequest = $this->triviaChallengeStakingRepository->getRequestById($requestId);
-
         if (!$challengeRequest) {
             return null;
         }
@@ -57,15 +56,25 @@ class StakingChallengeGameService
             ->triviaChallengeStakingRepository
             ->updateSubmission($requestId, $selectedOptions);
 
+        $matchedRequest = $this
+            ->triviaChallengeStakingRepository
+            ->getMatchedRequest($challengeRequest);
+
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
-            $challengeRequest->challenge_request_id,
+            $request->challenge_request_id,
             [
                 ...$request->toArray(),
-                'opponent' => $this
-                    ->triviaChallengeStakingRepository
-                    ->getMatchedRequest($challengeRequest)
-                    ->toArray(),
+                'opponent' => $matchedRequest->toArray()
+            ]
+        );
+
+        $this->firestoreService->updateDocument(
+            'trivia-challenge-requests',
+            $matchedRequest->challenge_request_id,
+            [
+                ...$matchedRequest->toArray(),
+                'opponent' => $request->toArray(),
             ]
         );
 
