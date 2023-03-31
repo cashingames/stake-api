@@ -32,6 +32,7 @@ class RegisterTest extends TestCase
     protected $user;
     const REGISTER_URL = '/api/auth/register';
     const RESEND_OTP_URL = '/api/auth/register/token/resend';
+    const SOCIAL_REGISTRATION_URL = '/api/auth/social-login/authenticate';
 
     protected function setUp(): void
     {
@@ -413,6 +414,43 @@ class RegisterTest extends TestCase
             'boost_id' => Boost::where('name', 'Skip')->first()->id,
             'boost_count' => 3,
             'used_count' => 0
+        ]);
+    }
+
+    /** @test */
+    public function gameark_user_can_sign_in_with_social_auth_directly()
+    {
+
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->postjson(self::SOCIAL_REGISTRATION_URL, [
+            'firstName' => 'Jane',
+            'last_name' => 'Doe',
+            'email' => 'email@email.com'
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function gameark_user_can_register_without_otp()
+    {
+
+        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::REGISTER_URL, [
+            'username' => 'username',
+            'email' => 'tester@gmail.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+
+        ]);
+
+        // $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            "message",
+            "data" => [
+                "token"
+            ]
         ]);
     }
 }
