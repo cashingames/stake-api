@@ -44,7 +44,7 @@ class TriviaChallengeStakingRepository
 
     public function getMatchedRequestById(string $id): ChallengeRequest|null
     {
-        return ChallengeRequest::where('challenge_request_id', $id)->first();
+        return $this->getMatchedRequest($this->getRequestById($id));
     }
 
     public function updateAsMatched(ChallengeRequest $challengeRequest, ChallengeRequest $opponentRequest): void
