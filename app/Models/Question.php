@@ -11,86 +11,76 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Question extends Model
 {
-  use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-  protected $with = [
-    'options'
-  ];
+    protected $with = [
+        'options'
+    ];
 
-  /**
-   * The attributes that should be hidden for arrays.
-   *
-   * @var array
-   */
-  protected $hidden = [
-    'game_id',
-    'created_at',
-    'updated_at'
-  ];
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'game_id',
+        'created_at',
+        'updated_at'
+    ];
 
-  protected $fillable = ['created_by', 'is_published'];
-  //
-  /**
-   * The "booted" method of the model.
-   */
-  protected static function booted(): void
-  {
-    static::addGlobalScope('published', function (Builder $builder) {
-      $builder->where('is_published', true);
-    });
-  }
+    protected $fillable = ['created_by', 'is_published'];
+    //
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('published', function (Builder $builder) {
+            $builder->where('is_published', true);
+        });
+    }
 
-  public function options()
-  {
-    return $this->hasMany(Option::class)->inRandomOrder();
-  }
+    public function options()
+    {
+        return $this->hasMany(Option::class)->inRandomOrder();
+    }
 
-  public function categories(): BelongsToMany
-  {
-    return $this->belongsToMany(Category::class, 'categories_questions', 'question_id', 'category_id');
-  }
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'categories_questions', 'question_id', 'category_id');
+    }
 
-  public function games()
-  {
-    return $this->hasMany(Game::class);
-  }
+    public function games()
+    {
+        return $this->hasMany(Game::class);
+    }
 
-  public function triviaQuestions()
-  {
-    return $this->hasMany(TriviaQuestion::class);
-  }
+    public function triviaQuestions()
+    {
+        return $this->hasMany(TriviaQuestion::class);
+    }
 
-  public function getLabelAttribute($value)
-  {
-    return base64_encode($value);
-  }
+    public function scopeEasy($query)
+    {
+        return $query->whereLevel(QuestionLevel::Easy);
+    }
+    public function scopeEasyOrMedium($query)
+    {
+        return $query->whereLevel(QuestionLevel::Easy)->orWhere('level', QuestionLevel::Medium);
+    }
 
-  public function scopeEasy($query)
-  {
-    return $query->whereLevel(QuestionLevel::Easy);
-  }
-  public function scopeEasyOrMedium($query)
-  {
-    return $query->whereLevel(QuestionLevel::Easy)->orWhere('level', QuestionLevel::Medium);
-  }
+    public function scopeMedium($query)
+    {
+        return $query->whereLevel(QuestionLevel::Medium);
+    }
 
-  public function scopeMedium($query)
-  {
-    return $query->whereLevel(QuestionLevel::Medium);
-  }
+    public function scopeHard($query)
+    {
+        return $query->whereLevel(QuestionLevel::Hard);
+    }
 
-  public function scopeHard($query)
-  {
-    return $query->whereLevel(QuestionLevel::Hard);
-  }
-
-  public function scopeExpert($query)
-  {
-    return $query->whereLevel(QuestionLevel::Expert);
-  }
-
-  public function getLevelAttribute($value)
-  {
-    return base64_encode($value);
-  }
+    public function scopeExpert($query)
+    {
+        return $query->whereLevel(QuestionLevel::Expert);
+    }
 }

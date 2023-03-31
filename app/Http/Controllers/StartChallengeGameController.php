@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ChallengeGameSession;
 use App\Models\ChallengeQuestion;
 use App\Models\GameType;
+use App\Traits\Utils\EnvironmentUtils;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;

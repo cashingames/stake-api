@@ -291,7 +291,7 @@ class GameTest extends TestCase
             'user_id' => $player->id,
             'opponent_id' => $opponent->id
         ]);
-        Mail::assertQueued(ChallengeInvite::class);
+        Mail::assertSent(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
     }
@@ -501,7 +501,7 @@ class GameTest extends TestCase
             'transaction_type' => 'CREDIT'
         ]);
         $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
-            return base64_decode($value->is_correct) == 1;
+            return $value->is_correct == 1;
         })->count();
 
         $expectedOdd = StakingOdd::where('score', $correctOptionsCount)->first()->odd;
@@ -574,7 +574,7 @@ class GameTest extends TestCase
             'transaction_type' => 'CREDIT'
         ]);
         $correctOptionsCount = collect($chosenOptions)->filter(function ($value) {
-            return base64_decode($value->is_correct) == 1;
+            return $value->is_correct == 1;
         })->count();
 
         $expectedOdd = StakingOdd::where('score', $correctOptionsCount)->first()->odd;

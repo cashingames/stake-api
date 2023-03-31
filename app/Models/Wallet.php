@@ -17,8 +17,7 @@ class Wallet extends Model
         'withdrawable_balance'
     ];
 
-
-    public function owner()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

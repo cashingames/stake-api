@@ -44,6 +44,7 @@ use App\Http\Controllers\WithdrawWinningsController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\SendOtpToEmailController;
 use App\Http\Controllers\EmailOtpVerificationController;
+use App\Http\Controllers\PlayGame\StartChallengeRequestController;
 use App\Http\Controllers\V3\GetGlobalLeaderboardController;
 
 Route::get('playground', PlayGroundController::class);
@@ -109,6 +110,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
+        Route::post('purchased/item', [WalletController::class, 'itemPurchased']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);
@@ -122,6 +124,9 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('stakers/sessions/recent', GetStakersSessionController::class)->middleware(['cacheResponse:300']);
         Route::post('stakers/email/verify', EmailOtpVerificationController::class);
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
+        Route::post('challenges/create', StartChallengeRequestController::class);
+        Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
+
     }
 );
 

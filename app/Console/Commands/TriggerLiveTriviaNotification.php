@@ -30,9 +30,9 @@ class TriggerLiveTriviaNotification extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
-        
+
         $activeLiveTrivia = LiveTrivia::active()->first();
 
         if (is_null($activeLiveTrivia)) {
@@ -43,44 +43,49 @@ class TriggerLiveTriviaNotification extends Command
         $liveTriviaStartTime = Carbon::parse($activeLiveTrivia->start_time);
 
         if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 60) {
-            
+
             // Log::info("1 hour away at " . $liveTriviaStartTime);
 
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification) {
                 foreach ($devices as $device) {
                     dispatch(function() use($device){
-                        (new SendPushNotification())->sendliveTriviaNotification($device, "in 1 hour");
+                        $pushNotification->sendliveTriviaNotification($device, "in 1 hour");
                     });
-                    
+
                 }
                 Log::info("Attempting to send live trivia notification to 500 devices 1 hour before");
             });
         }
         if ($currentTime->diffInMinutes($liveTriviaStartTime, false) == 30) {
-            
+
             Log::info("30 minutes away at " . $liveTriviaStartTime);
 
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification) {
                 foreach ($devices as $device) {
                     dispatch(function() use($device){
-                        (new SendPushNotification())->sendliveTriviaNotification($device, "in 30 minutes");
+                        $pushNotification->sendliveTriviaNotification($device, "in 30 minutes");
                     });
-                    
+
                 }
                 // Log::info("Attempting to send live trivia notification to 500 devices 30 minutes before");
             });
         }
 
         if ($currentTime->diffInMinutes($liveTriviaStartTime) == 0) {
-            
+
             Log::info("Right on time " . $liveTriviaStartTime);
-            
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification) {
+                $allTokens = [];
                 foreach ($devices as $device) {
-                    dispatch(function() use($device){
-                        (new SendPushNotification())->sendliveTriviaNotification($device, "now");
+                    dispatch(function() use($device, $allTokens){
+                        if($device_token != null){
+                            $allTokens[] = $device_token->device_token;
+                        }
                     });
-                    
+
+                    $pushNotification->sendliveTriviaNotification($allTokens, "now", true);
+
                 }
                 // Log::info("Attempting to send live trivia notification to 500 devices at start");
             });

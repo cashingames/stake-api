@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
+use App\Enums\UserAssetType;
 use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Models\WalletTransaction;
 use App\Models\Plan;
@@ -398,5 +400,66 @@ class WalletController extends BaseController
             'You have successfully bought ' . $plan->game_count . ' games',
             'You have successfully bought ' . $plan->game_count . ' games'
         );
+    }
+
+    public function itemPurchased(Request $request, ClientPlatform $clientPlatform)
+    {
+        if($clientPlatform != ClientPlatform::GameArkMobile){
+            return $this->sendError('App type not supported', 'App type not supported');
+        }
+        $data = $request->validate([
+            'type' => ['required'],
+            'item_id' => ['required']
+        ]);
+
+        if ($data['type'] == UserAssetType::BOOST) {
+            $boostId = $data['item_id'];
+            $boost = Boost::find($boostId);
+
+            if ($boost == null) {
+                return $this->sendError([], 'Wrong boost selected');
+            }
+
+            $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
+
+            if ($userBoost == null) {
+                $this->user->boosts()->create([
+                    'user_id' => $this->user->id,
+                    'boost_id' => $boostId,
+                    'boost_count' => $boost->pack_count,
+                    'used_count' => 0
+                ]);
+            } else {
+                $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
+            }
+
+            // trigger event for achievement
+            Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
+
+        }else{
+            $planId = $data['item_id'];
+
+            $plan = Plan::find($planId);
+            if ($plan === null) {
+                return $this->sendError('Plan does not exist', 'Plan does not exist');
+            }
+
+            DB::table('user_plans')->insert([
+                'user_id' => $this->user->id,
+                'plan_id' => $plan->id,
+                'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
+                'is_active' => true,
+                'used_count' => 0,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            // trigger event for achievement
+            Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::GAME_BOUGHT, $plan));
+
+            return response("Item purchased", 200);
+        }
+
+
     }
 }

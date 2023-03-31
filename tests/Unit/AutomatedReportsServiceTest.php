@@ -23,16 +23,16 @@ class AutomatedReportsServiceTest extends TestCase
         parent::setUp();
         User::factory()
             ->count(10)
-            ->create(['created_at' => now()->yesterday()]);
+            ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
         WalletTransaction::factory()
             ->count(10)
-            ->create(['created_at' => now()->yesterday()]);
+            ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
         Staking::factory()
             ->count(10)
-            ->create(['created_at' => now()->yesterday()]);
+            ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
         GameSession::factory()
             ->count(10)
-            ->create(['created_at' => now()->yesterday()]);
+            ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
 
         $this->user = User::inRandomOrder()->first();
         $this->reportsService = new AutomatedReportsService();
@@ -41,13 +41,18 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(11, $dailyReports);
+        $this->assertCount(14, $dailyReports);
     }
 
-    public function test_that_daily_reports_returns_net_profit()
+    public function test_that_daily_reports_returns_bogus_net_profit()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertArrayHasKey('netProfit', $dailyReports);
+        $this->assertArrayHasKey('bogusNetProfit', $dailyReports);
+    }
+    public function test_that_daily_reports_returns_true_net_profit()
+    {
+        $dailyReports = $this->reportsService->getDailyReports();
+        $this->assertArrayHasKey('trueNetProfit', $dailyReports);
     }
 
     public function test_that_daily_reports_correct_total_withdrawal_amount()
@@ -55,11 +60,12 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'DEBIT',
             'description' => 'Winnings Withdrawal Made',
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount' => 100
         ]);
 
         $dailyReports = $this->reportsService->getDailyReports();
+
         $this->assertEquals('1,000', $dailyReports['totalWithdrawals']);
     }
 
@@ -68,7 +74,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'CREDIT',
             'description' => 'Fund Wallet',
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount' => 100
         ]);
 
@@ -79,7 +85,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_correct_total_staked_amount()
     {
         Staking::query()->update([
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount_staked' => 100
         ]);
 
@@ -90,7 +96,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_daily_reports_correct_total_amount_won()
     {
         Staking::query()->update([
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount_won' => 100
         ]);
 
@@ -101,13 +107,13 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(17, $weeklyReports);
+        $this->assertCount(20, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()
     {
         Staking::query()->update([
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount_won' => 200
         ]);
 
@@ -118,7 +124,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_correct_total_staked_amount()
     {
         Staking::query()->update([
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount_staked' => 400
         ]);
 
@@ -131,7 +137,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'DEBIT',
             'description' => 'Winnings Withdrawal Made',
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount' => 100
         ]);
 
@@ -144,7 +150,7 @@ class AutomatedReportsServiceTest extends TestCase
         WalletTransaction::query()->update([
             'transaction_type' => 'CREDIT',
             'description' => 'Fund Wallet',
-            'created_at' => now()->subDays(1),
+            'created_at' => now('Africa/Lagos')->subDays(1),
             'amount' => 100
         ]);
 
@@ -155,7 +161,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_stakers()
     {
         Staking::query()->update([
-            'created_at' => now()->yesterday(),
+            'created_at' => now('Africa/Lagos')->yesterday(),
             'amount_staked' => 400,
             'user_id' => $this->user->id
         ]);

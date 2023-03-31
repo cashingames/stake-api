@@ -31,7 +31,8 @@ return [
     ],
     'firebase' => [
         'api_key' => env('FIREBASE_API_KEY'),
-        'server_key' => env('FIREBASE_SERVER_KEY')
+        'server_key' => env('FIREBASE_SERVER_KEY'),
+        'gameark_server_key' => env('GAMEARK_FIREBASE_SERVER_KEY')
     ],
     'termii' => [
         'api_key' => env('TERMII_API_KEY')
