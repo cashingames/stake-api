@@ -42,6 +42,11 @@ class TriviaChallengeStakingRepository
             ->first();
     }
 
+    public function getMatchedRequestById(string $id): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('challenge_request_id', $id)->first();
+    }
+
     public function updateAsMatched(ChallengeRequest $challengeRequest, ChallengeRequest $opponentRequest): void
     {
         $token = Str::uuid()->toString();
@@ -81,13 +86,15 @@ class TriviaChallengeStakingRepository
         return ChallengeRequest::where('challenge_request_id', $requestId)->first();
     }
 
-    public function updateSubmission(string $requestId, mixed $selectedOptions): ChallengeRequest|null
+    public function updateSubmission(string $requestId, mixed $selectedOptions): array
     {
         $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'option_id'))
             ->where('is_correct', true)
             ->get();
 
-        DB::transaction(function () use ($requestId, $correctOptions) {
+        $opponent = $this->getMatchedRequestById($requestId);
+
+        DB::transaction(function () use ($requestId, $correctOptions, $opponent) {
             foreach ($correctOptions as $option) {
                 DB::update(
                     'UPDATE trivia_challenge_questions SET is_correct = ?
@@ -99,17 +106,27 @@ class TriviaChallengeStakingRepository
                     ]
                 );
             }
+
+            $score = $correctOptions->count();
+            if ($opponent->status == 'COMPLETED' && $score < $opponent->score) {
+                ChallengeRequest::where('challenge_request_id', $opponent->challenge_request_id)
+                    ->update([
+                        'amount_won' => $opponent->amount ?? 0
+                    ]);
+            }
+
+            ChallengeRequest::where('challenge_request_id', $requestId)
+                ->update([
+                    'status' => 'COMPLETED',
+                    'score' => $score,
+                    'ended_at' => now(),
+                    'amount_won' => $score > $opponent->score ? $opponent->amount : 0
+                ]);
+
+
         });
 
-        //@TODO compute winner by checking opponent ended at
-        ChallengeRequest::where('challenge_request_id', $requestId)
-            ->update([
-                'status' => 'COMPLETED',
-                'score' => $correctOptions->count(),
-                'ended_at' => now(),
-            ]);
-
-        return $this->getRequestById($requestId);
+        return [$this->getRequestById($requestId), $opponent];
     }
 
 

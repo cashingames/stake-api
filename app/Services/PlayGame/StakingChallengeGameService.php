@@ -52,13 +52,9 @@ class StakingChallengeGameService
             return null;
         }
 
-        $request = $this
+        [$request, $matchedRequest] = $this
             ->triviaChallengeStakingRepository
             ->updateSubmission($requestId, $selectedOptions);
-
-        $matchedRequest = $this
-            ->triviaChallengeStakingRepository
-            ->getMatchedRequest($challengeRequest);
 
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
