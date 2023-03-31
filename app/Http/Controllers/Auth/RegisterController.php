@@ -66,7 +66,7 @@ class RegisterController extends BaseController
      * @return \Illuminate\Contracts\Validation\Validator
      */
 
-    protected function validator(array $data, $platform)
+    protected function validator(array $data, $platform = null)
     {
         return Validator::make($data, [
 
@@ -80,13 +80,11 @@ class RegisterController extends BaseController
                 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
             ],
             'country_code' => [
-                'string', 'max:4',
-                Rule::requiredIf(fn () => ($platform != ClientPlatform::GameArkMobile ))
+                'string', 'max:4', 'required'
             ],
             'phone_number' => [
-                'numeric',
+                'numeric', 'required',
                 new UniquePhoneNumberRule,
-                Rule::requiredIf(fn () => ($platform != ClientPlatform::GameArkMobile ))
             ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -278,24 +276,59 @@ class RegisterController extends BaseController
         SMSProviderInterface $smsService,
         ClientPlatform $platform
     ) {
-        $this->validator($request->all(), $platform)->validate();
+        if($platform == ClientPlatform::GameArkMobile){
+            return $this->registerGameArk($request, $smsService, $platform);
+        }
+
+        $this->validator($request->all())->validate();
 
         $user = $this->create($request->all(), $platform);
-
-        if($platform == ClientPlatform::GameArkMobile){
-            $token = auth()->login($user);
-
-            $result = [
-                'username' => $user->username,
-                'email' => $user->email,
-                'token' => $token,
-            ];
-            return $this->sendResponse($result, 'Account created successfully');
-        }
 
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
+    }
+
+    public function registerGameArk(
+        Request $request,
+        SMSProviderInterface $smsService,
+        ClientPlatform $platform)
+    {
+        // $this->validator($request->all(), $platform)->validate();
+        $request->validate([
+
+            'first_name' => [
+                'string', 'max:255',
+            ],
+            'last_name' => [
+                'string', 'max:255',
+            ],
+            'username' => [
+                'string', 'string', 'alpha_num', 'max:255', 'unique:users',
+            ],
+            'country_code' => [
+                'string', 'max:4'
+            ],
+            'phone_number' => [
+                'numeric',
+                new UniquePhoneNumberRule,
+            ],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'referrer' => ['nullable', 'string', 'exists:users,username']
+        ]);
+
+        $user = $this->create($request->all(), $platform);
+
+        $token = auth()->login($user);
+
+        $result = [
+            'username' => $user->username,
+            'email' => $user->email,
+            'token' => $token,
+        ];
+        return $this->sendResponse($result, 'Account created successfully');
+
     }
 
     public function resendOTP(
