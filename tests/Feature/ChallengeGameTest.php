@@ -128,7 +128,7 @@ class ChallengeGameTest extends TestCase
             'challenge_id' => $challenge->id,
             'staking_id' => $staking->id
         ]);
-        Mail::assertQueued(ChallengeInvite::class);
+        Mail::assertSent(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
     }
 

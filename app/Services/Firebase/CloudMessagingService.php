@@ -14,7 +14,7 @@ class CloudMessagingService{
 
     /**
      * Basic notification to be used across all platforms.
-     * 
+     *
      * This will contain title and body to be displayed in the notification tray of the device.
      *
      * @var array
@@ -23,21 +23,19 @@ class CloudMessagingService{
 
     /**
      * Data message
-     * 
+     *
      * Customer key-value pair of data to by handled within the app
-     * 
+     *
      * @var array
      */
     private $data;
 
     /**
      * Recipient of the message
-     * 
+     *
      * Topic name or device token to send notification to
-     * 
-     * @var string
+     *
      */
-
     private $to;
 
     /**
@@ -66,9 +64,9 @@ class CloudMessagingService{
 
     /**
      * Set serverKey
-     * 
+     *
      * Overwrites serverKey set in constructor
-     * 
+     *
      * @param string $serverKey
      * @return $this
      */
@@ -83,7 +81,7 @@ class CloudMessagingService{
 
     /**
      * Set notification object
-     * 
+     *
      * @param array $data
      * @return $this
      */
@@ -105,7 +103,7 @@ class CloudMessagingService{
 
     /**
      * Set custom data payload
-     * 
+     *
      * @param array $data
      * @return $this
      */
@@ -120,11 +118,10 @@ class CloudMessagingService{
 
     /**
      * Set recipient of notification
-     * 
-     * @param string $to
+     *
      * @return $this
      */
-    public function setTo(string $to){
+    public function setTo($to){
         $this->to = $to;
         return $this;
     }
@@ -139,11 +136,11 @@ class CloudMessagingService{
 
     /**
      * Send out notification to recipient
-     * 
+     *
      * If argument $data is not null, the method assumes you want to overwrite the data and notification properties
-     * 
+     *
      * This method must be called to actually send out the notification
-     * 
+     *
      * @param array|mixed $data
      */
     public function send(array $data=null){
@@ -153,13 +150,6 @@ class CloudMessagingService{
         if (isset($data) && array_key_exists('data', $data)){
             $this->setData($data['data']);
         }
-        // $client = new Client([
-        //     'headers' => [
-        //         'Authorization' => 'key=' . $this->serverKey,
-        //         'Content-Type' => 'application/json',
-        //         'Accept' => 'application/json'
-        //     ]
-        // ]);
 
         try {
             $response = $this->httpClient->request("POST", $this->endpoint, [
@@ -176,14 +166,42 @@ class CloudMessagingService{
             throw $th;
         }
     }
-    
+
+    public function sendToMany(array $data=null){
+        if (isset($data) && array_key_exists('notification', $data)){
+            $this->setNotification($data['notification']);
+        }
+        if (isset($data) && array_key_exists('data', $data)){
+            $this->setData($data['data']);
+        }
+
+        if(count($this->to) == 0){
+            return ;
+        }
+
+        try {
+            $response = $this->httpClient->request("POST", $this->endpoint, [
+                'json' => [
+                    'notification' => $this->notification,
+                    'data' => $this->data,
+                    'registration_ids' => $this->to
+                ]
+            ]);
+
+            $this->setResponse(json_decode($response->getBody()));
+            return $this->getResponse();
+        } catch (ConnectException $th) {
+            throw $th;
+        }
+    }
+
     protected function setResponse($response){
         $this->response = $response;
     }
 
     /**
      * Get response data after sending notification
-     * 
+     *
      * This method should only be called after `send` method has been called
      */
     public function getResponse(){

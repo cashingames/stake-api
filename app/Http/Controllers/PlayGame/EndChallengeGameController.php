@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
 use App\Services\PlayGame\StakingChallengeGameService;
+use Illuminate\Support\Facades\Log;
 
 class EndChallengeGameController extends Controller
 {
@@ -20,8 +21,10 @@ class EndChallengeGameController extends Controller
             'selected_options' => ['required'],
         ]);
 
+        Log::info('EndChallengeGameController', $data);
         $result = $triviaChallengeService->submit($data);
         if (!$result) {
+            Log::error('Unable to submit challenge');
             return ResponseHelper::error('Unable to submit challenge');
         }
 

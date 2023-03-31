@@ -6,24 +6,23 @@ use App\Models\Challenge;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use Illuminate\Mail\Mailables\Address;
 
-class RespondToChallengeInvite extends Mailable implements ShouldQueue
+class RespondToChallengeInvite extends Mailable
 {
     use Queueable, SerializesModels;
-
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
 
     public $status;
     public $player;
     public $challengeId;
 
+    /**
+     * Create a new message instance.
+     */
     public function __construct($status, $player, $challengeId)
     {   
         $this->status = $status;
@@ -32,23 +31,41 @@ class RespondToChallengeInvite extends Mailable implements ShouldQueue
     }
 
     /**
-     * Build the message.
-     *
-     * @return $this
+     * Get the message envelope.
      */
-    public function build()
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            from: new Address('noreply@cashingames.com', 'Cashingames'),
+            subject: 'Your Challenge Response !',
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
     {
         $challenge = Challenge::find($this->challengeId);
-        return $this->to($this->player->email)
-            ->from('noreply@cashingames.com')
-            ->subject('Your Challenge Response !')
-            ->view('emails.users.respondToChallengeInvite')
-            ->with([
+        return new Content(
+            view: 'emails.users.respondToChallengeInvite',
+            with: [
                 'opponent' => $challenge->opponent->username,
                 'user' => $this->player->username,
                 'year' => Carbon::now()->year,
                 'challengeId'=>$this->challengeId,
                 'status' => $this->status
-            ]);
+            ]
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
     }
 }

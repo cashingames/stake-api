@@ -40,7 +40,8 @@ class MessagesController extends BaseController
         }
 
         $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
-        Mail::send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"], $appType));
+
+        Mail::to(config('app.admin_email'))->send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"], $appType));
 
         //create automated ticket for support
 
