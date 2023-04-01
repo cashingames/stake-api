@@ -82,7 +82,7 @@ class MatchEndWalletAction
         ChallengeRequest $request,
         ChallengeRequest $matchedRequest
     ): bool {
-        return $matchedRequest->status !== 'COMPLETED' && $request->status !== 'COMPLETED';
+        return $matchedRequest->status == 'COMPLETED' && $request->status == 'COMPLETED';
     }
 
 
