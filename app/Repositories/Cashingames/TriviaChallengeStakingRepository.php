@@ -11,6 +11,12 @@ use App\Models\TriviaChallengeQuestion;
 
 class TriviaChallengeStakingRepository
 {
+
+    public function getRequestById(string $requestId): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('challenge_request_id', $requestId)->first();
+    }
+
     public function createForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
     {
         $requestId = Str::random(20);
@@ -22,7 +28,8 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-        ]);
+            'status' => 'MATCHING',
+        ])->fresh();
     }
 
     public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest|null
@@ -81,20 +88,13 @@ class TriviaChallengeStakingRepository
         TriviaChallengeQuestion::insert($result);
     }
 
-    public function getRequestById(string $requestId): ChallengeRequest|null
-    {
-        return ChallengeRequest::where('challenge_request_id', $requestId)->first();
-    }
-
-    public function updateSubmission(string $requestId, mixed $selectedOptions): array
+    public function scoreLoggedQuestions(string $requestId, array $selectedOptions): int
     {
         $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'option_id'))
             ->where('is_correct', true)
             ->get();
 
-        $opponent = $this->getMatchedRequestById($requestId);
-
-        DB::transaction(function () use ($requestId, $correctOptions, $opponent) {
+        DB::transaction(function () use ($requestId, $correctOptions) {
             foreach ($correctOptions as $option) {
                 DB::update(
                     'UPDATE trivia_challenge_questions SET is_correct = ?
@@ -106,25 +106,21 @@ class TriviaChallengeStakingRepository
                     ]
                 );
             }
-
-            $score = $correctOptions->count();
-            if ($opponent->status == 'COMPLETED' && $score < $opponent->score) {
-                ChallengeRequest::where('challenge_request_id', $opponent->challenge_request_id)
-                    ->update([
-                        'amount_won' => $opponent->amount ?? 0
-                    ]);
-            }
-
-            ChallengeRequest::where('challenge_request_id', $requestId)
-                ->update([
-                    'status' => 'COMPLETED',
-                    'score' => $score,
-                    'ended_at' => now(),
-                    'amount_won' => $score > $opponent->score ? $opponent->amount : 0
-                ]);
-
-
         });
+
+        return $correctOptions->count();
+    }
+
+    public function updateCompletedRequest(string $requestId, int|float $score): array
+    {
+        $opponent = $this->getMatchedRequestById($requestId);
+        ChallengeRequest::where('challenge_request_id', $requestId)
+            ->update([
+                'status' => 'COMPLETED',
+                'score' => $score,
+                'ended_at' => now(),
+            ]);
+
 
         return [$this->getRequestById($requestId), $opponent];
     }

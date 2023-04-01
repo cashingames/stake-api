@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Profile;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Testing\TestResponse;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -21,7 +23,6 @@ class StartChallengeRequestTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        // $this->withoutExceptionHandling();
 
         $this->instance(
             FirestoreClient::class,
@@ -38,22 +39,9 @@ class StartChallengeRequestTest extends TestCase
             })
         );
 
-        $user = User::factory()->create();
         $category = Category::factory()->create();
 
-        Wallet::factory()
-            ->for($user)
-            ->create([
-                'non_withdrawable_balance' => 1000
-            ]);
-
-        $response = $this->actingAs($user)
-            ->post(self::API_URL, [
-                'category' => $category->id,
-                'amount' => 500
-            ]);
-
-        $response->assertStatus(200);
+        $user = $this->prepareMatchRequest($category, 500);
 
         $this->assertDatabaseHas('challenge_requests', [
             'category_id' => $category->id,
@@ -80,14 +68,6 @@ class StartChallengeRequestTest extends TestCase
             FirestoreService::class,
             Mockery::mock(FirestoreService::class)
         );
-
-        $this->instance(
-            StakingChallengeGameService::class,
-            Mockery::mock(StakingChallengeGameService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('createDocument')->never();
-            })
-        );
-
 
         $user = User::factory()->create();
         $category = Category::factory()->create();
@@ -144,9 +124,10 @@ class StartChallengeRequestTest extends TestCase
         $this->assertDatabaseCount('trivia_challenge_questions', 20);
 
     }
-    private function prepareMatchRequest($category, $amount): void
+    private function prepareMatchRequest($category, $amount): User
     {
         $user = User::factory()->create();
+        Profile::factory()->for($user)->create();
         Wallet::factory()
             ->for($user)
             ->create([
@@ -157,5 +138,7 @@ class StartChallengeRequestTest extends TestCase
                 'category' => $category->id,
                 'amount' => $amount
             ]);
+
+        return $user;
     }
 }
