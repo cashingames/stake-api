@@ -412,7 +412,24 @@ class WalletController extends BaseController
             'item_id' => ['required']
         ]);
 
-        if ($data['type'] == UserAssetType::BOOST) {
+        Log::info("User data");
+
+        $type = null;
+
+        switch ($data['type']) {
+            case 'BOOST':
+                $type = UserAssetType::BOOST;
+                break;
+
+            default:
+                # code...
+                $type = UserAssetType::PLAN;
+                break;
+        }
+
+        Log::info(($type == UserAssetType::BOOST) ? 'true' : 'false');
+
+        if ($type == UserAssetType::BOOST) {
             $boostId = $data['item_id'];
             $boost = Boost::find($boostId);
 
