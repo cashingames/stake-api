@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Actions\TriviaChallenge\MatchRequestAction;
 use Illuminate\Http\Request;
 use App\Models\ChallengeRequest;
 use Illuminate\Http\JsonResponse;
@@ -28,9 +27,7 @@ class StartChallengeRequestController extends Controller
         $result = $triviaChallengeService->create($user, $data);
 
         //non blocking job
-        // MatchChallengeRequest::dispatch($result);
-        $action = app(MatchRequestAction::class);
-        $action->execute($result);
+        MatchChallengeRequest::dispatch($result);
 
         return ResponseHelper::success($this->transformResponse($result));
     }
