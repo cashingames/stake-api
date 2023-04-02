@@ -21,11 +21,14 @@ class MatchEndWalletAction
             $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
         );
 
-        if ($this->isCompleted($request, $matchedRequest) && $winner == null) {
-            $this->refundMatchedOpponents($request, $matchedRequest);
+        $isComplete = $this->isCompleted($request, $matchedRequest);
+        if (!$isComplete) {
+            return null;
         }
 
-        if ($winner != null) {
+        if ($winner == null) {
+            $this->refundMatchedOpponents($request, $matchedRequest);
+        } else {
             $this->creditWinner($winner);
         }
 
