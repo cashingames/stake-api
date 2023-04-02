@@ -46,7 +46,7 @@ class SocialSignInController extends BaseController
                 'email' => $request->email,
                 'firstName' => $request->firstName,
                 'lastName' => $request->lastName,
-                'username' => $request->email,
+                'username' => ($request->firstName).''.rand(10,1000),
                 'country_code' => '',
                 'phone_number' => '',
                 'referrer' => null
