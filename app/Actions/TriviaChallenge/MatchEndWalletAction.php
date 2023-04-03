@@ -5,6 +5,7 @@ namespace App\Actions\TriviaChallenge;
 use App\Actions\Wallet\CreditWalletAction;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use Illuminate\Support\Facades\Log;
 
 class MatchEndWalletAction
 {
@@ -22,6 +23,7 @@ class MatchEndWalletAction
         );
 
         $isComplete = $this->isCompleted($request, $matchedRequest);
+        Log::info('isComplete: ' . $isComplete);
         if (!$isComplete) {
             return null;
         }
@@ -70,7 +72,7 @@ class MatchEndWalletAction
         ChallengeRequest $matchedRequest
     ): ChallengeRequest|null {
 
-        if ($this->isCompleted($request, $matchedRequest)) {
+        if (!$this->isCompleted($request, $matchedRequest)) {
             return null;
         }
 
