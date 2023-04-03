@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\DailyReportEmail;
 use App\Mail\WeeklyReportEmail;
+use App\Models\ChallengeRequest;
 use App\Models\GameSession;
 use App\Models\Staking;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -68,17 +69,16 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('daily-report:send')->assertExitCode(0);
 
         Mail::assertSent(DailyReportEmail::class);
-
     }
 
     public function test_that_weekly_automated_report_command_runs()
     {
         GameSession::factory()
-        ->count(5)
+            ->count(5)
             ->create(['created_at' => now()->yesterday()]);
 
         Staking::factory()
-        ->count(5)
+            ->count(5)
             ->create(['created_at' => now()->yesterday()]);
 
         Mail::fake();
@@ -88,4 +88,16 @@ class ArtisanCommandsTest extends TestCase
         Mail::assertSent(WeeklyReportEmail::class);
     }
 
+    public function test_that_hanging_challenge_requests_get_cleaned_up()
+    {
+        ChallengeRequest::factory()
+            ->count(5)
+            ->create(['created_at' => now()]);
+        
+        ChallengeRequest::where('id',3)->update(['created_at' => now()->subMinutes(5)]);
+        
+        $this->artisan('challenge-requests:clean-up')->assertExitCode(0);
+
+        $this->assertDatabaseCount('challenge_requests', 4);
+    }
 }
