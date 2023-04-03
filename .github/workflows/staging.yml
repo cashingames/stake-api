@@ -52,7 +52,7 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-        run: php artisan test --coverage --min=55
+        run: php artisan test --coverage --min=60
   deploy:
     needs: build-test
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
