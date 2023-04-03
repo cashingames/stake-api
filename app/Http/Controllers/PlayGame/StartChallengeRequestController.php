@@ -27,8 +27,9 @@ class StartChallengeRequestController extends Controller
         $result = $triviaChallengeService->create($user, $data);
 
         //non blocking job
-        MatchChallengeRequest::dispatch($result);
-
+        // MatchChallengeRequest::dispatch($result);
+        $action = app(MatchRequestAction::class);
+        $action->execute($result);
         return ResponseHelper::success($this->transformResponse($result));
     }
 
