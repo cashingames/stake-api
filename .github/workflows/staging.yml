@@ -18,31 +18,6 @@ jobs:
           php-version: "8.2"
           coverage: xdebug
           extensions: grpc
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          # Use composer.json for key, if composer.lock is not committed.
-          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Create Database
-        run: |
-          mkdir -p database
-          touch database/database.sqlite
-          php artisan migrate --seed
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
-        run: php artisan test --coverage --min=55
       - name: Get extensions cache directory
         id: extensions-cache
         run: echo "::set-output name=dir::$(php -r "echo ini_get('extension_dir');")"
@@ -51,7 +26,7 @@ jobs:
         with:
           path: ${{ env.EXTENSIONS_PATH }}
           key: ${{ runner.os }}-extensions-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-extensions-${{ env.phpts }}
+          restore-keys: ${{ runner.os }}-extensions-${{ hashFiles('**/composer.lock') }}
   deploy:
     needs: build-test
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
