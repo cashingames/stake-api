@@ -20,11 +20,12 @@ jobs:
           extensions: grpc
       - name: Get extensions cache directory
         id: extensions-cache
-        run: echo "::set-output name=dir::$(php -r "echo ini_get('extension_dir');")"
+        # run: echo "::set-output name=dir::$(php -r "echo ini_get('extension_dir');")"
+        run: echo "dir=$(php -r "echo ini_get('extension_dir');")" >> ${GITHUB_OUTPUT}
       - name: Cache extensions
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ${{ env.EXTENSIONS_PATH }}
+          path: ${{ steps.extensions-cache.outputs.dir }}
           key: ${{ runner.os }}-extensions-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-extensions-${{ hashFiles('**/composer.lock') }}
   deploy:
