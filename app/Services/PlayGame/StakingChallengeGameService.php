@@ -61,9 +61,14 @@ class StakingChallengeGameService
         $score = $selectedOptions == null ?
             0 : $this->triviaChallengeStakingRepository->scoreLoggedQuestions($requestId, $selectedOptions);
 
+
         [$request, $matchedRequest] = $this
             ->triviaChallengeStakingRepository
             ->updateCompletedRequest($requestId, $score);
+
+        if ($this->isBot($matchedRequest)) {
+            [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
+        }
 
         $this->matchEndWalletAction->execute($requestId);
         $request->refresh();
@@ -98,5 +103,19 @@ class StakingChallengeGameService
         );
 
         return $request;
+    }
+
+    private function isBot(ChallengeRequest $matchRequest)
+    {
+
+        return $matchRequest->user_id == 1;
+    }
+
+    private function handleBotSubmission(ChallengeRequest $challengeRequest, float $score)
+    {
+        $opponentScore = rand(($score > 0 ? $score - 1 : 0), 10);
+        return $this
+            ->triviaChallengeStakingRepository
+            ->updateCompletedRequest($challengeRequest->id, $score);
     }
 }
