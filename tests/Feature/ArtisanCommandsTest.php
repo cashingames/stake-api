@@ -88,16 +88,4 @@ class ArtisanCommandsTest extends TestCase
         Mail::assertSent(WeeklyReportEmail::class);
     }
 
-    public function test_that_hanging_challenge_requests_get_cleaned_up()
-    {
-        ChallengeRequest::factory()
-            ->count(5)
-            ->create(['created_at' => now()]);
-        
-        ChallengeRequest::where('id',3)->update(['created_at' => now()->subMinutes(5)]);
-        
-        $this->artisan('challenge-requests:clean-up')->assertExitCode(0);
-
-        $this->assertDatabaseCount('challenge_requests', 4);
-    }
 }

@@ -26,11 +26,6 @@ class CleanUpChallengeMatchRequest extends Command
      */
     public function handle(): void
     {
-        ChallengeRequest::toBeCleanedUp()
-            ->chunkById(10, function ($requests) {
-                foreach ($requests as $request) {
-                    $request->delete();
-                }
-            }, $column = 'id');
+        ChallengeRequest::toBeCleanedUp()->delete();
     }
 }
