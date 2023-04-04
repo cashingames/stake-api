@@ -22,7 +22,6 @@ class StakingChallengeGameService
     }
     public function create(User $user, array $data): ChallengeRequest|null
     {
-        // dd($data);
         $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute(
@@ -107,7 +106,6 @@ class StakingChallengeGameService
 
     private function isBot(ChallengeRequest $matchRequest)
     {
-
         return $matchRequest->user_id == 1;
     }
 
@@ -116,6 +114,6 @@ class StakingChallengeGameService
         $opponentScore = rand(($score > 0 ? $score - 1 : 0), 10);
         return $this
             ->triviaChallengeStakingRepository
-            ->updateCompletedRequest($challengeRequest->id, $score);
+            ->updateCompletedRequest($challengeRequest->id, $opponentScore);
     }
 }
