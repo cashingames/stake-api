@@ -43,7 +43,7 @@ class MatchRequestAction
     private function matchWithBot(ChallengeRequest $challengeRequest,StakingChallengeGameService $triviaChallengeService ): ChallengeRequest|null
     {
         $bot = User::find(1);
-        $bot->username = FakerFactory::create()->userName();
+        $bot->username = FakerFactory::create('en_NG')->userName();
        
         $bot->wallet->non_withdrawable_balance += $challengeRequest->amount;
         $bot->wallet->save();
