@@ -22,7 +22,6 @@ class MatchRequestAction
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {   
-      
         
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
         if (!$matchedRequest) {
@@ -47,8 +46,7 @@ class MatchRequestAction
         $bot->wallet->non_withdrawable_balance += $challengeRequest->amount;
         $bot->wallet->save();
       
-        return $this->triviaChallengeStakingRepository->createForMatching($bot, $challengeRequest->amount , $challengeRequest->categoryId);
-       
+        return $this->triviaChallengeStakingRepository->createForMatching($bot, $challengeRequest->amount , $challengeRequest->category_id);  
     }
 
 
