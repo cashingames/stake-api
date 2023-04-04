@@ -3,10 +3,14 @@
 namespace App\Actions\TriviaChallenge;
 
 use App\Models\ChallengeRequest;
+use App\Models\User;
 use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Services\PlayGame\StakingChallengeGameService;
+use Faker\Factory as FakerFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MatchRequestAction
 {
@@ -14,14 +18,17 @@ class MatchRequestAction
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly FirestoreService $firestoreService,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
+        private readonly  StakingChallengeGameService $triviaChallengeService,
     ) {
     }
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
+
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
+
         if (!$matchedRequest) {
-            return null;
+            $matchedRequest = $this->matchWithBot($challengeRequest, $this->triviaChallengeService);
         }
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
@@ -32,6 +39,18 @@ class MatchRequestAction
 
         return $matchedRequest;
     }
+
+    private function matchWithBot(ChallengeRequest $challengeRequest,StakingChallengeGameService $triviaChallengeService ): ChallengeRequest|null
+    {
+        $bot = User::find(1);
+        $bot->username = FakerFactory::create()->userName();
+       
+        $bot->wallet->non_withdrawable_balance += $challengeRequest->amount;
+        $bot->wallet->save();
+
+        return $triviaChallengeService->create($bot, ['category' => $challengeRequest->category_id, 'amount' => $challengeRequest->amount]);
+    }
+
 
     private function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
@@ -77,10 +96,10 @@ class MatchRequestAction
 
     private function parseQuestions(Collection $questions): array
     {
-        return $questions->map(fn($question) => [
+        return $questions->map(fn ($question) => [
             'id' => $question->id,
             'label' => $question->label,
-            'options' => $question->options->map(fn($option) => [
+            'options' => $question->options->map(fn ($option) => [
                 'id' => $option->id,
                 'title' => $option->title,
                 'question_id' => $option->question_id,

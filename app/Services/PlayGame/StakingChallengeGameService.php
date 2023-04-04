@@ -22,6 +22,7 @@ class StakingChallengeGameService
     }
     public function create(User $user, array $data): ChallengeRequest|null
     {
+        // dd($data);
         $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute(
