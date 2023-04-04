@@ -412,8 +412,6 @@ class WalletController extends BaseController
             'item_id' => ['required']
         ]);
 
-        Log::info("User data");
-
         $type = null;
 
         switch ($data['type']) {
@@ -426,8 +424,6 @@ class WalletController extends BaseController
                 $type = UserAssetType::PLAN;
                 break;
         }
-
-        Log::info(($type == UserAssetType::BOOST) ? 'true' : 'false');
 
         if ($type == UserAssetType::BOOST) {
             $boostId = $data['item_id'];
