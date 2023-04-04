@@ -25,4 +25,10 @@ class ChallengeRequest extends Model
     {
         return $this->hasMany(TriviaChallengeQuestion::class);
     }
+
+    public function scopeToBeCleanedUp($query){
+        return $query->where('status', 'MATCHING')
+        ->where('created_at','<=',now()->subMinutes(2));
+    }
+
 }

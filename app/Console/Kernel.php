@@ -49,6 +49,7 @@ class Kernel extends ConsoleKernel
                 ->dailyAt('01:00');
         }
         $schedule->command('challenge:staking-refund')->withoutOverlapping()->hourly();
+        $schedule->command('challenge-requests:clean-up')->withoutOverlapping()->everyMinute();
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
             $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
