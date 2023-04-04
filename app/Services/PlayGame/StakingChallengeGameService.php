@@ -114,6 +114,6 @@ class StakingChallengeGameService
         $opponentScore = rand(($score > 0 ? $score - 1 : 0), 10);
         return $this
             ->triviaChallengeStakingRepository
-            ->updateCompletedRequest($challengeRequest->id, $opponentScore);
+            ->updateCompletedRequest($challengeRequest->challenge_request_id, $opponentScore);
     }
 }
