@@ -3,12 +3,15 @@
 namespace App\Actions\TriviaChallenge;
 
 use App\Models\ChallengeRequest;
+use App\Models\User;
 use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use Faker\Factory as FakerFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class MatchRequestAction
+class MatchRequestAction 
 {
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
@@ -18,10 +21,12 @@ class MatchRequestAction
     }
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
-    {
+    {   
+      
+        
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
         if (!$matchedRequest) {
-            return null;
+           $matchedRequest = $this->matchWithBot($challengeRequest);
         }
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
@@ -32,6 +37,20 @@ class MatchRequestAction
 
         return $matchedRequest;
     }
+
+    private function matchWithBot(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    {
+        $bot = User::find(1);
+        $bot->username = FakerFactory::create()->userName();
+        $bot->save();
+       
+        $bot->wallet->non_withdrawable_balance += $challengeRequest->amount;
+        $bot->wallet->save();
+      
+        return $this->triviaChallengeStakingRepository->createForMatching($bot, $challengeRequest->amount , $challengeRequest->categoryId);
+       
+    }
+
 
     private function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
