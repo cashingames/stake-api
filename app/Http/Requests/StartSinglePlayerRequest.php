@@ -154,6 +154,16 @@ class StartSinglePlayerRequest extends FormRequest
             );
         }
 
+        $percentWonThisYear = $this->walletRepository
+            ->getUserProfitPercentageOnStakingThisYear(auth()->id());
+
+        if ($percentWonThisYear > 300 && $platformProfit < config('trivia.platform_target')) {
+            return $validator->errors()->add(
+                'staking_amount',
+                'You are a genius!, please try again tomorrow'
+            );
+        }
+
         //if total session is greater than 10
         $todaysSessions = Staking::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
