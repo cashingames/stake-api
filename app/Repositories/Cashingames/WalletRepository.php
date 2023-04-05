@@ -31,7 +31,7 @@ class WalletRepository
      * @param mixed $user
      * @return float
      */
-    public function getUserProfitPercentageOnStaking(int $userId, Carbon $startDate, Carbon $endDate): int | float
+    public function getUserProfitPercentageOnStaking(int $userId, Carbon $startDate, Carbon $endDate): int|float
     {
         $todayStakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
             ->where('user_id', $userId)
@@ -54,7 +54,7 @@ class WalletRepository
      *
      * @return float|int
      */
-    public function getPlatformProfitPercentageOnStaking(Carbon $startDate, Carbon $endDate): int | float
+    public function getPlatformProfitPercentageOnStaking(Carbon $startDate, Carbon $endDate): int|float
     {
         $todayStakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -82,7 +82,7 @@ class WalletRepository
      */
 
     // get user profit on staking today
-    public function getUserProfitPercentageOnStakingToday(int $userId): int | float
+    public function getUserProfitPercentageOnStakingToday(int $userId): int|float
     {
         return $this->getUserProfitPercentageOnStaking($userId, now()->startOfDay(), now()->endOfDay());
     }
@@ -93,24 +93,49 @@ class WalletRepository
     }
 
     //get platform profit on staking today
-    public function getPlatformProfitPercentageOnStakingToday(): int | float
+    public function getPlatformProfitPercentageOnStakingToday(): int|float
     {
-            return $this->getPlatformProfitPercentageOnStaking(now()->startOfDay(), now()->endOfDay());
+        return $this->getPlatformProfitPercentageOnStaking(now()->startOfDay(), now()->endOfDay());
     }
 
     public function credit(Wallet $wallet, float $amount, string $description, string $reference = null): void
     {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
+            $newBalance = $wallet->withdrawable_balance + $amount;
+
             $wallet->update([
-                'non_withdrawable_balance' => $wallet->non_withdrawable_balance + $amount
+                'withdrawable_balance' => $newBalance
             ]);
 
             WalletTransaction::create([
                 'wallet_id' => $wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => $amount,
-                'balance' => $wallet->non_withdrawable_balance,
+                'balance' => $newBalance,
+                'description' => $description,
+                'reference' => $reference ?? Str::random(10),
+            ]);
+
+        });
+    }
+
+    public function creditFundingAccount(
+        Wallet $wallet, float $amount, string $description, string $reference = null
+    ): void {
+        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
+
+            $newBalance = $wallet->non_withdrawable_balance + $amount;
+
+            $wallet->update([
+                'non_withdrawable_balance' => $newBalance
+            ]);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $amount,
+                'balance' => $newBalance,
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
@@ -122,15 +147,17 @@ class WalletRepository
     {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
+            $newBalance = $wallet->non_withdrawable_balance - $amount;
+
             $wallet->update([
-                'non_withdrawable_balance' => $wallet->non_withdrawable_balance - $amount
+                'non_withdrawable_balance' => $newBalance
             ]);
 
             WalletTransaction::create([
                 'wallet_id' => $wallet->id,
                 'transaction_type' => 'DEBIT',
                 'amount' => $amount,
-                'balance' => $wallet->non_withdrawable_balance,
+                'balance' => $newBalance,
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);

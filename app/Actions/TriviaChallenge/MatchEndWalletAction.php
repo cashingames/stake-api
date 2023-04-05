@@ -39,13 +39,13 @@ class MatchEndWalletAction
 
     private function refundMatchedOpponents(ChallengeRequest $request, ChallengeRequest $matchedRequest): void
     {
-        $this->creditWalletAction->execute(
+        $this->creditWalletAction->executeRefund(
             $request->user->wallet,
             $request->amount,
             'Trivia challenge staking refund'
         );
 
-        $this->creditWalletAction->execute(
+        $this->creditWalletAction->executeRefund(
             $matchedRequest->user->wallet,
             $matchedRequest->amount,
             'Trivia challenge staking refund'

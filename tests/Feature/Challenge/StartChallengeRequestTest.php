@@ -24,6 +24,8 @@ class StartChallengeRequestTest extends TestCase
     {
         parent::setUp();
 
+        $this->createBothUser();
+
         $this->instance(
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
@@ -36,6 +38,8 @@ class StartChallengeRequestTest extends TestCase
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
                 $mock->shouldReceive('createDocument')->twice();
+                $mock->shouldReceive('updateDocument')->twice();
+
             })
         );
 
@@ -140,5 +144,16 @@ class StartChallengeRequestTest extends TestCase
             ]);
 
         return $user;
+    }
+
+    private function createBothUser(): void
+    {
+        $user1 = User::factory()->create();
+        Profile::factory()->for($user1)->create();
+        Wallet::factory()
+            ->for($user1)
+            ->create([
+                'non_withdrawable_balance' => 1000
+            ]);
     }
 }
