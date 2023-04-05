@@ -111,7 +111,12 @@ class StakingChallengeGameService
 
     private function handleBotSubmission(ChallengeRequest $challengeRequest, float $score)
     {
-        $opponentScore = rand(($score > 0 ? $score - 1 : 0), 10);
+        if ($score < 4) {
+            $opponentScore = rand(0, 10);
+        } else {
+            $opponentScore = rand($score - 2, 10);
+        }
+
         return $this
             ->triviaChallengeStakingRepository
             ->updateCompletedRequest($challengeRequest->challenge_request_id, $opponentScore);
