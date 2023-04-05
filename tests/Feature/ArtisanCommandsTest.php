@@ -90,7 +90,7 @@ class ArtisanCommandsTest extends TestCase
 
     public function test_refresh_daily_bonus_command()
     {
-        $this->artisan('bonus:hourly-refresh')->assertExitCode(0);
+        $this->artisan('bonus:refresh')->assertExitCode(0);
     }
 
 }
