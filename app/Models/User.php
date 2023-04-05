@@ -200,6 +200,14 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
 
+    public function hasActiveFreePlan()
+    {
+        if (is_null($this->getNextFreePlan())) {
+            return false;
+        }
+        return true;
+    }
+
     public function categories()
     {
         return $this->belongsToMany(User::class, 'game_sessions')->withPivot('points_gained', 'user_id');

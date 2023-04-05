@@ -38,52 +38,25 @@ class RefreshExhaustedDailyBonus extends Command
         $today = Carbon::now()->endOfDay();
         $freePlan = Plan::where('is_free', true)->first();
 
-        $this->renewExhaustedBonusToIncrement($today, $freePlan);
-        $this->renewExhaustedBonusTillLimit($today, $freePlan);
+        $this->renewExhaustedBonusToIncrementLimit($today, $freePlan);
+        // $this->renewExhaustedBonusTillLimit($today, $freePlan);
     }
 
-    public function renewExhaustedBonusToIncrement($today, $freePlan){
+    public function renewExhaustedBonusToIncrementLimit($today, $freePlan){
         User::all()->map(function ($user) use ($today, $freePlan) {
-            $currentPlan = UserPlan::where('user_id', $user->id)
-            ->where('plan_id', $freePlan->id)
-            ->where('expire_at', $today)
-            ->where('is_active', false)->first();
 
-            if($currentPlan != null){
-                // update
-                UserPlan::where('id', $currentPlan->id)
-                ->update([
+            if(!($user->hasActiveFreePlan())){
+                UserPlan::create([
+                    'plan_id' => $freePlan->id,
+                    'user_id' => $user->id,
+                    'description' => "Refreshing daily plan for " . $user->username,
                     'used_count' => 0,
-                    'plan_count' => $this->incrementCount,
+                    'plan_count' => 15,
                     'is_active' => true,
-                    'is_refreshing' => true
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                    'expire_at' => Carbon::now()->endOfDay()
                 ]);
-            }
-        });
-    }
-    public function renewExhaustedBonusTillLimit($today, $freePlan){
-        User::all()->map(function ($user) use ($today, $freePlan) {
-            $currentPlan = UserPlan::where('user_id', $user->id)
-            ->where('plan_id', $freePlan->id)
-            ->where('expire_at', $today)
-            ->where('is_refreshing', true)->first();
-
-            if($currentPlan != null){
-                if($currentPlan->plan_count < $this->incrementCountLimit){
-                    // update
-                    UserPlan::where('id', $currentPlan->id)
-                    ->update([
-                        'plan_count' => $currentPlan->plan_count + $this->incrementCount,
-                        'is_active' => true,
-                        'is_refreshing' => true
-                    ]);
-                }else{
-                    UserPlan::where('id', $currentPlan->id)
-                    ->update([
-                        'is_refreshing' => false
-                    ]);
-                }
-
             }
         });
     }
