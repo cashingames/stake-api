@@ -16,14 +16,14 @@ class RefreshExhaustedDailyBonus extends Command
      *
      * @var string
      */
-    protected $signature = 'bonus:hourly-refresh';
+    protected $signature = 'bonus:refresh';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refresh Exhausted Free Game Plan Hourly ';
+    protected $description = 'Refresh Exhausted Free Game Plan ';
 
     public $incrementCount = 5;
     public $incrementCountLimit = 15;

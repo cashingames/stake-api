@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
         }
         $schedule->command('challenge:staking-refund')->withoutOverlapping()->hourly();
 
-        $schedule->command('bonus:hourly-refresh')->withoutOverlapping()->everyThreeHours();
+        $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
 
         if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
             $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
