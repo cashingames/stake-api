@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Challenge;
 
+use App\Jobs\SendChallengeRefundNotification;
 use App\Models\Category;
 use App\Models\ChallengeRequest;
 use App\Models\Option;
@@ -14,6 +15,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 use App\Services\Firebase\FirestoreService;
+use Illuminate\Support\Facades\Queue;
 
 
 class EndChallengeTest extends TestCase
@@ -44,7 +46,7 @@ class EndChallengeTest extends TestCase
                 $mock->shouldReceive('updateDocument')->times(4);
             })
         );
-
+        Queue::fake();
         $category = Category::factory()->create();
         $this->seedQuestions($category);
 
@@ -134,6 +136,9 @@ class EndChallengeTest extends TestCase
             'user_id' => $secondUser->id,
             'non_withdrawable_balance' => 500,
         ]);
+
+        //assert that refund push notification was queued
+        Queue::assertPushed(SendChallengeRefundNotification::class, 2);
     }
 
     public function test_challenge_bot_flow(): void

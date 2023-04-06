@@ -198,13 +198,13 @@ class SendPushNotification
         $this->pushService->setNotification(
             [
                 'title' => "Cashingames Challenge Staking Refund",
-                'body' => "Your challenge staking has been refunded because your opponent failed to respond"
+                'body' => "Your challenge staking has been refunded"
             ]
         )
             ->setData(
                 [
                     'title' => "Challenge Staking Refund",
-                    'body' => "Your challenge staking has been refunded because your opponent failed to respond",
+                    'body' => "Your challenge staking has been refunded",
                     'action_type' => PushNotificationType::Challenge,
                     'action_id' => $challenge->id,
                     'unread_notifications_count' => $player->unreadNotifications()->count()

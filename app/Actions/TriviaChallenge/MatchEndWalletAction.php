@@ -3,6 +3,7 @@
 namespace App\Actions\TriviaChallenge;
 
 use App\Actions\Wallet\CreditWalletAction;
+use App\Jobs\SendChallengeRefundNotification;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use Illuminate\Support\Facades\Log;
@@ -44,13 +45,16 @@ class MatchEndWalletAction
             $request->amount,
             'Trivia challenge staking refund'
         );
-
+        SendChallengeRefundNotification::dispatch( $request , $request->user);
+        
         $this->creditWalletAction->executeRefund(
             $matchedRequest->user->wallet,
             $matchedRequest->amount,
             'Trivia challenge staking refund'
         );
 
+        SendChallengeRefundNotification::dispatch( $matchedRequest, $matchedRequest->user);
+        
     }
 
     private function creditWinner(ChallengeRequest $winner): void
