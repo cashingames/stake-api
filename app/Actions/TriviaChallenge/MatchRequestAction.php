@@ -10,7 +10,7 @@ use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Services\PlayGame\StakingChallengeGameService;
 use Faker\Factory as FakerFactory;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Lottery;
 
 class MatchRequestAction
 {
@@ -43,14 +43,24 @@ class MatchRequestAction
     private function matchWithBot(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
         $bot = User::find(1);
-        $bot->username = FakerFactory::create('en_NG')->userName();
 
-        // $bot->wallet->non_withdrawable_balance += $challengeRequest->amount;
-        // $bot->wallet->save();
+        $faker = FakerFactory::create('en_NG');
+
+        Lottery::odds(1, 2)
+            ->winner(function () use (&$bot, $faker) {
+                $bot->username = $faker->userName();
+            })
+            ->loser(function () use (&$bot, $faker) {
+                $bot->username = $faker->firstName();
+            })
+            ->choose();
 
         return $this->triviaChallengeService->create(
             $bot,
-            ['category' => $challengeRequest->category_id, 'amount' => $challengeRequest->amount]
+            [
+                'category' => $challengeRequest->category_id,
+                'amount' => $challengeRequest->amount
+            ]
         );
     }
 
