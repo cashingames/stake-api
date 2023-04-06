@@ -70,8 +70,15 @@ class StakingChallengeGameService
         }
 
         $this->matchEndWalletAction->execute($requestId);
+        $this->updateEndMatchFirestore($request, $matchedRequest);
+        return $request;
+    }
+
+    private function updateEndMatchFirestore(ChallengeRequest $request, ChallengeRequest $matchedRequest)
+    {
         $request->refresh();
         $matchedRequest->refresh();
+
 
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
@@ -101,7 +108,6 @@ class StakingChallengeGameService
             ]
         );
 
-        return $request;
     }
 
     private function isBot(ChallengeRequest $matchRequest)
@@ -109,16 +115,36 @@ class StakingChallengeGameService
         return $matchRequest->user_id == 1;
     }
 
-    private function handleBotSubmission(ChallengeRequest $challengeRequest, float $score)
+    private function handleBotSubmission(ChallengeRequest $botRequest, float $opponentScore): array
     {
-        if ($score < 4) {
-            $opponentScore = rand(0, 10);
-        } else {
-            $opponentScore = rand($score - 2, 10);
-        }
-
+        $botScore = $this->generateBotScore($opponentScore);
         return $this
             ->triviaChallengeStakingRepository
-            ->updateCompletedRequest($challengeRequest->challenge_request_id, $opponentScore);
+            ->updateCompletedRequest($botRequest->challenge_request_id, $botScore);
+    }
+
+    private function generateBotScore(float $opponentScore): float
+    {
+        if ($opponentScore < 4) {
+            $botScore = rand(0, 10);
+        } else {
+            $botScore = rand($opponentScore - 2, 10);
+        }
+
+        //when should bot win
+        /**
+         * @TODO: Use Odds
+         */
+        // Lottery::odds(3, 5)
+        //     ->winner(function () use ($opponentScore, &$botScore) {
+        //         $botScore = rand(
+        //             $opponentScore < 2 ? 0 : $opponentScore - 2,
+        //             10);
+        //     })
+        //     ->loser(function () use ($opponentScore, &$botScore) {
+        //         $botScore = rand(0, 10);
+        //     })
+        //     ->choose();
+        return $botScore;
     }
 }

@@ -19,7 +19,12 @@ class TriviaChallengeStakingRepository
 
     public function createForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
     {
-        $requestId = Str::random(20);
+        /**
+         * NOTE: Adding more randomness to to test if it will fix the unstable
+         * bot score.
+         * The current theory is that the request id is not unique enough
+         */
+        $requestId = uniqid($user->id, true);
 
         //Updates status to MATCHING by default
         return ChallengeRequest::create([
@@ -56,7 +61,7 @@ class TriviaChallengeStakingRepository
 
     public function updateAsMatched(ChallengeRequest $challengeRequest, ChallengeRequest $opponentRequest): void
     {
-        $token = Str::uuid()->toString();
+        $token = uniqid();
         DB::update(
             'UPDATE challenge_requests SET session_token = ?, status = ?, started_at = ?
              WHERE challenge_request_id IN (?, ?)',

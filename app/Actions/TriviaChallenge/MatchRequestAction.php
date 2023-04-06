@@ -48,10 +48,10 @@ class MatchRequestAction
 
         Lottery::odds(1, 2)
             ->winner(function () use (&$bot, $faker) {
-                $bot->username = $faker->userName();
+                $bot->username = strtolower($faker->userName());
             })
             ->loser(function () use (&$bot, $faker) {
-                $bot->username = $faker->firstName();
+                $bot->username = strtolower($faker->firstName());
             })
             ->choose();
 

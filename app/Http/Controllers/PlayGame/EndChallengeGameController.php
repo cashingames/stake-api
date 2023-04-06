@@ -24,7 +24,7 @@ class EndChallengeGameController extends Controller
         Log::info('EndChallengeGameController', $data);
         $result = $triviaChallengeService->submit($data);
         if (!$result) {
-            Log::error('Unable to submit challenge');
+            Log::error('CHALLENGE_SUBMIT_ERROR');
             return ResponseHelper::error('Unable to submit challenge');
         }
 
