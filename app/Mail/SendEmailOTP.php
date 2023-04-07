@@ -33,7 +33,7 @@ class SendEmailOTP extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
             from: new Address('noreply@cashingames.com', 'Cashingames'),
@@ -46,7 +46,7 @@ class SendEmailOTP extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
+    public function content(): Content
     {
         return new Content(
             view: 'emails.users.otpEmail',

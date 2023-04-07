@@ -35,7 +35,7 @@ class TokenGenerated extends Mailable
     public function envelope(): Envelope
     {
          return new Envelope(
-            from: new Address('noreply@thegameark.com', $this->appType),
+            from: new Address('noreply@cashingames.com', $this->appType),
             subject: "$this->appType: Reset Password",
         );
     }
