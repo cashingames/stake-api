@@ -39,6 +39,8 @@ class MatchChallengeRequest implements ShouldQueue
             'env' => $this->env,
         ]);
 
+        putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->env));
+
 
         $action->execute($this->requestData, $this->env);
     }

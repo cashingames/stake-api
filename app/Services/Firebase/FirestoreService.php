@@ -7,20 +7,13 @@ use Google\Cloud\Firestore\FirestoreClient;
 class FirestoreService
 {
     private FirestoreClient $firestore;
-    public function __construct(string $env = "")
+    public function __construct()
     {
-        if (request()->header('x-request-env') == 'development' || $env == 'development') {
-            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google-credentials-dev.json'));
-            // $this->firestore = new FirestoreClient([
-            //     'credentials' => storage_path('app/firebase/google-credentials-dev.json'),
-            // ]);
-        } else {
-            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google-credentials.json'));
-            // $this->firestore = new FirestoreClient([
-            //     'credentials' => storage_path('app/firebase/google-credentials.json'),
-            // ]);
+        $credentials = 'google-credentials.json';
+        if (request()->header('x-request-env') == 'development' || env('GOOGLE_CREDENTIALS_ENV') == 'development') {
+            $credentials = 'google-credentials-dev.json';
         }
-
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
         $this->firestore = app()->make(FirestoreClient::class);
     }
 

@@ -21,8 +21,6 @@ class EndChallengeGameController extends Controller
             'selected_options' => ['nullable'],
         ]);
 
-        $data['env'] = $request->header('x-request-env');
-
         Log::info('EndChallengeGameController', $data);
         $result = $triviaChallengeService->submit($data);
         if (!$result) {

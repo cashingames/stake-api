@@ -12,18 +12,16 @@ use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
 class StakingChallengeGameService
 {
-    private FirestoreService $firestoreService;
 
     public function __construct(
         private readonly DebitWalletAction $debitWalletAction,
         private readonly MatchEndWalletAction $matchEndWalletAction,
+        private readonly FirestoreService $firestoreService,
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
     ) {
     }
     public function create(User $user, array $data): ChallengeRequest|null
     {
-        $this->firestoreService = new FirestoreService($data['env']);
-
         $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute(
@@ -56,8 +54,6 @@ class StakingChallengeGameService
 
     public function submit(array $data): ChallengeRequest|null
     {
-        $this->firestoreService = new FirestoreService($data['env']);
-
         $requestId = $data['challenge_request_id'];
         $selectedOptions = $data['selected_options'];
 

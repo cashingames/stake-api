@@ -25,7 +25,7 @@ class MatchRequestAction
 
     public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
     {
-        $this->firestoreService = new FirestoreService($env);
+        $this->firestoreService = app(FirestoreService::class, ['env' => $env]);
 
         if ($challengeRequest->status !== 'MATCHING') {
             return null;
