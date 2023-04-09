@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Actions\TriviaChallenge\MatchRequestAction;
 use Illuminate\Http\Request;
 use App\Models\ChallengeRequest;
 use Illuminate\Http\JsonResponse;
+use App\Jobs\MatchChallengeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
 use App\Services\PlayGame\StakingChallengeGameService;
@@ -26,10 +26,8 @@ class StartChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->create($user, $data);
 
-        //non blocking job
-        // MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
-        $action = app(MatchRequestAction::class);
-        $action->execute($result);
+        MatchChallengeRequest::dispatch($result, $request->header('x-request-env') ?? '');
+
         return ResponseHelper::success($this->transformResponse($result));
     }
 

@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Testing\TestResponse;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -26,6 +25,7 @@ class StartChallengeRequestTest extends TestCase
 
         $this->createBothUser();
 
+        $this->withHeader('x-request-env', 'development');
         $this->instance(
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
@@ -42,7 +42,6 @@ class StartChallengeRequestTest extends TestCase
 
             })
         );
-
         $category = Category::factory()->create();
 
         $user = $this->prepareMatchRequest($category, 500);
