@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User;
 use App\Services\Firebase\FirestoreService;
 use App\Actions\Wallet\DebitWalletAction;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use Illuminate\Support\Facades\Log;
 
 class StakingChallengeGameService
 {
@@ -60,6 +61,7 @@ class StakingChallengeGameService
         //fix double submission bug from frontend
         $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
         if ($request->status == 'COMPLETED') {
+            Log::info('CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
             return $request;
         }
 
