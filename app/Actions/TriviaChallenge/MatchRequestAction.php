@@ -66,7 +66,6 @@ class MatchRequestAction
             [
                 'category' => $challengeRequest->category_id,
                 'amount' => $challengeRequest->amount,
-                'env' => $env,
             ]
         );
     }
