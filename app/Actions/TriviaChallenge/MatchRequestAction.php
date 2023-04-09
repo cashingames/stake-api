@@ -34,7 +34,7 @@ class MatchRequestAction
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
         if (!$matchedRequest) {
-            $matchedRequest = $this->matchWithBot($challengeRequest, $env);
+            $matchedRequest = $this->matchWithBot($challengeRequest);
         }
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
@@ -46,7 +46,7 @@ class MatchRequestAction
         return $matchedRequest;
     }
 
-    private function matchWithBot(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
+    private function matchWithBot(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
         $bot = User::find(1);
 
