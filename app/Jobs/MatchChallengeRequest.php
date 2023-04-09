@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Models\ChallengeRequest;
 use App\Actions\TriviaChallenge\MatchRequestAction;
+use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class MatchChallengeRequest implements ShouldQueue
 {
@@ -19,7 +21,12 @@ class MatchChallengeRequest implements ShouldQueue
      */
     public function __construct(
         private readonly ChallengeRequest $requestData,
+        private readonly string $env,
     ) {
+        Log::info('MatchChallengeRequest job created', [
+            'requestData' => $requestData,
+            'env' => $env,
+        ]);
     }
 
     /**
@@ -27,6 +34,16 @@ class MatchChallengeRequest implements ShouldQueue
      */
     public function handle(MatchRequestAction $action): void
     {
+        if ($this->env === 'development') {
+            EnvironmentUtils::setGoogleCredentials('development');
+        }
+
+        Log::info('MatchChallengeRequest Executing', [
+            'requestData' => $this->requestData,
+            'env' => $this->env,
+        ]);
+
+
         $action->execute($this->requestData);
     }
 }
