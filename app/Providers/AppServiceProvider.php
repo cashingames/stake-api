@@ -30,10 +30,8 @@ class AppServiceProvider extends ServiceProvider
     {
 
         if ($this->app->request->header('x-request-env')) {
-            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->app->request->header('x-request-env') ?? ''));
+            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->app->request->header('x-request-env')));
         }
-
-        putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->app->request->header('x-request-env') ?? ''));
 
         $this->app->singleton(
             SMSProviderInterface::class,
