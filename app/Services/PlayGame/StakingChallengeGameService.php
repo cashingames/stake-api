@@ -57,6 +57,12 @@ class StakingChallengeGameService
         $requestId = $data['challenge_request_id'];
         $selectedOptions = $data['selected_options'];
 
+        //fix double submission bug from frontend
+        $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
+        if ($request->status == 'COMPLETED') {
+            return $request;
+        }
+
         $score = $selectedOptions == null ?
             0 : $this->triviaChallengeStakingRepository->scoreLoggedQuestions($requestId, $selectedOptions);
 
