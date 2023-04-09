@@ -24,6 +24,8 @@ class StartChallengeRequestController extends Controller
             'amount' => ['required', 'numeric', 'max:' . $user->wallet->non_withdrawable_balance],
         ]);
 
+        $data['env'] = $request->header('x-request-env');
+
         $result = $triviaChallengeService->create($user, $data);
 
         MatchChallengeRequest::dispatchAfterResponse($result, $request->header('x-request-env'));

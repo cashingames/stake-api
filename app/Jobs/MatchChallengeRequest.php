@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\ChallengeRequest;
 use App\Actions\TriviaChallenge\MatchRequestAction;
-use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,9 +33,6 @@ class MatchChallengeRequest implements ShouldQueue
      */
     public function handle(MatchRequestAction $action): void
     {
-        if ($this->env === 'development') {
-            EnvironmentUtils::setGoogleCredentials('development');
-        }
 
         Log::info('MatchChallengeRequest Executing', [
             'requestData' => $this->requestData,
@@ -44,6 +40,6 @@ class MatchChallengeRequest implements ShouldQueue
         ]);
 
 
-        $action->execute($this->requestData);
+        $action->execute($this->requestData, $this->env);
     }
 }

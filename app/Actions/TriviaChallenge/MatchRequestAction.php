@@ -14,21 +14,27 @@ use Illuminate\Support\Lottery;
 
 class MatchRequestAction
 {
+    private FirestoreService $firestoreService;
+
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
-        private readonly FirestoreService $firestoreService,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakingChallengeGameService $triviaChallengeService,
     ) {
     }
 
-    public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
     {
+        $this->firestoreService = new FirestoreService($env);
+
+        if ($challengeRequest->status !== 'MATCHING') {
+            return null;
+        }
 
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
         if (!$matchedRequest) {
-            $matchedRequest = $this->matchWithBot($challengeRequest);
+            $matchedRequest = $this->matchWithBot($challengeRequest, $env);
         }
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
@@ -40,7 +46,7 @@ class MatchRequestAction
         return $matchedRequest;
     }
 
-    private function matchWithBot(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    private function matchWithBot(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
     {
         $bot = User::find(1);
 
@@ -59,7 +65,8 @@ class MatchRequestAction
             $bot,
             [
                 'category' => $challengeRequest->category_id,
-                'amount' => $challengeRequest->amount
+                'amount' => $challengeRequest->amount,
+                'env' => $env,
             ]
         );
     }

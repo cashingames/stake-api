@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\ClientPlatform;
-
+use App\Services\Firebase\FirestoreService;
 use App\Services\SMS\TermiiService;
 use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Support\Facades\Schema;
@@ -36,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(
             ClientPlatform::class,
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id')));
-        EnvironmentUtils::setGoogleCredentials();
+
+        $this->app->bind(
+            FirestoreService::class,
+            fn() => new FirestoreService()
+        );
     }
 }
