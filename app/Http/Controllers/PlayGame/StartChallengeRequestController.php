@@ -26,7 +26,7 @@ class StartChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->create($user, $data);
 
-        MatchChallengeRequest::dispatch($result, $request->header('x-request-env') ?? '');
+        MatchChallengeRequest::dispatch($result);
 
         return ResponseHelper::success($this->transformResponse($result));
     }

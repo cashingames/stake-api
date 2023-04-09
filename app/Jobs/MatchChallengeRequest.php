@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\ChallengeRequest;
 use App\Actions\TriviaChallenge\MatchRequestAction;
-use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,7 +19,6 @@ class MatchChallengeRequest implements ShouldQueue
      */
     public function __construct(
         private readonly ChallengeRequest $requestData,
-        private readonly string $env,
     ) {
     }
 
@@ -29,7 +27,6 @@ class MatchChallengeRequest implements ShouldQueue
      */
     public function handle(MatchRequestAction $action): void
     {
-        EnvironmentUtils::setGoogleCredentials($this->env);
         $action->execute($this->requestData);
     }
 }
