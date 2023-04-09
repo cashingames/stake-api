@@ -11,15 +11,17 @@ class FirestoreService
     {
         if (request()->header('x-request-env') == 'development' || $env == 'development') {
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google-credentials-dev.json'));
-            $this->firestore = new FirestoreClient([
-                'credentials' => storage_path('app/firebase/google-credentials-dev.json'),
-            ]);
+            // $this->firestore = new FirestoreClient([
+            //     'credentials' => storage_path('app/firebase/google-credentials-dev.json'),
+            // ]);
         } else {
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/google-credentials.json'));
-            $this->firestore = new FirestoreClient([
-                'credentials' => storage_path('app/firebase/google-credentials.json'),
-            ]);
+            // $this->firestore = new FirestoreClient([
+            //     'credentials' => storage_path('app/firebase/google-credentials.json'),
+            // ]);
         }
+
+        $this->firestore = app()->make(FirestoreClient::class);
     }
 
     public function createDocument(string $collection, string $document, array $data): void
