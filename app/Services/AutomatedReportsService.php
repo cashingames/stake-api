@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\ChallengeReportsRepository;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +39,11 @@ class AutomatedReportsService
     public $totalStakes;
     public $totalBonusStakesAmount;
     public $totalBonusWinningsAmount;
+    public $totalChallenges;
 
+    public function __construct(private readonly ChallengeReportsRepository $challengeRepository){
+
+    }
     public function getDailyReports()
     {
         $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->startOfDay());
@@ -71,6 +76,7 @@ class AutomatedReportsService
         $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
         $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakersInADay($startDate);
         $this->stakers = $this->getTopDailyStakers($startDate);
+        $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
 
 
         $data = [
@@ -88,6 +94,7 @@ class AutomatedReportsService
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
             'uniqueStakersCount' => $this->uniqueStakersCount,
             'stakers' => $this->stakers,
+            'totalChallenges' => $this->totalChallenges
 
         ];
 
@@ -135,6 +142,7 @@ class AutomatedReportsService
         // dd($this->totalGameSessions );
         $this->averageBoostUsedPerGameSession = $this->totalUsedBoostCount / $this->totalGameSessions;
         $this->averageStakesPerStaker = $this->uniqueStakersCount / $this->totalStakes;
+        $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
 
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
@@ -158,6 +166,7 @@ class AutomatedReportsService
             'skipBoostBoughtCount' => $this->skipBoostBoughtCount,
             'averageStakesPerStaker' => round($this->averageStakesPerStaker, 3),
             'averageBoostUsedPerGameSession' => round($this->averageBoostUsedPerGameSession, 3),
+            'totalChallenges' => $this->totalChallenges
         ];
 
         return $data;
@@ -317,4 +326,5 @@ class AutomatedReportsService
                 AND '{$endDate->toDateString()}' GROUP BY user_id ) As bonusWins");
         return $bonusWinningsAmount[0]->totalAmountWon;
     }
+
 }
