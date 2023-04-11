@@ -31,4 +31,13 @@ class ChallengeReportsRepository
             ->where('amount_won', '>', 0)
             ->distinct('user_id')->count();
     }
+
+    public function getTotalNmberOfUsersThatLost($startDate, $endDate)
+    {
+        return ChallengeRequest::whereBetween('created_at',  [$startDate->toDateString(), $endDate->toDateString()])
+            ->where('status', '=', 'COMPLETED')
+            ->where('user_id', '!=', 1)
+            ->where('amount_won', '=', 0)
+            ->distinct('user_id')->count();
+    }
 }
