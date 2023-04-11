@@ -192,6 +192,12 @@ class RegisterController extends BaseController
             'boost_count' => 3,
             'used_count' => 0
         ]);
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Bomb')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
     }
 
     protected function GamearkSingUpBonus($user)
@@ -220,6 +226,12 @@ class RegisterController extends BaseController
         $user->boosts()->create([
             'user_id' => $user->id,
             'boost_id' => Boost::where('name', 'Skip')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Bomb')->first()->id,
             'boost_count' => 3,
             'used_count' => 0
         ]);
