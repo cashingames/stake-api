@@ -40,6 +40,7 @@ class AutomatedReportsService
     public $totalBonusStakesAmount;
     public $totalBonusWinningsAmount;
     public $totalChallenges;
+    public $totalChallengePlayers;
 
     public function __construct(private readonly ChallengeReportsRepository $challengeRepository){
 
@@ -77,6 +78,7 @@ class AutomatedReportsService
         $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakersInADay($startDate);
         $this->stakers = $this->getTopDailyStakers($startDate);
         $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
+        $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
 
 
         $data = [
@@ -94,8 +96,8 @@ class AutomatedReportsService
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
             'uniqueStakersCount' => $this->uniqueStakersCount,
             'stakers' => $this->stakers,
-            'totalChallenges' => $this->totalChallenges
-
+            'totalChallenges' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers
         ];
 
         return $data;
@@ -143,6 +145,7 @@ class AutomatedReportsService
         $this->averageBoostUsedPerGameSession = $this->totalUsedBoostCount / $this->totalGameSessions;
         $this->averageStakesPerStaker = $this->uniqueStakersCount / $this->totalStakes;
         $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
+        $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
 
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
@@ -166,7 +169,8 @@ class AutomatedReportsService
             'skipBoostBoughtCount' => $this->skipBoostBoughtCount,
             'averageStakesPerStaker' => round($this->averageStakesPerStaker, 3),
             'averageBoostUsedPerGameSession' => round($this->averageBoostUsedPerGameSession, 3),
-            'totalChallenges' => $this->totalChallenges
+            'totalChallenges' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers
         ];
 
         return $data;

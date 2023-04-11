@@ -110,6 +110,10 @@
                 <th style="padding-top: 12px; padding-bottom: 12px;  border: 1px solid #dddddd;text-align: left;padding: 8px;">Total Challenges Played</th>
                 <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['totalChallenges']}}</td>
             </tr>
+            <tr style=" color: gray;text-align: left;">
+                <th style="padding-top: 12px; padding-bottom: 12px; border: 1px solid #dddddd;text-align: left;padding: 8px;">Number Of Users That Played Challenge</th>
+                <td style = "border: 1px solid #dddddd;text-align: left;padding: 8px;">{{$data['totalChallengePlayers']}}</td>
+            </tr>
         </table>
     </div>
     <h3 style="text-align: center;padding-top: 2rem;"> Top {{count($data['stakers'])}} Stakers  </h3>
