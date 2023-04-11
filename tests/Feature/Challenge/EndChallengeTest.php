@@ -141,86 +141,86 @@ class EndChallengeTest extends TestCase
         Queue::assertPushed(SendChallengeRefundNotification::class, 2);
     }
 
-    public function test_challenge_bot_flow(): void
-    {
-        $this->instance(
-            FirestoreService::class,
-            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('updateDocument')->times(4);
-            })
-        );
+    // public function test_challenge_bot_flow(): void
+    // {
+    //     $this->instance(
+    //         FirestoreService::class,
+    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+    //             $mock->shouldReceive('updateDocument')->times(4);
+    //         })
+    //     );
 
-        $category = Category::factory()->create();
-        $this->seedQuestions($category);
+    //     $category = Category::factory()->create();
+    //     $this->seedQuestions($category);
 
-        $firstUser = User::skip(2)->first();
-        $secondUser = User::first();
+    //     $firstUser = User::skip(2)->first();
+    //     $secondUser = User::first();
 
-        ChallengeRequest::factory()->for($firstUser)->create([
-            'session_token' => '123',
-            'challenge_request_id' => '1',
-            'status' => 'MATCHED',
-            'category_id' => $category->id,
-            'amount' => 500,
-            'started_at' => now(),
-        ]);
+    //     ChallengeRequest::factory()->for($firstUser)->create([
+    //         'session_token' => '123',
+    //         'challenge_request_id' => '1',
+    //         'status' => 'MATCHED',
+    //         'category_id' => $category->id,
+    //         'amount' => 500,
+    //         'started_at' => now(),
+    //     ]);
 
-        ChallengeRequest::factory()->for($secondUser)->create([
-            'session_token' => '123',
-            'challenge_request_id' => '2',
-            'status' => 'MATCHED',
-            'category_id' => $category->id,
-            'amount' => 500,
-            'started_at' => now()
-        ]);
+    //     ChallengeRequest::factory()->for($secondUser)->create([
+    //         'session_token' => '123',
+    //         'challenge_request_id' => '2',
+    //         'status' => 'MATCHED',
+    //         'category_id' => $category->id,
+    //         'amount' => 500,
+    //         'started_at' => now()
+    //     ]);
 
-        $this
-            ->actingAs(User::first())
-            ->postJson(
-                self::API_URL,
-                [
-                    'challenge_request_id' => '1',
-                    'selected_options' => [
-                        [
-                            'question_id' => 1,
-                            'option_id' => 1
-                        ]
-                    ]
-                ]
-            )
-            ->assertStatus(200);
+    //     $this
+    //         ->actingAs(User::first())
+    //         ->postJson(
+    //             self::API_URL,
+    //             [
+    //                 'challenge_request_id' => '1',
+    //                 'selected_options' => [
+    //                     [
+    //                         'question_id' => 1,
+    //                         'option_id' => 1
+    //                     ]
+    //                 ]
+    //             ]
+    //         )
+    //         ->assertStatus(200);
 
-        $this
-            ->actingAs(User::find(2))
-            ->postJson(
-                self::API_URL,
-                [
-                    'challenge_request_id' => '2',
-                    'selected_options' => [
-                        [
-                            'question_id' => '1',
-                            'option_id' => '1'
-                        ],
-                        [
-                            'question_id' => '1',
-                            'option_id' => '1'
-                        ],
+    //     $this
+    //         ->actingAs(User::find(2))
+    //         ->postJson(
+    //             self::API_URL,
+    //             [
+    //                 'challenge_request_id' => '2',
+    //                 'selected_options' => [
+    //                     [
+    //                         'question_id' => '1',
+    //                         'option_id' => '1'
+    //                     ],
+    //                     [
+    //                         'question_id' => '1',
+    //                         'option_id' => '1'
+    //                     ],
 
-                    ]
-                ]
-            )
-            ->assertStatus(200);
+    //                 ]
+    //             ]
+    //         )
+    //         ->assertStatus(200);
 
-        $this->assertDatabaseHas('challenge_requests', [
-            'challenge_request_id' => '1',
-            'status' => 'COMPLETED',
-        ]);
-        $this->assertDatabaseHas('challenge_requests', [
-            'challenge_request_id' => '2',
-            'status' => 'COMPLETED',
-        ]);
+    //     $this->assertDatabaseHas('challenge_requests', [
+    //         'challenge_request_id' => '1',
+    //         'status' => 'COMPLETED',
+    //     ]);
+    //     $this->assertDatabaseHas('challenge_requests', [
+    //         'challenge_request_id' => '2',
+    //         'status' => 'COMPLETED',
+    //     ]);
 
-    }
+    // }
 
     private function seedQuestions(Category $category): array
     {

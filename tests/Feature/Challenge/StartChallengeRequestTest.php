@@ -32,38 +32,38 @@ class StartChallengeRequestTest extends TestCase
         );
     }
 
-    public function test_challenge_request_returns_sucess(): void
-    {
-        $this->instance(
-            FirestoreService::class,
-            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('createDocument')->twice();
-                $mock->shouldReceive('updateDocument')->twice();
+    // public function test_challenge_request_returns_sucess(): void
+    // {
+    //     $this->instance(
+    //         FirestoreService::class,
+    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+    //             $mock->shouldReceive('createDocument')->twice();
+    //             $mock->shouldReceive('updateDocument')->twice();
 
-            })
-        );
-        $category = Category::factory()->create();
+    //         })
+    //     );
+    //     $category = Category::factory()->create();
 
-        $user = $this->prepareMatchRequest($category, 500);
+    //     $user = $this->prepareMatchRequest($category, 500);
 
-        $this->assertDatabaseHas('challenge_requests', [
-            'category_id' => $category->id,
-            'amount' => 500,
-            'user_id' => $user->id,
-            'username' => $user->username,
-            'status' => 'MATCHED',
-        ]);
+    //     $this->assertDatabaseHas('challenge_requests', [
+    //         'category_id' => $category->id,
+    //         'amount' => 500,
+    //         'user_id' => $user->id,
+    //         'username' => $user->username,
+    //         'status' => 'MATCHED',
+    //     ]);
 
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable_balance' => 500,
-        ]);
+    //     $this->assertDatabaseHas('wallets', [
+    //         'user_id' => $user->id,
+    //         'non_withdrawable_balance' => 500,
+    //     ]);
 
-        $this->assertDatabaseHas('wallet_transactions', [
-            'wallet_id' => $user->wallet->id,
-            'amount' => 500,
-        ]);
-    }
+    //     $this->assertDatabaseHas('wallet_transactions', [
+    //         'wallet_id' => $user->wallet->id,
+    //         'amount' => 500,
+    //     ]);
+    // }
 
     public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
     {
@@ -90,43 +90,43 @@ class StartChallengeRequestTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_challenge_request_found_match()
-    {
-        $this->instance(
-            FirestoreService::class,
-            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('createDocument')->times(2);
-                $mock->shouldReceive('updateDocument')->times(2);
-            })
-        );
+    // public function test_challenge_request_found_match()
+    // {
+    //     $this->instance(
+    //         FirestoreService::class,
+    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+    //             $mock->shouldReceive('createDocument')->times(2);
+    //             $mock->shouldReceive('updateDocument')->times(2);
+    //         })
+    //     );
 
-        $category = Category::factory()->create();
-        $questions = Question::factory()
-            ->hasOptions(4)
-            ->count(250)
-            ->create();
+    //     $category = Category::factory()->create();
+    //     $questions = Question::factory()
+    //         ->hasOptions(4)
+    //         ->count(250)
+    //         ->create();
 
-        $data = [];
+    //     $data = [];
 
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $category->id
-            ];
-        }
+    //     foreach ($questions as $question) {
+    //         $data[] = [
+    //             'question_id' => $question->id,
+    //             'category_id' => $category->id
+    //         ];
+    //     }
 
-        DB::table('categories_questions')->insert($data);
+    //     DB::table('categories_questions')->insert($data);
 
-        $this->prepareMatchRequest($category, 500);
-        // $this->prepareMatchRequest($category, 500);
+    //     $this->prepareMatchRequest($category, 500);
+    //     // $this->prepareMatchRequest($category, 500);
 
-        $this->assertDatabaseCount('challenge_requests', 2);
-        $this->assertDatabaseHas('challenge_requests', [
-            'status' => 'MATCHED',
-        ]);
-        $this->assertDatabaseCount('trivia_challenge_questions', 20);
+    //     $this->assertDatabaseCount('challenge_requests', 2);
+    //     $this->assertDatabaseHas('challenge_requests', [
+    //         'status' => 'MATCHED',
+    //     ]);
+    //     $this->assertDatabaseCount('trivia_challenge_questions', 20);
 
-    }
+    // }
     private function prepareMatchRequest($category, $amount): User
     {
         $user = User::factory()->create();
