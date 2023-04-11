@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Mail\WeeklyReportEmail;
+use App\Repositories\Cashingames\ChallengeReportsRepository;
 use App\Services\AutomatedReportsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -28,9 +29,11 @@ class SendAutomatedWeeklyReportEmail extends Command
      *
      * @return int
      */
-    public function handle()
-    {
-        $reportsService = new AutomatedReportsService();
+    public function handle() : void
+    {   
+        $challengeRepository = new ChallengeReportsRepository();
+
+        $reportsService = new AutomatedReportsService($challengeRepository);
 
         $data = $reportsService->getWeeklyReports();
 

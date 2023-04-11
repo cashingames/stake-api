@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Mail\DailyReportEmail;
+use App\Repositories\Cashingames\ChallengeReportsRepository;
 use App\Services\AutomatedReportsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use League\CommonMark\Parser\Inline\NewlineParser;
 
 class SendAutomatedDailyReportEmail extends Command
 {
@@ -31,8 +33,10 @@ class SendAutomatedDailyReportEmail extends Command
 
 
     public function handle(): void
-    {
-        $reportsService = new AutomatedReportsService();
+    {   
+        $challengeRepository = new ChallengeReportsRepository();
+
+        $reportsService = new AutomatedReportsService($challengeRepository);
 
         $data = $reportsService->getDailyReports();
 
