@@ -41,6 +41,11 @@ class AutomatedReportsService
     public $totalBonusWinningsAmount;
     public $totalChallenges;
     public $totalChallengePlayers;
+    public $totalChallengeWinners;
+    public $totalChallengeLosers;
+    public $amountWonByBot;
+    public $amountWonByUsers;
+    public $totalNumberOfDraws;
 
     public function __construct(private readonly ChallengeReportsRepository $challengeRepository){
 
@@ -79,7 +84,11 @@ class AutomatedReportsService
         $this->stakers = $this->getTopDailyStakers($startDate);
         $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
         $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
-
+        $this->totalChallengeWinners = $this->challengeRepository->getTotalNmberOfUsersThatWon($startDate, $endDate);
+        $this->totalChallengeLosers = $this->challengeRepository->getTotalNmberOfUsersThatLost($startDate, $endDate);
+        $this->amountWonByBot = $this->challengeRepository->getTotalAmountWonByBot($startDate, $endDate);
+        $this->amountWonByUsers = $this->challengeRepository->getTotalAmountWonByUsers($startDate, $endDate);
+        $this->totalNumberOfDraws = $this->challengeRepository->getTotalNmberOfDraws($startDate, $endDate);
 
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
@@ -96,8 +105,13 @@ class AutomatedReportsService
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
             'uniqueStakersCount' => $this->uniqueStakersCount,
             'stakers' => $this->stakers,
-            'totalChallenges' => $this->totalChallenges,
-            'totalChallengePlayers' => $this->totalChallengePlayers
+            'totalChallengeSessions' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers,
+            'totalChallengeWinners' => $this->totalChallengeWinners,
+            'totalChallengeLosers' => $this->totalChallengeLosers,
+            'totalChallengeDraws' => $this->totalNumberOfDraws,
+            'AmountWonByChallengeBot' => number_format($this->amountWonByBot),
+            'AmountWonByChallengePlayers' => number_format($this->amountWonByUsers)
         ];
 
         return $data;
@@ -146,7 +160,12 @@ class AutomatedReportsService
         $this->averageStakesPerStaker = $this->uniqueStakersCount / $this->totalStakes;
         $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
         $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
-
+        $this->totalChallengeWinners = $this->challengeRepository->getTotalNmberOfUsersThatWon($startDate, $endDate);
+        $this->totalChallengeLosers = $this->challengeRepository->getTotalNmberOfUsersThatLost($startDate, $endDate);
+        $this->amountWonByBot = $this->challengeRepository->getTotalAmountWonByBot($startDate, $endDate);
+        $this->amountWonByUsers = $this->challengeRepository->getTotalAmountWonByUsers($startDate, $endDate);
+        $this->totalNumberOfDraws = $this->challengeRepository->getTotalNmberOfDraws($startDate, $endDate);
+        
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
             'totalStakedamount' => number_format($this->totalStakedamount),
@@ -169,8 +188,13 @@ class AutomatedReportsService
             'skipBoostBoughtCount' => $this->skipBoostBoughtCount,
             'averageStakesPerStaker' => round($this->averageStakesPerStaker, 3),
             'averageBoostUsedPerGameSession' => round($this->averageBoostUsedPerGameSession, 3),
-            'totalChallenges' => $this->totalChallenges,
-            'totalChallengePlayers' => $this->totalChallengePlayers
+            'totalChallengeSessions' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers,
+            'totalChallengeWinners' => $this->totalChallengeWinners,
+            'totalChallengeLosers' => $this->totalChallengeLosers,
+            'totalChallengeDraws' => $this->totalNumberOfDraws,
+            'AmountWonByChallengeBot' => number_format($this->amountWonByBot),
+            'AmountWonByChallengePlayers' => number_format($this->amountWonByUsers)
         ];
 
         return $data;
