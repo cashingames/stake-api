@@ -150,7 +150,8 @@ class GameController extends BaseController
             case ClientPlatform::GameArkMobile:
                 $result->minVersionCode = config('trivia.min_version_code_gameark');
                 $result->minVersionForce = config('trivia.min_version_force_gameark');
-                $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
+                // $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
+                $result->boosts = Boost::all();
                 break;
         }
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
