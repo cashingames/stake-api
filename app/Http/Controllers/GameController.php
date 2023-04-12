@@ -45,8 +45,6 @@ class GameController extends BaseController
             return Achievement::all();
         });
 
-        $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
-
         $result->plans = Cache::rememberForever(
             'plans',
             fn() => Plan::where('is_free', false)->orderBy('price', 'ASC')->get()
@@ -144,10 +142,15 @@ class GameController extends BaseController
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce = config('trivia.min_version_force');
 
+        $result->boosts = Boost::whereNull('deleted_at')
+            ->where('name', '!=', 'Bomb')
+            ->get();
+
         switch ($platform) {
             case ClientPlatform::GameArkMobile:
                 $result->minVersionCode = config('trivia.min_version_code_gameark');
                 $result->minVersionForce = config('trivia.min_version_force_gameark');
+                $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
                 break;
         }
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
