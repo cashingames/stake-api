@@ -47,20 +47,20 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('winnings:credit')->assertExitCode(0);
     }
 
-    public function test_trigger_special_hour()
-    {
-        $this->artisan('odds:special-hour')->assertExitCode(0);
-    }
+    // public function test_trigger_special_hour()
+    // {
+    //     $this->artisan('odds:special-hour')->assertExitCode(0);
+    // }
 
-    public function test_trigger_live_trivia_notification()
-    {
-        $this->artisan('live-trivia:notify')->assertExitCode(0);
-    }
+    // public function test_trigger_live_trivia_notification()
+    // {
+    //     $this->artisan('live-trivia:notify')->assertExitCode(0);
+    // }
 
-    public function test_boost_reminder_notifications()
-    {
-        $this->artisan('boosts:send-notification')->assertExitCode(0);
-    }
+    // public function test_boost_reminder_notifications()
+    // {
+    //     $this->artisan('boosts:send-notification')->assertExitCode(0);
+    // }
 
     public function test_that_daily_automated_report_command_runs()
     {

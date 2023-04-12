@@ -21,8 +21,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
         Commands\CreditWinnings::class,
-        Commands\RefundExpiredChallengeStakingAmount::class,
-        Commands\SendInAppActivityUpdates::class,
+        // Commands\SendInAppActivityUpdates::class,
         // ComputeUsersLevelsCommand::class
     ];
 
