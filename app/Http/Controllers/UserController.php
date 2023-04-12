@@ -34,7 +34,6 @@ class UserController extends BaseController
         $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
-        $result->boosts = $this->user->userBoosts();
         $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
         $result->bookBalance = $this->user->bookBalance();
 
@@ -49,6 +48,9 @@ class UserController extends BaseController
             $result->achievements = $this->user->userAchievements();
             $result->activePlans = $this->composeUserPlans();
             $result->hasActivePlan = $this->user->hasActivePlan();
+            $result->boosts = $this->user->gameArkUserBoosts();
+        }else{
+            $result->boosts = $this->user->userBoosts();
         }
 
         return $this->sendResponse($result, 'User details');
