@@ -380,6 +380,18 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
             })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->whereNull('boosts.deleted_at')
+            ->where('name', '!=', 'Bomb')
+            ->where('user_boosts.boost_count', '>', 0)->get();
+    }
+
+    public function gameArkUserBoosts()
+    {
+        return DB::table('user_boosts')
+            ->where('user_id', $this->id)
+            ->join('boosts', function ($join) {
+                $join->on('boosts.id', '=', 'user_boosts.boost_id');
+            })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
+            ->whereNull('boosts.deleted_at')
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
 
