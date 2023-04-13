@@ -448,6 +448,7 @@ class RegisterTest extends TestCase
 
         // $response->assertStatus(200);
 
+        Mail::assertSent(WelcomeEmail::class);
         $response->assertJsonStructure([
             "message",
             "data" => [
