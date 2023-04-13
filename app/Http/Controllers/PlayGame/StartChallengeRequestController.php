@@ -7,6 +7,7 @@ use App\Models\ChallengeRequest;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
+use App\Jobs\MatchChallengeRequest;
 use App\Jobs\MatchWithHumanChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
@@ -25,9 +26,10 @@ class StartChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->create($user, $data);
 
-        //MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
-        $matchWithHumanFirstCall =  MatchWithHumanChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
-        
+        $matchedRequest =  MatchWithHumanChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
+        if(!$matchedRequest){
+            MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
+        }
         return ResponseHelper::success($this->transformResponse($result));
     }
 

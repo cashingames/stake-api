@@ -10,10 +10,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Traits\Utils\ResolveGoogleCredentials;
 
 class MatchChallengeRequest implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ResolveGoogleCredentials;
 
     /**
      * Create a new job instance.
@@ -39,9 +40,7 @@ class MatchChallengeRequest implements ShouldQueue
             'env' => $this->env,
         ]);
 
-        if ($this->env == 'development') {
-            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->env));
-        }
+        $this->detectGoogleCredentials($this->env);
 
         $action->execute($this->requestData, $this->env);
     }
