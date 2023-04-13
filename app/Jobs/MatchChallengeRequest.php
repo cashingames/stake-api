@@ -42,6 +42,12 @@ class MatchChallengeRequest implements ShouldQueue
         if ($this->env == 'development') {
             putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->env));
         }
+        if ($this->env == 'stake-development') {
+            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->env));
+        }
+        if ($this->env == 'stake-production') {
+            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->env));
+        }
 
         $action->execute($this->requestData, $this->env);
     }
