@@ -45,7 +45,7 @@ class ChallengeRequestMatchHelper
         Collection $questions
     ): void {
 
-        $this->firestoreService->updateDocument(
+        self::$firestoreService->updateDocument(
             'trivia-challenge-requests',
             $challengeRequest->challenge_request_id,
             [
@@ -54,7 +54,7 @@ class ChallengeRequestMatchHelper
                 'opponent' => $this->parseOpponent($matchedRequest),
             ]
         );
-        $this->firestoreService->updateDocument(
+        self::$firestoreService->updateDocument(
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [

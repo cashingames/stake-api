@@ -27,6 +27,7 @@ class StartChallengeRequestController extends Controller
         $result = $triviaChallengeService->create($user, $data);
 
         $matchedRequest =  MatchWithHumanChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
+       
         if(!$matchedRequest){
             MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
         }

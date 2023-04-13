@@ -40,7 +40,7 @@ class StartChallengeRequestTest extends TestCase
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('createDocument')->once();
+                $mock->shouldReceive('createDocument')->twice();
             })
         );
        
@@ -53,8 +53,9 @@ class StartChallengeRequestTest extends TestCase
             'amount' => 500,
             'user_id' => $user->id,
             'username' => $user->username,
-            'status' => 'MATCHING',
+            'status' => 'MATCHED',
         ]);
+        
         
     }
 

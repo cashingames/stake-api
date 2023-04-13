@@ -21,6 +21,11 @@ class MatchRequestAction
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakingChallengeGameService $triviaChallengeService,
     ) {
+        $this->matchHelper = new ChallengeRequestMatchHelper(
+            $this->triviaChallengeStakingRepository,
+            $this->triviaQuestionRepository,
+            $this->triviaChallengeService
+        );
     }
 
     public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
