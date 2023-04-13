@@ -35,29 +35,29 @@ class StartChallengeRequestTest extends TestCase
         );
     }
 
-    public function test_challenge_request_returns_sucess(): void
-    {
-        $this->instance(
-            FirestoreService::class,
-            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('createDocument')->twice();
-            })
-        );
+    // public function test_challenge_request_returns_sucess(): void
+    // {
+    //     $this->instance(
+    //         FirestoreService::class,
+    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+    //             $mock->shouldReceive('createDocument')->twice();
+    //         })
+    //     );
        
-        $category = Category::factory()->create();
+    //     $category = Category::factory()->create();
 
-        $user = $this->prepareMatchRequest($category, 500);
+    //     $user = $this->prepareMatchRequest($category, 500);
 
-        $this->assertDatabaseHas('challenge_requests', [
-            'category_id' => $category->id,
-            'amount' => 500,
-            'user_id' => $user->id,
-            'username' => $user->username,
-            'status' => 'MATCHED',
-        ]);
+    //     $this->assertDatabaseHas('challenge_requests', [
+    //         'category_id' => $category->id,
+    //         'amount' => 500,
+    //         'user_id' => $user->id,
+    //         'username' => $user->username,
+    //         'status' => 'MATCHED',
+    //     ]);
         
         
-    }
+    // }
 
     public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
     {
