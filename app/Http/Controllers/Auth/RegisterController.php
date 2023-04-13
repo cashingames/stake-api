@@ -7,6 +7,7 @@ use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
 use App\Mail\VerifyEmail;
+use App\Mail\WelcomeEmail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -324,6 +325,7 @@ class RegisterController extends BaseController
 
         $token = auth()->login($user);
 
+        Mail::to($request->email)->send(new WelcomeEmail());
         $result = [
             'username' => $user->username,
             'email' => $user->email,
