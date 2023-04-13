@@ -12,7 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use App\Mail\WelcomeEmail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
@@ -53,6 +54,8 @@ class SocialSignInController extends BaseController
             ];
 
             $token = $this->createAction($payload);
+
+            Mail::to($request->email)->send(new WelcomeEmail());
 
             $data = [
                 'token' => $token,
