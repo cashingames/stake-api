@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ChallengeRequest;
-use App\Actions\TriviaChallenge\MatchWithHumanRequestAction;
+use App\Actions\TriviaChallenge\MatchWithBotRequestAction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class MatchWithHumanChallengeRequest implements ShouldQueue
+class MatchWithBotChallengeRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -22,7 +22,7 @@ class MatchWithHumanChallengeRequest implements ShouldQueue
         private readonly ChallengeRequest $requestData,
         private readonly string $env,
     ) {
-        Log::info('MatchWithHumanChallengeRequest job created', [
+        Log::info('MatchWithBotChallengeRequest job created', [
             'requestData' => $requestData,
             'env' => $env,
         ]);
@@ -31,10 +31,10 @@ class MatchWithHumanChallengeRequest implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(MatchWithHumanRequestAction $action): void
+    public function handle(MatchWithBotRequestAction $action): void
     {
 
-        Log::info('MatchWithHumanChallengeRequest Executing', [
+        Log::info('MatchWithBotChallengeRequest Executing', [
             'requestData' => $this->requestData,
             'env' => $this->env,
         ]);
