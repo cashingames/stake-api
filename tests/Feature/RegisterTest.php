@@ -7,6 +7,7 @@ use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
 use App\Mail\VerifyEmail;
+use App\Mail\WelcomeEmail;
 use App\Models\Boost;
 use App\Services\FeatureFlag;
 use Mockery\MockInterface;
@@ -429,6 +430,7 @@ class RegisterTest extends TestCase
             'email' => 'email@email.com'
         ]);
 
+        Mail::assertSent(WelcomeEmail::class);
         $response->assertStatus(200);
     }
 
@@ -446,6 +448,7 @@ class RegisterTest extends TestCase
 
         // $response->assertStatus(200);
 
+        Mail::assertSent(WelcomeEmail::class);
         $response->assertJsonStructure([
             "message",
             "data" => [
