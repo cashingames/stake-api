@@ -56,13 +56,6 @@ class LoginController extends BaseController
             if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
                 if ($user->phone_verified_at == null) {
 
-                    if ($request->hasHeader('X-App-Source')) {
-                        if ($token = auth()->attempt($credentials)) {
-                            return $this->respondWithToken($token);
-                        }
-                        return $this->sendError('Invalid email or password', 'Invalid email or password');
-                    }
-
                     return $this->sendError([
                         'username' => $user->username,
                         'email' => $user->email,
@@ -71,14 +64,6 @@ class LoginController extends BaseController
                 }
             }else{
                 if ($user->email_verified_at == null) {
-
-                    if ($request->hasHeader('X-App-Source')) {
-                        if ($token = auth()->attempt($credentials)) {
-                            return $this->respondWithToken($token);
-                        }
-                        return $this->sendError('Invalid email or password', 'Invalid email or password');
-                    }
-
                     return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
                 }
             }
