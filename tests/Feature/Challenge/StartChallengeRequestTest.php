@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Challenge;
 
+use App\Jobs\MatchChallengeRequest;
+use App\Jobs\MatchWithHumanChallengeRequest;
 use App\Models\Category;
 use App\Models\Profile;
 use App\Models\Question;
@@ -13,6 +15,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 use App\Services\Firebase\FirestoreService;
+use Illuminate\Support\Facades\Queue;
 
 class StartChallengeRequestTest extends TestCase
 {
@@ -38,10 +41,9 @@ class StartChallengeRequestTest extends TestCase
     //         FirestoreService::class,
     //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
     //             $mock->shouldReceive('createDocument')->twice();
-    //             $mock->shouldReceive('updateDocument')->twice();
-
     //         })
     //     );
+       
     //     $category = Category::factory()->create();
 
     //     $user = $this->prepareMatchRequest($category, 500);
@@ -53,16 +55,8 @@ class StartChallengeRequestTest extends TestCase
     //         'username' => $user->username,
     //         'status' => 'MATCHED',
     //     ]);
-
-    //     $this->assertDatabaseHas('wallets', [
-    //         'user_id' => $user->id,
-    //         'non_withdrawable_balance' => 500,
-    //     ]);
-
-    //     $this->assertDatabaseHas('wallet_transactions', [
-    //         'wallet_id' => $user->wallet->id,
-    //         'amount' => 500,
-    //     ]);
+        
+        
     // }
 
     public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void

@@ -242,7 +242,7 @@ class GameTest extends TestCase
             'used_count' => 0
         ]);
 
-        $userBoost = $this->user->userBoosts();
+        $userBoost = $this->user->gameArkUserBoosts();
 
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,

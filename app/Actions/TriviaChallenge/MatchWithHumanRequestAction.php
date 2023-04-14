@@ -18,11 +18,16 @@ class MatchWithHumanRequestAction
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakingChallengeGameService $triviaChallengeService,
     ) {
+        $this->matchHelper = new ChallengeRequestMatchHelper(
+            $this->triviaChallengeStakingRepository,
+            $this->triviaQuestionRepository,
+            $this->triviaChallengeService
+        );
     }
 
     public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
     {
-        $this->matchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env])) ;
+        $this->matchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
 
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
@@ -38,5 +43,4 @@ class MatchWithHumanRequestAction
 
         return $matchedRequest;
     }
-
 }
