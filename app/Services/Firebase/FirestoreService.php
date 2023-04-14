@@ -3,22 +3,16 @@
 namespace App\Services\Firebase;
 
 use Google\Cloud\Firestore\FirestoreClient;
+use App\Traits\Utils\ResolveGoogleCredentials;
 
 class FirestoreService
 {
+    use ResolveGoogleCredentials;
     private FirestoreClient $firestore;
     public function __construct()
     {
-        $credentials = 'google-credentials.json';
-        if (request()->header('x-request-env') == 'development' || env('GOOGLE_CREDENTIALS_ENV') == 'development') {
-            $credentials = 'google-credentials-dev.json';
-        }
-        if (request()->header('x-request-env') == 'stake-development' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-development') {
-            $credentials = 'google-credentials-stake-dev.json';
-        }
-        if (request()->header('x-request-env') == 'stake-production' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-production') {
-            $credentials = 'google-credentials-stake-prod.json';
-        }
+        $credentials = $this->detectGoogleCredentialName(request()->header('x-request-env'));
+        
         putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
         $this->firestore = app()->make(FirestoreClient::class);
     }
