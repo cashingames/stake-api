@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
+        $schedule->command("queue:work --tries=1 --sleep=5")->everyMinute();
 
         // $schedule->command(ComputeUsersLevelsCommand::class)->everyMinute();
         $schedule->command('bonus:daily-expire')->withoutOverlapping()
