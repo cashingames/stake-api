@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientPlatform;
 use App\Models\Boost;
 use App\Models\Profile;
 use App\Models\User;
@@ -11,7 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use App\Mail\WelcomeEmail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
@@ -24,7 +26,7 @@ class SocialSignInController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function authenticateUser(Request $request)
+    public function authenticateUser(Request $request, ClientPlatform $clientPlatform)
     {
         $returningUser = User::where('email', $request->email)->first();
         if ($returningUser != null) {
@@ -33,6 +35,31 @@ class SocialSignInController extends BaseController
             $data = [
                 'token' => $token,
                 'isFirstTime' => false,
+
+            ];
+            return $this->sendResponse($data, 'Returning user token');
+        }
+
+        if($clientPlatform == ClientPlatform::GameArkMobile){
+            // automatically create this user
+
+            $payload = [
+                'email' => $request->email,
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'username' => ( is_null($request->firstName)) ? strstr($request->email, '@', true) . mt_rand(10, 99) : ($request->firstName).''.rand(10,1000),
+                'country_code' => '',
+                'phone_number' => '',
+                'referrer' => null
+            ];
+
+            $token = $this->createAction($payload);
+
+            Mail::to($request->email)->send(new WelcomeEmail());
+
+            $data = [
+                'token' => $token,
+                'isFirstTime' => true,
 
             ];
             return $this->sendResponse($data, 'Returning user token');
@@ -63,6 +90,12 @@ class SocialSignInController extends BaseController
             'referrer' => ['nullable', 'string', 'exists:users,username']
         ]);
 
+        $token = $this->createAction($data);
+
+        return $this->sendResponse($token, 'Token');
+    }
+
+    public function createAction($data){
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
@@ -96,7 +129,7 @@ class SocialSignInController extends BaseController
             'description' => "Registration Daily bonus plan for " . $user->username,
             'is_active' => true,
             'used_count' => 0,
-            'plan_count' => 15,
+            'plan_count' => 20,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'expire_at' => Carbon::now()->endOfDay()
@@ -132,6 +165,12 @@ class SocialSignInController extends BaseController
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => Boost::where('name', 'Bomb')->first()->id,
+                'boost_count' => 3,
+                'used_count' => 0
+            ]);
         }
         //credit referrer with points
         if (
@@ -155,8 +194,7 @@ class SocialSignInController extends BaseController
             /** @TODO: this needs to be changed to plan */
             // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
-        $token = auth()->tokenById($user->id);
+        return auth()->tokenById($user->id);
 
-        return $this->sendResponse($token, 'Token');
     }
 }

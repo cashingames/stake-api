@@ -2,73 +2,76 @@
 
 namespace App\Actions\TriviaChallenge;
 
+use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
+use App\Models\User;
 use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Services\PlayGame\StakingChallengeGameService;
+use Faker\Factory as FakerFactory;
+use Illuminate\Support\Lottery;
 
 class MatchRequestAction
 {
+    private ChallengeRequestMatchHelper $matchHelper;
+
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
-        private readonly FirestoreService $firestoreService,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
+        private readonly StakingChallengeGameService $triviaChallengeService,
     ) {
+        $this->matchHelper = new ChallengeRequestMatchHelper(
+            $this->triviaChallengeStakingRepository,
+            $this->triviaQuestionRepository,
+            $this->triviaChallengeService
+        );
     }
 
-    public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
     {
-        $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
-        if (!$matchedRequest) {
+        if ($challengeRequest->status !== 'MATCHING') {
             return null;
+        }
+
+        $this->matchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
+        $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
+
+        if (!$matchedRequest) {
+            $matchedRequest = $this->matchWithBot($challengeRequest);
         }
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
 
-        $questions = $this->processQuestions($challengeRequest, $matchedRequest);
+        $questions =  $this->matchHelper->processQuestions($challengeRequest, $matchedRequest);
 
-        $this->updateFirestore($challengeRequest, $matchedRequest, $questions);
+        $this->matchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
 
         return $matchedRequest;
     }
 
-    private function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): array
+    private function matchWithBot(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
-        $questions = $this
-            ->triviaQuestionRepository
-            ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id)
-            ->toArray();
+        $bot = User::find(1);
 
-        $this->triviaChallengeStakingRepository->logQuestions($questions, $challengeRequest, $matchedRequest);
+        $faker = FakerFactory::create('en_NG');
 
-        return $questions;
-    }
+        Lottery::odds(1, 2)
+            ->winner(function () use (&$bot, $faker) {
+                $bot->username = strtolower($faker->userName());
+            })
+            ->loser(function () use (&$bot, $faker) {
+                $bot->username = strtolower($faker->firstName());
+            })
+            ->choose();
 
-
-    private function updateFirestore(
-        ChallengeRequest $challengeRequest,
-        ChallengeRequest $matchedRequest,
-        array $questions
-    ): void {
-
-        $this->firestoreService->updateDocument(
-            'trivia-challenge-requests',
-            $challengeRequest->challenge_request_id,
+        return $this->triviaChallengeService->create(
+            $bot,
             [
-                'status' => 'MATCHED',
-                'questions' => $questions,
-                'opponent' => $matchedRequest->toArray(),
-            ]
-        );
-
-        $this->firestoreService->updateDocument(
-            'trivia-challenge-requests',
-            $matchedRequest->challenge_request_id,
-            [
-                'status' => 'MATCHED',
-                'questions' => $questions,
-                'opponent' => $challengeRequest->toArray(),
+                'category' => $challengeRequest->category_id,
+                'amount' => $challengeRequest->amount,
             ]
         );
     }
+
 }

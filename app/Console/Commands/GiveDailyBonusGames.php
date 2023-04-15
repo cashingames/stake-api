@@ -43,7 +43,7 @@ class GiveDailyBonusGames extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
         $freePlan = Plan::where('is_free', true)->first();
 
@@ -54,7 +54,7 @@ class GiveDailyBonusGames extends Command
                 'user_id' => $user->id,
                 'description' => "Daily bonus plan for " . $user->username,
                 'used_count' => 0,
-                'plan_count' => 15,
+                'plan_count' => 20,
                 'is_active' => true,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -62,10 +62,12 @@ class GiveDailyBonusGames extends Command
             ]);
         });
         if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) {
+            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification){
+                $allTokens = [];
                 foreach ($devices as $device) {
-                    (new SendPushNotification())->sendDailyBonusGamesNotification($device);
+                    $allTokens[] = $device->device_token;
                 }
+                $pushNotification->sendDailyBonusGamesNotification($allTokens, true);
             });
         }
     }

@@ -16,4 +16,9 @@ class CreditWalletAction
     {
         $this->walletRepository->credit($wallet, $amount, $description, null);
     }
+
+    public function executeRefund(Wallet $wallet, float $amount, string $description): void
+    {
+        $this->walletRepository->creditFundingAccount($wallet, $amount, $description, null);
+    }
 }

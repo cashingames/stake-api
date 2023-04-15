@@ -44,7 +44,17 @@ class ForgotPasswordTest extends TestCase
             "email" => $this->user->email,
         ]);
 
-        Mail::assertQueued(TokenGenerated::class);
+        Mail::assertSent(TokenGenerated::class);
+        $response->assertStatus(200);
+    }
+
+    public function test_reset_email_can_be_sent_from_GameArk()
+    {
+        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::RESET_EMAIL_URL, [
+            "email" => $this->user->email,
+        ]);
+
+        Mail::assertSent(TokenGenerated::class);
         $response->assertStatus(200);
     }
 
@@ -125,7 +135,7 @@ class ForgotPasswordTest extends TestCase
         $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::VERIFY_TOKEN_URL, [
             "token" => "9095",
         ]);
-      
+
         $response->assertJson([
             'message' => 'Verification successful'
         ]);

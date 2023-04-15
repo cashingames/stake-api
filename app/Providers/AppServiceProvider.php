@@ -3,9 +3,8 @@
 namespace App\Providers;
 
 use App\Enums\ClientPlatform;
-
+use App\Services\Firebase\FirestoreService;
 use App\Services\SMS\TermiiService;
-use App\Traits\Utils\EnvironmentUtils;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Services\SMS\SMSProviderInterface;
@@ -29,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        if ($this->app->request->header('x-request-env')) {
+            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->app->request->header('x-request-env')));
+        }
+
         $this->app->singleton(
             SMSProviderInterface::class,
             fn() => new TermiiService(config('services.termii.api_key'))
@@ -36,6 +40,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(
             ClientPlatform::class,
             fn() => ClientPlatform::detect($this->app->request->header('x-brand-id')));
-        EnvironmentUtils::setGoogleCredentials();
+
+        $this->app->bind(
+            FirestoreService::class,
+            fn() => new FirestoreService()
+        );
     }
 }

@@ -45,6 +45,10 @@ return [
         'enabled' => env('FEATURE_FLAG_CHALLENGE_GAME_STAKING_ENABLED', false),
         'activate_on' => null
     ],
+    'enable_challenge' => [
+        'enabled' => env('FEATURE_FLAG_ENABLE_CHALLENGE', false),
+        'activate_on' => null
+    ],
     'staking_with_odds' => [
         'enabled' => env('FEATURE_FLAG_STAKING_WITH_ODDS_ENABLED', false),
         'activate_on' => null

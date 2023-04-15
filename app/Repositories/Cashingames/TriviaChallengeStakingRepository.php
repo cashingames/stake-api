@@ -3,6 +3,7 @@
 namespace App\Repositories\Cashingames;
 
 use App\Models\ChallengeRequest;
+use App\Models\Option;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -10,9 +11,20 @@ use App\Models\TriviaChallengeQuestion;
 
 class TriviaChallengeStakingRepository
 {
+
+    public function getRequestById(string $requestId): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('challenge_request_id', $requestId)->first();
+    }
+
     public function createForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
     {
-        $requestId = Str::random(20);
+        /**
+         * NOTE: Adding more randomness to to test if it will fix the unstable
+         * bot score.
+         * The current theory is that the request id is not unique enough
+         */
+        $requestId = uniqid($user->id, true);
 
         //Updates status to MATCHING by default
         return ChallengeRequest::create([
@@ -21,7 +33,8 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-        ]);
+            'status' => 'MATCHING',
+        ])->fresh();
     }
 
     public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest|null
@@ -30,20 +43,35 @@ class TriviaChallengeStakingRepository
             ->where('challenge_request_id', '!=', $challengeRequest->challenge_request_id)
             ->where('amount', $challengeRequest->amount)
             ->where('user_id', '!=', $challengeRequest->user_id)
+            ->where('status', 'MATCHING')
             ->first();
+    }
+
+    public function getMatchedRequest(ChallengeRequest $challengeRequest): ChallengeRequest|null
+    {
+        return ChallengeRequest::where('session_token', $challengeRequest->session_token)
+            ->where('challenge_request_id', '!=', $challengeRequest->challenge_request_id)
+            ->first();
+    }
+
+    public function getMatchedRequestById(string $id): ChallengeRequest|null
+    {
+        return $this->getMatchedRequest($this->getRequestById($id));
     }
 
     public function updateAsMatched(ChallengeRequest $challengeRequest, ChallengeRequest $opponentRequest): void
     {
-        $token = Str::uuid()->toString();
+        $token = uniqid();
         DB::update(
-            'UPDATE challenge_requests SET session_token = ?, status = ?
+            'UPDATE challenge_requests SET session_token = ?, status = ?, started_at = ?
              WHERE challenge_request_id IN (?, ?)',
             [
                 $token,
                 'MATCHED',
+                now(),
                 $challengeRequest->challenge_request_id,
-                $opponentRequest->challenge_request_id
+                $opponentRequest->challenge_request_id,
+
             ]
         );
     }
@@ -65,20 +93,41 @@ class TriviaChallengeStakingRepository
         TriviaChallengeQuestion::insert($result);
     }
 
-    public function getRequestById(string $requestId): ChallengeRequest|null
+    public function scoreLoggedQuestions(string $requestId, array $selectedOptions): int
     {
-        return ChallengeRequest::where('challenge_request_id', $requestId)->first();
+        $correctOptions = Option::whereIn('id', array_column($selectedOptions, 'option_id'))
+            ->where('is_correct', true)
+            ->get();
+
+        DB::transaction(function () use ($requestId, $correctOptions) {
+            foreach ($correctOptions as $option) {
+                DB::update(
+                    'UPDATE trivia_challenge_questions SET is_correct = ?
+                     WHERE challenge_request_id = ? AND question_id = ?',
+                    [
+                        true,
+                        $requestId,
+                        $option['question_id']
+                    ]
+                );
+            }
+        });
+
+        return $correctOptions->count();
     }
 
-    public function updateSubmission(string $requestId, float $score): ChallengeRequest|null
+    public function updateCompletedRequest(string $requestId, int|float $score): array
     {
+        $opponent = $this->getMatchedRequestById($requestId);
         ChallengeRequest::where('challenge_request_id', $requestId)
             ->update([
                 'status' => 'COMPLETED',
                 'score' => $score,
+                'ended_at' => now(),
             ]);
 
-        return $this->getRequestById($requestId);
+
+        return [$this->getRequestById($requestId), $opponent];
     }
 
 

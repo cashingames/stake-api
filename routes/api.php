@@ -110,6 +110,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
         Route::post('points/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsWithPoints']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
+        Route::post('purchased/item', [WalletController::class, 'itemPurchased']);
         Route::post('plan/subscribe/{planId}', [WalletController::class, 'subscribeToPlan']);
         Route::post('claim/achievement/{achievementId}', [GameController::class, 'claimAchievement']);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);

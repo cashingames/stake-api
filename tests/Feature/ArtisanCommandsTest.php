@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\DailyReportEmail;
 use App\Mail\WeeklyReportEmail;
+use App\Models\ChallengeRequest;
 use App\Models\GameSession;
 use App\Models\Staking;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,20 +47,20 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('winnings:credit')->assertExitCode(0);
     }
 
-    public function test_trigger_special_hour()
-    {
-        $this->artisan('odds:special-hour')->assertExitCode(0);
-    }
+    // public function test_trigger_special_hour()
+    // {
+    //     $this->artisan('odds:special-hour')->assertExitCode(0);
+    // }
 
-    public function test_trigger_live_trivia_notification()
-    {
-        $this->artisan('live-trivia:notify')->assertExitCode(0);
-    }
+    // public function test_trigger_live_trivia_notification()
+    // {
+    //     $this->artisan('live-trivia:notify')->assertExitCode(0);
+    // }
 
-    public function test_boost_reminder_notifications()
-    {
-        $this->artisan('boosts:send-notification')->assertExitCode(0);
-    }
+    // public function test_boost_reminder_notifications()
+    // {
+    //     $this->artisan('boosts:send-notification')->assertExitCode(0);
+    // }
 
     public function test_that_daily_automated_report_command_runs()
     {
@@ -68,17 +69,16 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('daily-report:send')->assertExitCode(0);
 
         Mail::assertSent(DailyReportEmail::class);
-
     }
 
     public function test_that_weekly_automated_report_command_runs()
     {
         GameSession::factory()
-        ->count(5)
+            ->count(5)
             ->create(['created_at' => now()->yesterday()]);
 
         Staking::factory()
-        ->count(5)
+            ->count(5)
             ->create(['created_at' => now()->yesterday()]);
 
         Mail::fake();

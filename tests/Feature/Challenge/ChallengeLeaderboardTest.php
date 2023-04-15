@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Challenge;
 
 use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;

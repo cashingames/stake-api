@@ -7,6 +7,7 @@ use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
 use App\Mail\VerifyEmail;
+use App\Mail\WelcomeEmail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -62,24 +63,26 @@ class RegisterController extends BaseController
      * @return \Illuminate\Contracts\Validation\Validator
      */
 
-    protected function validator(array $data, $platform)
+    protected function validator(array $data, $platform = null)
     {
         return Validator::make($data, [
 
             'first_name' => [
-                'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+                'string', 'max:255',
             ],
             'last_name' => [
-                'string', 'string', 'max:255',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
+                'string', 'max:255',
             ],
             'username' => [
                 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-                Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))
             ],
-            'country_code' => ['required', 'string', 'max:4'],
-            'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule],
+            'country_code' => [
+                'string', 'max:4', 'required'
+            ],
+            'phone_number' => [
+                'numeric', 'required',
+                new UniquePhoneNumberRule,
+            ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username']
@@ -101,13 +104,14 @@ class RegisterController extends BaseController
                 'username' => $platform !== ClientPlatform::StakingMobileWeb
                     ? $data['username']
                     : strstr($data['email'], '@', true) . mt_rand(10, 99),
-                'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
-                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
+                'phone_number' =>  ( ($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
+                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
+                'email_verified_at' =>  (($platform == ClientPlatform::GameArkMobile) ? now() : null),
                 'is_on_line' => true,
-                'country_code' => $data['country_code'],
+                'country_code' => ( ($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
@@ -132,7 +136,7 @@ class RegisterController extends BaseController
             'description' => "Registration Daily bonus plan for " . $user->username,
             'is_active' => true,
             'used_count' => 0,
-            'plan_count' => 15,
+            'plan_count' => 20,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'expire_at' => Carbon::now()->endOfDay()
@@ -220,6 +224,12 @@ class RegisterController extends BaseController
             'boost_count' => 3,
             'used_count' => 0
         ]);
+        $user->boosts()->create([
+            'user_id' => $user->id,
+            'boost_id' => Boost::where('name', 'Bomb')->first()->id,
+            'boost_count' => 3,
+            'used_count' => 0
+        ]);
     }
 
     /**
@@ -242,7 +252,7 @@ class RegisterController extends BaseController
             }
         }
         if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
-            Mail::send(new VerifyEmail($user));
+            Mail::to($user->email)->send(new VerifyEmail($user));
 
             Log::info("Email verification sent to " . $user->email);
             if ($request->hasHeader('X-App-Source')) {
@@ -269,13 +279,60 @@ class RegisterController extends BaseController
         SMSProviderInterface $smsService,
         ClientPlatform $platform
     ) {
-        $this->validator($request->all(), $platform)->validate();
+        if($platform == ClientPlatform::GameArkMobile){
+            return $this->registerGameArk($request, $smsService, $platform);
+        }
+
+        $this->validator($request->all())->validate();
 
         $user = $this->create($request->all(), $platform);
 
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
+    }
+
+    public function registerGameArk(
+        Request $request,
+        SMSProviderInterface $smsService,
+        ClientPlatform $platform)
+    {
+        // $this->validator($request->all(), $platform)->validate();
+        $request->validate([
+
+            'first_name' => [
+                'string', 'max:255',
+            ],
+            'last_name' => [
+                'string', 'max:255',
+            ],
+            'username' => [
+                'string', 'string', 'alpha_num', 'max:255', 'unique:users',
+            ],
+            'country_code' => [
+                'string', 'max:4'
+            ],
+            'phone_number' => [
+                'numeric',
+                new UniquePhoneNumberRule,
+            ],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'referrer' => ['nullable', 'string', 'exists:users,username']
+        ]);
+
+        $user = $this->create($request->all(), $platform);
+
+        $token = auth()->login($user);
+
+        Mail::to($request->email)->send(new WelcomeEmail());
+        $result = [
+            'username' => $user->username,
+            'email' => $user->email,
+            'token' => $token,
+        ];
+        return $this->sendResponse($result, 'Account created successfully');
+
     }
 
     public function resendOTP(

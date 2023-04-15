@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\FeatureFlags;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
+use App\Enums\ClientPlatform;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use App\Models\UserPoint;
@@ -32,7 +33,7 @@ class LoginController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request)
+    public function login(Request $request, ClientPlatform $clientPlatform)
     {
 
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -51,35 +52,23 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
-            if ($user->phone_verified_at == null) {
+        if($clientPlatform != ClientPlatform::GameArkMobile){
+            if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
+                if ($user->phone_verified_at == null) {
 
-                if ($request->hasHeader('X-App-Source')) {
-                    if ($token = auth()->attempt($credentials)) {
-                        return $this->respondWithToken($token);
-                    }
-                    return $this->sendError('Invalid email or password', 'Invalid email or password');
+                    return $this->sendError([
+                        'username' => $user->username,
+                        'email' => $user->email,
+                        'phoneNumber' => $user->phone_number
+                    ], 'Account not verified');
                 }
-
-                return $this->sendError([
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phoneNumber' => $user->phone_number
-                ], 'Account not verified');
-            }
-        }else{
-            if ($user->email_verified_at == null) {
-
-                if ($request->hasHeader('X-App-Source')) {
-                    if ($token = auth()->attempt($credentials)) {
-                        return $this->respondWithToken($token);
-                    }
-                    return $this->sendError('Invalid email or password', 'Invalid email or password');
+            }else{
+                if ($user->email_verified_at == null) {
+                    return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
                 }
-
-                return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
             }
         }
+
         return $this->respondWithToken($token);
     }
 

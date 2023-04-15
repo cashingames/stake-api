@@ -196,7 +196,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_exhibition_game_can_be_ended_with_boosts_and_no_options()
+    public function test_gameark_exhibition_game_can_be_ended_with_boosts_and_no_options()
     {
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
@@ -211,7 +211,7 @@ class GameTest extends TestCase
             'used_count' => 0
         ]);
 
-        $userBoost = $this->user->userBoosts();
+        $userBoost = $this->user->gameArkUserBoosts();
 
         $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
@@ -242,7 +242,7 @@ class GameTest extends TestCase
             'used_count' => 0
         ]);
 
-        $userBoost = $this->user->userBoosts();
+        $userBoost = $this->user->gameArkUserBoosts();
 
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
@@ -291,7 +291,7 @@ class GameTest extends TestCase
             'user_id' => $player->id,
             'opponent_id' => $opponent->id
         ]);
-        Mail::assertQueued(ChallengeInvite::class);
+        Mail::assertSent(ChallengeInvite::class);
         Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
         $response->assertOk();
     }

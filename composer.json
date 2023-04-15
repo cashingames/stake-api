@@ -20,12 +20,12 @@
         "predis/predis": "~1.0",
         "sentry/sentry-laravel": "^3.3",
         "spatie/laravel-responsecache": "^7.4",
-        "yabacon/paystack-php": "^2.2"
+        "yabacon/paystack-php": "^2.2",
+        "fakerphp/faker": "^1.9.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
         "brianium/paratest": "^7.1",
-        "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",

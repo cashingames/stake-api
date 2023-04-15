@@ -7,6 +7,7 @@ use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\ChallengeReportsRepository;
 use App\Services\AutomatedReportsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -35,13 +36,14 @@ class AutomatedReportsServiceTest extends TestCase
             ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
 
         $this->user = User::inRandomOrder()->first();
-        $this->reportsService = new AutomatedReportsService();
+        $challengeRepository = new ChallengeReportsRepository();
+        $this->reportsService = new AutomatedReportsService( $challengeRepository );
     }
 
     public function test_that_daily_reports_returns_data()
     {
         $dailyReports = $this->reportsService->getDailyReports();
-        $this->assertCount(14, $dailyReports);
+        $this->assertCount(21, $dailyReports);
     }
 
     public function test_that_daily_reports_returns_bogus_net_profit()
@@ -107,7 +109,7 @@ class AutomatedReportsServiceTest extends TestCase
     public function test_that_weekly_reports_returns_data()
     {
         $weeklyReports = $this->reportsService->getWeeklyReports();
-        $this->assertCount(20, $weeklyReports);
+        $this->assertCount(27, $weeklyReports);
     }
 
     public function test_that_weekly_reports_correct_total_amount_won()

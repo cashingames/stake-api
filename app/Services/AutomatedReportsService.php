@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\ChallengeReportsRepository;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +39,17 @@ class AutomatedReportsService
     public $totalStakes;
     public $totalBonusStakesAmount;
     public $totalBonusWinningsAmount;
+    public $totalChallenges;
+    public $totalChallengePlayers;
+    public $totalChallengeWinners;
+    public $totalChallengeLosers;
+    public $amountWonByBot;
+    public $amountWonByUsers;
+    public $totalNumberOfDraws;
 
+    public function __construct(private readonly ChallengeReportsRepository $challengeRepository){
+
+    }
     public function getDailyReports()
     {
         $startDate = $this->toNigeriaTimeZoneFromUtc(Carbon::yesterday()->startOfDay());
@@ -71,7 +82,13 @@ class AutomatedReportsService
         $this->totalPurchasedBoostCount = $this->getTotalPurchasedBoostsCount($startDate, $endDate);
         $this->uniqueStakersCount = $this->getTotalNumberOfUniqueStakersInADay($startDate);
         $this->stakers = $this->getTopDailyStakers($startDate);
-
+        $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
+        $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
+        $this->totalChallengeWinners = $this->challengeRepository->getTotalNmberOfUsersThatWon($startDate, $endDate);
+        $this->totalChallengeLosers = $this->challengeRepository->getTotalNmberOfUsersThatLost($startDate, $endDate);
+        $this->amountWonByBot = $this->challengeRepository->getTotalAmountWonByBot($startDate, $endDate);
+        $this->amountWonByUsers = $this->challengeRepository->getTotalAmountWonByUsers($startDate, $endDate);
+        $this->totalNumberOfDraws = $this->challengeRepository->getTotalNmberOfDraws($startDate, $endDate);
 
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
@@ -88,7 +105,13 @@ class AutomatedReportsService
             'totalPurchasedBoostCount' =>  $this->totalPurchasedBoostCount,
             'uniqueStakersCount' => $this->uniqueStakersCount,
             'stakers' => $this->stakers,
-
+            'totalChallengeSessions' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers,
+            'totalChallengeWinners' => $this->totalChallengeWinners,
+            'totalChallengeLosers' => $this->totalChallengeLosers,
+            'totalChallengeDraws' => $this->totalNumberOfDraws,
+            'AmountWonByChallengeBot' => number_format($this->amountWonByBot),
+            'AmountWonByChallengePlayers' => number_format($this->amountWonByUsers)
         ];
 
         return $data;
@@ -135,7 +158,14 @@ class AutomatedReportsService
         // dd($this->totalGameSessions );
         $this->averageBoostUsedPerGameSession = $this->totalUsedBoostCount / $this->totalGameSessions;
         $this->averageStakesPerStaker = $this->uniqueStakersCount / $this->totalStakes;
-
+        $this->totalChallenges = $this->challengeRepository->getTotalChallengeSessions($startDate, $endDate);
+        $this->totalChallengePlayers = $this->challengeRepository->getTotalNmberOfUsersThatPlayed($startDate, $endDate);
+        $this->totalChallengeWinners = $this->challengeRepository->getTotalNmberOfUsersThatWon($startDate, $endDate);
+        $this->totalChallengeLosers = $this->challengeRepository->getTotalNmberOfUsersThatLost($startDate, $endDate);
+        $this->amountWonByBot = $this->challengeRepository->getTotalAmountWonByBot($startDate, $endDate);
+        $this->amountWonByUsers = $this->challengeRepository->getTotalAmountWonByUsers($startDate, $endDate);
+        $this->totalNumberOfDraws = $this->challengeRepository->getTotalNmberOfDraws($startDate, $endDate);
+        
         $data = [
             'totalAmountWon' => number_format($this->totalAmountWon),
             'totalStakedamount' => number_format($this->totalStakedamount),
@@ -158,6 +188,13 @@ class AutomatedReportsService
             'skipBoostBoughtCount' => $this->skipBoostBoughtCount,
             'averageStakesPerStaker' => round($this->averageStakesPerStaker, 3),
             'averageBoostUsedPerGameSession' => round($this->averageBoostUsedPerGameSession, 3),
+            'totalChallengeSessions' => $this->totalChallenges,
+            'totalChallengePlayers' => $this->totalChallengePlayers,
+            'totalChallengeWinners' => $this->totalChallengeWinners,
+            'totalChallengeLosers' => $this->totalChallengeLosers,
+            'totalChallengeDraws' => $this->totalNumberOfDraws,
+            'AmountWonByChallengeBot' => number_format($this->amountWonByBot),
+            'AmountWonByChallengePlayers' => number_format($this->amountWonByUsers)
         ];
 
         return $data;
@@ -317,4 +354,5 @@ class AutomatedReportsService
                 AND '{$endDate->toDateString()}' GROUP BY user_id ) As bonusWins");
         return $bonusWinningsAmount[0]->totalAmountWon;
     }
+
 }

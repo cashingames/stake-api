@@ -21,8 +21,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
         Commands\CreditWinnings::class,
-        Commands\RefundExpiredChallengeStakingAmount::class,
-        Commands\SendInAppActivityUpdates::class,
+        // Commands\SendInAppActivityUpdates::class,
         // ComputeUsersLevelsCommand::class
     ];
 
@@ -48,35 +47,40 @@ class Kernel extends ConsoleKernel
             $schedule->command('weekly-report:send')
                 ->dailyAt('01:00');
         }
-        $schedule->command('challenge:staking-refund')->withoutOverlapping()->hourly();
 
         $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
-            $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
+        //     $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
+        // }
+        //$schedule->command('challenge-requests:clean-up')->withoutOverlapping()->everyMinute();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            $schedule->command('boosts:send-notification')->withoutOverlapping()
-                ->hourly()
-                ->between('12:00', '14:00')
-                ->days([0, 3]);
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
+        //     $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
+        // }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            $schedule->command('updates:send-notification')->withoutOverlapping()->hourly();
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
+        //     $schedule->command('boosts:send-notification')->withoutOverlapping()
+        //         ->hourly()
+        //         ->between('12:00', '14:00')
+        //         ->days([0, 3]);
+        // }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::SPECIAL_HOUR_NOTIFICATION)) {
-            $schedule->command('odds:special-hour')->withoutOverlapping()->hourly()->when(function () {
+        // if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
+        //     $schedule->command('updates:send-notification')->withoutOverlapping()->hourly();
+        // }
 
-                $now = date("H") . ":00";
-                $specialHours = config('odds.special_hours');
+        // if (FeatureFlag::isEnabled(FeatureFlags::SPECIAL_HOUR_NOTIFICATION)) {
+        //     $schedule->command('odds:special-hour')->withoutOverlapping()->hourly()->when(function () {
 
-                return in_array($now, $specialHours);
-            })->timezone('Africa/Lagos');
-        }
+        //         $now = date("H") . ":00";
+        //         $specialHours = config('odds.special_hours');
 
+        //         return in_array($now, $specialHours);
+        //     })->timezone('Africa/Lagos');
+        // }
+
+        //This command matures users winnings based on their viable dates
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $schedule->command('winnings:credit')->withoutOverlapping()->hourly();
         }

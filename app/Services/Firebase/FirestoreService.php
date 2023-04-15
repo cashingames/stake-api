@@ -3,12 +3,18 @@
 namespace App\Services\Firebase;
 
 use Google\Cloud\Firestore\FirestoreClient;
+use App\Traits\Utils\ResolveGoogleCredentials;
 
 class FirestoreService
 {
-    public function __construct(
-        private readonly FirestoreClient $firestore
-    ) {
+    use ResolveGoogleCredentials;
+    private FirestoreClient $firestore;
+    public function __construct()
+    {
+        $credentials = $this->detectGoogleCredentialName(request()->header('x-request-env'));
+        
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
+        $this->firestore = app()->make(FirestoreClient::class);
     }
 
     public function createDocument(string $collection, string $document, array $data): void

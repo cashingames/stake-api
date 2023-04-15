@@ -30,6 +30,7 @@ class StoreTest extends TestCase
     const CLAIM_ACHIEVEMENT_URL = '/api/v2/claim/achievement/';
     const BUY_BOOST_POINTS_URL = '/api/v2/points/buy-boosts/';
     const BUY_BOOST_WALLET_URL = '/api/v2/wallet/buy-boosts/';
+    const BUY_ITEM_URL = '/api/v3/purchased/item';
     const SUBSCRIBE_TO_PLAN_URL = '/api/v2/plan/subscribe/';
     protected $user;
 
@@ -160,7 +161,6 @@ class StoreTest extends TestCase
 
         $response = $this->post(self::BUY_BOOST_POINTS_URL . Boost::inRandomOrder()->first()->id);
 
-        // $response->dump();
         $response->assertStatus(200);
     }
 
@@ -223,6 +223,20 @@ class StoreTest extends TestCase
         $plan = Plan::where('is_free', false)->inRandomOrder()->first();
 
         $response = $this->post(self::SUBSCRIBE_TO_PLAN_URL . $plan->id);
+        $response->assertStatus(200);
+    }
+
+    public function test_gameark_inapp_item_can_be_bought()
+    {
+
+        $this->seed(BoostSeeder::class);
+        $this->seed(PlanSeeder::class);
+
+        $response = $this->withHeaders(['x-brand-id'=> 10])->postjson(self::BUY_ITEM_URL, [
+            "type" => 'plan',
+            "item_id" => Boost::inRandomOrder()->first()->id
+        ]);
+
         $response->assertStatus(200);
     }
 }
