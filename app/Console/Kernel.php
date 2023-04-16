@@ -48,6 +48,11 @@ class Kernel extends ConsoleKernel
                 ->dailyAt('01:00');
         }
 
+        $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
+
+        // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
+        //     $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
+        // }
         //$schedule->command('challenge-requests:clean-up')->withoutOverlapping()->everyMinute();
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
@@ -74,7 +79,7 @@ class Kernel extends ConsoleKernel
         //         return in_array($now, $specialHours);
         //     })->timezone('Africa/Lagos');
         // }
-        
+
         //This command matures users winnings based on their viable dates
         if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
             $schedule->command('winnings:credit')->withoutOverlapping()->hourly();

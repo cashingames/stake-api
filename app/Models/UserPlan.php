@@ -9,9 +9,9 @@ class UserPlan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["user_id", "plan_id", "description", "is_active", "used_count", "plan_count",  "created_at", "updated_at", "expire_at"];
+    protected $fillable = ["user_id", "plan_id", "description", "is_active", "is_refreshing", "used_count", "plan_count",  "created_at", "updated_at", "expire_at"];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = ['is_active' => 'boolean', 'is_refreshing' => 'boolean'];
 
     public function user()
     {
