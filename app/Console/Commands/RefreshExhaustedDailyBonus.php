@@ -51,7 +51,7 @@ class RefreshExhaustedDailyBonus extends Command
                     'user_id' => $user->id,
                     'description' => "Refreshing daily plan for " . $user->username,
                     'used_count' => 0,
-                    'plan_count' => 20,
+                    'plan_count' => 5,
                     'is_active' => true,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
