@@ -26,8 +26,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
-    )
-    {
+    ) {
         $this->user = auth()->user();
     }
 
@@ -37,6 +36,13 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         $questions = $this->stakeQuestionsHardeningService
             ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
+
+        if ($questions->count() < 10) {
+            return [
+                'gameSession' => null,
+                'questions' => []
+            ];
+        }
 
         DB::beginTransaction();
 
@@ -51,7 +57,6 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
             'gameSession' => $gameSession,
             'questions' => $questions
         ];
-
     }
 
     private function generateSession(): GameSession
@@ -111,7 +116,6 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
             'game_session_id' => $gameSessionId,
             'staking_id' => $stakingId
         ]);
-
     }
 
     public function logQuestions($questions, $gameSession): void
@@ -129,7 +133,4 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         DB::table('game_session_questions')->insert($data);
     }
-
-
-
 }
