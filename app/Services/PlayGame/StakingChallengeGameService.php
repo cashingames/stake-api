@@ -98,11 +98,11 @@ class StakingChallengeGameService
             'trivia-challenge-requests',
             $request->challenge_request_id,
             [
-                'score' => $request->score,
+                'score' => intval($request->score),
                 'status' => $request->status,
                 'amount_won' => $request->amount_won,
                 'opponent' => [
-                    'score' => $matchedRequest->score,
+                    'score' => intval($matchedRequest->score),
                     'status' => $matchedRequest->status,
                 ]
             ]
@@ -112,11 +112,11 @@ class StakingChallengeGameService
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [
-                'score' => $matchedRequest->score,
+                'score' => intval($matchedRequest->score),
                 'status' => $matchedRequest->status,
                 'amount_won' => $matchedRequest->amount_won,
                 'opponent' => [
-                    'score' => $request->score,
+                    'score' => intval($request->score),
                     'status' => $request->status,
                 ]
             ]
