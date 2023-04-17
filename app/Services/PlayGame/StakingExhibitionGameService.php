@@ -26,8 +26,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
-    )
-    {
+    ) {
         $this->user = auth()->user();
     }
 
@@ -38,20 +37,25 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $questions = $this->stakeQuestionsHardeningService
             ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
 
-        DB::beginTransaction();
+        if ($questions->count() > 10) {
+            DB::beginTransaction();
 
-        $gameSession = $this->generateSession();
-        $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
-        $this->createExhibitionStaking($stakingId, $gameSession->id);
-        $this->logQuestions($questions, $gameSession);
+            $gameSession = $this->generateSession();
+            $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
+            $this->createExhibitionStaking($stakingId, $gameSession->id);
+            $this->logQuestions($questions, $gameSession);
 
-        DB::commit();
+            DB::commit();
 
+            return [
+                'gameSession' => $gameSession,
+                'questions' => $questions
+            ];
+        }
         return [
-            'gameSession' => $gameSession,
-            'questions' => $questions
+            'gameSession' => null,
+            'questions' => []
         ];
-
     }
 
     private function generateSession(): GameSession
@@ -111,7 +115,6 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
             'game_session_id' => $gameSessionId,
             'staking_id' => $stakingId
         ]);
-
     }
 
     public function logQuestions($questions, $gameSession): void
@@ -129,7 +132,4 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         DB::table('game_session_questions')->insert($data);
     }
-
-
-
 }
