@@ -108,4 +108,9 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('fcm:daily-evening-reminder')->assertExitCode(0);
     }
 
+    public function test_contraint_reminder_reminder_command()
+    {
+        $this->artisan('fcm:contraint-reminder')->assertExitCode(0);
+    }
+
 }

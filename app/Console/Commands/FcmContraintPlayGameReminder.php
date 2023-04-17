@@ -57,7 +57,7 @@ class FcmContraintPlayGameReminder extends Command
             if($interval->days == 7){
                 // meaning it's 7 days since he played last
                 $pushTokens[] = $this->getToken($user);
-            }else if($interval->days == 30){
+            }else if($interval->days >= 30){
                 // meaning it's 7 days since he played last
                 $pushTokens[] = $this->getToken($user);
             }
