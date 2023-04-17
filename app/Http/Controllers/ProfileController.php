@@ -10,12 +10,44 @@ use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Enums\ClientPlatform;
 
 class ProfileController extends BaseController
 {
-    public function editPersonalInformation(Request $request)
-    {
 
+    public function editPIForGameArk(Request $request)
+    {
+        $data = $request->validate([
+            'username' => [
+                'required', 'string', 'max:20',
+                Rule::unique('users','username')->ignore($this->user->id),
+            ],
+            'email' => [
+                'required', 'string', 'max:255','email',
+                Rule::unique('users','email')->ignore($this->user->id),
+            ],
+            'gender' => ['nullable', 'string', 'max:20'],
+            'dateOfBirth' => ['nullable', 'date'],
+        ]);
+
+        $profile = $this->user->profile;
+
+        $this->user->username = $data['username'];
+        $this->user->email = $data['email'];
+        $this->user->save();
+
+        if (isset($data['gender']) &&  !is_null($data['gender'])) {
+            $profile->gender =  $data['gender'];
+        }
+
+        if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
+            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
+        }
+        $profile->save();
+    }
+
+    public function editPIForCashingames(Request $request)
+    {
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
@@ -27,7 +59,7 @@ class ProfileController extends BaseController
                 'required', 'string', 'max:255','email',
                 Rule::unique('users','email')->ignore($this->user->id),
             ],
-           
+
             // 'phoneNumber' => [
             //     'required','min:11','max:11',
             //     Rule::unique('users','phone_number')->ignore($this->user->id),
@@ -36,7 +68,7 @@ class ProfileController extends BaseController
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-        // if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) { 
+        // if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
         //     $this->user->phone_number = $data['phoneNumber'];
         //     $this->user->save();
         // }
@@ -56,6 +88,16 @@ class ProfileController extends BaseController
             $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
         $profile->save();
+    }
+
+    public function editPersonalInformation(Request $request, ClientPlatform $clientPlatform)
+    {
+
+        if($clientPlatform == ClientPlatform::GameArkMobile){
+            $this->editPIForGameArk($request);
+        }else{
+            $this->editPIForCashingames($request);
+        }
 
         return $this->sendResponse($this->user, "Profile Updated.");
     }

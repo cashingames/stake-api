@@ -113,6 +113,18 @@ class ProfileTest extends TestCase
         $this->assertEquals($this->user->email, 'johndoe@email.com');
     }
 
+    public function test_gameark_profile_can_be_edited()
+    {
+
+        $response = $this->withHeaders(['x-brand-id'=> 10])->postjson('/api/v2/profile/me/edit-personal', [
+            'username' => 'JayDee',
+            'email' => 'johndoe@email.com',
+            'gender' => 'male',
+            'dateOfBirth' => '23-09-1998'
+        ]);
+        $response->assertStatus(200);
+    }
+
     public function test_bank_details_can_be_edited()
     {
 
