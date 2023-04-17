@@ -31,5 +31,4 @@ class EndChallengeGameController extends Controller
 
         return ResponseHelper::success((object) ['score' => $result->score]);
     }
-
 }
