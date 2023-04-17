@@ -11,6 +11,9 @@ use App\Models\User;
 use App\Models\Plan;
 use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\DB;
+use App\Models\FcmPushSubscription;
+
+use DateTime;
 
 class FcmContraintPlayGameReminder extends Command
 {
@@ -46,24 +49,34 @@ class FcmContraintPlayGameReminder extends Command
     public function handle(SendPushNotification $pushNotification)
     {
         $pushTokens = [];
-        User::all()->map(function ($user) use ($freePlan) {
+        User::all()->map(function ($user) use ($pushTokens) {
             $lastActive = new DateTime($user->last_activity_time);
             $current = new DateTime();
 
             $interval = $lastActive->diff($current);
             if($interval->days == 7){
                 // meaning it's 7 days since he played last
+                $pushTokens[] = $this->getToken($user);
+            }else if($interval->days == 30){
+                // meaning it's 7 days since he played last
+                $pushTokens[] = $this->getToken($user);
             }
         });
 
-        if (FeatureFlag::isEnabled(FeatureFlags::IN_APP_ACTIVITIES_PUSH_NOTIFICATION)) {
-            DB::table('fcm_push_subscriptions')->latest()->distinct()->chunk(500, function ($devices) use($pushNotification){
-                $allTokens = [];
-                foreach ($devices as $device) {
-                    $allTokens[] = $device->device_token;
-                }
-                $pushNotification->sendDailyBonusGamesNotification($allTokens, true);
-            });
+        $pushNotification->sendDailyReminderNotification(
+            $pushTokens,
+            true,
+            "GameArk",
+            "Hey there! We've missed you in GameArk! Don't let your adventure come to an end. Log back in and continue your journey through our immersive world.!🎉🎮");
+
+    }
+
+    public function getToken($user)
+    {
+        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+        if (!is_null($device_token)) {
+            return $device_token->device_token;
         }
+        return "";
     }
 }
