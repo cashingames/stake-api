@@ -93,4 +93,19 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('bonus:refresh')->assertExitCode(0);
     }
 
+    public function test_daily_morning_reminder_command()
+    {
+        $this->artisan('fcm:daily-morning-reminder')->assertExitCode(0);
+    }
+
+    public function test_daily_afternoon_reminder_command()
+    {
+        $this->artisan('fcm:daily-afternoon-reminder')->assertExitCode(0);
+    }
+
+    public function test_daily_evening_reminder_command()
+    {
+        $this->artisan('fcm:daily-evening-reminder')->assertExitCode(0);
+    }
+
 }

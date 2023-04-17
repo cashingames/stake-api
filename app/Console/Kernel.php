@@ -49,6 +49,12 @@ class Kernel extends ConsoleKernel
         }
 
         $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
+        // fcm:daily-morning-reminder
+        $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
+        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
+        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('13:00');
+
+
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
         //     $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
