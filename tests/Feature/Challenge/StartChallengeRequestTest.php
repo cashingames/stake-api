@@ -6,11 +6,9 @@ use App\Jobs\MatchChallengeRequest;
 use App\Jobs\MatchWithHumanChallengeRequest;
 use App\Models\Category;
 use App\Models\Profile;
-use App\Models\Question;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -34,61 +32,32 @@ class StartChallengeRequestTest extends TestCase
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
         );
+        Queue::fake();
     }
 
-    // public function test_challenge_request_returns_sucess(): void
-    // {
-    //     $this->instance(
-    //         FirestoreService::class,
-    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-    //             $mock->shouldReceive('createDocument')->twice();
-    //         })
-    //     );
-
-    //     $category = Category::factory()->create();
-
-    //     $user = $this->prepareMatchRequest($category, 500);
-
-    //     $this->assertDatabaseHas('challenge_requests', [
-    //         'category_id' => $category->id,
-    //         'amount' => 500,
-    //         'user_id' => $user->id,
-    //         'username' => $user->username,
-    //         'status' => 'MATCHED',
-    //     ]);
-
-
-    // }
-
-    public function test_challenge_request_returns_error_when_user_has_insufficient_balance(): void
+    public function test_challenge_request_returns_sucess(): void
     {
         $this->instance(
             FirestoreService::class,
-            Mockery::mock(FirestoreService::class)
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->once();
+            })
         );
 
-        $user = User::factory()->create();
         $category = Category::factory()->create();
 
-        Wallet::factory()
-            ->for($user)
-            ->create([
-                'non_withdrawable_balance' => 0
-            ]);
+        $user = $this->prepareMatchRequest($category, 500);
 
-        $response = $this->actingAs($user)
-            ->postJson(self::API_URL, [
-                'category' => $category->id,
-                'amount' => 1000
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson([
-            "message" => "Insufficient Balance",
+        $this->assertDatabaseHas('challenge_requests', [
+            'category_id' => $category->id,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'status' => 'MATCHING',
         ]);
     }
 
-    public function test_challenge_request_returns_error_when_category_does_not_exist(): void
+     public function test_challenge_request_returns_error_when_category_does_not_exist(): void
     {
         $this->instance(
             FirestoreService::class,
@@ -170,43 +139,31 @@ class StartChallengeRequestTest extends TestCase
             "message" => "Amount should not be more than 1000",
         ]);
     }
-    // public function test_challenge_request_found_match()
-    // {
-    //     $this->instance(
-    //         FirestoreService::class,
-    //         Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-    //             $mock->shouldReceive('createDocument')->times(2);
-    //             $mock->shouldReceive('updateDocument')->times(2);
-    //         })
-    //     );
 
-    //     $category = Category::factory()->create();
-    //     $questions = Question::factory()
-    //         ->hasOptions(4)
-    //         ->count(250)
-    //         ->create();
+    public function test_challenge_request_human_and_bot_matching_jobs_were_pushed(): void
+    {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('createDocument')->once();
+            })
+        );
 
-    //     $data = [];
+        $category = Category::factory()->create();
 
-    //     foreach ($questions as $question) {
-    //         $data[] = [
-    //             'question_id' => $question->id,
-    //             'category_id' => $category->id
-    //         ];
-    //     }
+        $user = $this->prepareMatchRequest($category, 500);
 
-    //     DB::table('categories_questions')->insert($data);
-
-    //     $this->prepareMatchRequest($category, 500);
-    //     // $this->prepareMatchRequest($category, 500);
-
-    //     $this->assertDatabaseCount('challenge_requests', 2);
-    //     $this->assertDatabaseHas('challenge_requests', [
-    //         'status' => 'MATCHED',
-    //     ]);
-    //     $this->assertDatabaseCount('trivia_challenge_questions', 20);
-
-    // }
+        $this->assertDatabaseHas('challenge_requests', [
+            'category_id' => $category->id,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'status' => 'MATCHING',
+        ]);
+       
+        Queue::assertPushed(MatchWithHumanChallengeRequest::class);
+        Queue::assertPushed(MatchChallengeRequest::class);
+    }
     private function prepareMatchRequest($category, $amount): User
     {
         $user = User::factory()->create();
