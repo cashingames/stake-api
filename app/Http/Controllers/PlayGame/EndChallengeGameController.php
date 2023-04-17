@@ -19,6 +19,7 @@ class EndChallengeGameController extends Controller
         $data = $request->validate([
             'challenge_request_id' => ['required'],
             'selected_options' => ['nullable'],
+            'consumed_boosts' => ['nullable']
         ]);
 
         Log::info('EndChallengeGameController', $data);
