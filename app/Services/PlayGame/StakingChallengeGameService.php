@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
 use App\Services\Firebase\FirestoreService;
 use App\Actions\Wallet\DebitWalletAction;
+use App\Models\UserBoost;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use Illuminate\Support\Facades\Log;
 
@@ -57,6 +58,7 @@ class StakingChallengeGameService
     {
         $requestId = $data['challenge_request_id'];
         $selectedOptions = $data['selected_options'];
+        $consumedBoosts = $data['consumed_boosts'] ?? null;
 
         //fix double submission bug from frontend
         $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
@@ -79,6 +81,10 @@ class StakingChallengeGameService
 
         $this->matchEndWalletAction->execute($requestId);
         $this->updateEndMatchFirestore($request, $matchedRequest);
+
+        if (!is_null($consumedBoosts)) {
+            $this->handleConsumedBoosts($consumedBoosts, $request);
+        }
         return $request;
     }
 
@@ -115,7 +121,6 @@ class StakingChallengeGameService
                 ]
             ]
         );
-
     }
 
     private function isBot(ChallengeRequest $matchRequest)
@@ -154,5 +159,26 @@ class StakingChallengeGameService
         //     })
         //     ->choose();
         return $botScore;
+    }
+
+    private function handleConsumedBoosts($consumedBoosts, $request)
+    {
+        DB::transaction(function () use ($consumedBoosts, $request) {
+            foreach ($consumedBoosts as $row) {
+                $userBoost = UserBoost::where('user_id', $request->user_id)->where('boost_id', $row['boost']['id'])->first();
+
+                $userBoost->update([
+                    'used_count' => $userBoost->used_count + 1,
+                    'boost_count' => $userBoost->boost_count - 1
+                ]);
+
+                DB::table('challenge_boosts')->insert([
+                    'challenge_request_id' => $request->challenge_request_id,
+                    'boost_id' => $row['boost']['id'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        });
     }
 }
