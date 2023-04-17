@@ -37,24 +37,25 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $questions = $this->stakeQuestionsHardeningService
             ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
 
-        if ($questions->count() > 10) {
-            DB::beginTransaction();
-
-            $gameSession = $this->generateSession();
-            $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
-            $this->createExhibitionStaking($stakingId, $gameSession->id);
-            $this->logQuestions($questions, $gameSession);
-
-            DB::commit();
-
+        if ($questions->count() < 10) {
             return [
-                'gameSession' => $gameSession,
-                'questions' => $questions
+                'gameSession' => null,
+                'questions' => []
             ];
         }
+
+        DB::beginTransaction();
+
+        $gameSession = $this->generateSession();
+        $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
+        $this->createExhibitionStaking($stakingId, $gameSession->id);
+        $this->logQuestions($questions, $gameSession);
+
+        DB::commit();
+
         return [
-            'gameSession' => null,
-            'questions' => []
+            'gameSession' => $gameSession,
+            'questions' => $questions
         ];
     }
 
