@@ -82,7 +82,7 @@ class StakingChallengeGameService
         $this->matchEndWalletAction->execute($requestId);
         $this->updateEndMatchFirestore($request, $matchedRequest);
 
-        if ($consumedBoosts) {
+        if (!is_null($consumedBoosts)) {
             $this->handleConsumedBoosts($consumedBoosts, $request);
         }
         return $request;
