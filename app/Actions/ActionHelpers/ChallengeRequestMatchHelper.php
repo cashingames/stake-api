@@ -85,6 +85,7 @@ class ChallengeRequestMatchHelper
             'username' => $challengeRequest->username,
             'avatar' => $challengeRequest->user->profile->avatar,
             'status' => $challengeRequest->status,
+            'is_bot' => $challengeRequest->user->id == 1,
         ];
     }
 }
