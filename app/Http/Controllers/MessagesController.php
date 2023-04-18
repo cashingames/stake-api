@@ -22,6 +22,7 @@ class MessagesController extends BaseController
     {
         $data = $request->validate([
             'first_name' => ['nullable', 'string'],
+            'username' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'email' => ['required', 'email', 'string'],
             'message_body' => ['required', 'string']
@@ -37,6 +38,12 @@ class MessagesController extends BaseController
 
         if (isset($data["last_name"]) &&  !is_null($data["last_name"])) {
             $lastName =  $data["last_name"];
+        }
+
+        if($firstName == '' && $lastName == ''){
+            if (isset($data["username"]) && !is_null($data["username"])) {
+                $firstName = $data["username"];
+            }
         }
 
         $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
