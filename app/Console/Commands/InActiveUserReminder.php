@@ -15,14 +15,14 @@ use App\Models\FcmPushSubscription;
 
 use DateTime;
 
-class FcmContraintPlayGameReminder extends Command
+class InActiveUserReminder extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fcm:contraint-reminder';
+    protected $signature = 'fcm:inactive-user-reminder';
 
     /**
      * The console command description.
@@ -48,35 +48,19 @@ class FcmContraintPlayGameReminder extends Command
      */
     public function handle(SendPushNotification $pushNotification)
     {
-        $pushTokens = [];
-        User::all()->map(function ($user) use ($pushTokens) {
-            $lastActive = new DateTime($user->last_activity_time);
-            $current = new DateTime();
 
-            $interval = $lastActive->diff($current);
-            if($interval->days == 7){
-                // meaning it's 7 days since he played last
-                $pushTokens[] = $this->getToken($user);
-            }else if($interval->days >= 30){
-                // meaning it's 7 days since he played last
-                $pushTokens[] = $this->getToken($user);
-            }
-        });
+        $date=new datetime();
+        $lastsevendaysdate= date_sub($date,date_interval_create_from_date_string("7 days"));
+        $lastthirtydaysdate= date_sub($date,date_interval_create_from_date_string("30 days"));
+
+        $data = DB::select("SELECT b.device_token FROM users AS a INNER JOIN fcm_push_subscriptions AS b ON a.id=b.user_id WHERE a.last_activity_time >= ? AND a.last_activity_time <= ?", [$lastsevendaysdate, $lastthirtydaysdate]);
 
         $pushNotification->sendDailyReminderNotification(
-            $pushTokens,
+            $data,
             true,
             "GameArk",
             "Hey there! We've missed you in GameArk! Don't let your adventure come to an end. Log back in and continue your journey through our immersive world.!🎉🎮");
 
     }
 
-    public function getToken($user)
-    {
-        $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
-        if (!is_null($device_token)) {
-            return $device_token->device_token;
-        }
-        return "";
-    }
 }
