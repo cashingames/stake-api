@@ -110,7 +110,7 @@ class ArtisanCommandsTest extends TestCase
 
     public function test_contraint_reminder_reminder_command()
     {
-        $this->artisan('fcm:contraint-reminder')->assertExitCode(0);
+        $this->artisan('fcm:inactive-user-reminder')->assertExitCode(0);
     }
 
 }
