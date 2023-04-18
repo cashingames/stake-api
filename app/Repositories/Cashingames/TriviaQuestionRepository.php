@@ -25,7 +25,7 @@ class TriviaQuestionRepository
             ->questions()
             ->easy()
             ->inRandomOrder()
-            ->take(10)
+            ->take(20)
             ->get();
     }
 }

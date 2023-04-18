@@ -20,7 +20,8 @@ class ChallengeRequestMatchHelper
     ) {
     }
 
-    public function setFirestoreService($firestoreService) {
+    public function setFirestoreService($firestoreService)
+    {
         self::$firestoreService = $firestoreService;
     }
     
