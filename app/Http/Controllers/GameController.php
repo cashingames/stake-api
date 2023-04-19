@@ -170,9 +170,7 @@ class GameController extends BaseController
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
         $result->minimumBoostScore = $this->MINIMUM_GAME_BOOST_SCORE;
 
-        // return $this->sendResponse($result, "Common data");
         return $this->sendResponse((new CommonDataResponse())->transform($result, $platform), "Common data");
-        // return (new GameSessionResponse())->transform($game);
     }
 
     public function claimAchievement($achievementId)
