@@ -6,6 +6,7 @@ use App\Enums\Contest\PrizeType;
 use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
+use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Plan;
@@ -169,7 +170,9 @@ class GameController extends BaseController
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
         $result->minimumBoostScore = $this->MINIMUM_GAME_BOOST_SCORE;
 
-        return $this->sendResponse($result, "Common data");
+        // return $this->sendResponse($result, "Common data");
+        return $this->sendResponse((new CommonDataResponse())->transform($result, $platform), "Common data");
+        // return (new GameSessionResponse())->transform($game);
     }
 
     public function claimAchievement($achievementId)
