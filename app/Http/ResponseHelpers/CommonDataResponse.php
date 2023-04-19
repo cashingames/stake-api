@@ -31,8 +31,6 @@ class CommonDataResponse{
             $result->boosts = $newBoost;
         }
 
-        dd($result->boosts);
-
         return $result;
     }
 }
