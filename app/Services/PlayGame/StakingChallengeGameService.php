@@ -147,7 +147,7 @@ class StakingChallengeGameService
          */
         Lottery::odds(4, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
-                $botScore = ($opponentScore == 10 || $opponentScore = 9) ? 10 : rand($opponentScore + 1, 10);
+                $botScore = ($opponentScore == 10 || $opponentScore == 9) ? 10 : rand($opponentScore + 1, 10);
             })
             ->loser(function () use ($opponentScore, &$botScore) {
                 $botScore = rand($opponentScore - 2, 10);
