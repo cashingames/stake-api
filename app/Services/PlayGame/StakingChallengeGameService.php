@@ -11,6 +11,7 @@ use App\Actions\Wallet\DebitWalletAction;
 use App\Models\UserBoost;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Lottery;
 
 class StakingChallengeGameService
 {
@@ -138,26 +139,20 @@ class StakingChallengeGameService
 
     private function generateBotScore(float $opponentScore): float
     {
-        if ($opponentScore < 4) {
-            $botScore = rand(0, 10);
-        } else {
-            $botScore = rand($opponentScore - 2, 10);
-        }
+        $botScore = 10;
 
-        //when should bot win
         /**
-         * @TODO: Use Odds
+         * When Odds should win
+         * Current odds: 4/5 to help us recoop the lost amount
          */
-        // Lottery::odds(3, 5)
-        //     ->winner(function () use ($opponentScore, &$botScore) {
-        //         $botScore = rand(
-        //             $opponentScore < 2 ? 0 : $opponentScore - 2,
-        //             10);
-        //     })
-        //     ->loser(function () use ($opponentScore, &$botScore) {
-        //         $botScore = rand(0, 10);
-        //     })
-        //     ->choose();
+        Lottery::odds(4, 5)
+            ->winner(function () use ($opponentScore, &$botScore) {
+                $botScore = ($opponentScore == 10 || $opponentScore = 9) ? 10 : rand($opponentScore + 1, 10);
+            })
+            ->loser(function () use ($opponentScore, &$botScore) {
+                $botScore = rand($opponentScore - 2, 10);
+            })
+            ->choose();
         return $botScore;
     }
 
