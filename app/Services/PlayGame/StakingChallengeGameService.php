@@ -143,14 +143,14 @@ class StakingChallengeGameService
 
         /**
          * When Odds should win
-         * Current odds: 4/5 to help us recoop the lost amount
+         * Current odds: 3/5 to help us recoop the lost amount
          */
-        Lottery::odds(4, 5)
+        Lottery::odds(3, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
                 $botScore = ($opponentScore == 10 || $opponentScore == 9) ? 10 : rand($opponentScore + 1, 10);
             })
             ->loser(function () use ($opponentScore, &$botScore) {
-                $botScore = rand($opponentScore - 2, 10);
+                $botScore = rand($opponentScore, 10);
             })
             ->choose();
         return $botScore;
