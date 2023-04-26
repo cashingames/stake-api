@@ -262,4 +262,17 @@ class ProfileTest extends TestCase
             'message' => 'The new password must be different from the old password.',
         ]);
     }
+
+    public function test_gameark_users_receive_coinsBalance_payload()
+    {
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->get(self::PROFILE_DATA_URL);
+
+        $response->assertJson([
+            'data' => [
+                'coinsBalance' => $this->user->getUserCoins(),
+            ]
+        ]);
+    }
 }

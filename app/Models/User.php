@@ -434,4 +434,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(UserNotification::class, 'notifiable')->orderBy('created_at', 'desc');
     }
+
+    public function userCoins()
+        {
+            return $this->hasOne(UserCoin::class);
+        }
+
+        public function getUserCoins()
+    {
+        $userCoin = UserCoin::where('user_id', $this->id)->first();
+        if(is_null($userCoin)){
+        //    $userCoin = UserCoin::create(['coins_value' => 0, 'user_id' => $this->id]);
+        $userCoin = $this->userCoins()->create(['coins_value' => 0]);
+
+        }
+        return $userCoin->sum('coins_value');
+            // ->sum('coins_value');
+    }
+
 }

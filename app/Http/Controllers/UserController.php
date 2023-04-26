@@ -50,6 +50,7 @@ class UserController extends BaseController
             $result->activePlans = $this->composeUserPlans();
             $result->hasActivePlan = $this->user->hasActivePlan();
             $result->boosts = $this->user->gameArkUserBoosts();
+            $result->coinsBalance = $this->user->getUserCoins();
         }else{
             $result->boosts = $this->user->userBoosts();
         }
