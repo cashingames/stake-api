@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ClientPlatform;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use App\Http\ResponseHelpers\CommonDataResponse;
 use stdClass;
 
 class UserController extends BaseController
@@ -53,7 +54,7 @@ class UserController extends BaseController
             $result->boosts = $this->user->userBoosts();
         }
 
-        return $this->sendResponse($result, 'User details');
+        return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }
 
     private function composeUserPlans()
