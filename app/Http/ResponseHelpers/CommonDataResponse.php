@@ -23,6 +23,7 @@ class CommonDataResponse{
                 $d->point_value = $boostItem->point_value;
                 $d->pack_count = $boostItem->pack_count;
                 $d->currency_value = $boostItem->currency_value;
+                $d->count = is_null($boostItem->count) ? 0 : $boostItem->count;
                 $d->icon = str_ireplace("icons", "icons/cashingames_boosts", $boostItem->icon);
 
                 $newBoost[] = $d;

@@ -8,6 +8,8 @@ use App\Models\UserPlan;
 use App\Models\User;
 use App\Models\Plan;
 use Illuminate\Support\Facades\DB;
+use App\Models\FcmPushSubscription;
+use App\Actions\SendPushNotification;
 
 class RefreshExhaustedDailyBonus extends Command
 {
@@ -33,17 +35,23 @@ class RefreshExhaustedDailyBonus extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendPushNotification $pushNotification)
     {
-        $today = Carbon::now()->endOfDay();
+        // $today = Carbon::now()->endOfDay();
         $freePlan = Plan::where('is_free', true)->first();
 
-        $this->renewExhaustedBonusToIncrementLimit($today, $freePlan);
-        // $this->renewExhaustedBonusTillLimit($today, $freePlan);
+        $pushTokens = $this->renewExhaustedBonusToIncrementLimit($freePlan);
+
+        $pushNotification->sendDailyReminderNotification(
+            $pushTokens,
+            true,
+            "GameArk",
+            "Good news! Your GameArk lives have been refreshed and you're ready to continue your adventure. Jump back into the game and conquer those challenging levels with your new set of lives. 👍🎮");
     }
 
-    public function renewExhaustedBonusToIncrementLimit($today, $freePlan){
-        User::all()->map(function ($user) use ($today, $freePlan) {
+    public function renewExhaustedBonusToIncrementLimit($freePlan){
+        $pushTokens = [];
+        User::all()->map(function ($user) use ($pushTokens, $freePlan) {
 
             if(!($user->hasActiveFreePlan())){
                 UserPlan::create([
@@ -57,7 +65,14 @@ class RefreshExhaustedDailyBonus extends Command
                     'updated_at' => Carbon::now(),
                     'expire_at' => Carbon::now()->endOfDay()
                 ]);
+
+                $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+                if (!is_null($device_token)) {
+                    $pushTokens[] = $device_token->device_token;
+                }
             }
         });
+
+        return $pushTokens;
     }
 }

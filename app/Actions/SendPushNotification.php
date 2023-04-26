@@ -331,4 +331,39 @@ class SendPushNotification
         Log::info('Logger: FCM Sent TO-> '.$device_token->device_token);
     }
 
+    public function sendDailyReminderNotification($user, $hasMany = false, $title, $msg)
+    {
+
+        $instance = $this->pushService->setNotification(
+            [
+                'title' => $title,
+                'body' => $msg
+            ]
+        )
+            ->setData(
+                [
+
+                    'title' => $title,
+                    'body' => $msg,
+                    'action_type' => "#",
+                    'action_id' => "#"
+
+                ]
+            );
+
+        if($hasMany){
+            $instance->setTo($user)
+            ->sendToMany();
+        }else{
+            $device_token = FcmPushSubscription::where('user_id', $user->id)->latest()->first();
+            if (is_null($device_token)) {
+                return;
+            }
+
+            $instance->setTo($device_token->device_token)
+            ->send();
+
+        }
+    }
+
 }
