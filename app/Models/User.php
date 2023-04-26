@@ -386,7 +386,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_id', $this->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
+            })->select('boosts.id', 'boosts.point_value', 'boosts.pack_count', 'boosts.currency_value', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->whereNull('boosts.deleted_at')
             ->where('name', '!=', 'Bomb')
             ->where('user_boosts.boost_count', '>', 0)->get();
@@ -398,7 +398,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_id', $this->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
+            })->select('boosts.id', 'boosts.point_value', 'boosts.pack_count', 'boosts.currency_value', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
             ->whereNull('boosts.deleted_at')
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
