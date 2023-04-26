@@ -32,7 +32,7 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
-
+use App\Models\UserCoin;
 use stdClass;
 
 class GameController extends BaseController
@@ -222,7 +222,7 @@ class GameController extends BaseController
         );
     }
 
-    public function endSingleGame(Request $request, ReferralService $referralService)
+    public function endSingleGame(Request $request, ReferralService $referralService, ClientPlatform $clientPlatform)
     {
 
         Log::info($request->all());
@@ -315,8 +315,14 @@ class GameController extends BaseController
         }
 
 
+
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
+
+
+        if($clientPlatform == ClientPlatform::GameArkMobile){
+            $game = $this->processUserCoin($game);
+        }
 
         if (FeatureFlag::isEnabled('odds') && $staking == null) {
             $game->points_gained = $points * $game->odd_multiplier;
@@ -371,5 +377,27 @@ class GameController extends BaseController
         Event::dispatch(new AchievementBadgeEvent($request, AchievementType::GAME_PLAYED, $game));
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
+    }
+
+    public function processUserCoin($game)
+    {
+        $coinsEarned = 0;
+        $userScore = $game->correct_count;
+        if($userScore == 10){
+            $coinsEarned = 30;
+        } else if($userScore >= 8 ){
+            $coinsEarned = 20;
+        } else if($userScore >= 5 && $userScore < 8 ){
+            $coinsEarned = 10;
+        } else if($userScore > 2 && $userScore < 5){
+            $coinsEarned = 5;
+        } else {
+            $coinsEarned = 0;
+        }
+        $game->coins_earned = $coinsEarned;
+        $currentUserCoin = $this->user->getUserCoins();
+        $newUserCoin = $currentUserCoin + $coinsEarned;
+        UserCoin::where('user_id', $this->user->id)->update(['coins_value' => $newUserCoin]);
+        return $game;
     }
 }

@@ -777,4 +777,31 @@ class GameTest extends TestCase
             'message' => 'You can only make a first time stake of 200 naira',
         ]);
     }
+
+    public function test_gameark_users_can_be_rewarded_coins_after_game_ended()
+    {
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+
+        // $response->assertJson([
+        //     'message' => 'Game Ended',
+        // ]);
+        
+        $response->assertJsonStructure([
+            "message",
+            "data" => [
+                "coins_earned"
+            ]
+        ]);
+    }
 }
