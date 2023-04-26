@@ -136,7 +136,7 @@ class WalletController extends BaseController
                 'reference' => $reference, // unique to transactions
             ]);
         } catch (PaystackException $e) {
-            Log::info("transaction could not be verified . Error : ". $e->getMessage());
+            Log::info("transaction could not be verified . Error : " . $e->getMessage());
             return false;
         }
 
@@ -189,7 +189,9 @@ class WalletController extends BaseController
 
     private function savePaymentTransaction($reference, $email, $amount)
     {
-        if (!is_null(WalletTransaction::where('reference', $reference)->first())) {
+        $transaction = WalletTransaction::where('reference', $reference)->sharedLock()->first();
+
+        if (!is_null($transaction)) {
             Log::info('payment transaction already exists');
             return response("", 200);
         }
@@ -404,7 +406,7 @@ class WalletController extends BaseController
 
     public function itemPurchased(Request $request, ClientPlatform $clientPlatform)
     {
-        if($clientPlatform != ClientPlatform::GameArkMobile){
+        if ($clientPlatform != ClientPlatform::GameArkMobile) {
             return $this->sendError('App type not supported', 'App type not supported');
         }
         $data = $request->validate([
@@ -448,8 +450,7 @@ class WalletController extends BaseController
 
             // trigger event for achievement
             Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
-
-        }else{
+        } else {
             $planId = $data['item_id'];
 
             $plan = Plan::find($planId);
@@ -472,7 +473,5 @@ class WalletController extends BaseController
 
             return response("Item purchased", 200);
         }
-
-
     }
 }
