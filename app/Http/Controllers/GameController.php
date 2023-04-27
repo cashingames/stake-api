@@ -227,7 +227,7 @@ class GameController extends BaseController
 
         Log::info($request->all());
 
-        $game = $this->user->gameSessions()->where('session_token', $request->token)->first();
+        $game = $this->user->gameSessions()->where('session_token', $request->token)->sharedLock()->first();
         if ($game == null) {
             Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
