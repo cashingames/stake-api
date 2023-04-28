@@ -35,7 +35,6 @@ class UserController extends BaseController
         $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
-        $result->unreadNotificationsCount = $this->user->unreadNotifications()->count();
         $result->bookBalance = $this->user->bookBalance();
 
         if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
@@ -51,8 +50,10 @@ class UserController extends BaseController
             $result->hasActivePlan = $this->user->hasActivePlan();
             $result->boosts = $this->user->gameArkUserBoosts();
             $result->coinsBalance = $this->user->getUserCoins();
-        }else{
+            $result->unreadNotificationsCount = $this->user->gameArkUnreadNotifications();
+        } else {
             $result->boosts = $this->user->userBoosts();
+            $result->unreadNotificationsCount = $this->user->cashingamesUnreadNotifications();
         }
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
@@ -104,7 +105,7 @@ class UserController extends BaseController
     {
         $user = User::find($this->user->id);
 
-        if(is_null($user)){
+        if (is_null($user)) {
             return $this->sendResponse('Your Account has been deleted', 'Your Account has been deleted');
         }
 

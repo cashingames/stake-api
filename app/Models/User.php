@@ -119,7 +119,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Achievement::class);
     }
 
-    public function challengeRequests(){
+    public function challengeRequests()
+    {
         return $this->hasMany(ChallengeRequest::class);
     }
 
@@ -305,7 +306,7 @@ class User extends Authenticatable implements JWTSubject
         return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
     }
 
-        public function getAverageOfRecentGames()
+    public function getAverageOfRecentGames()
     {
         $lastTwoGamesAverage = $this->gameSessions()
             ->completed()
@@ -367,8 +368,8 @@ class User extends Authenticatable implements JWTSubject
     public function userAchievementBadge()
     {
         $db = AchievementBadge::join('user_achievement_badges', function ($join) {
-                $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
-            })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'milestone_count', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl', 'quality_image')->get();
+            $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
+        })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'milestone_count', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl', 'quality_image')->get();
 
         DB::table('user_achievement_badges')->where('user_id', $this->id)->where('is_claimed', 1)->update(array(
             'is_notified' => 1
@@ -408,7 +409,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->transactions()->unsettled()->sum('amount');
     }
 
-    public function totalWithdrawals(){
+    public function totalWithdrawals()
+    {
         return $this->transactions()->withdrawals()->sum('amount');
     }
 
@@ -436,20 +438,25 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function userCoins()
-        {
-            return $this->hasOne(UserCoin::class);
-        }
-
-        public function getUserCoins()
     {
-        $userCoin = UserCoin::where('user_id', $this->id)->first();
-        if(is_null($userCoin)){
-        //    $userCoin = UserCoin::create(['coins_value' => 0, 'user_id' => $this->id]);
-        $userCoin = $this->userCoins()->create(['coins_value' => 0]);
-
-        }
-        return $userCoin->sum('coins_value');
-            // ->sum('coins_value');
+        return $this->hasOne(UserCoin::class);
     }
 
+    public function getUserCoins()
+    {
+        $userCoin = UserCoin::where('user_id', $this->id)->first();
+        if (is_null($userCoin)) {
+            $userCoin = $this->userCoins()->create(['coins_value' => 0]);
+        }
+        return $userCoin->sum('coins_value');
+    }
+
+    public function gameArkUnreadNotifications()
+    {
+        return $this->unreadNotifications()->count();
+    }
+    public function cashingamesUnreadNotifications()
+    {
+        return $this->unreadNotifications()->where('type', 'NOT LIKE', '%challenge%')->count();
+    }
 }
