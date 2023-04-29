@@ -30,6 +30,20 @@ return [
         'min_amount' => env('MINIMUM_WALLET_FUNDABLE_AMOUNT', 100),
         'max_amount' => env('MAXIMUM_WALLET_FUNDABLE_AMOUNT', 100000)
     ],
+    'coin_reward' => [
+        'user_scores' => [
+            'perfect_score' => env('PERFECT_SCORE', 10),
+            'high_score' => env('HIGH_SCORE', 8),
+            'medium_score' => env('MEDIUM_SCORE', 5),
+            'low_score' => env('LOW_SCORE', 2)
+        ],
+        'coins_earned' => [
+            'perfect_coin' => env('PERFECT_COIN', 30),
+            'high_coin' => env('HIGH_COIN', 20),
+            'medium_coin' => env('MEDIUM_COIN', 10),
+            'low_coin' => env('LOW_COIN', 5)
+        ]
+    ],
     'platform_target' => env('PLATFORM_TARGET_PERCENTAGE', 50),
     'min_version_code' => env('MIN_CODE_VERSION', '1.0.35'),
     'minimum_game_boost_score' => env("MINIMUM_GAME_BOOST_SCORE", 4),

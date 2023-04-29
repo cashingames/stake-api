@@ -10,7 +10,8 @@ class UserCoin extends Model
     use HasFactory;
 
     protected $fillable =[
-        'coins_value'
+        'coins_value',
+        'user_id'
     ];
     public function users()
     {

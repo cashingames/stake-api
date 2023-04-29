@@ -60,7 +60,8 @@ class ProfileTest extends TestCase
                 'boosts' => [],
                 'achievements' => [],
                 'hasActivePlan' => false,
-                'unreadNotificationsCount' => 0
+                'unreadNotificationsCount' => 0,
+                'coinsBalance' => $this->user->getUserCoins()
             ]
         ]);
     }

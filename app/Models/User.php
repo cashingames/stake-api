@@ -446,9 +446,9 @@ class User extends Authenticatable implements JWTSubject
     {
         $userCoin = UserCoin::where('user_id', $this->id)->first();
         if (is_null($userCoin)) {
-            $userCoin = $this->userCoins()->create(['coins_value' => 0]);
+            return 0;
         }
-        return $userCoin->sum('coins_value');
+        return $userCoin->coins_value;
     }
 
     public function gameArkUnreadNotifications()
@@ -458,5 +458,9 @@ class User extends Authenticatable implements JWTSubject
     public function cashingamesUnreadNotifications()
     {
         return $this->unreadNotifications()->where('type', 'NOT LIKE', '%challenge%')->count();
+    }
+    public function coinsTransaction()
+    {
+        return $this->hasMany(UserCoinTransaction::class);
     }
 }
