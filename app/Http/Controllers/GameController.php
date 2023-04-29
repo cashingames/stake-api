@@ -394,6 +394,7 @@ class GameController extends BaseController
         } else {
             $coinsEarned = 0;
         }
+        
         $game->coins_earned = $coinsEarned;
         $currentUserCoin = $this->user->getUserCoins();
         $newUserCoin = $currentUserCoin + $coinsEarned;

@@ -842,13 +842,12 @@ class GameTest extends TestCase
             "chosenOptions" => [],
             "consumedBoosts" => []
         ]);
-        // $coinsWon = config('trivia.coin_reward.coins_earned.perfect_coin');
-        // $game->update(['correct_count' => config('trivia.coin_reward.coins_earned.perfect_score')]);
-        // $game->update(['coins_earned' => $coinsWon]);
 
         $this->assertDatabaseHas('user_coin_transactions', [
             'user_id' => $this->user->id,
             'transaction_type' => 'CREDIT',
+            'description' => 'Game coins awarded',
+            'value' => 0
         ]);
     }
 
