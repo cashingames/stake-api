@@ -383,21 +383,32 @@ class GameController extends BaseController
     {
         $coinsEarned = 0;
         $userScore = $game->correct_count;
-        if($userScore == 10){
-            $coinsEarned = 30;
-        } else if($userScore >= 8 ){
-            $coinsEarned = 20;
-        } else if($userScore >= 5 && $userScore < 8 ){
-            $coinsEarned = 10;
-        } else if($userScore > 2 && $userScore < 5){
-            $coinsEarned = 5;
+        if($userScore == config('trivia.coin_reward.user_scores.perfect_score')){
+            $coinsEarned =  config('trivia.coin_reward.coins_earned.perfect_coin');
+        } else if($userScore >= config('trivia.coin_reward.user_scores.high_score')){
+            $coinsEarned = config('trivia.coin_reward.coins_earned.high_coin');
+        } else if($userScore >= config('trivia.coin_reward.user_scores.medium_score')){
+            $coinsEarned = config('trivia.coin_reward.coins_earned.medium_coin');
+        } else if($userScore >  config('trivia.coin_reward.user_scores.low_score')){
+            $coinsEarned = config('trivia.coin_reward.coins_earned.low_coin');
         } else {
             $coinsEarned = 0;
         }
         $game->coins_earned = $coinsEarned;
         $currentUserCoin = $this->user->getUserCoins();
         $newUserCoin = $currentUserCoin + $coinsEarned;
-        UserCoin::where('user_id', $this->user->id)->update(['coins_value' => $newUserCoin]);
+        $userCoin = $this->user->userCoins()->firstOrNew();
+        if(is_null($userCoin)){
+            UserCoin::create(['coins_value' => $newUserCoin, 'user_id' => $this->user->id]);
+        }else{
+            UserCoin::where('user_id', $this->user->id)->update(['coins_value' => $newUserCoin]);
+        }
+        $this->user->coinsTransaction()->create([
+            'user_id' => $this->user->id,
+            'transaction_type' => 'CREDIT',
+            'description' => 'Game coins awarded',
+            'value' => $coinsEarned
+        ]);
         return $game;
     }
 }

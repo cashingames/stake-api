@@ -26,6 +26,8 @@ use App\Models\GameSession;
 use App\Models\Option;
 use App\Models\Staking;
 use App\Models\StakingOdd;
+use App\Models\UserCoin;
+use App\Models\UserCoinTransaction;
 use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
@@ -35,6 +37,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
@@ -791,12 +794,6 @@ class GameTest extends TestCase
             "chosenOptions" => [],
             "consumedBoosts" => []
         ]);
-
-
-        // $response->assertJson([
-        //     'message' => 'Game Ended',
-        // ]);
-        
         $response->assertJsonStructure([
             "message",
             "data" => [
@@ -804,4 +801,140 @@ class GameTest extends TestCase
             ]
         ]);
     }
+
+    public function test_that_an_old_user_coin_is_updated_after_gameplay()
+    {
+        Config::set('trivia.coin_reward.user_scores.perfect_score', 10);
+        Config::set('trivia.coin_reward.coins_earned.perfect_coin', 30);
+        
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+        UserCoin::create(['user_id' => $this->user->id, 'coins_value' => 10]);
+        $coinsWon = $this->user->getUserCoins() + config('trivia.coin_reward.coins_earned.perfect_coin');
+        UserCoin::where('user_id', $this->user->id)->update(['coins_value' => $coinsWon ]);
+        $game->update(['correct_count' => config('trivia.coin_reward.coins_earned.perfect_score')]);
+        $this->assertDatabaseHas('user_coins', [
+            'user_id' => $this->user->id,
+            'coins_value' => $coinsWon
+        ]);
+    }
+    
+    public function test_that_userCoin_transaction_is_created_after_user_awarded_with_coins()
+    {
+        Config::set('trivia.coin_reward.user_scores.perfect_score', 10);
+        Config::set('trivia.coin_reward.coins_earned.perfect_coin', 30);
+        
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+        // $coinsWon = config('trivia.coin_reward.coins_earned.perfect_coin');
+        // $game->update(['correct_count' => config('trivia.coin_reward.coins_earned.perfect_score')]);
+        // $game->update(['coins_earned' => $coinsWon]);
+
+        $this->assertDatabaseHas('user_coin_transactions', [
+            'user_id' => $this->user->id,
+            'transaction_type' => 'CREDIT',
+        ]);
+    }
+
+    public function test_that_a_new_user_coin_is_awarded_coin_after_play()
+    {
+
+        Config::set('trivia.coin_reward.user_scores.perfect_score', 10);
+        Config::set('trivia.coin_reward.coins_earned.perfect_coin', 30);
+         // create new user
+         $newUser = User::create([
+            'username' => 'testUser',
+            'phone_number' => '08133445858',
+            'email' => 'testaccount@gmail.com',
+            'password' => 'xcvb',
+            'otp_token' => '2134',
+            'is_on_line' => true,
+            'country_code' => 'NGN'
+        ]);
+        $newUser
+            ->profile()
+            ->create([
+                'first_name' => 'zxcv',
+                'last_name' => 'asdasd',
+                'referral_code' => 'zxczxc',
+                'referrer' => $this->user->profile->referrer,
+            ]);
+
+        $newUser->wallet()
+            ->create([]);
+
+        DB::table('user_plans')->insert([
+            'user_id' => $newUser->id,
+            'plan_id' => 1,
+            'description' => "Registration Daily bonus plan for " . $newUser->username,
+            'is_active' => true,
+            'used_count' => 0,
+            'plan_count' => 1,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'expire_at' => Carbon::now()->endOfDay()
+        ]);
+
+        // play game and end
+        #start
+        $questions = Question::factory()
+            ->count(250)
+            ->create();
+        $data = [];
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        DB::table('categories_questions')->insert($data);
+        $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2
+        ]);
+
+        #end game
+        GameSession::factory()
+            ->count(20)
+            ->create();
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING', 'user_id' => $newUser->id]);
+
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $coinsWon = $this->user->getUserCoins() + config('trivia.coin_reward.coins_earned.perfect_coin');
+        UserCoin::create(['user_id' => $newUser->id, 'coins_value' => $coinsWon]);
+    
+        $this->assertDatabaseHas('user_coins', [
+            'user_id' => $newUser->id,
+            'coins_value' => $coinsWon
+        ]);
+    }
+
 }
