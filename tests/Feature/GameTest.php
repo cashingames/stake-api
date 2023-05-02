@@ -878,6 +878,8 @@ class GameTest extends TestCase
         $newUser->wallet()
             ->create([]);
 
+            $this->actingAs($newUser);
+
         DB::table('user_plans')->insert([
             'user_id' => $newUser->id,
             'plan_id' => 1,
@@ -915,9 +917,9 @@ class GameTest extends TestCase
         GameSession::factory()
             ->count(20)
             ->create();
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
-        $game = $this->user->gameSessions()->first();
-        $game->update(['state' => 'ONGOING', 'user_id' => $newUser->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $newUser->id]);
+        $game = $newUser->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
 
         $response = $this->withHeaders([
             'x-brand-id' => 10,
@@ -927,9 +929,7 @@ class GameTest extends TestCase
             "consumedBoosts" => []
         ]);
 
-        $coinsWon = $this->user->getUserCoins() + config('trivia.coin_reward.coins_earned.perfect_coin');
-        UserCoin::create(['user_id' => $newUser->id, 'coins_value' => $coinsWon]);
-    
+        $coinsWon = $newUser->getUserCoins();    
         $this->assertDatabaseHas('user_coins', [
             'user_id' => $newUser->id,
             'coins_value' => $coinsWon
