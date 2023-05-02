@@ -331,9 +331,37 @@ class SendPushNotification
         Log::info('Logger: FCM Sent TO-> '.$device_token->device_token);
     }
 
-    public function sendDailyReminderNotification($user, $hasMany = false, $title, $msg)
+    public function sendDailyReminderNotification($usersToken, $hasMany = false, $title, $msg)
     {
+        if(is_array($usersToken)){
+            // divide the tokens into 900
+            $maxPerBatch = 900;
+            $totalToken = count($usersToken);
+            $length = ($totalToken > $maxPerBatch) ? ceil($totalToken / $maxPerBatch) : 1 ;
+            $current = 0;
 
+            for ($i=0; $i < $length ; $i++) {
+
+                $tokens = [];
+                // fetch upto 900 from list
+                for($j = 0 ; $j < $maxPerBatch; $j++){
+
+                    if($current < $totalToken){
+                        $tokens[] = $usersToken[$current];
+                    }
+                    $current++;
+                }
+
+                $this->sendNotificationInBatches($tokens, $hasMany, $title, $msg);
+            }
+        }else{
+            $this->sendNotificationInBatches($usersToken, $hasMany, $title, $msg);
+        }
+
+    }
+
+    public function sendNotificationInBatches($user, $hasMany = false, $title, $msg)
+    {
         $instance = $this->pushService->setNotification(
             [
                 'title' => $title,
