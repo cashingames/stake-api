@@ -251,10 +251,11 @@ class RegisterTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_a_user_can_register_without_first_and_last_name_and_username_from_stakers_app()
+    public function test_a_user_can_register_without_first_and_last_name_from_stakers_app()
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'username'=>'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -265,6 +266,7 @@ class RegisterTest extends TestCase
 
 
         $this->assertDatabaseHas('users', [
+            'username' => 'janeJoe',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
             'country_code' => '+234',
@@ -275,6 +277,7 @@ class RegisterTest extends TestCase
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'username'=>'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -284,6 +287,7 @@ class RegisterTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
+            'username'=>'janeJoe',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
             'country_code' => '+234',
@@ -319,6 +323,7 @@ class RegisterTest extends TestCase
         config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'username'=>'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -362,6 +367,7 @@ class RegisterTest extends TestCase
     public function test_new_user_gets_boost_bonus_in_stakers_app()
     {
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'username'=>'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',

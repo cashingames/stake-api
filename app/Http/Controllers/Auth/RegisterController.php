@@ -74,7 +74,7 @@ class RegisterController extends BaseController
                 'string', 'max:255',
             ],
             'username' => [
-                'string', 'string', 'alpha_num', 'max:255', 'unique:users',
+                'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
             ],
             'country_code' => [
                 'string', 'max:4', 'required'
@@ -101,9 +101,7 @@ class RegisterController extends BaseController
 
         $user =
             User::create([
-                'username' => $platform !== ClientPlatform::StakingMobileWeb
-                    ? $data['username']
-                    : strstr($data['email'], '@', true) . mt_rand(10, 99),
+                'username' => $data['username'],
                 'phone_number' =>  ( ($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
