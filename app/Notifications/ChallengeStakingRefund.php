@@ -2,12 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Enums\PushNotificationType;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ChallengeStakingRefund extends Notification 
+class ChallengeStakingRefund extends Notification
 {
     use Queueable;
 
@@ -26,18 +27,7 @@ class ChallengeStakingRefund extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        return ['fcm', 'database'];
     }
 
     /**
@@ -45,10 +35,23 @@ class ChallengeStakingRefund extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         return [
-            //
+            'title' => "Your challenge staking has been refunded",
+            'action_type' => PushNotificationType::ActivityUpdate,
+            'action_id' => '#'
+        ];
+    }
+
+    public function toFcm($notifiable): array
+    {
+        return [
+            'title' => "Cashingames Challenge Staking Refund",
+            'body' => "Your challenge staking has been refunded",
+            'action_type' => PushNotificationType::ActivityUpdate,
+            'action_id' => '#',
+            'unread_notifications_count' => $notifiable->unreadNotifications()->count()
         ];
     }
 }
