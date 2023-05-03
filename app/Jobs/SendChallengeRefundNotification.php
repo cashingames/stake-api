@@ -32,6 +32,8 @@ class SendChallengeRefundNotification implements ShouldQueue
      */
     public function handle(SendPushNotification $pushNotification): void
     {   
+        //redo to use new custom notification class like so:
+        //$user->notify(new ChallengeStakingRefund());
         $pushNotification->sendChallengeStakingRefundNotification($this->user, $this->request);
     }
 }

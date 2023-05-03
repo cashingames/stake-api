@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Enums\ClientPlatform;
+use App\Notifications\CustomNotificationChannels\FcmNotificationChannel;
 use App\Services\Firebase\FirestoreService;
 use App\Services\SMS\TermiiService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Support\Facades\Notification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,5 +47,9 @@ class AppServiceProvider extends ServiceProvider
             FirestoreService::class,
             fn() => new FirestoreService()
         );
+        
+        Notification::extend('fcm', function ($app) {
+            return new FcmNotificationChannel();
+        });
     }
 }

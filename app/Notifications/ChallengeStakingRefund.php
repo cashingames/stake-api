@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Notifications;
+
+use App\Enums\PushNotificationType;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class ChallengeStakingRefund extends Notification
+{
+    use Queueable;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return ['fcm', 'database'];
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray($notifiable): array
+    {
+        return [
+            'title' => "Your challenge staking has been refunded",
+            'action_type' => PushNotificationType::ActivityUpdate,
+            'action_id' => '#'
+        ];
+    }
+
+    public function toFcm($notifiable): array
+    {
+        return [
+            'title' => "Cashingames Challenge Staking Refund",
+            'body' => "Your challenge staking has been refunded",
+            'action_type' => PushNotificationType::ActivityUpdate,
+            'action_id' => '#',
+            'unread_notifications_count' => $notifiable->unreadNotifications()->count()
+        ];
+    }
+}
