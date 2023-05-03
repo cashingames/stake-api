@@ -28,7 +28,12 @@ class SocialSignInController extends BaseController
      */
     public function authenticateUser(Request $request, ClientPlatform $clientPlatform)
     {
+        // check if user exist
         $returningUser = User::where('email', $request->email)->first();
+        if( ($returningUser == null) && (!is_null($request->appleUserId)) && ($clientPlatform == ClientPlatform::GameArkMobile)){
+            $returningUser = User::where('apple_user_id', $request->appleUserId)->first();
+        }
+
         if ($returningUser != null) {
             $token = auth()->tokenById($returningUser->id);
 
@@ -50,7 +55,8 @@ class SocialSignInController extends BaseController
                 'username' => ( is_null($request->firstName)) ? strstr($request->email, '@', true) . mt_rand(10, 99) : ($request->firstName).''.rand(10,1000),
                 'country_code' => '',
                 'phone_number' => '',
-                'referrer' => null
+                'referrer' => null,
+                'apple_user_id' => $request->appleUserId
             ];
 
             $token = $this->createAction($payload);
