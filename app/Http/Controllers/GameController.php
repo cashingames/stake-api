@@ -399,11 +399,10 @@ class GameController extends BaseController
         $currentUserCoin = $this->user->getUserCoins();
         $newUserCoin = $currentUserCoin + $coinsEarned;
         $userCoin = $this->user->userCoins()->firstOrNew();
-        if(is_null($userCoin)){
-            UserCoin::create(['coins_value' => $newUserCoin, 'user_id' => $this->user->id]);
-        }else{
-            UserCoin::where('user_id', $this->user->id)->update(['coins_value' => $newUserCoin]);
-        }
+        $userCoin->coins_value = $newUserCoin;
+        $userCoin->user_id = $this->user->id;
+        $userCoin->save();
+       
         $this->user->coinsTransaction()->create([
             'user_id' => $this->user->id,
             'transaction_type' => 'CREDIT',
