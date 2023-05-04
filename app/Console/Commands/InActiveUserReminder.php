@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\SendPushNotification;
+use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -46,9 +47,9 @@ class InActiveUserReminder extends Command
      *
      * @return int
      */
-    public function handle(SendPushNotification $pushNotification)
+    public function handle()
     {
-
+        $pushNotification = new SendPushNotification(ClientPlatform::GameArkMobile);
         $date=new datetime();
         $lastsevendaysdate= date_sub($date,date_interval_create_from_date_string("7 days"));
         $lastthirtydaysdate= date_sub($date,date_interval_create_from_date_string("30 days"));

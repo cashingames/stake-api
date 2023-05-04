@@ -10,6 +10,7 @@ use App\Models\Plan;
 use App\Models\FcmPushSubscription;
 use Illuminate\Support\Facades\DB;
 use App\Actions\SendPushNotification;
+use App\Enums\ClientPlatform;
 
 class FcmDailyAfternoonPlayGameReminder extends Command
 {
@@ -32,8 +33,9 @@ class FcmDailyAfternoonPlayGameReminder extends Command
      *
      * @return int
      */
-    public function handle(SendPushNotification $pushNotification)
+    public function handle()
     {
+        $pushNotification = new SendPushNotification(ClientPlatform::GameArkMobile);
         $pushTokens = $this->GetDailyReminderUserToken();
 
         // send

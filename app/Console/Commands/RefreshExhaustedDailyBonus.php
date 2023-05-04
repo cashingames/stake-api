@@ -10,6 +10,7 @@ use App\Models\Plan;
 use Illuminate\Support\Facades\DB;
 use App\Models\FcmPushSubscription;
 use App\Actions\SendPushNotification;
+use App\Enums\ClientPlatform;
 
 class RefreshExhaustedDailyBonus extends Command
 {
@@ -35,8 +36,9 @@ class RefreshExhaustedDailyBonus extends Command
      *
      * @return int
      */
-    public function handle(SendPushNotification $pushNotification)
+    public function handle()
     {
+        $pushNotification = new SendPushNotification(ClientPlatform::GameArkMobile);
         // $today = Carbon::now()->endOfDay();
         $freePlan = Plan::where('is_free', true)->first();
 
