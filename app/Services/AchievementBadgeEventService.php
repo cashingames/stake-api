@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\UserPoint;
 use App\Models\User;
+use App\Models\UserCoin;
+use App\Models\UserCoinTransaction;
 use App\Models\AchievementBadge;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Str;
@@ -217,15 +219,19 @@ class AchievementBadgeEventService{
             return null;
         }
 
+        // we are no longer rewarding for points or cash
+        //
         switch ($achievement->reward_type) {
             case AchievementType::REWARD_CASH:
                 # code...
-                $this->rewardByCash($badge, $achievement->reward);
+                // $this->rewardByCash($badge, $achievement->reward);
+                $this->rewardByCoin($badge, $achievement->reward);
                 break;
 
             case AchievementType::REWARD_POINT:
                 # code...
-                $this->rewardByPoint($badge, $achievement->reward);
+                // $this->rewardByPoint($badge, $achievement->reward);
+                $this->rewardByCoin($badge, $achievement->reward);
                 break;
 
             default:
@@ -270,6 +276,32 @@ class AchievementBadgeEventService{
                 'non_withdrawable_balance' => $user->wallet->non_withdrawable_balance + $reward
             ));
 
+
+            DB::table('user_achievement_badges')->where('id', $badge->id)->update(array(
+                'is_rewarded' => 1
+            ));
+        });
+
+    }
+
+    public function rewardByCoin($badge, $reward){
+        // code to reward the point to the user
+        $user = $this->user;
+
+        DB::transaction(function() use ($user, $reward, $badge) {
+            UserCoinTransaction::create([
+                'user_id' => $this->user->id,
+                'transaction_type' => 'CREDIT',
+                'description' => 'Coins awarded from achievement',
+                'value' => $reward
+            ]);
+
+            $currentUserCoin = $this->user->getUserCoins();
+            $newUserCoin = $currentUserCoin + $reward;
+            $userCoin = $this->user->userCoins()->firstOrNew();
+            $userCoin->coins_value = $newUserCoin;
+            $userCoin->user_id = $this->user->id;
+            $userCoin->save();
 
             DB::table('user_achievement_badges')->where('id', $badge->id)->update(array(
                 'is_rewarded' => 1
