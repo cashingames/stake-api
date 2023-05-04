@@ -10,22 +10,19 @@ class NotificationController extends BaseController
     /**
      * Fetch all notifications
      */
-    public function index(ClientPlatform $platform, Request $request)
+    public function index( Request $request)
     {
         $notifications = $this->user->notifications();
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-            $notifications->where('type', 'NOT LIKE', '%challenge%');
-        }
 
         return $this->sendResponse($notifications->paginate(20), "Notifications fetched successfully");
     }
     /**
      * Mark single or all user notifications as read
      */
-    public function readNotification(ClientPlatform $platform, Request $request, $notificationId)
+    public function readNotification(Request $request, $notificationId)
     {
         $notificationId == "all" ?
-            $this->readAllNotifications($platform) :
+            $this->readAllNotifications() :
             $this->readSingleNotification($notificationId);
 
         $unreadNotifications = $this->user->unreadNotifications()->count();
@@ -41,14 +38,10 @@ class NotificationController extends BaseController
         UserNotification::whereId($notificationId)->update(['read_at' => now()]);
     }
 
-    private function readAllNotifications(ClientPlatform $platform)
+    private function readAllNotifications()
     {
 
         $query = $this->user->unreadNotifications();
-
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-            $query->where('type', 'NOT LIKE', '%challenge%');
-        }
 
         $query->update(['read_at' => now()]);
     }

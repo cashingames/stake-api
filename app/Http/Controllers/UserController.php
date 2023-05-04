@@ -36,6 +36,7 @@ class UserController extends BaseController
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->bookBalance = $this->user->bookBalance();
+        $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
 
         if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
             $result->points = $this->user->points();
@@ -50,10 +51,8 @@ class UserController extends BaseController
             $result->hasActivePlan = $this->user->hasActivePlan();
             $result->boosts = $this->user->gameArkUserBoosts();
             $result->coinsBalance = $this->user->getUserCoins();
-            $result->unreadNotificationsCount = $this->user->gameArkUnreadNotifications();
         } else {
             $result->boosts = $this->user->userBoosts();
-            $result->unreadNotificationsCount = $this->user->cashingamesUnreadNotifications();
         }
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");

@@ -100,24 +100,24 @@ class NotificationTest extends TestCase
         $this->assertEquals($readCount, 3);
     }
 
-    public function test_can_mark_all_notifications_as_read_does_not_read_challenge()
-    {
+    // public function test_can_mark_all_notifications_as_read_does_not_read_challenge()
+    // {
 
-        $this->withHeaders([
-            'x-brand-id' => 2,
-        ])->postJson(self::NOTIFICATION_URL . "/read/all");
+    //     $this->withHeaders([
+    //         'x-brand-id' => 2,
+    //     ])->postJson(self::NOTIFICATION_URL . "/read/all");
 
-        $readCount = UserNotification::whereNotNull('read_at')->count();
+    //     $readCount = UserNotification::whereNotNull('read_at')->count();
 
-        $this->assertEquals($readCount, 1);
-    }
+    //     $this->assertEquals($readCount, 1);
+    // }
 
-    public function test_that_challenge_notifications_are_not_returned_for_staking_platform()
-    {
-        $response = $this->withHeaders([
-            'x-brand-id' => 2,
-        ])->getJson(self::NOTIFICATION_URL);
+    // public function test_that_challenge_notifications_are_not_returned_for_staking_platform()
+    // {
+    //     $response = $this->withHeaders([
+    //         'x-brand-id' => 2,
+    //     ])->getJson(self::NOTIFICATION_URL);
 
-        $response->assertJsonCount(1, 'data.data');
-    }
+    //     $response->assertJsonCount(1, 'data.data');
+    // }
 }
