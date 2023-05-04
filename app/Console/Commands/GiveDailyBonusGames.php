@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\SendPushNotification;
+use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -43,8 +44,9 @@ class GiveDailyBonusGames extends Command
      *
      * @return int
      */
-    public function handle(SendPushNotification $pushNotification)
+    public function handle()
     {
+        $pushNotification = new SendPushNotification(ClientPlatform::GameArkMobile);
         $freePlan = Plan::where('is_free', true)->first();
 
         User::all()->map(function ($user) use ($freePlan) {
