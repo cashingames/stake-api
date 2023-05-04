@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Notifications\ChallengeStakingRefund;
 
 class SendChallengeRefundNotification implements ShouldQueue
 {
@@ -30,10 +31,9 @@ class SendChallengeRefundNotification implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(SendPushNotification $pushNotification): void
+    public function handle(): void
     {   
-        //redo to use new custom notification class like so:
-        //$user->notify(new ChallengeStakingRefund());
-        $pushNotification->sendChallengeStakingRefundNotification($this->user, $this->request);
+        $this->user->notify(new ChallengeStakingRefund($this->request->amount));
+    
     }
 }

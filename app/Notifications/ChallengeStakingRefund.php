@@ -12,12 +12,14 @@ class ChallengeStakingRefund extends Notification
 {
     use Queueable;
 
+    public $amount;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($amount)
     {
-        //
+        $this->amount = $amount;
     }
 
     /**
@@ -39,7 +41,7 @@ class ChallengeStakingRefund extends Notification
     {
         return [
             'title' => "Your challenge staking has been refunded",
-            'action_type' => PushNotificationType::ActivityUpdate,
+            'action_type' => PushNotificationType::Challenge,
             'action_id' => '#'
         ];
     }
@@ -48,8 +50,8 @@ class ChallengeStakingRefund extends Notification
     {
         return [
             'title' => "Cashingames Challenge Staking Refund",
-            'body' => "Your challenge staking has been refunded",
-            'action_type' => PushNotificationType::ActivityUpdate,
+            'body' => "Your challenge staking of ₦$this->amount has been refunded",
+            'action_type' => PushNotificationType::Challenge,
             'action_id' => '#',
             'unread_notifications_count' => $notifiable->unreadNotifications()->count()
         ];

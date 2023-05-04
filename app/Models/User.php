@@ -452,14 +452,11 @@ class User extends Authenticatable implements JWTSubject
         return $userCoin->coins_value;
     }
 
-    public function gameArkUnreadNotifications()
+    public function getUnreadNotificationsCount()
     {
         return $this->unreadNotifications()->count();
     }
-    public function cashingamesUnreadNotifications()
-    {
-        return $this->unreadNotifications()->where('type', 'NOT LIKE', '%challenge%')->count();
-    }
+
     public function coinsTransaction()
     {
         return $this->hasMany(UserCoinTransaction::class);
