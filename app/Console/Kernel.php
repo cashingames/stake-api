@@ -52,7 +52,7 @@ class Kernel extends ConsoleKernel
         // fcm:contraint-reminder
         $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
         $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
-        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('13:00');
+        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
         $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
 
 
