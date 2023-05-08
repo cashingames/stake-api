@@ -287,7 +287,6 @@ class GameController extends BaseController
             $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
             if (!is_null($staking)) {
-                dd('ebe a');
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
                 if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
