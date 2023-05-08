@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
 use App\Models\Wallet;
 use App\Enums\AchievementType;
 
-class AchievementBadgeEventService{
+class AchievementBadgeEventService
+{
     public $user;
 
     public function __construct($user)
@@ -23,16 +24,17 @@ class AchievementBadgeEventService{
         $this->user = $user;
     }
 
-    public function boostBought($user, $payload){
+    public function boostBought($user, $payload)
+    {
         // change from id to name
         switch ($payload->name) {
 
-            case AchievementType::BOOST_TIME_FREEZE :
+            case AchievementType::BOOST_TIME_FREEZE:
                 # code for time freeze...
                 $this->badgeStateLogic($user, 24, 5);
                 break;
 
-            case AchievementType::BOOST_SKIP :
+            case AchievementType::BOOST_SKIP:
                 # code for skip...
                 $this->badgeStateLogic($user, 23, 5);
                 break;
@@ -43,20 +45,21 @@ class AchievementBadgeEventService{
         }
     }
 
-    public function gameBought($user, $payload){
+    public function gameBought($user, $payload)
+    {
         // change from id to name
         switch ($payload->name) {
-            case AchievementType::GAME_LEAST :
+            case AchievementType::GAME_LEAST:
                 # code for least p bought...
                 $this->badgeStateLogic($user, 20, 10);
                 break;
 
-            case AchievementType::GAME_DOUBLE :
+            case AchievementType::GAME_DOUBLE:
                 # code for double o bought...
                 $this->badgeStateLogic($user, 21, 10);
                 break;
 
-            case AchievementType::GAME_ULTIMATE :
+            case AchievementType::GAME_ULTIMATE:
                 # code for ultimate bought...
                 $this->badgeStateLogic($user, 22, 10);
                 break;
@@ -67,19 +70,23 @@ class AchievementBadgeEventService{
         }
     }
 
-    public function challengeStarted($user){
+    public function challengeStarted($user)
+    {
         $this->badgeStateLogic($user, 17);
         $this->badgeStateLogic($user, 19, 20);
     }
-    public function challengeAccepted($user){
+    public function challengeAccepted($user)
+    {
         $this->badgeStateLogic($user, 18);
     }
 
-    public function referralKing($user){
+    public function referralKing($user)
+    {
         $this->badgeStateLogic($user, 25, 30);
     }
 
-    public function gamePlayed($user, $payload){
+    public function gamePlayed($user, $payload)
+    {
 
         # FOR GOOD STARTED
         $this->processFirstBadge($user, $payload);
@@ -88,13 +95,13 @@ class AchievementBadgeEventService{
         // get game information
         // game category
         $categoryPlaying = DB::table('categories')->where('id', $payload->category_id)->first();
-        if($categoryPlaying->category_id != 0){
+        if ($categoryPlaying->category_id != 0) {
             // parent category
             $categoryPlaying = DB::table('categories')->where('id', $categoryPlaying->category_id)->first();
         }
 
         switch (strtolower($categoryPlaying->name)) {
-            case AchievementType::GAME_PLAYED_FOOTBALL :
+            case AchievementType::GAME_PLAYED_FOOTBALL:
                 # code relating to football...
                 $this->numberofGamePlayedLogic($user, $payload, 4);
                 $this->scoringWithinARangeLogic($user, $payload, 7);
@@ -103,7 +110,7 @@ class AchievementBadgeEventService{
                 $this->scoringWithinARangeLogic($user, $payload, 16);
                 break;
 
-            case AchievementType::GAME_PLAYED_MUSIC :
+            case AchievementType::GAME_PLAYED_MUSIC:
                 # code relating to music...
                 $this->numberofGamePlayedLogic($user, $payload, 3);
                 $this->scoringWithinARangeLogic($user, $payload, 6);
@@ -112,7 +119,7 @@ class AchievementBadgeEventService{
                 $this->scoringWithinARangeLogic($user, $payload, 15);
                 break;
 
-            case AchievementType::GAME_PLAYED_GENERAL :
+            case AchievementType::GAME_PLAYED_GENERAL:
                 # code relating to general...
                 $this->numberofGamePlayedLogic($user, $payload, 2);
                 $this->scoringWithinARangeLogic($user, $payload, 5);
@@ -132,30 +139,33 @@ class AchievementBadgeEventService{
 
     # generic functions
 
-    public function getSingleAchievement($achievement_id){
+    public function getSingleAchievement($achievement_id)
+    {
         $payload = (AchievementBadge::where('id', $achievement_id)->get());
 
-        if(count($payload) != 0){
+        if (count($payload) != 0) {
 
             return $payload[0];
-        }else{
+        } else {
             return null;
         }
     }
 
-    public function getSingleBadge($user_id, $achievement_badge_id){
+    public function getSingleBadge($user_id, $achievement_badge_id)
+    {
         $payload = (DB::table('user_achievement_badges')->where('user_id', $user_id)->where('achievement_badge_id', $achievement_badge_id)->get());
 
-        if(count($payload) != 0){
+        if (count($payload) != 0) {
 
             return $payload[0];
-        }else{
+        } else {
             return null;
         }
     }
 
-    public function endSingleBadge($curGS, $count, $uid, $aid, $countAppend = 1){
-        if(is_null($curGS)){
+    public function endSingleBadge($curGS, $count, $uid, $aid, $countAppend = 1)
+    {
+        if (is_null($curGS)) {
             // create and end
 
             $user = User::where('id', $uid)->first();
@@ -166,8 +176,7 @@ class AchievementBadgeEventService{
                 'is_claimed' => 1,
                 'is_rewarded' => 0,
             ]);
-
-        }else{
+        } else {
             // end
             DB::table('user_achievement_badges')->where('id', $curGS->id)->update(array(
                 'count' => intval($curGS->count) + $countAppend,
@@ -181,8 +190,9 @@ class AchievementBadgeEventService{
         return null;
     }
 
-    public function appendSingleBadge($curGS, $uid, $aid, $count = 1){
-        if(is_null($curGS)){
+    public function appendSingleBadge($curGS, $uid, $aid, $count = 1)
+    {
+        if (is_null($curGS)) {
             // create
 
             $user = User::where('id', $uid)->first();
@@ -193,8 +203,7 @@ class AchievementBadgeEventService{
                 'is_claimed' => 0,
                 'is_rewarded' => 0,
             ]);
-
-        }else{
+        } else {
             // update
             DB::table('user_achievement_badges')->where('id', $curGS->id)->update(array(
                 'count' => intval($curGS->count) + $count,
@@ -204,23 +213,25 @@ class AchievementBadgeEventService{
         return null;
     }
 
-    public function rewardBadge($uid, $aid){
+    public function rewardBadge($uid, $aid)
+    {
         $badge = $this->getSingleBadge($uid, $aid);
 
         // has badge being awarded
-        if($badge->is_rewarded){
+        if ($badge->is_rewarded) {
             return null;
         }
 
         // reward badge
         $achievement = AchievementBadge::where('id', $aid)->first();
 
-        if(is_null($achievement)){
+        if (is_null($achievement)) {
             return null;
         }
 
         // we are no longer rewarding for points or cash
         //
+
         switch ($achievement->reward_type) {
             case AchievementType::REWARD_CASH:
                 # code...
@@ -235,15 +246,17 @@ class AchievementBadgeEventService{
                 break;
 
             default:
+                $this->rewardByCoin($badge, $achievement->reward);
                 # code...
                 break;
         }
     }
 
-    public function rewardByPoint($badge, $reward){
+    public function rewardByPoint($badge, $reward)
+    {
 
         // code to reward the point to the user
-        DB::transaction(function() use($badge, $reward){
+        DB::transaction(function () use ($badge, $reward) {
             UserPoint::create([
                 'user_id' => $badge->user_id,
                 'value' => $reward,
@@ -255,14 +268,14 @@ class AchievementBadgeEventService{
                 'is_rewarded' => 1
             ));
         });
-
     }
 
-    public function rewardByCash($badge, $reward){
+    public function rewardByCash($badge, $reward)
+    {
         // code to reward the point to the user
         $user = $this->user;
 
-        DB::transaction(function() use ($user, $reward, $badge) {
+        DB::transaction(function () use ($user, $reward, $badge) {
             WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
@@ -281,126 +294,129 @@ class AchievementBadgeEventService{
                 'is_rewarded' => 1
             ));
         });
-
     }
 
-    public function rewardByCoin($badge, $reward){
+    public function rewardByCoin($badge, $reward)
+    {
         // code to reward the point to the user
         $user = $this->user;
 
-        DB::transaction(function() use ($user, $reward, $badge) {
+        DB::transaction(function () use ($user, $reward, $badge) {
             UserCoinTransaction::create([
-                'user_id' => $this->user->id,
+                'user_id' => $user->id,
                 'transaction_type' => 'CREDIT',
                 'description' => 'Coins awarded from achievement',
                 'value' => $reward
             ]);
 
-            $currentUserCoin = $this->user->getUserCoins();
+            $currentUserCoin = $user->getUserCoins();
             $newUserCoin = $currentUserCoin + $reward;
-            $userCoin = $this->user->userCoins()->firstOrNew();
+            $userCoin = $user->userCoins()->firstOrNew();
             $userCoin->coins_value = $newUserCoin;
-            $userCoin->user_id = $this->user->id;
+            $userCoin->user_id = $user->id;
             $userCoin->save();
 
             DB::table('user_achievement_badges')->where('id', $badge->id)->update(array(
                 'is_rewarded' => 1
             ));
         });
-
     }
 
 
     # individual achievements
-    public function processFirstBadge($user, $payload){
+    public function processFirstBadge($user, $payload)
+    {
         $gameCat = $user->getNextFreePlan();
         $curGS = $this->getSingleBadge($user->id, 1);
 
-        if(!is_null($curGS) && $curGS->is_claimed){
+        if (!is_null($curGS) && $curGS->is_claimed) {
             return null;
         }
 
-        if(!is_null($gameCat)){
+        if (!is_null($gameCat)) {
             $this->appendSingleBadge($curGS, $user->id, 1);
-        }else{
+        } else {
             $this->endSingleBadge($curGS, 5, $user->id, 1);
         }
     }
-    public function numberofGamePlayedLogic($user, $payload, $aid = -1){
+    public function numberofGamePlayedLogic($user, $payload, $aid = -1)
+    {
         // $aid = 2;
         $curGS = $this->getSingleBadge($user->id, $aid);
         $achievement = $this->getSingleAchievement($aid);
 
-        if(!is_null($curGS)){
-            if($curGS->is_claimed){
+        if (!is_null($curGS)) {
+            if ($curGS->is_claimed) {
                 return null;
             }
         }
 
-        if(is_null($curGS)){
+        if (is_null($curGS)) {
             // doesn't have a game yet
             $this->appendSingleBadge($curGS, $user->id, $aid);
-        }else{
+        } else {
             // check game count logic
 
-            if(($curGS->count + 1) >= ($achievement->milestone * $achievement->milestone_count)){
+            if (($curGS->count + 1) >= ($achievement->milestone * $achievement->milestone_count)) {
                 $this->endSingleBadge($curGS, 50, $user->id, $aid);
-            }else{
+            } else {
                 $this->appendSingleBadge($curGS, $user->id, $aid);
             }
         }
     }
 
-    public function scoringWithinARangeLogic($user, $payload, $aid = -1){
+    public function scoringWithinARangeLogic($user, $payload, $aid = -1)
+    {
         // $aid = 4;
         $curGS = $this->getSingleBadge($user->id, $aid);
         $achievement = $this->getSingleAchievement($aid);
 
-        if(!is_null($curGS)){
-            if($curGS->is_claimed){
+        if (!is_null($curGS)) {
+            if ($curGS->is_claimed) {
                 return null;
             }
         }
 
         // check if user scored aboved a threshold
-        if($payload->correct_count < $achievement->milestone){
+        if ($payload->correct_count < $achievement->milestone) {
             return null;
         }
 
-        if(is_null($curGS)){
+        if (is_null($curGS)) {
             // doesn't have a game yet
             $this->appendSingleBadge($curGS, $user->id, $aid, $achievement->milestone);
-        }else{
+        } else {
             // check game count logic
 
-            if(($curGS->count + $achievement->milestone) >= ($achievement->milestone * $achievement->milestone_count)){
+            if (($curGS->count + $achievement->milestone) >= ($achievement->milestone * $achievement->milestone_count)) {
                 $this->endSingleBadge($curGS, 70, $user->id, $aid, $achievement->milestone);
-            }else{
+            } else {
                 $this->appendSingleBadge($curGS, $user->id, $aid, $achievement->milestone);
             }
         }
     }
 
-    public function badgeStateLogic($user, $aid = -1, $end = 10){
+    public function badgeStateLogic($user, $aid = -1, $end = 10)
+    {
         // $aid = 2;
         $curGS = $this->getSingleBadge($user->id, $aid);
         $achievement = $this->getSingleAchievement($aid);
 
-        if(!is_null($curGS)){
-            if($curGS->is_claimed){
+        if (!is_null($curGS)) {
+            if ($curGS->is_claimed) {
                 return null;
             }
         }
 
-        if(is_null($curGS)){
+        if (is_null($curGS)) {
             // doesn't have a game yet
             $this->appendSingleBadge($curGS, $user->id, $aid);
-        }else{
+        } else {
             // check game count logic
 
-            if(($curGS->count + 1) >= ($achievement->milestone * $achievement->milestone_count)){
+            if (($curGS->count + 1) >= ($achievement->milestone * $achievement->milestone_count)) {
                 $this->endSingleBadge($curGS, $end, $user->id, $aid);
-            }else{
+            } else {
                 $this->appendSingleBadge($curGS, $user->id, $aid);
             }
         }

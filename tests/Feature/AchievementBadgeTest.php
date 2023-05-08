@@ -122,6 +122,31 @@ class AchievementBadgeTest extends TestCase
         $this->assertTrue($awarded);
     }
 
+    public function test_achievement_has_been_rewarded()
+    {
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::enable(FeatureFlags::ACHIEVEMENT_BADGES);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $achievement = DB::table('user_achievement_badges')
+            ->where('user_id', $this->user->id)
+            ->where('is_claimed', true)
+            ->where('is_rewarded', true)
+            ->first();
+
+        $awarded = (!is_null($achievement)) ? true : false;
+
+        $this->assertTrue($awarded);
+    }
+
     public function test_get_achievment_collections()
     {
         $response = $this->get("/api/v3/achievement-badges");
