@@ -21,6 +21,7 @@ return [
     ],
     'game' => [
         'questions_count' => env('GAME_QUESTIONS_COUNT', 10),
+        'demo_games_count' => env('DEMO_GAMES_COUNT', 5)
     ],
     'live_trivia' => [
         'enabled' => env('HAS_LIVE_TRIVIA', false),

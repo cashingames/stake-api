@@ -86,6 +86,8 @@ class GameTest extends TestCase
         FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
         config(['odds.maximum_exhibition_staking_amount' => 1000]);
         config(['trivia.bonus.signup.stakers_bonus_amount' => 1000]);
+        config(['trivia.game.demo_games_count' => 5]);
+       
     }
 
     public function test_common_data_can_be_retrieved()
@@ -346,9 +348,28 @@ class GameTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_that_a_staking_exhibition_game_does_not_start_for_old_users_if_balance_is_exhausted()
+    {
+       
+        Staking::factory()->count(6)->create(['user_id'=>$this->user->id]);
 
 
-    public function test_that_a_staking_exhibition_game_does_not_start_if_wallet_balance_is_insufficient()
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 500
+        ]);
+
+        $response->assertJson([
+            'message' => 'Insufficient funds',
+            'errors' => [
+                'staking_amount' => ['Insufficient funds']
+            ]
+        ]);
+    }
+
+    public function test_that_a_staking_exhibition_game_does_not_start_if_demo_balance_is_exhausted()
     {
 
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
@@ -358,17 +379,17 @@ class GameTest extends TestCase
             "staking_amount" => 500
         ]);
 
-        // {"message":"Insufficient funds","errors":{"staking_amount":["Insufficient funds"]}}
         $response->assertJson([
-            'message' => 'Insufficient funds',
+            'message' => 'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash',
             'errors' => [
-                'staking_amount' => ['Insufficient funds']
+                'staking_amount' => ['Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash']
             ]
         ]);
     }
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
-    {
+    {   
+        Staking::factory()->count(5)->create(['user_id'=>$this->user->id]);
         $questions = Question::factory()
             ->count(250)
             ->create();
@@ -744,43 +765,6 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_new_user_cannot_stake_more_than_bonus_amount_on_first_stake()
-    {
-        config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
-        $questions = Question::factory()
-            ->hasOptions(4)
-            ->count(250)
-            ->create();
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-
-        $this->user->wallet->update([
-            'non_withdrawable_balance' => 400
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 400
-        ]);
-        $response->assertJson([
-            'message' => 'You can only make a first time stake of 200 naira',
-        ]);
-    }
-
     public function test_gameark_users_can_be_rewarded_coins_after_game_ended()
     {
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
@@ -935,5 +919,7 @@ class GameTest extends TestCase
             'coins_value' => $coinsWon
         ]);
     }
+
+
 
 }
