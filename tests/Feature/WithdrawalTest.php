@@ -195,4 +195,21 @@ class WithdrawalTest extends TestCase
         $response->assertStatus(500);
     }
 
+    public function test_that_demo_cash_remains_in_book_balance_and_cannot_be_withdrawn(){
+
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 500,
+            'balance' => 100,
+            'description' =>  'Demo Game Winnings',
+            'reference' => Str::random(10),
+            'viable_date' => now()->subHour()
+        ]);
+
+        $this->artisan('winnings:credit')->assertExitCode(0);
+
+        
+        $this->assertEquals($this->user->bookBalance(), 500);
+    }
 }

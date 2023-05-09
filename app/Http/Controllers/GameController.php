@@ -32,6 +32,7 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Models\Staking;
 use App\Models\UserCoin;
 use stdClass;
 
@@ -48,12 +49,12 @@ class GameController extends BaseController
 
         $result->plans = Cache::rememberForever(
             'plans',
-            fn() => Plan::where('is_free', false)->orderBy('price', 'ASC')->get()
+            fn () => Plan::where('is_free', false)->orderBy('price', 'ASC')->get()
         );
 
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn() =>
+            fn () =>
             GameMode::select(
                 'id',
                 'name',
@@ -65,9 +66,9 @@ class GameController extends BaseController
                 ->get()
         );
 
-        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
+        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn() => Category::all());
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
 
         $gameInfo = DB::select("
         SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
@@ -294,14 +295,26 @@ class GameController extends BaseController
                     $amountWon = $staking->amount_staked * $pointStandardOdd;
                 }
 
+                $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
+
+                $transactionDescription = '';
+                $viableDate = now();
+
+                if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
+                    $transactionDescription = 'Demo Game Winnings';
+                } else {
+                    $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
+                    $viableDate = now()->addHours(config('trivia.hours_before_withdrawal'));
+                }
+
                 WalletTransaction::create([
                     'wallet_id' => $this->user->wallet->id,
                     'transaction_type' => 'CREDIT',
                     'amount' => $amountWon,
                     'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
-                    'description' => 'Staking winning of ' . $amountWon . ' cash',
+                    'description' => $transactionDescription,
                     'reference' => Str::random(10),
-                    'viable_date' => Carbon::now()->addHours(config('trivia.hours_before_withdrawal'))
+                    'viable_date' => $viableDate
                 ]);
 
                 $staking->update(['amount_won' => $amountWon]);
@@ -320,7 +333,7 @@ class GameController extends BaseController
         $game->correct_count = $points;
 
 
-        if($clientPlatform == ClientPlatform::GameArkMobile){
+        if ($clientPlatform == ClientPlatform::GameArkMobile) {
             $game = $this->processUserCoin($game);
         }
 
@@ -383,18 +396,18 @@ class GameController extends BaseController
     {
         $coinsEarned = 0;
         $userScore = $game->correct_count;
-        if($userScore == config('trivia.coin_reward.user_scores.perfect_score')){
+        if ($userScore == config('trivia.coin_reward.user_scores.perfect_score')) {
             $coinsEarned =  config('trivia.coin_reward.coins_earned.perfect_coin');
-        } else if($userScore >= config('trivia.coin_reward.user_scores.high_score')){
+        } else if ($userScore >= config('trivia.coin_reward.user_scores.high_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.high_coin');
-        } else if($userScore >= config('trivia.coin_reward.user_scores.medium_score')){
+        } else if ($userScore >= config('trivia.coin_reward.user_scores.medium_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.medium_coin');
-        } else if($userScore >  config('trivia.coin_reward.user_scores.low_score')){
+        } else if ($userScore >  config('trivia.coin_reward.user_scores.low_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.low_coin');
         } else {
             $coinsEarned = 0;
         }
-        
+
         $game->coins_earned = $coinsEarned;
         $currentUserCoin = $this->user->getUserCoins();
         $newUserCoin = $currentUserCoin + $coinsEarned;
@@ -402,7 +415,7 @@ class GameController extends BaseController
         $userCoin->coins_value = $newUserCoin;
         $userCoin->user_id = $this->user->id;
         $userCoin->save();
-       
+
         $this->user->coinsTransaction()->create([
             'user_id' => $this->user->id,
             'transaction_type' => 'CREDIT',

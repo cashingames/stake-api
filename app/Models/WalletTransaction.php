@@ -58,4 +58,9 @@ class WalletTransaction extends Model
         return $query->where('transaction_type', 'CREDIT')
         ->where('description','Fund Wallet');
     }
+
+    public function scopeDemoGameWinnings($query){
+        return $query->where('transaction_type', 'CREDIT')
+        ->where('description','Demo Game Winnings');
+    }
 }

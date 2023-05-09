@@ -31,6 +31,7 @@ class CreditWinnings extends Command
     public function handle()
     {
         WalletTransaction::unsettled()
+            ->where('description','!=','Demo Game Winnings')
             ->where('viable_date', '<=', Carbon::now())
             ->chunkById(10, function ($transactions) {
                 foreach ($transactions as $transaction) {
