@@ -113,15 +113,20 @@ class StartSinglePlayerRequest extends FormRequest
         $totalSessions = Staking::where('user_id', auth()->id())->count();
 
         if (
-            $totalSessions < config('trivia.game.demo_games_count') &&
-            $user->wallet->non_withdrawable_balance <= config('trivia.bonus.signup.stakers_bonus_amount')
+            $totalSessions <= config('trivia.game.demo_games_count') &&
+            $user->wallet->non_withdrawable_balance <= 0
         ) {
             return $validator->errors()->add(
                 'staking_amount',
                 'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash'
             );
         } elseif (
-            $totalSessions >= config('trivia.game.demo_games_count') &&
+            $totalSessions <= config('trivia.game.demo_games_count') &&
+            $user->wallet->non_withdrawable_balance <  $stakingAmount
+        ) {
+            return $validator->errors()->add('staking_amount', 'Insufficient funds');
+        } elseif (
+            $totalSessions > config('trivia.game.demo_games_count') &&
             $user->wallet->non_withdrawable_balance <  $stakingAmount
         ) {
             return $validator->errors()->add('staking_amount', 'Insufficient funds');
