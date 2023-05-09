@@ -43,19 +43,19 @@ class FcmDailyEveningPlayGameReminder extends Command
             $pushTokens,
             true,
             "Evening GameArker",
-            "How did your day go? Log in to GameArk to unwind.  Keep your brain sharp and have some fun in the process!🧠🌟");
+            "How did your day go? Log in to GameArk to unwind.  Keep your brain sharp and have some fun in the process!🧠🌟"
+        );
     }
 
     public function GetDailyReminderUserToken()
     {
         $allTokens = [];
 
-        $devices = DB::select('SELECT device_token from fcm_push_subscriptions where valid = ?', [1]);
+        $devices = DB::select('SELECT DISTINCT device_token from fcm_push_subscriptions where valid = ?', [1]);
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
 
         return $allTokens;
     }
-
 }

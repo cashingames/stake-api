@@ -43,19 +43,19 @@ class FcmDailyAfternoonPlayGameReminder extends Command
             $pushTokens,
             true,
             "Afternoon GameArker",
-            "Get ready for today's adventure in GameArk! Your daily game lives and boosts have been added and are ready to use. Log in now and let's make today's adventure the best one yet!🚀🎮");
+            "Get ready for today's adventure in GameArk! Your daily game lives and boosts have been added and are ready to use. Log in now and let's make today's adventure the best one yet!🚀🎮"
+        );
     }
 
     public function GetDailyReminderUserToken()
     {
         $allTokens = [];
 
-        $devices = DB::select('SELECT device_token from fcm_push_subscriptions where valid = ?', [1]);
+        $devices = DB::select('SELECT DISTINCT device_token from fcm_push_subscriptions where valid = ?', [1]);
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
 
         return $allTokens;
     }
-
 }
