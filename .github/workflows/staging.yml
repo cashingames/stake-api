@@ -53,8 +53,8 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
-          username: api-user@stg.cashingames.com
-          password: ${{ secrets.STG_FTP_PASSWORD }}
+          username: user@stg-gameark-api.cashingames.com
+          password: ${{ secrets.FTP_PASSWORD_STG }}
           exclude: |
             **/.git*
             **/.git*/**
