@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
@@ -30,20 +32,37 @@ class CreditWinnings extends Command
      */
     public function handle()
     {
-        WalletTransaction::unsettled()
-            ->where('description','!=','Demo Game Winnings')
-            ->where('viable_date', '<=', Carbon::now())
-            ->chunkById(10, function ($transactions) {
-                foreach ($transactions as $transaction) {
-                    $wallet = $transaction->wallet;
-                    if($wallet){
-                        $wallet->update([
-                            'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
-                        ]);
+        if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
+            WalletTransaction::unsettled()
+                ->where('description', '!=', 'Demo Game Winnings')
+                ->where('viable_date', '<=', Carbon::now())
+                ->chunkById(10, function ($transactions) {
+                    foreach ($transactions as $transaction) {
+                        $wallet = $transaction->wallet;
+                        if ($wallet) {
+                            $wallet->update([
+                                'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
+                            ]);
+                        }
                     }
-                }
-                $transactions->each->update(['settled_at' => now()]);
-            }, $column = 'id');
-        return 0;
+                    $transactions->each->update(['settled_at' => now()]);
+                }, $column = 'id');
+            return 0;
+        } else {
+            WalletTransaction::unsettled()
+                ->where('viable_date', '<=', Carbon::now())
+                ->chunkById(10, function ($transactions) {
+                    foreach ($transactions as $transaction) {
+                        $wallet = $transaction->wallet;
+                        if ($wallet) {
+                            $wallet->update([
+                                'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
+                            ]);
+                        }
+                    }
+                    $transactions->each->update(['settled_at' => now()]);
+                }, $column = 'id');
+            return 0;
+        }
     }
 }

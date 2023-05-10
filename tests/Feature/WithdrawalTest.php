@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Enums\FeatureFlags;
 use Tests\TestCase;
 use App\Models\User;
 use Mockery\MockInterface;
 use Illuminate\Support\Str;
 use Database\Seeders\UserSeeder;
 use App\Models\WalletTransaction;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -196,7 +198,7 @@ class WithdrawalTest extends TestCase
     }
 
     public function test_that_demo_cash_remains_in_book_balance_and_cannot_be_withdrawn(){
-
+        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'CREDIT',

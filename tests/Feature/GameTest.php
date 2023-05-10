@@ -350,7 +350,7 @@ class GameTest extends TestCase
 
     public function test_that_a_staking_exhibition_game_does_not_start_for_old_users_if_balance_is_exhausted()
     {
-       
+        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
         Staking::factory()->count(6)->create(['user_id'=>$this->user->id]);
 
 
@@ -371,7 +371,7 @@ class GameTest extends TestCase
 
     public function test_that_a_staking_exhibition_game_does_not_start_if_demo_balance_is_exhausted()
     {
-
+        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,

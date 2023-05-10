@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\FeatureFlags;
 use App\Enums\GameType;
 use App\Models\LiveTrivia;
 use App\Models\Staking;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Cache;
 
 class StartSinglePlayerRequest extends FormRequest
@@ -112,26 +114,42 @@ class StartSinglePlayerRequest extends FormRequest
         $user = auth()->user();
         $totalSessions = Staking::where('user_id', auth()->id())->count();
 
-        if (
-            $totalSessions <= config('trivia.game.demo_games_count') &&
-            $user->wallet->non_withdrawable_balance <= 0
-        ) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash'
-            );
-        } elseif (
-            $totalSessions <= config('trivia.game.demo_games_count') &&
-            $user->wallet->non_withdrawable_balance <  $stakingAmount
-        ) {
-            return $validator->errors()->add('staking_amount', 'Insufficient funds');
-        } elseif (
-            $totalSessions > config('trivia.game.demo_games_count') &&
-            $user->wallet->non_withdrawable_balance <  $stakingAmount
-        ) {
-            return $validator->errors()->add('staking_amount', 'Insufficient funds');
-        }
+        if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
+            if (
+                $totalSessions <= config('trivia.game.demo_games_count') &&
+                $user->wallet->non_withdrawable_balance <= 0
+            ) {
+                return $validator->errors()->add(
+                    'staking_amount',
+                    'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash'
+                );
+            } elseif (
+                $totalSessions <= config('trivia.game.demo_games_count') &&
+                $user->wallet->non_withdrawable_balance <  $stakingAmount
+            ) {
+                return $validator->errors()->add('staking_amount', 'Insufficient funds');
+            } elseif (
+                $totalSessions > config('trivia.game.demo_games_count') &&
+                $user->wallet->non_withdrawable_balance <  $stakingAmount
+            ) {
+                return $validator->errors()->add('staking_amount', 'Insufficient funds');
+            }
+        } else {
 
+            if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
+                return $validator->errors()->add(
+                    'staking_amount',
+                    'You can only make a first time stake of '
+                        . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+                );
+            } elseif ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
+                return $validator->errors()->add(
+                    'staking_amount',
+                    'First stake cannot be less than  '
+                        . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
+                );
+            }
+        }
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
         if ($userProfit > 300) {
             return $validator->errors()->add(

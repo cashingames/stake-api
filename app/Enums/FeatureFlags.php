@@ -17,4 +17,5 @@ class FeatureFlags{
     const STAKING_WITH_ODDS = "staking_with_odds";
     const IN_APP_ACTIVITIES_PUSH_NOTIFICATION = "in_app_activities_push_notification";
     const SEND_AUTOMATED_REPORTS = "send_automated_reports";
+    const DEMO_GAMES = "demo_games";
 }
