@@ -11,7 +11,7 @@ use stdClass;
 
 class AchievementBadeController extends BaseController
 {
-    //
+
     public function getAchievements(Request $request){
         // $result = new stdClass;
 
