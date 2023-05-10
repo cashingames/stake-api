@@ -60,5 +60,9 @@ return [
     'send_automated_reports' => [
         'enabled' => env('FEATURE_FLAG_SEND_AUTOMATED_REPORTS_ENABLED', false),
         'activate_on' => null
-    ]
+    ],
+    'demo_games' => [
+        'enabled' => env('FEATURE_FLAG_DEMO_GAMES_ENABLED', false),
+        'activate_on' => null
+    ],
 ];

@@ -295,27 +295,38 @@ class GameController extends BaseController
                     $amountWon = $staking->amount_staked * $pointStandardOdd;
                 }
 
-                $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
+                if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
+                    $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
 
-                $transactionDescription = '';
-                $viableDate = now();
+                    $transactionDescription = '';
+                    $viableDate = now();
 
-                if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
-                    $transactionDescription = 'Demo Game Winnings';
+                    if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
+                        $transactionDescription = 'Demo Game Winnings';
+                    } else {
+                        $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
+                        $viableDate = now()->addHours(config('trivia.hours_before_withdrawal'));
+                    }
+                    WalletTransaction::create([
+                        'wallet_id' => $this->user->wallet->id,
+                        'transaction_type' => 'CREDIT',
+                        'amount' => $amountWon,
+                        'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
+                        'description' => $transactionDescription,
+                        'reference' => Str::random(10),
+                        'viable_date' => $viableDate
+                    ]);
                 } else {
-                    $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
-                    $viableDate = now()->addHours(config('trivia.hours_before_withdrawal'));
+                    WalletTransaction::create([
+                        'wallet_id' => $this->user->wallet->id,
+                        'transaction_type' => 'CREDIT',
+                        'amount' => $amountWon,
+                        'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
+                        'description' => 'Staking winning of ' . $amountWon . ' cash',
+                        'reference' => Str::random(10),
+                        'viable_date' => now()->addHours(config('trivia.hours_before_withdrawal'))
+                    ]);
                 }
-
-                WalletTransaction::create([
-                    'wallet_id' => $this->user->wallet->id,
-                    'transaction_type' => 'CREDIT',
-                    'amount' => $amountWon,
-                    'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
-                    'description' => $transactionDescription,
-                    'reference' => Str::random(10),
-                    'viable_date' => $viableDate
-                ]);
 
                 $staking->update(['amount_won' => $amountWon]);
 
