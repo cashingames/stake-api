@@ -407,24 +407,22 @@ class GameController extends BaseController
     {
         $coinsEarned = 0;
         $userScore = $game->correct_count;
+        
         if ($userScore == config('trivia.coin_reward.user_scores.perfect_score')) {
             $coinsEarned =  config('trivia.coin_reward.coins_earned.perfect_coin');
-        } else if ($userScore >= config('trivia.coin_reward.user_scores.high_score')) {
+        } else if ($userScore >= config('trivia.coin_reward.user_scores.high_score') && $userScore < config('trivia.coin_reward.user_scores.perfect_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.high_coin');
-        } else if ($userScore >= config('trivia.coin_reward.user_scores.medium_score')) {
+        } else if ($userScore >= config('trivia.coin_reward.user_scores.medium_score') && $userScore < config('trivia.coin_reward.user_scores.high_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.medium_coin');
-        } else if ($userScore >  config('trivia.coin_reward.user_scores.low_score')) {
+        } else if ($userScore >=  config('trivia.coin_reward.user_scores.low_score') && $userScore < config('trivia.coin_reward.user_scores.medium_score')) {
             $coinsEarned = config('trivia.coin_reward.coins_earned.low_coin');
         } else {
             $coinsEarned = 0;
         }
 
         $game->coins_earned = $coinsEarned;
-        $currentUserCoin = $this->user->getUserCoins();
-        $newUserCoin = $currentUserCoin + $coinsEarned;
         $userCoin = $this->user->userCoins()->firstOrNew();
-        $userCoin->coins_value = $newUserCoin;
-        $userCoin->user_id = $this->user->id;
+        $userCoin->coins_value = $userCoin->coins_value + $coinsEarned;
         $userCoin->save();
 
         $this->user->coinsTransaction()->create([
