@@ -18,11 +18,14 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
     }
 
     private function getQuestions(string $categoryId): Collection
-    {
+    {   
+       
         $value = Category::find($categoryId)
             ->questions()
-            ->where('level', 'easy')
-            ->orWhere('level', 'medium')
+            ->where(function ($query) {
+                $query->where('level', 'easy')
+                    ->orWhere('level', 'medium');
+            })
             ->inRandomOrder()
             ->take(20)
             ->get();
