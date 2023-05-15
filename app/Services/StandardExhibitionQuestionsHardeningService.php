@@ -14,30 +14,28 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
 
     public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection
     {
-        return $this->getEasyQuestions($categoryId);
+        return $this->getQuestions($categoryId);
     }
 
-    private function getEasyQuestions(string $categoryId): Collection
+    private function getQuestions(string $categoryId): Collection
     {
         $value = Category::find($categoryId)
-                ->questions()
-                ->easy()
-                ->inRandomOrder()
-                ->take(20)
-                ->get();
+            ->questions()
+            ->where('level', 'easy')
+            ->orWhere('level', 'medium')
+            ->inRandomOrder()
+            ->take(20)
+            ->get();
 
         $value = $value->each(function ($i, $k) {
 
-            $i->options->each(function($ib, $kb){
+            $i->options->each(function ($ib, $kb) {
                 $ib->makeVisible(['is_correct']);
             });
-
         });
 
 
 
         return $value;
-
     }
-
 }
