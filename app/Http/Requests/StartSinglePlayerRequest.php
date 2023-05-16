@@ -48,10 +48,10 @@ class StartSinglePlayerRequest extends FormRequest
     public function rules()
     {
         return [
-            'category' => ['required', 'numeric'],
-            'type' => ['required', 'numeric'],
-            'mode' => ['required', 'numeric'],
-            'trivia' => ['nullable', 'numeric'],
+            'category' => ['required', 'numeric', 'exists:categories,id'],
+            'type' => ['required', 'numeric', 'exists:game_types,id'],
+            'mode' => ['required', 'numeric','exists:game_modes,id'],
+            'trivia' => ['nullable', 'numeric','exists:trivias,id'],
             'staking_amount' => [
                 'nullable',
                 'numeric',
