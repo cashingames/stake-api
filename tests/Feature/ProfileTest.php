@@ -56,6 +56,8 @@ class ProfileTest extends TestCase
                 'points' => $this->user->points(),
                 'walletBalance' => $this->user->wallet->non_withdrawable_balance,
                 'bookBalance' => $this->user->bookBalance(),
+                'mainBalance' => $this->user->wallet->non_withdrawable_balance + $this->user->wallet->withdrawable_balance,
+                'bonusBalance' => $this->user->wallet->bonus_balance,
                 'withdrawableBalance' => $this->user->wallet->withdrawable_balance,
                 'boosts' => [],
                 'achievements' => [],
