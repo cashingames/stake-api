@@ -68,10 +68,10 @@ class RegisterController extends BaseController
         return Validator::make($data, [
 
             'first_name' => [
-                'string', 'max:255',
+                'required','string', 'max:255',
             ],
             'last_name' => [
-                'string', 'max:255',
+                'required','string', 'max:255',
             ],
             'username' => [
                 'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
