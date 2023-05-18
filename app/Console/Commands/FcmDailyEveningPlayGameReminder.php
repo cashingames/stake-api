@@ -50,7 +50,7 @@ class FcmDailyEveningPlayGameReminder extends Command
     {
         $allTokens = [];
 
-        $devices = DB::select('SELECT device_token from fcm_push_subscriptions where valid = ?', [1]);
+        $devices = DB::select('SELECT DISTINCT device_token from fcm_push_subscriptions where valid = ?', [1]);
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
