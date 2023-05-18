@@ -102,10 +102,10 @@ class WalletRepository
     {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
-            $newBalance = $wallet->withdrawable_balance + $amount;
+            $newBalance = $wallet->withdrawable + $amount;
 
             $wallet->update([
-                'withdrawable_balance' => $newBalance
+                'withdrawable' => $newBalance
             ]);
 
             WalletTransaction::create([
@@ -125,10 +125,10 @@ class WalletRepository
     ): void {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
-            $newBalance = $wallet->non_withdrawable_balance + $amount;
+            $newBalance = $wallet->non_withdrawable + $amount;
 
             $wallet->update([
-                'non_withdrawable_balance' => $newBalance
+                'non_withdrawable' => $newBalance
             ]);
 
             WalletTransaction::create([
@@ -147,10 +147,10 @@ class WalletRepository
     {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
-            $newBalance = $wallet->non_withdrawable_balance - $amount;
+            $newBalance = $wallet->non_withdrawable - $amount;
 
             $wallet->update([
-                'non_withdrawable_balance' => $newBalance
+                'non_withdrawable' => $newBalance
             ]);
 
             WalletTransaction::create([

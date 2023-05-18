@@ -31,10 +31,9 @@ class UserController extends BaseController
         $result->gender = $this->user->profile->gender;
         $result->avatar = $this->user->profile->avatar;
         $result->referralCode = $this->user->username;
-        $result->walletBalance = $this->user->wallet->non_withdrawable_balance;
-        $result->mainBalance = $this->user->wallet->non_withdrawable_balance + $this->user->wallet->withdrawable_balance;
-        $result->bonusBalance = $this->user->wallet->bonus_balance;
-        $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
+        $result->walletBalance = $this->user->wallet->non_withdrawable + $this->user->wallet->withdrawable;
+        $result->bonusBalance = $this->user->wallet->bonus;
+        $result->withdrawableBalance = $this->user->wallet->withdrawable;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->bookBalance = $this->user->bookBalance();

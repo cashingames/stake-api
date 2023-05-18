@@ -36,7 +36,7 @@ class WithdrawWinningsController extends BaseController
         //     return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');
         // }
 
-        $debitAmount = $this->user->wallet->withdrawable_balance;
+        $debitAmount = $this->user->wallet->withdrawable;
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -85,13 +85,13 @@ class WithdrawWinningsController extends BaseController
         }
 
         DB::transaction(function () use ($transferInitiated, $debitAmount) {
-            $this->user->wallet->withdrawable_balance -= $debitAmount;
+            $this->user->wallet->withdrawable -= $debitAmount;
 
             WalletTransaction::create([
                 'wallet_id' => $this->user->wallet->id,
                 'transaction_type' => 'DEBIT',
                 'amount' => $debitAmount,
-                'balance' => $this->user->wallet->withdrawable_balance,
+                'balance' => $this->user->wallet->withdrawable,
                 'description' => 'Winnings Withdrawal Made',
                 'reference' => $transferInitiated->reference,
             ]);

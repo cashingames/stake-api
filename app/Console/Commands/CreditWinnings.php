@@ -41,7 +41,7 @@ class CreditWinnings extends Command
                         $wallet = $transaction->wallet;
                         if ($wallet) {
                             $wallet->update([
-                                'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
+                                'withdrawable' => ($wallet->withdrawable + $transaction->amount)
                             ]);
                         }
                     }
@@ -56,7 +56,7 @@ class CreditWinnings extends Command
                         $wallet = $transaction->wallet;
                         if ($wallet) {
                             $wallet->update([
-                                'withdrawable_balance' => ($wallet->withdrawable_balance + $transaction->amount)
+                                'withdrawable' => ($wallet->withdrawable + $transaction->amount)
                             ]);
                         }
                     }

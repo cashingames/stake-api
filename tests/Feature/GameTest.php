@@ -332,7 +332,7 @@ class GameTest extends TestCase
             'expire_at' => Carbon::now()->endOfDay()
         ]);
         $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
+            'non_withdrawable' => 5000
         ]);
 
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
@@ -409,7 +409,7 @@ class GameTest extends TestCase
 
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $this->user->wallet->update([
-            'non_withdrawable_balance' => 1000
+            'non_withdrawable' => 1000
         ]);
         UserPlan::create([
             'plan_id' => $this->plan->id,
@@ -461,7 +461,7 @@ class GameTest extends TestCase
         ]);
 
         $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
+            'non_withdrawable' => 5000
         ]);
 
         $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
@@ -497,7 +497,7 @@ class GameTest extends TestCase
             'expire_at' => Carbon::now()->endOfDay()
         ]);
         $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
+            'non_withdrawable' => 5000
         ]);
 
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
@@ -569,7 +569,7 @@ class GameTest extends TestCase
             'expire_at' => Carbon::now()->endOfDay()
         ]);
         $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
+            'non_withdrawable' => 5000
         ]);
 
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);

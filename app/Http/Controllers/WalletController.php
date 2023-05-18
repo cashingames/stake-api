@@ -197,13 +197,13 @@ class WalletController extends BaseController
         }
 
         $user = User::where('email', $email)->first();
-        $user->wallet->non_withdrawable_balance += ($amount) / 100;
+        $user->wallet->non_withdrawable += ($amount) / 100;
 
         WalletTransaction::create([
             'wallet_id' => $user->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
-            'balance' => $user->wallet->non_withdrawable_balance,
+            'balance' => $user->wallet->non_withdrawable,
             'description' => 'Fund Wallet',
             'reference' => $reference,
         ]);
@@ -222,13 +222,13 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        $transaction->wallet->withdrawable_balance += ($amount) / 100;
+        $transaction->wallet->withdrawable += ($amount) / 100;
 
         WalletTransaction::create([
             'wallet_id' =>  $transaction->wallet_id,
             'transaction_type' => 'CREDIT',
             'amount' => ($amount) / 100,
-            'balance' => $transaction->wallet->withdrawable_balance,
+            'balance' => $transaction->wallet->withdrawable,
             'description' => 'Winnings Withdrawal Reversed',
             'reference' => $reference,
         ]);
@@ -318,11 +318,11 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
-        if ($wallet->non_withdrawable_balance < ($boost->currency_value)) {
+        if ($wallet->non_withdrawable < ($boost->currency_value)) {
             return $this->sendError([], 'You do not have enough money in your wallet.');
         }
 
-        $wallet->non_withdrawable_balance -= $boost->currency_value;
+        $wallet->non_withdrawable -= $boost->currency_value;
         $wallet->save();
 
 
@@ -330,7 +330,7 @@ class WalletController extends BaseController
             'wallet_id' => $wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
-            'balance' => $wallet->non_withdrawable_balance,
+            'balance' => $wallet->non_withdrawable,
             'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
             'reference' => Str::random(10),
         ]);
@@ -351,7 +351,7 @@ class WalletController extends BaseController
         // trigger event for achievement
         Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
 
-        return $this->sendResponse($wallet->non_withdrawable_balance, 'Boost Bought');
+        return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
     }
 
 
@@ -368,18 +368,18 @@ class WalletController extends BaseController
             return $this->sendError('Plan does not exist', 'Plan does not exist');
         }
 
-        if ($plan->price > $this->user->wallet->non_withdrawable_balance) {
+        if ($plan->price > $this->user->wallet->non_withdrawable) {
             return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
         }
 
-        $this->user->wallet->non_withdrawable_balance -= $plan->price;
+        $this->user->wallet->non_withdrawable -= $plan->price;
         $this->user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $plan->price,
-            'balance' => $this->user->wallet->non_withdrawable_balance,
+            'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'reference' => Str::random(10),
         ]);

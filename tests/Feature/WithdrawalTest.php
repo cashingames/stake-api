@@ -59,14 +59,14 @@ class WithdrawalTest extends TestCase
         Config::set('trivia.email_verification_limit_threshold', 10000);
         $this->user->update(['email_verified_at' => null]);
     
-        $this->user->wallet->withdrawable_balance = 20000;
+        $this->user->wallet->withdrawable = 20000;
         $this->user->wallet->save();
        
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => 15000,
-            'balance' => $this->user->wallet->withdrawable_balance,
+            'balance' => $this->user->wallet->withdrawable,
             'description' => 'Winnings Withdrawal Made',
             'reference' => Str::random(10),
             'created_at' => now()->subHours(3)
@@ -82,7 +82,7 @@ class WithdrawalTest extends TestCase
     public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount(){
         Config::set('trivia.staking.min_withdrawal_amount', 500);
 
-        $this->user->wallet->withdrawable_balance = 150;
+        $this->user->wallet->withdrawable = 150;
         $this->user->wallet->save();
 
 
@@ -117,7 +117,7 @@ class WithdrawalTest extends TestCase
                 'reference' => 'randomref'
             ]);
         });
-        $this->user->wallet->withdrawable_balance = 5000;
+        $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
         $response = $this->post(self::WITHDRAWAL_URL);
@@ -140,7 +140,7 @@ class WithdrawalTest extends TestCase
                 'reference' => 'randomref'
             ]);
         });
-        $this->user->wallet->withdrawable_balance = 5000;
+        $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
         $response = $this->post(self::WITHDRAWAL_URL);
@@ -159,7 +159,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturnFalse();
         });
 
-        $this->user->wallet->withdrawable_balance = 5000;
+        $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
         $response = $this->post(self::WITHDRAWAL_URL);
@@ -179,7 +179,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('initiateTransfer')->andThrowExceptions([new Exception()]);
         });
 
-        $this->user->wallet->withdrawable_balance = 5000;
+        $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
         $response = $this->post(self::WITHDRAWAL_URL);

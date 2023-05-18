@@ -88,7 +88,7 @@ class ChallengeGameTest extends TestCase
         DB::table('categories_questions')->insert($data);
 
         $this->user->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
 
         $player = $this->user;
@@ -171,7 +171,7 @@ class ChallengeGameTest extends TestCase
         FeatureFlag::enable(FeatureFlags::CHALLENGE_GAME_STAKING);
 
         $this->user->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
 
         $opponent = $this->user;
@@ -325,10 +325,10 @@ class ChallengeGameTest extends TestCase
         DB::table('categories_questions')->insert($data);
 
         $creator->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
         $opponent->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
 
 
@@ -406,10 +406,10 @@ class ChallengeGameTest extends TestCase
         DB::table('categories_questions')->insert($data);
 
         $creator->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
         $opponent->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
 
 

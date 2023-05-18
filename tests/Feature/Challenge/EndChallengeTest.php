@@ -130,11 +130,11 @@ class EndChallengeTest extends TestCase
         //refund if both users got the same score
         $this->assertDatabaseHas('wallets', [
             'user_id' => $firstUser->id,
-            'non_withdrawable_balance' => 500,
+            'non_withdrawable' => 500,
         ]);
         $this->assertDatabaseHas('wallets', [
             'user_id' => $secondUser->id,
-            'non_withdrawable_balance' => 500,
+            'non_withdrawable' => 500,
         ]);
 
         //assert that refund push notification was queued

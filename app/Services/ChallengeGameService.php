@@ -94,7 +94,7 @@ class ChallengeGameService
                     'wallet_id' => User::find($cS->user_id)->wallet->id,
                     'transaction_type' => 'CREDIT',
                     'amount' => $amountWon,
-                    'balance' => User::find($cS->user_id)->wallet->withdrawable_balance,
+                    'balance' => User::find($cS->user_id)->wallet->withdrawable,
                     'description' => 'Staking winning of ' . $amountWon . ' on challenge',
                     'reference' => Str::random(10),
                     'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
@@ -113,7 +113,7 @@ class ChallengeGameService
             'wallet_id' => $winningUser->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => $amountWon,
-            'balance' => $winningUser->wallet->withdrawable_balance,
+            'balance' => $winningUser->wallet->withdrawable,
             'description' => 'Staking winning of ' . $amountWon . ' on challenge',
             'reference' => Str::random(10),
             'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))

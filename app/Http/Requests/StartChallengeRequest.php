@@ -30,7 +30,7 @@ class StartChallengeRequest extends FormRequest
     {
         return [
             'category' => ['required', 'numeric', 'exists:categories,id'],
-            'amount' => ['required', 'numeric', 'max:' . auth()->user()->wallet->non_withdrawable_balance],
+            'amount' => ['required', 'numeric', 'max:' . auth()->user()->wallet->non_withdrawable],
         ];
     }
 

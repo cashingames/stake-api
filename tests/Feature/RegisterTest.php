@@ -336,7 +336,7 @@ class RegisterTest extends TestCase
 
         $this->assertDatabaseHas('wallets', [
             'user_id' => $user->id,
-            'non_withdrawable_balance' => 200.00,
+            'non_withdrawable' => 200.00,
         ]);
     }
 
@@ -360,7 +360,7 @@ class RegisterTest extends TestCase
 
         $this->assertDatabaseHas('wallets', [
             'user_id' => $user->id,
-            'non_withdrawable_balance' => 50.00,
+            'non_withdrawable' => 50.00,
         ]);
     }
 
