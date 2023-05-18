@@ -85,7 +85,8 @@ class RegisterController extends BaseController
             ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
+            'bonus_checked' => ['nullable','boolean']
         ]);
     }
 
@@ -166,13 +167,13 @@ class RegisterController extends BaseController
     {
         $bonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
         DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable_balance += $bonusAmount;
+            $user->wallet->non_withdrawable += $bonusAmount;
 
             WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable_balance,
+                'balance' => $user->wallet->non_withdrawable,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
             ]);
@@ -197,13 +198,13 @@ class RegisterController extends BaseController
     {
         $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
         DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable_balance += $bonusAmount;
+            $user->wallet->non_withdrawable += $bonusAmount;
 
             WalletTransaction::create([
                 'wallet_id' => $user->wallet->id,
                 'transaction_type' => 'CREDIT',
                 'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable_balance,
+                'balance' => $user->wallet->non_withdrawable,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
             ]);

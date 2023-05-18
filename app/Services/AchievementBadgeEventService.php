@@ -286,7 +286,7 @@ class AchievementBadgeEventService
             ]);
 
             DB::table('wallets')->where('id', $user->wallet->id)->update(array(
-                'non_withdrawable_balance' => $user->wallet->non_withdrawable_balance + $reward
+                'non_withdrawable' => $user->wallet->non_withdrawable + $reward
             ));
 
 

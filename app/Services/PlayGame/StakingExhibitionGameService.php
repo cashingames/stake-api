@@ -78,14 +78,14 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
-        $this->user->wallet->non_withdrawable_balance -= $stakingAmount;
+        $this->user->wallet->non_withdrawable -= $stakingAmount;
         $this->user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $stakingAmount,
-            'balance' => $this->user->wallet->non_withdrawable_balance,
+            'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'Placed a staking of ' . $stakingAmount,
             'reference' => Str::random(10),
         ]);

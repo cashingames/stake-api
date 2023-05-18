@@ -140,7 +140,7 @@ class StoreTest extends TestCase
     public function test_boosts_can_be_bought_from_wallet()
     {
         $this->seed(BoostSeeder::class);
-        $this->user->wallet->update(['non_withdrawable_balance' => 1000]);
+        $this->user->wallet->update(['non_withdrawable' => 1000]);
 
         $response = $this->post(self::BUY_BOOST_WALLET_URL . Boost::inRandomOrder()->first()->id);
         $response->assertJsonFragment(['message' => 'Boost Bought']);
@@ -218,7 +218,7 @@ class StoreTest extends TestCase
     {
         $this->seed(PlanSeeder::class);
         $this->user->wallet()->update([
-            'non_withdrawable_balance' => 2500,
+            'non_withdrawable' => 2500,
         ]);
         $plan = Plan::where('is_free', false)->inRandomOrder()->first();
 

@@ -37,10 +37,10 @@ class SendChallengeInviteController extends BaseController
         }
 
         if ($request->has('staking_amount') && is_numeric($request->staking_amount)) {
-            if (is_array($request->opponentId) && $this->user->wallet->non_withdrawable_balance < ($request->staking_amount * count($request->opponentId))) {
+            if (is_array($request->opponentId) && $this->user->wallet->non_withdrawable < ($request->staking_amount * count($request->opponentId))) {
                 return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance to stake against all opponents');
             }
-            if ($this->user->wallet->non_withdrawable_balance < $request->staking_amount) {
+            if ($this->user->wallet->non_withdrawable < $request->staking_amount) {
                 return $this->sendError('Insufficient wallet balance', 'Insufficient wallet balance');
             }
 

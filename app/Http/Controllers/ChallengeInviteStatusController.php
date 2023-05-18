@@ -38,7 +38,7 @@ class ChallengeInviteStatusController extends BaseController
         if (FeatureFlag::isEnabled(FeatureFlags::CHALLENGE_GAME_STAKING)){
             $challenge = Challenge::findOrFail($request->challenge_id);
             if (count($challenge->stakings) > 0){
-                if ($this->user->wallet->non_withdrawable_balance < $challenge->stakings()->first()->staking->amount_staked){
+                if ($this->user->wallet->non_withdrawable < $challenge->stakings()->first()->staking->amount_staked){
                     return $this->sendError('Insufficient wallet balance', 'You do not have enough balance to accept this challenge');
                 }
                 $staking = $challenge->stakings()->first()->staking;

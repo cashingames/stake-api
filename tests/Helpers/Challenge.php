@@ -39,7 +39,7 @@ class Challenge extends TestCase
         Wallet::factory()
             ->for($user)
             ->create([
-                'non_withdrawable_balance' => 1000
+                'non_withdrawable' => 1000
             ]);
 
         $this->actingAs($user)

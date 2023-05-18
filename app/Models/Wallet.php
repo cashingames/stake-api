@@ -13,8 +13,9 @@ class Wallet extends Model
 
     protected $fillable = [
         'user_id',
-        'non_withdrawable_balance',
-        'withdrawable_balance'
+        'non_withdrawable',
+        'withdrawable',
+        'bonus'
     ];
 
     public function user()

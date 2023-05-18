@@ -35,7 +35,7 @@ class LiveTriviaEntranceFeeTest extends TestCase
 
     public function test_a_user_can_pay_for_a_live_trivia()
     {   
-        $this->user->wallet->update(['non_withdrawable_balance' => 500]);
+        $this->user->wallet->update(['non_withdrawable' => 500]);
 
         $response = $this->postjson(self::LIVE_TRIVIA_ENTRANCE_PAYMENT_URL, [
             "liveTriviaId" => $this->trivia->id
@@ -61,7 +61,7 @@ class LiveTriviaEntranceFeeTest extends TestCase
 
     public function test_that_a_payment_record_is_created_for_user_and_live_trivia()
     {   
-        $this->user->wallet->update(['non_withdrawable_balance' => 500]);
+        $this->user->wallet->update(['non_withdrawable' => 500]);
 
         $response = $this->postjson(self::LIVE_TRIVIA_ENTRANCE_PAYMENT_URL, [
             "liveTriviaId" => $this->trivia->id

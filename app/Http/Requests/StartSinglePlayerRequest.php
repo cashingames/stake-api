@@ -117,7 +117,7 @@ class StartSinglePlayerRequest extends FormRequest
         if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
             if (
                 $totalSessions <= config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <= 0
+                $user->wallet->non_withdrawable <= 0
             ) {
                 return $validator->errors()->add(
                     'staking_amount',
@@ -125,12 +125,12 @@ class StartSinglePlayerRequest extends FormRequest
                 );
             } elseif (
                 $totalSessions <= config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <  $stakingAmount
+                $user->wallet->non_withdrawable <  $stakingAmount
             ) {
                 return $validator->errors()->add('staking_amount', 'Insufficient funds');
             } elseif (
                 $totalSessions > config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <  $stakingAmount
+                $user->wallet->non_withdrawable <  $stakingAmount
             ) {
                 return $validator->errors()->add('staking_amount', 'Insufficient funds');
             }

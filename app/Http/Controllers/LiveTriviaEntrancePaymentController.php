@@ -24,7 +24,7 @@ class LiveTriviaEntrancePaymentController extends BaseController
 
         $liveTrivia = Trivia::find($request->liveTriviaId);
 
-        if ($this->user->wallet->non_withdrawable_balance < $liveTrivia->entry_fee) {
+        if ($this->user->wallet->non_withdrawable < $liveTrivia->entry_fee) {
             return $this->sendError('Insufficient Wallet Balance', 'Insufficient Wallet Balance');
         }
 
@@ -32,14 +32,14 @@ class LiveTriviaEntrancePaymentController extends BaseController
             return $this->sendResponse('Payment successful', 'Payment successful');
         }
 
-        $this->user->wallet->non_withdrawable_balance -= $liveTrivia->entry_fee;
+        $this->user->wallet->non_withdrawable -= $liveTrivia->entry_fee;
         $this->user->wallet->save();
 
         WalletTransaction::create([
             'wallet_id' =>  $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
             'amount' => $liveTrivia->entry_fee,
-            'balance' => $this->user->wallet->non_withdrawable_balance,
+            'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'Paid entrance fee for live trivia',
             'reference' => Str::random(10),
         ]);
