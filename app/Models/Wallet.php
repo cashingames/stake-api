@@ -27,4 +27,9 @@ class Wallet extends Model
     {
         return $this->hasMany(WalletTransaction::class);
     }
+
+    public function hasBonus(){
+        return $this->bonus > 0;
+    }
+
 }

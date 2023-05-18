@@ -116,12 +116,14 @@ class WalletRepository
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
-
-        });
+                });
     }
 
     public function creditFundingAccount(
-        Wallet $wallet, float $amount, string $description, string $reference = null
+        Wallet $wallet,
+        float $amount,
+        string $description,
+        string $reference = null
     ): void {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
@@ -139,7 +141,6 @@ class WalletRepository
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
-
         });
     }
 
@@ -161,8 +162,44 @@ class WalletRepository
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
-
         });
     }
 
+    public function subtractFromApplicableWallet($wallet, $amount)
+    {
+        if ($wallet->hasBonus() &&  $wallet->bonus > $amount ) {
+
+            DB::transaction(function () use ($wallet, $amount) {
+
+                $wallet->bonus -= $amount;
+                $wallet->save();
+    
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'transaction_type' => 'DEBIT',
+                    'amount' => $amount,
+                    'balance' =>  $wallet->bonus,
+                    'description' => 'Bonus staking of ' . $amount,
+                    'reference' => Str::random(10),
+                ]);
+            });
+
+            return $wallet->bonus;
+        }
+        DB::transaction(function () use ($wallet, $amount) {
+
+            $wallet->non_withdrawable -= $amount;
+            $wallet->save();
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'DEBIT',
+                'amount' => $amount,
+                'balance' =>  $wallet->non_withdrawable,
+                'description' => 'Placed a staking of ' . $amount,
+                'reference' => Str::random(10),
+            ]);
+        });
+        return $wallet->non_withdrawable;
+    }
 }

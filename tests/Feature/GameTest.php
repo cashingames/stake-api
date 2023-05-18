@@ -920,6 +920,83 @@ class GameTest extends TestCase
         ]);
     }
 
+    public function test_bonus_balance_is_being_deducted_for_staking_when_a_user_has_bonus(){
+        Staking::factory()->count(5)->create(['user_id'=>$this->user->id]);
+        $questions = Question::factory()
+            ->count(50)
+            ->create();
 
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+        
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 1000
+        ]);
+
+        $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 500
+        ]);
+        
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->wallet->id,
+            'bonus' => 500,
+            'non_withdrawable' => 2000
+        ]);
+    }
+
+    public function test_amount_is_deducted_from_funding_balance_if_bonus_is_insufficient(){
+        Staking::factory()->count(5)->create(['user_id'=>$this->user->id]);
+        $questions = Question::factory()
+            ->count(50)
+            ->create();
+
+        $data = [];
+
+       
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('categories_questions')->insert($data);
+        
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 100
+        ]);
+        
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 500
+        ]);
+        
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->wallet->id,
+            'bonus' => 100,
+            'non_withdrawable' => 1500
+        ]);
+    }
 
 }

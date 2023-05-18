@@ -2,12 +2,14 @@
 
 namespace App\Services\PlayGame;
 
+use App\Actions\Wallet\DebitWalletAction;
 use App\Enums\FeatureFlags;
 use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
 use App\Models\Staking;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\WalletRepository;
 use App\Services\FeatureFlag;
 use App\Services\QuestionsHardeningServiceInterface;
 use App\Services\StakeQuestionsHardeningService;
@@ -26,6 +28,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
+        private readonly WalletRepository $walletRepository,
     ) {
         $this->user = auth()->user();
     }
@@ -78,18 +81,8 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
-        $this->user->wallet->non_withdrawable -= $stakingAmount;
-        $this->user->wallet->save();
-
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $stakingAmount,
-            'balance' => $this->user->wallet->non_withdrawable,
-            'description' => 'Placed a staking of ' . $stakingAmount,
-            'reference' => Str::random(10),
-        ]);
-
+        $this->walletRepository->subtractFromApplicableWallet($this->user->wallet, $stakingAmount);
+        
         $odd = 1;
 
         /**
@@ -109,6 +102,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
         return $staking->id;
     }
+
 
     public function createExhibitionStaking($stakingId, $gameSessionId): void
     {
