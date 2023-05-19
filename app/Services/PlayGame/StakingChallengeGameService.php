@@ -30,7 +30,8 @@ class StakingChallengeGameService
             $this->debitWalletAction->execute(
                 $user->wallet,
                 $data['amount'],
-                'Trivia challenge staking request'
+                'Trivia challenge staking request',
+                "non_withdrawable"
             );
             $response = $this
                 ->triviaChallengeStakingRepository

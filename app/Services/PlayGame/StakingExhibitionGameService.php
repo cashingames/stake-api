@@ -3,6 +3,7 @@
 namespace App\Services\PlayGame;
 
 use App\Actions\Wallet\DebitWalletAction;
+use App\Actions\Wallet\DebitWalletForStaking;
 use App\Enums\FeatureFlags;
 use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
@@ -28,7 +29,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
-        private readonly WalletRepository $walletRepository,
+        private readonly DebitWalletForStaking $walletDebitAction,
     ) {
         $this->user = auth()->user();
     }
@@ -81,7 +82,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
-        $this->walletRepository->subtractFromApplicableWallet($this->user->wallet, $stakingAmount);
+        $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
         
         $odd = 1;
 
