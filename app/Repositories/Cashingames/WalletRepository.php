@@ -116,12 +116,14 @@ class WalletRepository
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
-
         });
     }
 
     public function creditFundingAccount(
-        Wallet $wallet, float $amount, string $description, string $reference = null
+        Wallet $wallet,
+        float $amount,
+        string $description,
+        string $reference = null
     ): void {
         DB::transaction(function () use ($wallet, $amount, $description, $reference) {
 
@@ -139,30 +141,39 @@ class WalletRepository
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
             ]);
-
         });
     }
 
-    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null): void
+    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null, string $balanceAccount): void
     {
-        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
+        $balanceAmount = 0;
 
-            $newBalance = $wallet->non_withdrawable - $amount;
+        if ($balanceAccount == "non_withdrawable") {
+            $wallet->non_withdrawable -= $amount;
+            $wallet->save();
 
-            $wallet->update([
-                'non_withdrawable' => $newBalance
-            ]);
+            $balanceAmount = $wallet->non_withdrawable;
+        }
+        if ($balanceAccount == "bonus") {
+            $wallet->bonus -= $amount;
+            $wallet->save();
 
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'transaction_type' => 'DEBIT',
-                'amount' => $amount,
-                'balance' => $newBalance,
-                'description' => $description,
-                'reference' => $reference ?? Str::random(10),
-            ]);
+            $balanceAmount = $wallet->bonus;
+        }
+        if ($balanceAccount == "withdrawable") {
+            $wallet->withdrawable -= $amount;
+            $wallet->save();
 
-        });
+            $balanceAmount = $wallet->withdrawable;
+        }
+
+        WalletTransaction::create([
+            'wallet_id' => $wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => $amount,
+            'balance' => $balanceAmount,
+            'description' => $description,
+            'reference' => $reference ?? Str::random(10),
+        ]);
     }
-
 }

@@ -125,6 +125,13 @@ class WithdrawalTest extends TestCase
         $response->assertJson([
             'message' => 'Your transfer is being successfully processed to your bank account'
         ]);
+
+        $this->assertDatabaseHas('wallet_transactions', [
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => "DEBIT",
+            'description' => 'Winnings Withdrawal Made',
+            'balance' => $this->user->wallet->withdrawable
+        ]);
     }
 
     public function test_pending_response_from_payment_gateway(){

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ClientPlatform;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -15,7 +16,7 @@ class WithdrawWinningsController extends BaseController
 {
     //
     //@TODO - enforce hours between which withdrawals can be made
-    public function __invoke(ClientPlatform $platform, PaystackService $withdrawalService)
+    public function __invoke(ClientPlatform $platform, PaystackService $withdrawalService, WalletRepository $walletRepository)
     {
 
         if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
@@ -84,20 +85,8 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-        DB::transaction(function () use ($transferInitiated, $debitAmount) {
-            $this->user->wallet->withdrawable -= $debitAmount;
-
-            WalletTransaction::create([
-                'wallet_id' => $this->user->wallet->id,
-                'transaction_type' => 'DEBIT',
-                'amount' => $debitAmount,
-                'balance' => $this->user->wallet->withdrawable,
-                'description' => 'Winnings Withdrawal Made',
-                'reference' => $transferInitiated->reference,
-            ]);
-            $this->user->wallet->save();
-        });
-
+        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable");
+        
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status === 'pending') {
