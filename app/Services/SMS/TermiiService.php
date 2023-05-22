@@ -3,6 +3,7 @@
 namespace App\Services\SMS;
 
 use App\Jobs\ExpireGeneratedOtp;
+use App\Models\AuthToken;
 use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
@@ -61,35 +62,23 @@ class TermiiService implements SMSProviderInterface
         return json_decode($response->getBody());
     }
 
-    private function generateOtp()
+    public function deliverOTP($user, $tokenType)
     {
-        $otp = mt_rand(10000, 99999);
+        $otp_token = mt_rand(10000, 99999);
 
-        $user = User::where('otp_token',  $otp);
+        AuthToken::create([
+            'user_id' => $user->id,
+            'token' => $otp_token,
+            'token_type' => $tokenType,
+            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))
+        ]);
 
-        if ($user->exists()) {
-            $otp = mt_rand(10000, 99999);
-        };
-
-        ExpireGeneratedOtp::dispatch($user->first())
-            ->delay(now()->addMinutes(config('auth.verification.minutes_before_otp_expiry')));
-
-        return $otp;
-    }
-
-    public function deliverOTP($user)
-    {
-        $otp_token = $this->generateOtp();
-
-        if ($user->otp_token == null) {
-            $user->update(['otp_token' => $otp_token]);
-        }
         $smsData = [
             'to' => $user->country_code . (substr($user->phone_number, -10)),
             'channel' => 'dnd',
             'type' => 'plain',
             'from' => "N-Alert",
-            'sms' => "{$user->username}, your Cashingames secure OTP is {$user->otp_token}. Do not share with anyone"
+            'sms' => "{$user->username}, your Cashingames secure OTP is {$otp_token}. Do not share with anyone"
         ];
         try {
             $this->send($smsData);

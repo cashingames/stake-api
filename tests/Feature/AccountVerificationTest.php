@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AuthTokenType;
+use App\Models\AuthToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -28,9 +30,18 @@ class AccountVerificationTest extends TestCase
         $user = User::factory()->create([
             'phone_number' => '8012345678'
         ]);
+
+        config(['auth.verification.minutes_before_otp_expiry' => 5]);
+
+        $authTokenRecord = AuthToken::create([
+            'user_id' => $user->id,
+            'token' => mt_rand(10000, 99999),
+            'token_type' => AuthTokenType::PhoneVerification->value,
+            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))
+        ]);
         $response = $this->postJson("/api/auth/register/verify-token", [
             'phone_number' => $user->phone_number,
-            'token' => $user->otp_token
+            'token' => $authTokenRecord->token
         ]);
         $response->assertJson([
             'message' => 'Verification successful'

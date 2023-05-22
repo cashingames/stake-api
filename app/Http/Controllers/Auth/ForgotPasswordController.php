@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\AuthTokenType;
 use App\Enums\ClientPlatform;
 use App\Http\Controllers\BaseController;
 use App\Mail\TokenGenerated;
+use App\Models\AuthToken;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Rules\UniquePhoneNumberRule;
@@ -44,7 +46,7 @@ class ForgotPasswordController extends BaseController
 
             if (!is_null($user)) {
                 try {
-                    $smsService->deliverOTP($user);
+                    $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
                     return $this->sendResponse(true, 'OTP Sent');
                 } catch (\Throwable $th) {
                     Log::info("Forgot Password: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
@@ -94,11 +96,10 @@ class ForgotPasswordController extends BaseController
 
         if ($platform == ClientPlatform::StakingMobileWeb) {
 
-            $user = User::where('otp_token', $data['token'])->first();
+            $userAuthToken = AuthToken::where('token_type', AuthTokenType::PhoneVerification->value)
+                ->where('token', $data['token'])->where('expire_at', '>=', now())->first();
 
-            if (!is_null($user)) {
-                $user->update(['otp_token' => null]);
-
+            if (!is_null($userAuthToken)) {
                 return $this->sendResponse("Verification successful", 'Verification successful');
             }
             return $this->sendError("Invalid verification code", "Invalid verification code");

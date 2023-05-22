@@ -28,7 +28,6 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'phone_number',
         'password',
-        'otp_token',
         'country_code',
         'brand_id',
         'apple_user_id',
@@ -460,5 +459,9 @@ class User extends Authenticatable implements JWTSubject
     public function coinsTransaction()
     {
         return $this->hasMany(UserCoinTransaction::class);
+    }
+
+    public function authTokens(){
+        return $this->hasMany(AuthToken::class);
     }
 }

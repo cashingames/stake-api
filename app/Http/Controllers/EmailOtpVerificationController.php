@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AuthTokenType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -19,10 +20,12 @@ class EmailOtpVerificationController extends BaseController
             'token' => ['required', 'alpha_num'],
         ]);
 
-        if ($this->user->otp_token == $data['token']) {
+        $authToken = $this->user->authTokens()->where('token_type', AuthTokenType::EmailVerification->value)
+        ->where('token', $data['token'])->where('expire_at', '>=', now())->first();
+
+        if (!is_null($authToken)) {
 
             $this->user->email_verified_at = now();
-            $this->user->otp_token = null;
             $this->user->save();
 
             Log::info($this->user->username . " verified email with OTP");

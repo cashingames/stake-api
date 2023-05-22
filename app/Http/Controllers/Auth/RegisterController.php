@@ -25,6 +25,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Enums\AuthTokenType;
 
 class RegisterController extends BaseController
 {
@@ -107,7 +108,6 @@ class RegisterController extends BaseController
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
-                'otp_token' => null,
                 'email_verified_at' =>  (($platform == ClientPlatform::GameArkMobile) ? now() : null),
                 'is_on_line' => true,
                 'country_code' => ( ($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
@@ -245,7 +245,7 @@ class RegisterController extends BaseController
     ) {
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
             try {
-                $smsService->deliverOTP($user);
+                $smsService->deliverOTP($user , AuthTokenType::PhoneVerification->value);
             } catch (\Throwable $th) {
                 Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
             }
@@ -353,7 +353,7 @@ class RegisterController extends BaseController
             return $this->sendResponse([], "You can not send OTP at this time, please try later");
         } else {
             try {
-                $smsService->deliverOTP($user);
+                $smsService->deliverOTP($user,  AuthTokenType::PhoneVerification->value);
                 return $this->sendResponse([
                     'next_resend_minutes' => 2
                 ], "OTP has been resent to phone number");

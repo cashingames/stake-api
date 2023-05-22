@@ -637,7 +637,6 @@ class GameTest extends TestCase
             'phone_number' => '08133445858',
             'email' => 'testaccount@gmail.com',
             'password' => 'xcvb',
-            'otp_token' => '2134',
             'is_on_line' => true,
             'country_code' => 'NGN'
         ]);
@@ -846,7 +845,6 @@ class GameTest extends TestCase
             'phone_number' => '08133445858',
             'email' => 'testaccount@gmail.com',
             'password' => 'xcvb',
-            'otp_token' => '2134',
             'is_on_line' => true,
             'country_code' => 'NGN'
         ]);
