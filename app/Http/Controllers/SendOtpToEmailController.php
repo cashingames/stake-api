@@ -27,7 +27,7 @@ class SendOtpToEmailController extends BaseController
                 'user_id' => $this->user->id,
                 'token' => $otp_token,
                 'token_type' => AuthTokenType::EmailVerification->value,
-                'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))
+                'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
             ]);
 
             Mail::to($this->user->email)->send(new SendEmailOTP($this->user, $otp_token));

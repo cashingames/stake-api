@@ -70,7 +70,7 @@ class TermiiService implements SMSProviderInterface
             'user_id' => $user->id,
             'token' => $otp_token,
             'token_type' => $tokenType,
-            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))
+            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
         ]);
 
         $smsData = [

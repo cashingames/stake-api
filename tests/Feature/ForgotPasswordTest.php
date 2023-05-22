@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AuthTokenType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Mail\TokenGenerated;
+use App\Models\AuthToken;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Carbon;
 use UserSeeder;
@@ -23,7 +25,7 @@ class ForgotPasswordTest extends TestCase
      * @return void
      */
 
-    protected $user;
+    protected $user, $authTokenRecord;
     const RESET_EMAIL_URL = '/api/auth/password/email';
     const VERIFY_TOKEN_URL = '/api/auth/token/verify';
 
@@ -36,6 +38,14 @@ class ForgotPasswordTest extends TestCase
         $this->user = User::first();
         config(['services.termii.api_key' => 'termii_api_key']);
         Mail::fake();
+        config(['auth.verification.minutes_before_otp_expiry' => 5]);
+
+        $this->authTokenRecord = AuthToken::create([
+            'user_id' => $this->user->id,
+            'token' => mt_rand(10000, 99999),
+            'token_type' => AuthTokenType::PhoneVerification->value,
+            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
+        ]);
     }
 
     public function test_reset_email_can_be_sent()
@@ -127,13 +137,11 @@ class ForgotPasswordTest extends TestCase
     }
 
     public function test_that_reset_token_can_be_verified_for_stakers_app()
-    {
-
-        $this->user->update(['otp_token' => 9095]);
-        $this->user->refresh();
+    {   
+        // dd($this->authTokenRecord);
 
         $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::VERIFY_TOKEN_URL, [
-            "token" => "9095",
+            "token" => strval($this->authTokenRecord->token),
         ]);
 
         $response->assertJson([

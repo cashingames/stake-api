@@ -30,7 +30,7 @@ class VerifyOTPController extends BaseController
         }
 
         $user = User::where('phone_number',  $phone)->first();
-
+       
         $userAuthToken = $user->authTokens()->where('token_type', AuthTokenType::PhoneVerification->value)
             ->where('token', $data['token'])->where('expire_at', '>=', now())->first();
 

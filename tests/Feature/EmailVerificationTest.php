@@ -44,7 +44,7 @@ class EmailVerificationTest extends TestCase
             'user_id' => $this->user->id,
             'token' => mt_rand(10000, 99999),
             'token_type' => AuthTokenType::EmailVerification->value,
-            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))
+            'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
         ]);
     }
 
