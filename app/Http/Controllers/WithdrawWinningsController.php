@@ -22,11 +22,21 @@ class WithdrawWinningsController extends BaseController
 
             'account_number' => ['required', 'numeric'],
             'bank_name' => ['required', 'string', 'max:15'],
-            'amount' => ['required', 'min:' . $this->user->wallet->withdrawable],
+            'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
             'account_name' => ['required', 'string']
         ]);
 
+        $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
+
+        if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
+            $data = [
+                'verifyEmailNavigation' => true,
+            ];
+            return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
+        }
+
         $debitAmount = $request->amount;
+        
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -63,7 +73,7 @@ class WithdrawWinningsController extends BaseController
 
         $fullName = $this->user->profile->first_name . ' ' . $this->user->profile->last_name;
       
-        if ($verifyAccount->data->account_name !== strToUpper($fullName)) {
+        if ($verifyAccount->data->account_name !== strtoupper($fullName)) {
             return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
         }
 

@@ -18,15 +18,17 @@ use App\Services\Payments\PaystackService;
 use Exception;
 
 class WithdrawalTest extends TestCase
-{   
+{
     use RefreshDatabase;
 
     protected $user;
 
     protected $banksMock;
 
+    protected $verificationMock;
+
     const WITHDRAWAL_URL = '/api/v3/winnings/withdraw';
-    
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,24 +46,31 @@ class WithdrawalTest extends TestCase
         ]));
 
         $this->actingAs($this->user);
-        
     }
 
-    public function test_that_a_user_cannot_withdraw_zero_naira(){
-        $response = $this->post(self::WITHDRAWAL_URL);
+    public function test_that_a_user_cannot_withdraw_zero_naira()
+    {
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 0,
+            'bank_name' => 'Test Bank'
+
+        ]);
         $response->assertJson([
             'message' => 'Invalid withdrawal amount. You can not withdraw NGN0',
         ]);
     }
 
-    public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded(){
+    public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded()
+    {
 
         Config::set('trivia.email_verification_limit_threshold', 10000);
         $this->user->update(['email_verified_at' => null]);
-    
+
         $this->user->wallet->withdrawable = 20000;
         $this->user->wallet->save();
-       
+
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'DEBIT',
@@ -71,46 +80,87 @@ class WithdrawalTest extends TestCase
             'reference' => Str::random(10),
             'created_at' => now()->subHours(3)
         ]);
-    
-        $response = $this->withHeaders(['x-brand-id' => 2])->post(self::WITHDRAWAL_URL);
-        
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 0,
+            'bank_name' => 'Test Bank'
+
+        ]);
+
         $response->assertJsonFragment([
             'verifyEmailNavigation' => true,
         ]);
     }
 
-    public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount(){
+    public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount()
+    {
         Config::set('trivia.staking.min_withdrawal_amount', 500);
 
         $this->user->wallet->withdrawable = 150;
         $this->user->wallet->save();
 
 
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 150,
+            'bank_name' => 'Test Bank'
+
+        ]);
         $response->assertJson([
             'message' => 'You can not withdraw less than NGN' . config('trivia.staking.min_withdrawal_amount'),
         ]);
     }
-   
-    public function test_that_a_user_cannot_withdraw_without_updating_bank_details(){
-        
-        $this->user->profile->bank_name =  NULL;
-        $this->user->profile->account_number = NULL;
-        $this->user->profile->save();
 
-        $response = $this->post(self::WITHDRAWAL_URL);
-        $response->assertJson([
-            'message' => 'Please update your profile with your bank details',
-        ]);
-    }
-
-    public function test_that_user_can_withdraw_successfully(){
+    public function test_that_a_user_cannot_withdraw_if_name_is_not_equal_to_account_name()
+    {
         $banksMock = $this->banksMock;
-        $this->mock(PaystackService::class, function (MockInterface $mock) use($banksMock){
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
-            $mock->shouldReceive('verifyAccount')->andReturnTrue();
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => 'TEST ACCOUNT'
+                ]
+            ]);
+            $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
+            $mock->shouldReceive('initiateTransfer')->andReturn((object)[
+                'status' => 'success',
+                'reference' => 'randomref'
+            ]);
+        });
+        $this->user->wallet->withdrawable = 1000;
+        $this->user->wallet->save();
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
+        $response->assertJson([
+            'message' => 'Account name does not match your registration name. Please contact support.',
+        ]);
+    }
+
+    public function test_that_user_can_withdraw_successfully()
+    {
+        $banksMock = $this->banksMock;
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+            $mock->shouldReceive('getBanks')->once()->andReturn(
+                $banksMock
+            );
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                ]
+            ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
             $mock->shouldReceive('initiateTransfer')->andReturn((object)[
                 'status' => 'success',
@@ -120,7 +170,13 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
 
         $response->assertJson([
             'message' => 'Your transfer is being successfully processed to your bank account'
@@ -134,13 +190,19 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
-    public function test_pending_response_from_payment_gateway(){
+    public function test_pending_response_from_payment_gateway()
+    {
         $banksMock = $this->banksMock;
         $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
-            $mock->shouldReceive('verifyAccount')->andReturnTrue();
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                ]
+            ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
             $mock->shouldReceive('initiateTransfer')->andReturn((object)[
                 'status' => 'pending',
@@ -150,38 +212,59 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
 
         $response->assertJson([
             'message' => 'Transfer processing, wait for your bank account to reflect'
         ]);
     }
 
-    public function test_that_money_is_not_send_to_unverified_bank_account(){
-        
-        $this->mock(PaystackService::class, function (MockInterface $mock){
+    public function test_that_money_is_not_send_to_unverified_bank_account()
+    {
+
+        $this->mock(PaystackService::class, function (MockInterface $mock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $this->banksMock
             );
-            $mock->shouldReceive('verifyAccount')->andReturnFalse();
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => false,
+            ]);
         });
 
         $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
 
         $response->assertJson([
             'message' => 'Account is not valid'
         ]);
     }
 
-    public function test_error_handled_when_withdrawal_initiation_goes_wrong_at_provider(){
+    public function test_error_handled_when_withdrawal_initiation_goes_wrong_at_provider()
+    {
         $this->mock(PaystackService::class, function (MockInterface $mock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $this->banksMock
             );
-            $mock->shouldReceive('verifyAccount')->andReturnTrue();
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                ]
+            ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
             $mock->shouldReceive('initiateTransfer')->andThrowExceptions([new Exception()]);
         });
@@ -189,7 +272,13 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->withdrawable = 5000;
         $this->user->wallet->save();
 
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
 
         $response->assertJson([
             'message' => 'We are unable to complete your withdrawal request at this time, please try in a short while or contact support'
@@ -197,14 +286,22 @@ class WithdrawalTest extends TestCase
     }
 
 
-    public function test_that_a_deleted_account_cannot_make_withdrawal() {
+    public function test_that_a_deleted_account_cannot_make_withdrawal()
+    {
         $this->user->delete();
-        $response = $this->post(self::WITHDRAWAL_URL);
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
 
         $response->assertStatus(500);
     }
 
-    public function test_that_demo_cash_remains_in_book_balance_and_cannot_be_withdrawn(){
+    public function test_that_demo_cash_remains_in_book_balance_and_cannot_be_withdrawn()
+    {
         FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
         WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
@@ -218,7 +315,7 @@ class WithdrawalTest extends TestCase
 
         $this->artisan('winnings:credit')->assertExitCode(0);
 
-        
+
         $this->assertEquals($this->user->bookBalance(), 500);
     }
 }
