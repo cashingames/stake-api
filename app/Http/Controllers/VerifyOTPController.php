@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AuthTokenType;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -23,19 +24,21 @@ class VerifyOTPController extends BaseController
         ]);
 
         $phone = $data['phone_number'];
-       
+
         if (str_starts_with($data['phone_number'], '0')) {
             $phone = ltrim($data['phone_number'], $data['phone_number'][0]);
         }
 
-        $user = User::where('phone_number',  $phone)->where('otp_token', $data['token'])->first();
+        $user = User::where('phone_number',  $phone)->first();
        
-        if ($user == null) {
+        $userAuthToken = $user->authTokens()->where('token_type', AuthTokenType::PhoneVerification->value)
+            ->where('token', $data['token'])->where('expire_at', '>=', now())->first();
+
+        if ($userAuthToken  == null) {
             return $this->sendError('Invalid verification code', 'Invalid verification code');
         }
 
         $user->phone_verified_at = now();
-        $user->otp_token = null;
         $user->save();
 
         Log::info($user->username . " verified with OTP");

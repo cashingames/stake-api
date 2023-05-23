@@ -21,11 +21,12 @@ class SendEmailOTP extends Mailable
      * @return void
      */
 
-    public $user;
+    public $user, $otp_token;
 
-    public function __construct(User $user)
+    public function __construct(User $user, $otp_token)
     {
         $this->user = $user;
+        $this->otp_token = $otp_token;
     }
 
     /**

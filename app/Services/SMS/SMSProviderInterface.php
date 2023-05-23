@@ -6,5 +6,5 @@ interface SMSProviderInterface{
 
     public function send(array $data);
 
-    public function deliverOTP($user);
+    public function deliverOTP($user, $tokenType);
 }

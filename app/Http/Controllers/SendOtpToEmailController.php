@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AuthTokenType;
 use App\Enums\ClientPlatform;
 use App\Mail\SendEmailOTP;
+use App\Models\AuthToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -18,12 +20,18 @@ class SendOtpToEmailController extends BaseController
      */
     public function __invoke()
 {
-        if (is_null($this->user->otp_token) && is_null($this->user->email_verified_at)) {
-            $this->user->update(['otp_token' => mt_rand(10000, 99999)]);
-            $this->user->refresh();
+        if (is_null($this->user->email_verified_at)) {
+            $otp_token = mt_rand(10000, 99999);
 
-            Mail::to($this->user->email)->send(new SendEmailOTP($this->user));
-            return $this->sendResponse($this->user->otp_token, 'Email Sent');
+            AuthToken::create([
+                'user_id' => $this->user->id,
+                'token' => $otp_token,
+                'token_type' => AuthTokenType::EmailVerification->value,
+                'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
+            ]);
+
+            Mail::to($this->user->email)->send(new SendEmailOTP($this->user, $otp_token));
+            return $this->sendResponse($otp_token, 'Email Sent');
         }
       
         return $this->sendResponse('Email is Verified', 'Email is Verified ');
