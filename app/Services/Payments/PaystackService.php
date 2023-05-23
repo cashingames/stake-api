@@ -6,6 +6,7 @@ use App\Models\WalletTransaction;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use stdClass;
 
 class PaystackService
 {
@@ -27,23 +28,25 @@ class PaystackService
         $this->user = auth()->user();
     }
 
-    public function verifyAccount($bankCode)
+    public function verifyAccount($bankCode, $accountNumber)
     {
         $url = 'https://api.paystack.co/bank/resolve?account_number=' .
-             $this->user->profile->account_number . '&bank_code=' . $bankCode;
+            $accountNumber . '&bank_code=' . $bankCode;
         $response = null;
         try {
             $response = $this->client->request('GET', $url);
         } catch (\Exception $ex) {
             Log::info($ex);
-            return false;
+            $response = new stdClass;
+            $response->status = false;
+            return $response;
         }
 
         $data = \json_decode((string) $response->getBody());
-        return $data->status;
+        return $data;
     }
 
-    public function createTransferRecipient($bankCode)
+    public function createTransferRecipient($bankCode, $accountName, $accountNumber)
     {
         $url = "https://api.paystack.co/transferrecipient";
         $response = null;
@@ -51,8 +54,8 @@ class PaystackService
             $response = $this->client->request("POST", $url, [
                 'json' => [
                     "type" => "nuban",
-                    "name" => $this->user->profile->account_name,
-                    "account_number" => $this->user->profile->account_number,
+                    "name" => $accountName,
+                    "account_number" => $accountNumber,
                     "bank_code" => $bankCode,
                     "currency" => "NGN"
                 ]
@@ -87,7 +90,6 @@ class PaystackService
         Log::info("feedback from paystack: " . json_encode($data));
 
         return $data->data;
-        
     }
 
     public function getBanks()
