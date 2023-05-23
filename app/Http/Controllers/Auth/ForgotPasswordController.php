@@ -123,11 +123,18 @@ class ForgotPasswordController extends BaseController
         Request $request,
         SMSProviderInterface $smsService
     ) {
-        $this->validate($request, [
-            'username' => ['required', 'exists:users,username']
-        ]);
 
-        $user = User::where('username', $request->username)->first();
+        $this->validate($request, [
+            'phone_number' => ['required', 'string', 'max:15']
+        ]);
+        
+        $phone = $request->phone_number;
+
+        if (str_starts_with($request->phone_number, '0')) {
+            $phone = ltrim($request->phone_number, $request->phone_number[0]);
+        }
+    
+        $user = User::where('phone_number', $phone)->first();
 
         if ($user->phone_verified_at != null) {
             return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
