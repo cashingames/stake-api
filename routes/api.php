@@ -59,6 +59,7 @@ Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
 Route::post('auth/register/verify-token', VerifyOTPController::class);
 Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP']);
+Route::post('auth/password/token/resend', [ForgotPasswordController::class, 'resendOTP']);
 
 Route::middleware('api')->prefix('v3')->group(
     function () {

@@ -355,7 +355,7 @@ class RegisterController extends BaseController
             try {
                 $smsService->deliverOTP($user,  AuthTokenType::PhoneVerification->value);
                 return $this->sendResponse([
-                    'next_resend_minutes' => 2
+                    'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
                 ], "OTP has been resent to phone number");
             } catch (\Throwable $th) {
                 //throw $th;
