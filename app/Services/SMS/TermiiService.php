@@ -82,7 +82,7 @@ class TermiiService implements SMSProviderInterface
         ];
         try {
             $this->send($smsData);
-            Cache::put($user->username . "_last_otp_time", now()->toTimeString(), $seconds = 120);
+            Cache::put($user->username . "_last_otp_time", now()->toTimeString(), $seconds = 60 * config('auth.verification.minutes_before_otp_expiry'));
         } catch (\Throwable $th) {
 
             throw $th;

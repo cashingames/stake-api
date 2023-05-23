@@ -8,6 +8,7 @@ use App\Http\Controllers\BaseController;
 use App\Mail\TokenGenerated;
 use App\Models\AuthToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use App\Rules\UniquePhoneNumberRule;
 use App\Services\SMS\SMSProviderInterface;
@@ -115,6 +116,37 @@ class ForgotPasswordController extends BaseController
             return $this->sendResponse("Verification successful", 'Verification successful');
         } else {
             return $this->sendError('Verification failed', 'verification failed');
+        }
+    }
+
+    public function resendOTP(
+        Request $request,
+        SMSProviderInterface $smsService
+    ) {
+        $this->validate($request, [
+            'username' => ['required', 'exists:users,username']
+        ]);
+
+        $user = User::where('username', $request->username)->first();
+
+        if ($user->phone_verified_at != null) {
+            return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
+        }
+
+        if (Cache::has($user->username . "_last_otp_time")) {
+            //otp was still recently sent to this user, so no need resending
+            return $this->sendResponse([], "You can not send OTP at this time, please try later");
+        } else {
+            try {
+                $smsService->deliverOTP($user,  AuthTokenType::PhoneVerification->value);
+                return $this->sendResponse([
+                    'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
+                ], "OTP has been resent to phone number");
+            } catch (\Throwable $th) {
+                //throw $th;
+                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+            }
         }
     }
 }
