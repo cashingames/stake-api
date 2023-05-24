@@ -32,6 +32,7 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Enums\WalletBalanceType;
 use App\Models\Staking;
 use App\Models\UserCoin;
 use stdClass;
@@ -314,7 +315,8 @@ class GameController extends BaseController
                         'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
                         'description' => $transactionDescription,
                         'reference' => Str::random(10),
-                        'viable_date' => $viableDate
+                        'viable_date' => $viableDate,
+                        'balance_type' => WalletBalanceType::WinningsBalance->value
                     ]);
                 } else {
                     WalletTransaction::create([
@@ -324,7 +326,8 @@ class GameController extends BaseController
                         'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
                         'description' => 'Staking winning of ' . $amountWon . ' cash',
                         'reference' => Str::random(10),
-                        'viable_date' => now()->addHours(config('trivia.hours_before_withdrawal'))
+                        'viable_date' => now()->addHours(config('trivia.hours_before_withdrawal')),
+                        'balance_type' => WalletBalanceType::WinningsBalance->value
                     ]);
                 }
 

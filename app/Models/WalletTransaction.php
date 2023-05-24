@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\WalletBalanceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,7 +26,7 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance','viable_date','settled_at'
+        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance', 'viable_date', 'settled_at'
     ];
 
 
@@ -43,32 +44,39 @@ class WalletTransaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeUnsettled($query){
-        
+    public function scopeUnsettled($query)
+    {
+
         return $query->where('transaction_type', 'CREDIT')
-        ->whereNull('settled_at')->whereNotNull('viable_date');
+            ->whereNull('settled_at')->whereNotNull('viable_date');
     }
 
-    public function scopeWithdrawals($query){
+    public function scopeWithdrawals($query)
+    {
         return $query->where('transaction_type', 'DEBIT')
-        ->where('description','Winnings Withdrawal Made');
+            ->where('description', 'Winnings Withdrawal Made');
     }
 
-    public function scopeTotalFundings($query){
+    public function scopeTotalFundings($query)
+    {
         return $query->where('transaction_type', 'CREDIT')
-        ->where('description','Fund Wallet');
+            ->where('description', 'Fund Wallet');
     }
 
-    public function scopeDemoGameWinnings($query){
+    public function scopeDemoGameWinnings($query)
+    {
         return $query->where('transaction_type', 'CREDIT')
-        ->where('description','Demo Game Winnings');
+            ->where('description', 'Demo Game Winnings');
     }
 
-    public function scopeMainTransactions($query){
-        return $query->where('description', 'NOT LIKE', "%bonus%");
+    public function scopeMainTransactions($query)
+    {
+        return $query->where('balance_type',  WalletBalanceType::CreditsBalance->value)
+            ->orWhere('balance_type', WalletBalanceType::WinningsBalance->value);
     }
 
-    public function scopeBonusTransactions($query){
-        return $query->where('description', 'LIKE', "%bonus%");
+    public function scopeBonusTransactions($query)
+    {
+        return $query->where('balance_type',  WalletBalanceType::BonusBalance->value);
     }
 }

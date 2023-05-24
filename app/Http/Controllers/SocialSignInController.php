@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Enums\WalletBalanceType;
 
 class SocialSignInController extends BaseController
 {
@@ -155,6 +156,7 @@ class SocialSignInController extends BaseController
                 'balance' => $user->wallet->non_withdrawable,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
+                'balance_type' => WalletBalanceType::BonusBalance->value
             ]);
 
             $user->wallet->save();
