@@ -39,12 +39,22 @@ class WalletController extends BaseController
 
     public function transactions()
     {
-        $transactions = $this->user->transactions()
+        $mainTransactions = $this->user->transactions()->mainTransactions()
             ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
-        return (new WalletTransactionsResponse())->transform($transactions);
+        $bonusTransactions = $this->user->transactions()->bonusTransactions()
+            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('wallet_transactions.created_at', 'desc')
+            ->paginate(10);
+
+
+        $data = [
+            "mainTransactions" => (new WalletTransactionsResponse())->transform($mainTransactions)->original,
+            "bonusTransactions" => (new WalletTransactionsResponse())->transform($bonusTransactions)->original,
+        ];
+        return $data;
     }
 
     public function earnings()

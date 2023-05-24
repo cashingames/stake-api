@@ -63,4 +63,12 @@ class WalletTransaction extends Model
         return $query->where('transaction_type', 'CREDIT')
         ->where('description','Demo Game Winnings');
     }
+
+    public function scopeMainTransactions($query){
+        return $query->where('description', 'NOT LIKE', "%bonus%");
+    }
+
+    public function scopeBonusTransactions($query){
+        return $query->where('description', 'LIKE', "%bonus%");
+    }
 }

@@ -21,7 +21,7 @@ class WithdrawWinningsController extends BaseController
         $request->validate([
 
             'account_number' => ['required', 'numeric'],
-            'bank_name' => ['required', 'string', 'max:15'],
+            'bank_name' => ['required', 'string', 'max:200'],
             'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
             'account_name' => ['required', 'string']
         ]);
