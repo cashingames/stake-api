@@ -136,8 +136,8 @@ class ForgotPasswordController extends BaseController
     
         $user = User::where('phone_number', $phone)->first();
 
-        if ($user->phone_verified_at != null) {
-            return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
+        if ($user == null) {
+            return $this->sendResponse("Phone number does not exist", "Phone number does not exist");
         }
 
         if (Cache::has($user->username . "_last_otp_time")) {
