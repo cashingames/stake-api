@@ -16,28 +16,27 @@ class WithdrawWinningsController extends BaseController
 {
     //
     //@TODO - enforce hours between which withdrawals can be made
-    public function __invoke(ClientPlatform $platform, PaystackService $withdrawalService, WalletRepository $walletRepository)
+    public function __invoke(Request $request, PaystackService $withdrawalService, WalletRepository $walletRepository)
     {
+        $request->validate([
 
-        if (is_null($this->user->profile->bank_name) || is_null($this->user->profile->account_number)) {
-            return $this->sendError(false, 'Please update your profile with your bank details');
+            'account_number' => ['required', 'numeric'],
+            'bank_name' => ['required', 'string', 'max:15'],
+            'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
+            'account_name' => ['required', 'string']
+        ]);
+
+        $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
+
+        if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
+            $data = [
+                'verifyEmailNavigation' => true,
+            ];
+            return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
         }
 
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-            $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
-            if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
-                $data = [
-                    'verifyEmailNavigation' => true,
-                ];
-                return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-            }
-        }
-
-        // if (is_null($this->user->phone_verified_at)) {
-        //     return $this->sendError(false, 'Please verify your phone number to make withdrawals or contact support on hello@cashingames.com');
-        // }
-
-        $debitAmount = $this->user->wallet->withdrawable;
+        $debitAmount = $request->amount;
+        
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -61,17 +60,24 @@ class WithdrawWinningsController extends BaseController
         $bankCode = '';
 
         foreach ($banks->data as $bank) {
-            if ($bank->name == $this->user->profile->bank_name) {
+            if ($bank->name == $request->bank_name) {
                 $bankCode = $bank->code;
             }
         }
 
-        $isValidAccount = $withdrawalService->verifyAccount($bankCode);
+        $verifyAccount = $withdrawalService->verifyAccount($bankCode, $request->account_number);
 
-        if (!$isValidAccount) {
+        if (!$verifyAccount->status) {
             return $this->sendError(false, 'Account is not valid');
         }
-        $recipientCode = $withdrawalService->createTransferRecipient($bankCode);
+
+        $fullName = $this->user->profile->first_name . ' ' . $this->user->profile->last_name;
+      
+        if ($verifyAccount->data->account_name !== strtoupper($fullName)) {
+            return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
+        }
+
+        $recipientCode = $withdrawalService->createTransferRecipient($bankCode, $verifyAccount->data->account_name, $request->account_number);
 
         if (is_null($recipientCode)) {
             return $this->sendError(false, 'Recipient code could not be generated');
@@ -86,7 +92,7 @@ class WithdrawWinningsController extends BaseController
         }
 
         $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable");
-        
+
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status === 'pending') {
