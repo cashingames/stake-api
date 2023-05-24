@@ -136,6 +136,10 @@ class ForgotPasswordController extends BaseController
     
         $user = User::where('phone_number', $phone)->first();
 
+        if ($user == null) {
+            return $this->sendResponse("Phone number does not exist", "Phone number does not exist");
+        }
+
         if (Cache::has($user->username . "_last_otp_time")) {
             //otp was still recently sent to this user, so no need resending
             return $this->sendResponse([], "You can not send OTP at this time, please try later");
