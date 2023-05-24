@@ -26,7 +26,7 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance', 'viable_date', 'settled_at'
+        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance', 'viable_date','balance_type', 'settled_at'
     ];
 
 
