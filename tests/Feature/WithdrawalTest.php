@@ -161,6 +161,7 @@ class WithdrawalTest extends TestCase
                     'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
                 ]
             ]);
+
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
             $mock->shouldReceive('initiateTransfer')->andReturn((object)[
                 'status' => 'success',

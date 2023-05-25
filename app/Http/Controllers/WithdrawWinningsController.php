@@ -21,8 +21,8 @@ class WithdrawWinningsController extends BaseController
         $request->validate([
 
             'account_number' => ['required', 'numeric'],
-            'bank_name' => ['required', 'string', 'max:15'],
-            'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
+            'bank_name' => ['required', 'string', 'max:150'],
+            'amount' => ['required', 'integer', 'max:' . $this->user->wallet->withdrawable],
             'account_name' => ['required', 'string']
         ]);
 
@@ -36,7 +36,7 @@ class WithdrawWinningsController extends BaseController
         }
 
         $debitAmount = $request->amount;
-        
+
 
         if ($debitAmount <= 0) {
             return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
@@ -72,8 +72,13 @@ class WithdrawWinningsController extends BaseController
         }
 
         $fullName = $this->user->profile->first_name . ' ' . $this->user->profile->last_name;
-      
-        if ($verifyAccount->data->account_name !== strtoupper($fullName)) {
+
+        $verifiedAccountName = $this->getValidAccountName($verifyAccount->data->account_name);
+
+        if (
+            ($verifiedAccountName['firstAndLastName'] !== strtoupper($fullName) )
+        ) {
+            Log::info($this->user->username . " valid account names are {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']} ");
             return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
         }
 
@@ -101,5 +106,16 @@ class WithdrawWinningsController extends BaseController
         if ($transferInitiated->status === "success") {
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
+    }
+
+    private function getValidAccountName($accountName)
+    {
+        $accountNameParts = explode(" ", $accountName);
+        $firstAndLastName = $accountNameParts[0] . " " . $accountNameParts[count($accountNameParts) - 1];
+        $lastAndFirstName = $accountNameParts[count($accountNameParts) - 1] . " " . $accountNameParts[0];
+        return [
+            'firstAndLastName' => $firstAndLastName,
+            'lastAndFirstName' => $lastAndFirstName
+        ];
     }
 }
