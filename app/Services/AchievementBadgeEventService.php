@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use App\Models\Wallet;
 use App\Enums\AchievementType;
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 
 class AchievementBadgeEventService
 {
@@ -284,7 +285,8 @@ class AchievementBadgeEventService
                 'balance' => $reward,
                 'description' => 'Point rewarded from achievement',
                 'reference' => Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'description_action' => WalletTransactionAction::BonusCredited->value
             ]);
 
             DB::table('wallets')->where('id', $user->wallet->id)->update(array(

@@ -26,7 +26,7 @@ class WalletTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance', 'viable_date','balance_type', 'settled_at'
+        'wallet_id', 'transaction_type', 'amount', 'description', 'reference', 'balance', 'transaction_action','balance_type',
     ];
 
 
@@ -42,13 +42,6 @@ class WalletTransaction extends Model
     public function owner()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function scopeUnsettled($query)
-    {
-
-        return $query->where('transaction_type', 'CREDIT')
-            ->whereNull('settled_at')->whereNotNull('viable_date');
     }
 
     public function scopeWithdrawals($query)

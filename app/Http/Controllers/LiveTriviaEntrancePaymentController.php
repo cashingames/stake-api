@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use App\Models\LiveTriviaUserPayment;
 use App\Models\Trivia;
 use App\Models\WalletTransaction;
@@ -29,7 +30,7 @@ class LiveTriviaEntrancePaymentController extends BaseController
             return $this->sendError('Insufficient Wallet Balance', 'Insufficient Wallet Balance');
         }
 
-        if(LiveTriviaUserPayment::where('trivia_id', $request->liveTriviaId)->where('user_id', $this->user->id)->exists()){
+        if (LiveTriviaUserPayment::where('trivia_id', $request->liveTriviaId)->where('user_id', $this->user->id)->exists()) {
             return $this->sendResponse('Payment successful', 'Payment successful');
         }
 
@@ -43,7 +44,8 @@ class LiveTriviaEntrancePaymentController extends BaseController
             'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'Paid entrance fee for live trivia',
             'reference' => Str::random(10),
-            'balance_type' => WalletBalanceType::CreditsBalance->value
+            'balance_type' => WalletBalanceType::CreditsBalance->value,
+            'transaction_action' => WalletTransactionAction::LiveTriviaFeePaid->value
         ]);
 
         LiveTriviaUserPayment::create([
