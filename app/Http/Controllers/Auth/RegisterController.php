@@ -27,6 +27,7 @@ use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
 use App\Enums\AuthTokenType;
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 
 class RegisterController extends BaseController
 {
@@ -177,7 +178,8 @@ class RegisterController extends BaseController
                 'balance' => $user->wallet->non_withdrawable,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_action' => WalletTransactionAction::BonusCredited->value
             ]);
             $user->wallet->save();
         });
@@ -209,7 +211,8 @@ class RegisterController extends BaseController
                 'balance' => $user->wallet->non_withdrawable,
                 'description' => 'Sign Up Bonus',
                 'reference' => Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_action' => WalletTransactionAction::BonusCredited->value
             ]);
             $user->wallet->save();
         });

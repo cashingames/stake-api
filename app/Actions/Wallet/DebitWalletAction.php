@@ -11,8 +11,8 @@ class DebitWalletAction
         private readonly WalletRepository $walletRepository
     ) {
     }
-    public function execute(Wallet $wallet, float $amount, string $description, string $balance): void
+    public function execute(Wallet $wallet, float $amount, string $description, string $balance, string $action): void
     {
-        $this->walletRepository->debit($wallet, $amount, $description, null, $balance);
+        $this->walletRepository->debit($wallet, $amount, $description, null, $balance, $action);
     }
 }

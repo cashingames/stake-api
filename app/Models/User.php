@@ -404,11 +404,6 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
 
-    public function bookBalance()
-    {
-        return $this->transactions()->unsettled()->sum('amount');
-    }
-
     public function totalWithdrawals()
     {
         return $this->transactions()->withdrawals()->sum('amount');

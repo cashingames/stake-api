@@ -54,7 +54,6 @@ class ProfileTest extends TestCase
                 'countryCode' => $this->user->country_code,
                 'phoneNumber' => $this->user->phone_number,
                 'points' => $this->user->points(),
-                'bookBalance' => $this->user->bookBalance(),
                 'walletBalance' => $this->user->wallet->non_withdrawable + $this->user->wallet->withdrawable,
                 'bonusBalance' => $this->user->wallet->bonus_balance,
                 'withdrawableBalance' => $this->user->wallet->withdrawable,

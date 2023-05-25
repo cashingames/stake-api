@@ -3,6 +3,7 @@
 namespace App\Repositories\Cashingames;
 
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use App\Models\Staking;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
@@ -116,7 +117,8 @@ class WalletRepository
                 'balance' => $newBalance,
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
-                'balance_type' => WalletBalanceType::WinningsBalance->value
+                'balance_type' => WalletBalanceType::WinningsBalance->value,
+                'transaction_action' => WalletTransactionAction::WinningsCredited->value
             ]);
         });
     }
@@ -142,12 +144,13 @@ class WalletRepository
                 'balance' => $newBalance,
                 'description' => $description,
                 'reference' => $reference ?? Str::random(10),
-                'balance_type' => WalletBalanceType::CreditsBalance->value
+                'balance_type' => WalletBalanceType::CreditsBalance->value,
+                'transaction_action' => WalletTransactionAction::WalletFunded->value
             ]);
         });
     }
 
-    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null, string $balanceAccount): void
+    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null, string $balanceAccount, string $action): void
     {
         $balanceAmount = 0;
         $balanceType = '';
@@ -181,7 +184,8 @@ class WalletRepository
             'balance' => $balanceAmount,
             'description' => $description,
             'reference' => $reference ?? Str::random(10),
-            'balance_type' => $balanceType 
+            'balance_type' => $balanceType ,
+            'transaction_action' => $action
         ]);
     }
 }

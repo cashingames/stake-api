@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
         //
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
-        Commands\CreditWinnings::class,
+        // Commands\CreditWinnings::class,
         // Commands\SendInAppActivityUpdates::class,
         // ComputeUsersLevelsCommand::class
     ];
@@ -53,7 +53,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
         $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
         $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
-        $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
+        $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly();
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
@@ -87,9 +87,9 @@ class Kernel extends ConsoleKernel
         // }
 
         //This command matures users winnings based on their viable dates
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            $schedule->command('winnings:credit')->withoutOverlapping()->hourly();
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        //     $schedule->command('winnings:credit')->withoutOverlapping()->hourly();
+        // }
     }
 
     /**

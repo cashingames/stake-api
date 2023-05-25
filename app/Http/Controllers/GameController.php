@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\Staking;
 use App\Models\UserCoin;
 use stdClass;
@@ -300,13 +302,17 @@ class GameController extends BaseController
                     $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
 
                     $transactionDescription = '';
-                    $viableDate = now();
+                    $transactionAction = '';
+                    $balanceType = '';
 
                     if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
                         $transactionDescription = 'Demo Game Winnings';
+                        $balanceType = WalletBalanceType::BonusBalance->value;
+                        $transactionAction  = WalletTransactionAction::BonusCredited;
                     } else {
                         $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
-                        $viableDate = now()->addHours(config('trivia.hours_before_withdrawal'));
+                        $balanceType = WalletBalanceType::WinningsBalance->value;
+                        $transactionAction  = WalletTransactionAction::WinningsCredited;
                     }
                     WalletTransaction::create([
                         'wallet_id' => $this->user->wallet->id,
@@ -315,8 +321,8 @@ class GameController extends BaseController
                         'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
                         'description' => $transactionDescription,
                         'reference' => Str::random(10),
-                        'viable_date' => $viableDate,
-                        'balance_type' => WalletBalanceType::WinningsBalance->value
+                        'balance_type' => $balanceType,
+                        'transaction_action' => $transactionAction
                     ]);
                 } else {
                     WalletTransaction::create([
@@ -326,8 +332,8 @@ class GameController extends BaseController
                         'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
                         'description' => 'Staking winning of ' . $amountWon . ' cash',
                         'reference' => Str::random(10),
-                        'viable_date' => now()->addHours(config('trivia.hours_before_withdrawal')),
-                        'balance_type' => WalletBalanceType::WinningsBalance->value
+                        'balance_type' => WalletBalanceType::WinningsBalance->value,
+                        'transaction_action' => WalletTransactionAction::WinningsCredited->value
                     ]);
                 }
 
