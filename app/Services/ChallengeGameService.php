@@ -12,6 +12,7 @@ use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\SendPushNotification;
+use App\Enums\WalletBalanceType;
 use App\Models\Category;
 use App\Notifications\ChallengeReceivedNotification;
 
@@ -97,7 +98,8 @@ class ChallengeGameService
                     'balance' => User::find($cS->user_id)->wallet->withdrawable,
                     'description' => 'Staking winning of ' . $amountWon . ' on challenge',
                     'reference' => Str::random(10),
-                    'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
+                    'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal')),
+                    'balance_type' => WalletBalanceType::WinningsBalance->value
                 ]);
             }
             return true;
@@ -116,7 +118,8 @@ class ChallengeGameService
             'balance' => $winningUser->wallet->withdrawable,
             'description' => 'Staking winning of ' . $amountWon . ' on challenge',
             'reference' => Str::random(10),
-            'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal'))
+            'viable_date' => Carbon::now()->addHours(config('trivia.staking.hours_before_withdrawal')),
+            'balance_type' => WalletBalanceType::WinningsBalance->value
         ]);
         $challengeStaking->staking()->update(['amount_won' => $amountWon]);
 

@@ -22,7 +22,7 @@ use Yabacon\Paystack\Event as PaystackEvent;
 use Yabacon\Paystack;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
 use App\Enums\AchievementType;
-
+use App\Enums\WalletBalanceType;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 
@@ -39,12 +39,22 @@ class WalletController extends BaseController
 
     public function transactions()
     {
-        $transactions = $this->user->transactions()
+        $mainTransactions = $this->user->transactions()->mainTransactions()
             ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
-        return (new WalletTransactionsResponse())->transform($transactions);
+        $bonusTransactions = $this->user->transactions()->bonusTransactions()
+            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('wallet_transactions.created_at', 'desc')
+            ->paginate(10);
+
+
+        $data = [
+            "mainTransactions" => (new WalletTransactionsResponse())->transform($mainTransactions)->original,
+            "bonusTransactions" => (new WalletTransactionsResponse())->transform($bonusTransactions)->original,
+        ];
+        return $data;
     }
 
     public function earnings()
@@ -206,6 +216,7 @@ class WalletController extends BaseController
             'balance' => $user->wallet->non_withdrawable,
             'description' => 'Fund Wallet',
             'reference' => $reference,
+            'balance_type' => WalletBalanceType::CreditsBalance->value
         ]);
         $user->wallet->save();
 
@@ -231,6 +242,7 @@ class WalletController extends BaseController
             'balance' => $transaction->wallet->withdrawable,
             'description' => 'Winnings Withdrawal Reversed',
             'reference' => $reference,
+            'balance_type' => WalletBalanceType::WinningsBalance->value
         ]);
         $transaction->wallet->save();
 
@@ -333,6 +345,7 @@ class WalletController extends BaseController
             'balance' => $wallet->non_withdrawable,
             'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
             'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::CreditsBalance->value
         ]);
 
         $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
@@ -382,6 +395,7 @@ class WalletController extends BaseController
             'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
             'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::CreditsBalance->value
         ]);
 
 

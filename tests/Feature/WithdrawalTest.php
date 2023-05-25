@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\FeatureFlags;
+use App\Enums\WalletBalanceType;
 use Tests\TestCase;
 use App\Models\User;
 use Mockery\MockInterface;
@@ -78,7 +79,8 @@ class WithdrawalTest extends TestCase
             'balance' => $this->user->wallet->withdrawable,
             'description' => 'Winnings Withdrawal Made',
             'reference' => Str::random(10),
-            'created_at' => now()->subHours(3)
+            'created_at' => now()->subHours(3),
+            'balance_type' => WalletBalanceType::WinningsBalance->value
         ]);
 
         $response = $this->post(self::WITHDRAWAL_URL, [
@@ -310,7 +312,8 @@ class WithdrawalTest extends TestCase
             'balance' => 100,
             'description' =>  'Demo Game Winnings',
             'reference' => Str::random(10),
-            'viable_date' => now()->subHour()
+            'viable_date' => now()->subHour(),
+            'balance_type' => WalletBalanceType::BonusBalance->value
         ]);
 
         $this->artisan('winnings:credit')->assertExitCode(0);

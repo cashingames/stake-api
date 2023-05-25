@@ -9,7 +9,7 @@ use stdClass;
 use App\Traits\Utils\DateUtils;
 
 class WalletTransactionsResponse
-{   
+{
     use DateUtils;
     public int $transactionId;
     public WalletTransactionType $type;
@@ -20,22 +20,13 @@ class WalletTransactionsResponse
     public function transform($transactions): Object
     {
 
-        $presenter = [];
-        // $presenter->success = true;
-        // $presenter->data = [];
-        // $presenter->message = "Wallet transactions information";
+        $presenter = [
+            "all" => $this->transformAllTransactions($transactions),
+            "credits" => $this->transformCreditTransactions($transactions),
+            "debits" => $this->transformDebitTransactions($transactions)
+        ];
 
-        foreach ($transactions as $t) {
 
-            $transaction = new WalletTransactionsResponse;
-            $transaction->transactionId = $t->id;
-            $transaction->type = $this->getTransactionType($t->type);
-            $transaction->amount = $t->amount;
-            $transaction->description = $t->description;
-            $transaction->transactionDate = $this->toNigeriaTimeZoneFromUtc($t->transactionDate)->toDateTimeString();
-
-            $presenter[] = $transaction;
-        }
         return response()->json($presenter);
     }
 
@@ -49,5 +40,61 @@ class WalletTransactionsResponse
             return WalletTransactionType::Debit;
         }
         return "INVALID TRANSACTION TYPE";
+    }
+
+    private function transformAllTransactions($transactions)
+    {
+        $data = [];
+
+        foreach ($transactions as $t) {
+
+            $transaction = new WalletTransactionsResponse;
+            $transaction->transactionId = $t->id;
+            $transaction->type = $this->getTransactionType($t->type);
+            $transaction->amount = $t->amount;
+            $transaction->description = $t->description;
+            $transaction->transactionDate = $this->toNigeriaTimeZoneFromUtc($t->transactionDate)->toDateTimeString();
+
+            $data[] = $transaction;
+        }
+        return $data;
+    }
+
+    private function transformCreditTransactions($transactions)
+    {
+        $data = [];
+
+        foreach ($transactions as $t) {
+            if ($t->type ==  WalletTransactionType::Credit->value) {
+                $transaction = new WalletTransactionsResponse;
+                $transaction->transactionId = $t->id;
+                $transaction->type = $this->getTransactionType($t->type);
+                $transaction->amount = $t->amount;
+                $transaction->description = $t->description;
+                $transaction->transactionDate = $this->toNigeriaTimeZoneFromUtc($t->transactionDate)->toDateTimeString();
+
+                $data[] = $transaction;
+            }
+        }
+        return $data;
+    }
+
+    private function transformDebitTransactions($transactions)
+    {
+        $data = [];
+
+        foreach ($transactions as $t) {
+            if ($t->type ==  WalletTransactionType::Debit->value) {
+                $transaction = new WalletTransactionsResponse;
+                $transaction->transactionId = $t->id;
+                $transaction->type = $this->getTransactionType($t->type);
+                $transaction->amount = $t->amount;
+                $transaction->description = $t->description;
+                $transaction->transactionDate = $this->toNigeriaTimeZoneFromUtc($t->transactionDate)->toDateTimeString();
+
+                $data[] = $transaction;
+            }
+        }
+        return $data;
     }
 }

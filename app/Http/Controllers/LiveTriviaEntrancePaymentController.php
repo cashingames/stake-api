@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WalletBalanceType;
 use App\Models\LiveTriviaUserPayment;
 use App\Models\Trivia;
 use App\Models\WalletTransaction;
@@ -42,6 +43,7 @@ class LiveTriviaEntrancePaymentController extends BaseController
             'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'Paid entrance fee for live trivia',
             'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::CreditsBalance->value
         ]);
 
         LiveTriviaUserPayment::create([
