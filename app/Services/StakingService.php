@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use App\Models\ChallengeStaking;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
@@ -38,6 +40,8 @@ class StakingService
             'balance' => $this->user->wallet->non_withdrawable,
             'description' => 'Placed a staking of ' . $stakingAmount,
             'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::CreditsBalance->value,
+            'description_action' => WalletTransactionAction::StakingPlaced->value
         ]);
 
         $odd = 1;

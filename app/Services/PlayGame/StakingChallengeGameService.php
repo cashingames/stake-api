@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
 use App\Services\Firebase\FirestoreService;
 use App\Actions\Wallet\DebitWalletAction;
+use App\Enums\WalletTransactionAction;
 use App\Models\UserBoost;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use Illuminate\Support\Facades\Log;
@@ -31,7 +32,8 @@ class StakingChallengeGameService
                 $user->wallet,
                 $data['amount'],
                 'Trivia challenge staking request',
-                "non_withdrawable"
+                "non_withdrawable",
+                WalletTransactionAction::StakingPlaced->value
             );
             $response = $this
                 ->triviaChallengeStakingRepository

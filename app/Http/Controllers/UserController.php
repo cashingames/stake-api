@@ -36,7 +36,6 @@ class UserController extends BaseController
         $result->withdrawableBalance = $this->user->wallet->withdrawable;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
-        $result->bookBalance = $this->user->bookBalance();
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
 
         if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {

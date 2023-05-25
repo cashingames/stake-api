@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\FeatureFlags;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use Tests\TestCase;
 use App\Models\User;
 use Mockery\MockInterface;
@@ -78,7 +80,9 @@ class WithdrawalTest extends TestCase
             'balance' => $this->user->wallet->withdrawable,
             'description' => 'Winnings Withdrawal Made',
             'reference' => Str::random(10),
-            'created_at' => now()->subHours(3)
+            'created_at' => now()->subHours(3),
+            'balance_type' => WalletBalanceType::WinningsBalance->value,
+            'description_action' => WalletTransactionAction::WinningsWithdrawn->value
         ]);
 
         $response = $this->post(self::WITHDRAWAL_URL, [
@@ -301,22 +305,4 @@ class WithdrawalTest extends TestCase
         $response->assertStatus(500);
     }
 
-    public function test_that_demo_cash_remains_in_book_balance_and_cannot_be_withdrawn()
-    {
-        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => 500,
-            'balance' => 100,
-            'description' =>  'Demo Game Winnings',
-            'reference' => Str::random(10),
-            'viable_date' => now()->subHour()
-        ]);
-
-        $this->artisan('winnings:credit')->assertExitCode(0);
-
-
-        $this->assertEquals($this->user->bookBalance(), 500);
-    }
 }

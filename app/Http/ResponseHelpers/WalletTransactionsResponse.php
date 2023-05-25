@@ -9,7 +9,7 @@ use stdClass;
 use App\Traits\Utils\DateUtils;
 
 class WalletTransactionsResponse
-{   
+{
     use DateUtils;
     public int $transactionId;
     public WalletTransactionType $type;
@@ -21,9 +21,6 @@ class WalletTransactionsResponse
     {
 
         $presenter = [];
-        // $presenter->success = true;
-        // $presenter->data = [];
-        // $presenter->message = "Wallet transactions information";
 
         foreach ($transactions as $t) {
 
@@ -50,4 +47,6 @@ class WalletTransactionsResponse
         }
         return "INVALID TRANSACTION TYPE";
     }
+
+    
 }

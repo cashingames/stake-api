@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ClientPlatform;
+use App\Enums\WalletTransactionAction;
 use App\Models\WalletTransaction;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Payments\PaystackService;
@@ -19,10 +20,9 @@ class WithdrawWinningsController extends BaseController
     public function __invoke(Request $request, PaystackService $withdrawalService, WalletRepository $walletRepository)
     {
         $request->validate([
-
             'account_number' => ['required', 'numeric'],
-            'bank_name' => ['required', 'string', 'max:150'],
-            'amount' => ['required', 'integer', 'max:' . $this->user->wallet->withdrawable],
+            'bank_name' => ['required', 'string', 'max:200'],
+            'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
             'account_name' => ['required', 'string']
         ]);
 
@@ -96,7 +96,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable");
+        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
 
         Log::info('withdrawal transaction created ' . $this->user->username);
 
