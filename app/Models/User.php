@@ -461,4 +461,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserCoinTransaction::class);
     }
+
+    public function rewards()
+    {
+        return $this->belongsToMany(Reward::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'release_on');
+    }
 }
