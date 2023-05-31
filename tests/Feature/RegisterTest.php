@@ -2,17 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BonusType;
 use App\Enums\FeatureFlags;
 use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
 use App\Mail\VerifyEmail;
 use App\Mail\WelcomeEmail;
+use App\Models\Bonus;
 use App\Models\Boost;
 use App\Services\FeatureFlag;
 use Mockery\MockInterface;
 use Illuminate\Support\Facades\Mail;
 use App\Services\SMS\SMSProviderInterface;
+use Database\Seeders\BonusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterTest extends TestCase
@@ -298,116 +301,6 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_new_user_gets_configurable_bonus_in_stakers_app()
-    {
-        config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
-            'last_name' => "Doe",
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable' => 200.00,
-        ]);
-    }
-
-    public function test_new_user_gets_configurable_bonus_in_fun_app()
-    {
-        config(['trivia.bonus.signup.general_bonus_amount' => 50]);
-
-        $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable' => 50.00,
-        ]);
-    }
-
-    public function test_new_user_gets_boost_bonus_in_stakers_app()
-    {
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
-            'last_name' => "Doe",
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-    }
-
-    public function test_new_user_gets_boost_bonus_in_fun_app()
-    {
-        $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-    }
-
     /** @test */
     public function gameark_user_can_sign_in_with_social_auth_directly()
     {
@@ -444,6 +337,55 @@ class RegisterTest extends TestCase
             "data" => [
                 "token"
             ]
+        ]);
+    }
+
+    public function test_that_user_bonus_record_is_created_when_user_chooses_to_have_bonus()
+    {
+        $this->seed(BonusSeeder::class);
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'first_name' =>'Jane',
+            'last_name' => "Doe",
+            'username'=>'janeJoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'bonus_checked' => true
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseHas('user_bonuses', [
+            'user_id'=> $user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+        ]);
+    }
+
+    public function test_that_user_bonus_record_is_not_created_when_user_does_not_choose_to_have_bonus()
+    {
+        $this->seed(BonusSeeder::class);
+
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
+            'first_name' =>'Jane',
+            'last_name' => "Doe",
+            'username'=>'janeJoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+
+        ]);
+
+        $user = User::where('email', 'email@email.com' )->first();
+
+        $this->assertDatabaseMissing('user_bonuses', [
+            'user_id'=> $user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }
 }

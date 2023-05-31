@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Boost;
 use App\Mail\VerifyEmail;
 use App\Mail\WelcomeEmail;
+use App\Services\Bonuses\RegistrationBonusService;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -71,10 +72,10 @@ class RegisterController extends BaseController
         return Validator::make($data, [
 
             'first_name' => [
-                'required','string', 'max:255',
+                'required', 'string', 'max:255',
             ],
             'last_name' => [
-                'required','string', 'max:255',
+                'required', 'string', 'max:255',
             ],
             'username' => [
                 'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
@@ -89,7 +90,7 @@ class RegisterController extends BaseController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
-            'bonus_checked' => ['nullable','boolean']
+            'bonus_checked' => ['nullable', 'boolean']
         ]);
     }
 
@@ -101,18 +102,18 @@ class RegisterController extends BaseController
      */
     protected function create(array $data, $platform)
     {
-      //create the user
+        //create the user
 
         $user =
             User::create([
                 'username' => $data['username'],
-                'phone_number' =>  ( ($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
+                'phone_number' => (($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
-                'email_verified_at' =>  (($platform == ClientPlatform::GameArkMobile) ? now() : null),
+                'email_verified_at' => (($platform == ClientPlatform::GameArkMobile) ? now() : null),
                 'is_on_line' => true,
-                'country_code' => ( ($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
+                'country_code' => (($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
@@ -145,23 +146,24 @@ class RegisterController extends BaseController
 
         //give user sign up bonus
 
-        if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
+        if (isset($data['bonus_checked']) && $data['bonus_checked']) {
+            $registrationBonusService = new RegistrationBonusService;
 
-            $platform == ClientPlatform::StakingMobileWeb ? $this->cashingamesSignupBonus($user) : $this->GamearkSingUpBonus($user);
-        //credit referrer with points
-        if (
-            config('trivia.bonus.enabled') &&
-            config('trivia.bonus.signup.referral') &&
-            config('trivia.bonus.signup.referral_on_signup') &&
-            isset($data['referrer'])
-        ) {
+            $registrationBonusService->giveBonus($user);
 
-            $profileReferral = User::where('username', $data["referrer"])->first();
-            if ($profileReferral != null) {
-                Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
+            if (
+                config('trivia.bonus.enabled') &&
+                config('trivia.bonus.signup.referral') &&
+                config('trivia.bonus.signup.referral_on_signup') &&
+                isset($data['referrer'])
+            ) {
+
+                $profileReferral = User::where('username', $data["referrer"])->first();
+                if ($profileReferral != null) {
+                    Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
+                }
             }
         }
-    }
         return $user;
     }
 
@@ -251,7 +253,7 @@ class RegisterController extends BaseController
     ) {
         if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
             try {
-                $smsService->deliverOTP($user , AuthTokenType::PhoneVerification->value);
+                $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
             } catch (\Throwable $th) {
                 Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
             }
@@ -284,7 +286,7 @@ class RegisterController extends BaseController
         SMSProviderInterface $smsService,
         ClientPlatform $platform
     ) {
-        if($platform == ClientPlatform::GameArkMobile){
+        if ($platform == ClientPlatform::GameArkMobile) {
             return $this->registerGameArk($request, $smsService, $platform);
         }
 
@@ -300,8 +302,8 @@ class RegisterController extends BaseController
     public function registerGameArk(
         Request $request,
         SMSProviderInterface $smsService,
-        ClientPlatform $platform)
-    {
+        ClientPlatform $platform
+    ) {
         // $this->validator($request->all(), $platform)->validate();
         $request->validate([
 
@@ -337,7 +339,6 @@ class RegisterController extends BaseController
             'token' => $token,
         ];
         return $this->sendResponse($result, 'Account created successfully');
-
     }
 
     public function resendOTP(
