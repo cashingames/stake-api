@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('user_bonuses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id');
+            $table->foreignId('bonus_id');
+            $table->boolean('is_on')->default(false);
+            $table->decimal('amount_credited', $precision = 9, $scale = 2)->default(0);
+            $table->decimal('amount_remaining_after_staking', $precision = 9, $scale = 2)->default(0);
+            $table->decimal('total_amount_won', $precision = 9, $scale = 2)->default(0);
+            $table->decimal('amount_remaining_after_withdrawal', $precision = 9, $scale = 2)->default(0);
             $table->timestamps();
         });
     }

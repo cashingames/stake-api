@@ -229,6 +229,16 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(ChallengeGameSession::class);
     }
 
+    public function bonuses()
+    {
+        return $this->hasManyThrough(Bonus::class, UserBonus::class);
+    }
+ 
+    public function userBonuses()
+    {
+        return $this->hasMany(UserBonus::class);
+    }
+
     public function challenges()
     {
         return $this->hasMany(Challenge::class);

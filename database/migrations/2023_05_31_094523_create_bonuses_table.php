@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('trigger');
+            $table->integer('duration_count');
+            $table->string('duration_measurement');
             $table->timestamps();
         });
     }
