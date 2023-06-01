@@ -27,16 +27,20 @@ class StartChallengeRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
     public function rules(): array
-    {
+    {   
         return [
             'category' => ['required', 'numeric', 'exists:categories,id'],
-            'amount' => ['required', 'numeric', 'max:' . auth()->user()->wallet->non_withdrawable],
+            'amount' => ['required', 'numeric'],
         ];
     }
 
     public function withValidator(Validator $validator): void
-    {
+    {   
+        
         $validator->after(function (Validator $validator) {
+            if ($this->input('amount') > auth()->user()->wallet->non_withdrawable) {
+                $validator->errors()->add('amount', 'Insufficient Balance');
+            }
             if ($this->input('amount') > config('trivia.maximum_challenge_staking_amount')) {
                 $validator->errors()->add('amount', 'Amount should not be more than ' . config('trivia.maximum_challenge_staking_amount'));
             }
@@ -54,7 +58,7 @@ class StartChallengeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'amount.max' => 'Insufficient Balance',
+            'amount.min' => 'Insufficient Balance',
         ];
     }
 }
