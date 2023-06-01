@@ -65,4 +65,8 @@ return [
         'enabled' => env('FEATURE_FLAG_DEMO_GAMES_ENABLED', false),
         'activate_on' => null
     ],
+    'registration_bonus' => [
+        'enabled' => env('FEATURE_FLAG_BONUS_ON_REGISTRATION_ENABLED', false),
+        'activate_on' => null
+    ],
 ];

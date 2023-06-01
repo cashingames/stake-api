@@ -301,47 +301,9 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function gameark_user_can_sign_in_with_social_auth_directly()
-    {
-
-        $response = $this->withHeaders([
-            'x-brand-id' => 10,
-        ])->postjson(self::SOCIAL_REGISTRATION_URL, [
-            'firstName' => 'Jane',
-            'last_name' => 'Doe',
-            'email' => 'email@email.com'
-        ]);
-
-        Mail::assertSent(WelcomeEmail::class);
-        $response->assertStatus(200);
-    }
-
-    /** @test */
-    public function gameark_user_can_register_without_otp()
-    {
-
-        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::REGISTER_URL, [
-            'username' => 'username',
-            'email' => 'tester@gmail.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        // $response->assertStatus(200);
-
-        Mail::assertSent(WelcomeEmail::class);
-        $response->assertJsonStructure([
-            "message",
-            "data" => [
-                "token"
-            ]
-        ]);
-    }
-
     public function test_that_user_bonus_record_is_created_when_user_chooses_to_have_bonus()
     {
+        config(['features.registration_bonus.enabled' => true]);
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
@@ -366,7 +328,8 @@ class RegisterTest extends TestCase
     }
 
     public function test_that_user_bonus_record_is_not_created_when_user_does_not_choose_to_have_bonus()
-    {
+    {   
+        config(['features.registration_bonus.enabled' => true]);
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [

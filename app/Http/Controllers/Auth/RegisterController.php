@@ -145,23 +145,27 @@ class RegisterController extends BaseController
         ]);
 
         //give user sign up bonus
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            if (isset($data['bonus_checked']) && $data['bonus_checked']) {
 
-        if (isset($data['bonus_checked']) && $data['bonus_checked']) {
-            $registrationBonusService = new RegistrationBonusService;
+                $registrationBonusService = new RegistrationBonusService;
 
-            $registrationBonusService->giveBonus($user);
+                $registrationBonusService->giveBonus($user);
+            }
+        } else {
+            $this->cashingamesSignupBonus($user);
+        }
+        
+        if (
+            config('trivia.bonus.enabled') &&
+            config('trivia.bonus.signup.referral') &&
+            config('trivia.bonus.signup.referral_on_signup') &&
+            isset($data['referrer'])
+        ) {
 
-            if (
-                config('trivia.bonus.enabled') &&
-                config('trivia.bonus.signup.referral') &&
-                config('trivia.bonus.signup.referral_on_signup') &&
-                isset($data['referrer'])
-            ) {
-
-                $profileReferral = User::where('username', $data["referrer"])->first();
-                if ($profileReferral != null) {
-                    Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
-                }
+            $profileReferral = User::where('username', $data["referrer"])->first();
+            if ($profileReferral != null) {
+                Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
             }
         }
         return $user;

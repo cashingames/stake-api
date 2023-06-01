@@ -18,4 +18,5 @@ class FeatureFlags{
     const IN_APP_ACTIVITIES_PUSH_NOTIFICATION = "in_app_activities_push_notification";
     const SEND_AUTOMATED_REPORTS = "send_automated_reports";
     const DEMO_GAMES = "demo_games";
+    const REGISTRATION_BONUS = "registration_bonus";
 }
