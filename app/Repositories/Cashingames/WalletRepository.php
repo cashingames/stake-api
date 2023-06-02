@@ -188,4 +188,36 @@ class WalletRepository
             'transaction_action' => $action
         ]);
     }
+
+    public function creditBonusAccount(Wallet $wallet, float $amount, string $description, string $reference = null): void
+    {
+        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
+
+            $newBalance = $wallet->bonus + $amount;
+
+            $wallet->update([
+                'bonus' => $newBalance
+            ]);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'transaction_type' => 'CREDIT',
+                'amount' => $amount,
+                'balance' => $newBalance,
+                'description' => $description,
+                'reference' => $reference ?? Str::random(10),
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_action' => WalletTransactionAction::BonusCredited->value
+            ]);
+        });
+    }
+
+
+    public function hasFundedBefore($user)
+    {
+        return WalletTransaction::where('user_id', $user->id)
+            ->where('transaction_action', WalletTransactionAction::WalletFunded->value)
+            ->exists();
+    }
+
 }

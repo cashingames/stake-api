@@ -8,7 +8,8 @@ interface BonusInterface
 {
     public function giveBonus(User $user);
 
-    public function activateBonus();
+    public function activateBonus(User $user);
 
     public function deactivateBonus();
+
 }

@@ -11,6 +11,8 @@ return [
             'referral_on_first_game' => env('REFERRER_SIGNUP_BONUS_ON_FIRST_GAME', false),
             'referral_on_signup' => env('REFERRER_SIGNUP_BONUS_ON_REGISTRATION', false),
             'referral_on_signup_bonus_amount' => env('REFERRER_SIGNUP_BONUS_GAMES_COUNT', 2),
+            'registration_bonus_limit' => env('REGISTRATION_BONUS_LIMIT', 10000),
+            'registration_bonus_percentage' => env('REGISTRATION_BONUS_PERCENTAGE', 100)
         ],
     ],
     'tournament' => [

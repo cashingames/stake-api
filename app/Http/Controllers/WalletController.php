@@ -11,6 +11,7 @@ use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
 use App\Models\Profile;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,9 +27,17 @@ use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
+use App\Repositories\Cashingames\WalletRepository;
 
 class WalletController extends BaseController
 {
+
+    private $walletRepository;
+
+    public function __construct()
+    {
+        $this->walletRepository = new WalletRepository;
+    }
 
     public function me()
     {
@@ -200,27 +209,43 @@ class WalletController extends BaseController
 
     private function savePaymentTransaction($reference, $email, $amount)
     {
-        $transaction = WalletTransaction::where('reference', $reference)->sharedLock()->first();
 
+        $transaction = WalletTransaction::where('reference', $reference)->sharedLock()->first();
         if (!is_null($transaction)) {
             Log::info('payment transaction already exists');
             return response("", 200);
         }
 
         $user = User::where('email', $email)->first();
-        $user->wallet->non_withdrawable += ($amount) / 100;
 
-        WalletTransaction::create([
-            'wallet_id' => $user->wallet->id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($amount) / 100,
-            'balance' => $user->wallet->non_withdrawable,
-            'description' => 'Fund Wallet',
-            'reference' => $reference,
-            'balance_type' => WalletBalanceType::CreditsBalance->value,
-            'transaction_action' => WalletTransactionAction::WalletFunded->value
-        ]);
-        $user->wallet->save();
+        $hasFundedBefore = $this->walletRepository->hasFundedBefore($user);
+
+        if (!$hasFundedBefore) {
+
+            $registrationBonusService = new RegistrationBonusService;
+
+            $registrationBonusService->activateBonus($user);
+
+            $bonusAmount = ($amount/100 ) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
+            if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
+                $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
+            }
+           
+            $this->walletRepository->creditBonusAccount(
+                $user->wallet,
+                $bonusAmount,
+                'Bonus Credited',
+                null,
+            );
+
+        }
+
+        $this->walletRepository->creditFundingAccount(
+            $user->wallet,
+            ($amount / 100),
+            'Fund Wallet',
+            null,
+        );
 
         Log::info('payment successful from paystack');
         return response("", 200);

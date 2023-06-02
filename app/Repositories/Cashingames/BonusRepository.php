@@ -5,6 +5,7 @@ namespace App\Repositories\Cashingames;
 use App\Models\Bonus;
 use App\Models\User;
 use App\Models\UserBonus;
+
 class BonusRepository
 {
 
@@ -16,6 +17,10 @@ class BonusRepository
         ]);
     }
 
-
- 
+    public function activateBonus(Bonus $bonus, User $user)
+    {
+        UserBonus::where('user_id', $user->id)
+            ->where('bonus_id', $bonus->id)
+            ->where('is_on', false)->update(['is_on' => true]);
+    }
 }
