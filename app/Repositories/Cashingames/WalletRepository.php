@@ -215,7 +215,7 @@ class WalletRepository
 
     public function hasFundedBefore($user)
     {
-        return WalletTransaction::where('user_id', $user->id)
+        return WalletTransaction::where('wallet_id', $user->wallet->id)
             ->where('transaction_action', WalletTransactionAction::WalletFunded->value)
             ->exists();
     }
