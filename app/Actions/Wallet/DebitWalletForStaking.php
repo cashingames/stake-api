@@ -20,7 +20,7 @@ class DebitWalletForStaking
         $balanceToDeduct = " ";
         $action = WalletTransactionAction::StakingPlaced->value;
 
-        if ($wallet->hasBonus() &&  $wallet->bonus > $amount) {
+        if ($wallet->hasBonus() &&  $wallet->bonus >= $amount) {
 
             $balanceToDeduct = "bonus";
             $description = "Bonus Staking of ".$amount;
