@@ -23,11 +23,13 @@ use Yabacon\Paystack\Event as PaystackEvent;
 use Yabacon\Paystack;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
 use App\Enums\AchievementType;
+use App\Enums\FeatureFlags;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Services\FeatureFlag;
 
 class WalletController extends BaseController
 {
@@ -207,29 +209,30 @@ class WalletController extends BaseController
             Log::info('payment transaction already exists');
             return response("", 200);
         }
-        
+
         $user = User::where('email', $email)->first();
         $walletRepository = new WalletRepository;
-        $hasFundedBefore = $walletRepository->hasFundedBefore($user);
 
-        if (!$hasFundedBefore) {
-            $registrationBonusService = new RegistrationBonusService;
-            $shouldRecieveBonus = $registrationBonusService->activateBonus($user);
-            if ($shouldRecieveBonus) {
-                $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
-                if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
-                    $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            $hasFundedBefore = $walletRepository->hasFundedBefore($user);
+
+            if (!$hasFundedBefore) {
+                $registrationBonusService = new RegistrationBonusService;
+                $shouldRecieveBonus = $registrationBonusService->activateBonus($user);
+                if ($shouldRecieveBonus) {
+                    $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
+                    if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
+                        $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
+                    }
+                    $walletRepository->creditBonusAccount(
+                        $user->wallet,
+                        $bonusAmount,
+                        'Bonus Credited',
+                        null,
+                    );
                 }
-
-                $walletRepository->creditBonusAccount(
-                    $user->wallet,
-                    $bonusAmount,
-                    'Bonus Credited',
-                    null,
-                );
             }
         }
-
         $walletRepository->creditFundingAccount(
             $user->wallet,
             ($amount / 100),
