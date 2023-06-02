@@ -31,14 +31,6 @@ use App\Repositories\Cashingames\WalletRepository;
 
 class WalletController extends BaseController
 {
-
-    private $walletRepository;
-
-    public function __construct()
-    {
-        $this->walletRepository = new WalletRepository;
-    }
-
     public function me()
     {
         $data = [
@@ -215,15 +207,13 @@ class WalletController extends BaseController
             Log::info('payment transaction already exists');
             return response("", 200);
         }
-
+        
         $user = User::where('email', $email)->first();
-
-        $hasFundedBefore = $this->walletRepository->hasFundedBefore($user);
+        $walletRepository = new WalletRepository;
+        $hasFundedBefore = $walletRepository->hasFundedBefore($user);
 
         if (!$hasFundedBefore) {
-
             $registrationBonusService = new RegistrationBonusService;
-
             $shouldRecieveBonus = $registrationBonusService->activateBonus($user);
             if ($shouldRecieveBonus) {
                 $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
@@ -231,7 +221,7 @@ class WalletController extends BaseController
                     $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
                 }
 
-                $this->walletRepository->creditBonusAccount(
+                $walletRepository->creditBonusAccount(
                     $user->wallet,
                     $bonusAmount,
                     'Bonus Credited',
@@ -240,7 +230,7 @@ class WalletController extends BaseController
             }
         }
 
-        $this->walletRepository->creditFundingAccount(
+        $walletRepository->creditFundingAccount(
             $user->wallet,
             ($amount / 100),
             'Fund Wallet',

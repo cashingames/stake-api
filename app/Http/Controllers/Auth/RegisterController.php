@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Boost;
 use App\Mail\VerifyEmail;
 use App\Mail\WelcomeEmail;
-use App\Services\Bonuses\RegistrationBonusService;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -100,20 +100,20 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \App\User
      */
-    protected function create(array $data, $platform)
+    protected function create(array $data)
     {
         //create the user
 
         $user =
             User::create([
                 'username' => $data['username'],
-                'phone_number' => (($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
+                'phone_number' => ((str_starts_with($data['phone_number'], '0') ?
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
-                'email_verified_at' => (($platform == ClientPlatform::GameArkMobile) ? now() : null),
+                'email_verified_at' =>  null,
                 'is_on_line' => true,
-                'country_code' => (($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
+                'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
@@ -204,45 +204,6 @@ class RegisterController extends BaseController
         ]);
     }
 
-    protected function GamearkSingUpBonus($user)
-    {
-        $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
-        DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable += $bonusAmount;
-
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value,
-                'transaction_action' => WalletTransactionAction::BonusCredited->value
-            ]);
-            $user->wallet->save();
-        });
-
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Bomb')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-    }
-
     /**
      * The user has been registered.
      *
@@ -288,62 +249,17 @@ class RegisterController extends BaseController
     public function register(
         Request $request,
         SMSProviderInterface $smsService,
-        ClientPlatform $platform
     ) {
-        if ($platform == ClientPlatform::GameArkMobile) {
-            return $this->registerGameArk($request, $smsService, $platform);
-        }
-
+        
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all(), $platform);
+        $user = $this->create($request->all());
 
         if ($response = $this->registered($request, $smsService, $user)) {
             return $response;
         }
     }
 
-    public function registerGameArk(
-        Request $request,
-        SMSProviderInterface $smsService,
-        ClientPlatform $platform
-    ) {
-        // $this->validator($request->all(), $platform)->validate();
-        $request->validate([
-
-            'first_name' => [
-                'string', 'max:255',
-            ],
-            'last_name' => [
-                'string', 'max:255',
-            ],
-            'username' => [
-                'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-            ],
-            'country_code' => [
-                'string', 'max:4'
-            ],
-            'phone_number' => [
-                'numeric',
-                new UniquePhoneNumberRule,
-            ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
-        ]);
-
-        $user = $this->create($request->all(), $platform);
-
-        $token = auth()->login($user);
-
-        Mail::to($request->email)->send(new WelcomeEmail());
-        $result = [
-            'username' => $user->username,
-            'email' => $user->email,
-            'token' => $token,
-        ];
-        return $this->sendResponse($result, 'Account created successfully');
-    }
 
     public function resendOTP(
         Request $request,
