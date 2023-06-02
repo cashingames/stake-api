@@ -32,7 +32,9 @@ class RegistrationBonusService implements BonusInterface
         $inactiveBonus = $this->inactiveRegistrationBonus($user);
         if (!is_null($inactiveBonus)) {
             $this->bonusRepository->activateBonus($this->bonus, $user);
+            return true;
         }
+        return false;
     }
 
     public function deactivateBonus()
