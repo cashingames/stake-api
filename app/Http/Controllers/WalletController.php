@@ -224,20 +224,20 @@ class WalletController extends BaseController
 
             $registrationBonusService = new RegistrationBonusService;
 
-            $registrationBonusService->activateBonus($user);
+            $shouldRecieveBonus = $registrationBonusService->activateBonus($user);
+            if ($shouldRecieveBonus) {
+                $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
+                if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
+                    $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
+                }
 
-            $bonusAmount = ($amount/100 ) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
-            if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
-                $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
+                $this->walletRepository->creditBonusAccount(
+                    $user->wallet,
+                    $bonusAmount,
+                    'Bonus Credited',
+                    null,
+                );
             }
-           
-            $this->walletRepository->creditBonusAccount(
-                $user->wallet,
-                $bonusAmount,
-                'Bonus Credited',
-                null,
-            );
-
         }
 
         $this->walletRepository->creditFundingAccount(
