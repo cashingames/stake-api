@@ -36,10 +36,10 @@ class Kernel extends ConsoleKernel
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
 
         // $schedule->command(ComputeUsersLevelsCommand::class)->everyMinute();
-        $schedule->command('bonus:daily-expire')->withoutOverlapping()
-            ->dailyAt('00:01');
-        $schedule->command('bonus:daily-activate')->withoutOverlapping()
-            ->dailyAt('00:03');
+        // $schedule->command('bonus:daily-expire')->withoutOverlapping()
+        //     ->dailyAt('00:01');
+        // $schedule->command('bonus:daily-activate')->withoutOverlapping()
+        //     ->dailyAt('00:03');
 
         if (FeatureFlag::isEnabled(FeatureFlags::SEND_AUTOMATED_REPORTS)) {
             $schedule->command('daily-report:send')
@@ -48,12 +48,12 @@ class Kernel extends ConsoleKernel
                 ->dailyAt('01:00');
         }
 
-        $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
+        // $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
         // fcm:contraint-reminder
-        $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
-        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
-        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
-        $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly();
+        // $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
+        // $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
+        // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
+        // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly();
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {

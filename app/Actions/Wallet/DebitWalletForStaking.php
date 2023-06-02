@@ -23,14 +23,19 @@ class DebitWalletForStaking
         if ($wallet->hasBonus() &&  $wallet->bonus >= $amount) {
 
             $balanceToDeduct = "bonus";
-            $description = "Bonus Staking of ".$amount;
-           
+            $description = "Bonus Staking of " . $amount;
+
             $this->walletRepository->debit($wallet, $amount, $description, null, $balanceToDeduct, $action);
             return $wallet->bonus;
         }
+
+        if ($wallet->non_withdrawable < $amount) {
+            $amount = $wallet->non_withdrawable;
+        }
+        
         $balanceToDeduct = "non_withdrawable";
         $description = 'Placed a staking of ' . $amount;
-      
+
         $this->walletRepository->debit($wallet, $amount, $description, null, $balanceToDeduct, $action);
         return $wallet->non_withdrawable;
     }
