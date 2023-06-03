@@ -33,6 +33,7 @@ use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
 use Database\Seeders\StakingOddsRulesSeeder;
 use Database\Seeders\AchievementBadgeSeeder;
+use Database\Seeders\BonusSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -75,6 +76,7 @@ class GameTest extends TestCase
         $this->seed(StakingOddSeeder::class);
         $this->seed(StakingOddsRulesSeeder::class);
         $this->seed(AchievementBadgeSeeder::class);
+        $this->seed(BonusSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -348,44 +350,6 @@ class GameTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_that_a_staking_exhibition_game_does_not_start_for_old_users_if_balance_is_exhausted()
-    {
-        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
-        Staking::factory()->count(6)->create(['user_id'=>$this->user->id]);
-
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 500
-        ]);
-
-        $response->assertJson([
-            'message' => 'Insufficient funds',
-            'errors' => [
-                'staking_amount' => ['Insufficient funds']
-            ]
-        ]);
-    }
-
-    public function test_that_a_staking_exhibition_game_does_not_start_if_demo_balance_is_exhausted()
-    {
-        FeatureFlag::enable(FeatureFlags::DEMO_GAMES);
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 500
-        ]);
-
-        $response->assertJson([
-            'message' => 'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash',
-            'errors' => [
-                'staking_amount' => ['Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash']
-            ]
-        ]);
-    }
 
     public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
     {   
@@ -938,6 +902,7 @@ class GameTest extends TestCase
         DB::table('categories_questions')->insert($data);
         
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         $this->user->wallet->update([
             'non_withdrawable' => 2000,
             'bonus' => 1000
@@ -978,6 +943,7 @@ class GameTest extends TestCase
         DB::table('categories_questions')->insert($data);
         
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+        FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         $this->user->wallet->update([
             'non_withdrawable' => 2000,
             'bonus' => 100

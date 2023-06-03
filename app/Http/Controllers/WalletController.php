@@ -218,9 +218,9 @@ class WalletController extends BaseController
 
             if (!$hasFundedBefore) {
                 $registrationBonusService = new RegistrationBonusService;
-                $shouldRecieveBonus = $registrationBonusService->activateBonus($user);
+                $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
+                $shouldRecieveBonus = $registrationBonusService->activateBonus($user, $bonusAmount);
                 if ($shouldRecieveBonus) {
-                    $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
                     if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
                         $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
                     }
