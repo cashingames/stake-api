@@ -27,4 +27,15 @@ class BonusRepository
                 'amount_remaining_after_staking' => $amount
             ]);
     }
+
+    public function updateWonAmount(Bonus $bonus, User $user, float $amount)
+    {
+
+        $userBonus = UserBonus::where('user_id', $user->id)
+            ->where('bonus_id', $bonus->id)
+            ->where('is_on', true)->first();
+
+        $userBonus->total_amount_won = $userBonus->total_amount_won + $amount;
+        $userBonus->save();
+    }
 }

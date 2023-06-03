@@ -19,6 +19,9 @@ use App\Models\GameSessionQuestion;
 use App\Models\Question;
 use App\Models\StakingOdd;
 use App\Models\Trivia;
+use App\Repositories\Cashingames\BonusRepository;
+use App\Repositories\Cashingames\WalletRepository;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\WalletTransaction;
@@ -32,11 +35,6 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
-use App\Enums\WalletBalanceType;
-use App\Enums\WalletTransactionAction;
-use App\Enums\WalletTransactionType;
-use App\Models\Staking;
-use App\Models\UserCoin;
 use stdClass;
 
 class GameController extends BaseController
@@ -226,7 +224,7 @@ class GameController extends BaseController
         );
     }
 
-    public function endSingleGame(Request $request, ReferralService $referralService, ClientPlatform $clientPlatform)
+    public function endSingleGame(Request $request, ReferralService $referralService,)
     {
 
         Log::info($request->all());
@@ -289,6 +287,7 @@ class GameController extends BaseController
 
             $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
+            
             if (!is_null($staking)) {
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
@@ -298,47 +297,20 @@ class GameController extends BaseController
                     $amountWon = $staking->amount_staked * $pointStandardOdd;
                 }
 
-                if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
-                    $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
-
-                    $transactionDescription = '';
-                    $transactionAction = '';
-                    $balanceType = '';
-
-                    if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
-                        $transactionDescription = 'Demo Game Winnings';
-                        $balanceType = WalletBalanceType::BonusBalance->value;
-                        $transactionAction  = WalletTransactionAction::BonusCredited;
-                    } else {
-                        $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
-                        $balanceType = WalletBalanceType::WinningsBalance->value;
-                        $transactionAction  = WalletTransactionAction::WinningsCredited;
-                    }
-                    WalletTransaction::create([
-                        'wallet_id' => $this->user->wallet->id,
-                        'transaction_type' => 'CREDIT',
-                        'amount' => $amountWon,
-                        'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
-                        'description' => $transactionDescription,
-                        'reference' => Str::random(10),
-                        'balance_type' => $balanceType,
-                        'transaction_action' => $transactionAction
-                    ]);
-                } else {
-                    WalletTransaction::create([
-                        'wallet_id' => $this->user->wallet->id,
-                        'transaction_type' => 'CREDIT',
-                        'amount' => $amountWon,
-                        'balance' => ($this->user->wallet->withdrawable + $this->user->wallet->non_withdrawable),
-                        'description' => 'Staking winning of ' . $amountWon . ' cash',
-                        'reference' => Str::random(10),
-                        'balance_type' => WalletBalanceType::WinningsBalance->value,
-                        'transaction_action' => WalletTransactionAction::WinningsCredited->value
-                    ]);
-                }
-
+                $walletRepository = new WalletRepository;
+                $description = 'Staking winning of ' . $amountWon . ' cash';
+                $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
                 $staking->update(['amount_won' => $amountWon]);
 
+               
+                if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS) ) {
+                   
+                    $registrationBonusService = new RegistrationBonusService;
+                    $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
+                    if ($hasRegistrationBonus) {
+                        $registrationBonusService->updateAmountWon($this->user, $amountWon);
+                    }
+                }
                 if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
                     ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
                 } else {
@@ -347,15 +319,8 @@ class GameController extends BaseController
             }
         }
 
-
-
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
-
-
-        if ($clientPlatform == ClientPlatform::GameArkMobile) {
-            $game = $this->processUserCoin($game);
-        }
 
         if (FeatureFlag::isEnabled('odds') && $staking == null) {
             $game->points_gained = $points * $game->odd_multiplier;
@@ -404,42 +369,11 @@ class GameController extends BaseController
         // call for referral logic
         $referralService->gift();
 
-
-
         // call the event listener
         Event::dispatch(new AchievementBadgeEvent($request, AchievementType::GAME_PLAYED, $game));
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
 
-    public function processUserCoin($game)
-    {
-        $coinsEarned = 0;
-        $userScore = $game->correct_count;
-        
-        if ($userScore == config('trivia.coin_reward.user_scores.perfect_score')) {
-            $coinsEarned =  config('trivia.coin_reward.coins_earned.perfect_coin');
-        } else if ($userScore >= config('trivia.coin_reward.user_scores.high_score') && $userScore < config('trivia.coin_reward.user_scores.perfect_score')) {
-            $coinsEarned = config('trivia.coin_reward.coins_earned.high_coin');
-        } else if ($userScore >= config('trivia.coin_reward.user_scores.medium_score') && $userScore < config('trivia.coin_reward.user_scores.high_score')) {
-            $coinsEarned = config('trivia.coin_reward.coins_earned.medium_coin');
-        } else if ($userScore >=  config('trivia.coin_reward.user_scores.low_score') && $userScore < config('trivia.coin_reward.user_scores.medium_score')) {
-            $coinsEarned = config('trivia.coin_reward.coins_earned.low_coin');
-        } else {
-            $coinsEarned = 0;
-        }
-
-        $game->coins_earned = $coinsEarned;
-        $userCoin = $this->user->userCoins()->firstOrNew();
-        $userCoin->coins_value = $userCoin->coins_value + $coinsEarned;
-        $userCoin->save();
-
-        $this->user->coinsTransaction()->create([
-            'user_id' => $this->user->id,
-            'transaction_type' => 'CREDIT',
-            'description' => 'Game coins awarded',
-            'value' => $coinsEarned
-        ]);
-        return $game;
-    }
+ 
 }
