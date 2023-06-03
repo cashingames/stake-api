@@ -63,6 +63,11 @@ class RegistrationBonusService implements BonusInterface
     {
         return $user->gameSessions()->where('category_id', $category)->exists();
     }
+
+    public function updateAmountWon($user, $amount){
+        $this->bonusRepository->updateWonAmount($this->bonus, $user, $amount);
+    }
+    
     private function userBonusQuery($user)
     {
         return UserBonus::where('user_id', $user->id)
