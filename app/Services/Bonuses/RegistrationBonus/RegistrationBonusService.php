@@ -27,11 +27,11 @@ class RegistrationBonusService implements BonusInterface
         $this->bonusRepository->giveBonus($this->bonus, $user);
     }
 
-    public function activateBonus(User $user)
+    public function activateBonus(User $user, float $amount)
     {
         $inactiveBonus = $this->inactiveRegistrationBonus($user);
         if (!is_null($inactiveBonus)) {
-            $this->bonusRepository->activateBonus($this->bonus, $user);
+            $this->bonusRepository->activateBonus($this->bonus, $user, $amount);
             return true;
         }
         return false;
@@ -41,10 +41,31 @@ class RegistrationBonusService implements BonusInterface
     {
     }
 
-    private function inactiveRegistrationBonus($user)
+    public function inactiveRegistrationBonus($user)
+    {
+        return $this->userBonusQuery($user)
+            ->where('is_on', false)->first();
+    }
+
+    public function hasActiveRegistrationBonus($user)
+    {
+        return $this->userBonusQuery($user)
+            ->where('is_on', true)->exists();
+    }
+
+    public function activeRegistrationBonus($user)
+    {
+        return $this->userBonusQuery($user)
+            ->where('is_on', true)->first();
+    }
+
+    public function hasPlayedCategory($user, $category)
+    {
+        return $user->gameSessions()->where('category_id', $category)->exists();
+    }
+    private function userBonusQuery($user)
     {
         return UserBonus::where('user_id', $user->id)
-            ->where('bonus_id', $this->bonus->id)
-            ->where('is_on', false)->first();
+            ->where('bonus_id', $this->bonus->id);
     }
 }

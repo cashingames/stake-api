@@ -17,10 +17,10 @@ class BonusRepository
         ]);
     }
 
-    public function activateBonus(Bonus $bonus, User $user)
+    public function activateBonus(Bonus $bonus, User $user, float $amount)
     {
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
-            ->where('is_on', false)->update(['is_on' => true]);
+            ->where('is_on', false)->update(['is_on' => true, 'amount_remaining_after_staking' => $amount]);
     }
 }

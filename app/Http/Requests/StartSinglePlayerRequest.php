@@ -8,6 +8,7 @@ use App\Models\LiveTrivia;
 use App\Models\Staking;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Cache;
 
@@ -15,7 +16,8 @@ class StartSinglePlayerRequest extends FormRequest
 {
 
     public function __construct(
-        private WalletRepository $walletRepository
+        private WalletRepository $walletRepository,
+        private RegistrationBonusService $registrationBonusService
     ) {
     }
     /**
@@ -112,43 +114,32 @@ class StartSinglePlayerRequest extends FormRequest
 
         $stakingAmount = $this->input('staking_amount');
         $user = auth()->user();
-        $totalSessions = Staking::where('user_id', auth()->id())->count();
 
-        // if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
-        //     if (
-        //         $totalSessions <= config('trivia.game.demo_games_count') &&
-        //         $user->wallet->non_withdrawable <= 0
-        //     ) {
-        //         return $validator->errors()->add(
-        //             'staking_amount',
-        //             'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash'
-        //         );
-        //     } elseif (
-        //         $totalSessions <= config('trivia.game.demo_games_count') &&
-        //         $user->wallet->non_withdrawable <  $stakingAmount
-        //     ) {
-        //         return $validator->errors()->add('staking_amount', 'Insufficient funds');
-        //     } elseif (
-        //         $totalSessions > config('trivia.game.demo_games_count') &&
-        //         $user->wallet->non_withdrawable <  $stakingAmount
-        //     ) {
-        //         return $validator->errors()->add('staking_amount', 'Insufficient funds');
-        //     }
-        // } else {
-
-        // if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'You can only make a first time stake of '
-        //             . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
-        //     );
-        // } elseif ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'First stake cannot be less than  '
-        //             . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
-        //     );
-        // }
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            $hasRegistrationBonus = $this->registrationBonusService->hasActiveRegistrationBonus($user);
+            if ($hasRegistrationBonus) {
+                $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($user);
+                if ($stakingAmount <= $registrationBonus->amount_remaining_after_staking) {
+                    $hasPlayedCategory = $this->registrationBonusService->hasPlayedCategory($user, $this->input('category'));
+                    if ($hasPlayedCategory) {
+                        return $validator->errors()->add(
+                            'category',
+                            'Sorry, you cannot play a category twice using your welcome bonus, Please play another.'
+                        );
+                    }
+                }
+                if (
+                    ($stakingAmount > $registrationBonus->amount_remaining_after_staking)
+                    and
+                    ($registrationBonus->amount_remaining_after_staking > config('trivia.minimum_exhibition_staking_amount'))
+                ) {
+                    return $validator->errors()->add(
+                        'staking_amount',
+                        'Registration bonus is remaining '. $registrationBonus->amount_remaining_after_staking
+                    );
+                }
+            }
+        }
 
         $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
         if ($userProfit > 300) {
