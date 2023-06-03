@@ -21,6 +21,10 @@ class BonusRepository
     {
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
-            ->where('is_on', false)->update(['is_on' => true, 'amount_remaining_after_staking' => $amount]);
+            ->where('is_on', false)->update([
+                'is_on' => true,
+                'amount_credited' => 500,
+                'amount_remaining_after_staking' => $amount
+            ]);
     }
 }

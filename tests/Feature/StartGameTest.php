@@ -2,13 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BonusType;
+use App\Enums\FeatureFlags;
+use App\Models\Bonus;
 use App\Models\Category;
+use App\Models\GameSession;
 use App\Models\Plan;
 use App\Models\Question;
 use App\Models\Trivia;
 use App\Models\User;
+use App\Models\UserBonus;
 use App\Models\UserPlan;
+use App\Services\FeatureFlag;
 use Carbon\Carbon;
+use Database\Seeders\BonusSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
 use Database\Seeders\GameTypeSeeder;
@@ -38,6 +45,7 @@ class StartGameTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
+        $this->seed(BonusSeeder::class);
 
         $this->user = User::first();
         $this->category = Category::first();
@@ -87,7 +95,6 @@ class StartGameTest extends TestCase
             "type" => 2
         ]);
         $response->assertOk();
-
     }
 
     public function test_livetrivia_game_can_be_started_for_a_new_user()
@@ -159,4 +166,127 @@ class StartGameTest extends TestCase
         ]);
     }
 
+    public function test_that_game_can_be_started_with_registration_bonus()
+    {
+        config(['features.registration_bonus.enabled' => true]);
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+
+        $questions = Question::factory()
+            ->count(50)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        DB::table('categories_questions')->insert($data);
+
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 500
+        ]);
+
+        $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 200
+        ]);
+
+        $this->assertDatabaseHas('user_bonuses', [
+            'user_id' => $this->user->id,
+            'amount_remaining_after_staking' => 300
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->id,
+            'bonus' => 300,
+            'non_withdrawable' => 2000,
+        ]);
+
+    }
+
+    public function test_that_game_cannot_be_started_with_registration_bonus_for_the_same_category_twice()
+    {
+        config(['features.registration_bonus.enabled' => true]);
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+
+        GameSession::factory()
+        ->create(['user_id' => $this->user->id, 'category_id' => $this->category->id]);
+
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 500
+        ]);
+
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 200
+        ]);
+
+        $response->assertJson([
+            'message' => 'Sorry, you cannot play a category twice using your welcome bonus, Please play another.',
+        ]);
+    }
+
+    public function test_that_game_cannot_be_started_if_staking_amout_is_less_than_registration_bonus()
+    {
+        config(['features.registration_bonus.enabled' => true]);
+        config(['trivia.minimum_exhibition_staking_amount' => 400]);
+        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 1500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 100
+        ]);
+
+        $response = $this->postjson('/api/v2/game/start/single-player', [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 600
+        ]);
+
+        $response->assertJson([
+            'message' => 'Registration bonus is remaining 500',
+        ]);
+    }
 }
