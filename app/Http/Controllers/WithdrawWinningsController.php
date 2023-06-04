@@ -106,7 +106,7 @@ class WithdrawWinningsController extends BaseController
         if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
             $hasRecentRegistrationBonus = $registrationBonusService->hasRecentRegistrationBonus($this->user);
             if ($hasRecentRegistrationBonus) {
-                $perfectGamesCount = $this->user->gameSessions->perfectGames()->count();
+                $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
 
                 if ($perfectGamesCount < config('trivia.minimum_withdrawal_perfect_score_threshold')) {
                     return $this->sendError(false, 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus');

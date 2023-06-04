@@ -764,7 +764,7 @@ class GameTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('wallets', [
-            'user_id' => $this->user->wallet->id,
+            'user_id' => $this->user->id,
             'bonus' => 500,
             'non_withdrawable' => 2000
         ]);

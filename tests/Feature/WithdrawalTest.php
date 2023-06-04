@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BonusType;
 use App\Enums\FeatureFlags;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Models\Bonus;
+use App\Models\GameSession;
 use Tests\TestCase;
 use App\Models\User;
+use App\Models\UserBonus;
 use Mockery\MockInterface;
 use Illuminate\Support\Str;
 use Database\Seeders\UserSeeder;
@@ -17,6 +21,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\Payments\PaystackService;
+use Database\Seeders\BonusSeeder;
 use Exception;
 
 class WithdrawalTest extends TestCase
@@ -162,7 +167,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
                 ]
             ]);
 
@@ -205,7 +210,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -267,7 +272,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name)." ".strtoupper($this->user->profile->last_name)
+                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -290,11 +295,13 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
-    public function test_that_user_cannot_withdraw_bonus_win_if_he_did_not_get_perfect_scores()
-    {   
+    public function test_that_user_cannot_withdraw_registration_bonus_win_if_he_did_not_get_minimum_perfect_scores()
+    {
         config(['features.registration_bonus.enabled' => true]);
+        config(['trivia.minimum_withdrawal_perfect_score_threshold' => 5]);
+
         $this->seed(BonusSeeder::class);
-        
+
         $banksMock = $this->banksMock;
         $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
@@ -303,7 +310,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => 'TEST ACCOUNT'
+                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -312,19 +319,93 @@ class WithdrawalTest extends TestCase
                 'reference' => 'randomref'
             ]);
         });
-        
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 1500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 1000,
+            'amount_remaining_after_withdrawal' => 1000
+        ]);
+
         $this->user->wallet->withdrawable = 1000;
         $this->user->wallet->save();
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
-            'amount' => 500,
+            'account_name' => $this->user->profile->first_name . " " . $this->user->profile->last_name,
+            'amount' => 1000,
             'bank_name' => 'Test Bank'
 
         ]);
         $response->assertJson([
-            'message' => 'Account name does not match your registration name. Please contact support.',
+            'message' => 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus',
+        ]);
+    }
+
+    public function test_that_user_can_withdraw_registration_bonus_win_if_he_gets_minimum_perfect_scores()
+    {
+        config(['features.registration_bonus.enabled' => true]);
+        config(['trivia.minimum_withdrawal_perfect_score_threshold' => 5]);
+
+        $this->seed(BonusSeeder::class);
+
+        $banksMock = $this->banksMock;
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+            $mock->shouldReceive('getBanks')->once()->andReturn(
+                $banksMock
+            );
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
+                ]
+            ]);
+            $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
+            $mock->shouldReceive('initiateTransfer')->andReturn((object)[
+                'status' => 'success',
+                'reference' => 'randomref'
+            ]);
+        });
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 1500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 1000,
+            'amount_remaining_after_withdrawal' => 1000
+        ]);
+        GameSession::factory()
+            ->count(5)
+            ->create();
+        GameSession::query()->update(['user_id' => $this->user->id, 'correct_count' => 10]);
+        $this->user->wallet->withdrawable = 1000;
+        $this->user->wallet->save();
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => $this->user->profile->first_name . " " . $this->user->profile->last_name,
+            'amount' => 1000,
+            'bank_name' => 'Test Bank'
+
+        ]);
+        $response->assertJson([
+            'message' => 'Your transfer is being successfully processed to your bank account',
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->id,
+            'withdrawable' => 0
+        ]);
+
+        $this->assertDatabaseHas('user_bonuses', [
+            'user_id' => $this->user->id,
+            'total_amount_won'  => 1000,
+            'amount_remaining_after_withdrawal' => 0
         ]);
     }
 
@@ -341,5 +422,4 @@ class WithdrawalTest extends TestCase
 
         $response->assertStatus(500);
     }
-
 }
