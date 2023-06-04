@@ -42,7 +42,8 @@ class WithdrawalTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->user = User::first();
-
+        $this->seed(BonusSeeder::class);
+        
         $this->banksMock = json_decode(json_encode([
             'data' => [
                 [
@@ -299,8 +300,6 @@ class WithdrawalTest extends TestCase
     {
         config(['features.registration_bonus.enabled' => true]);
         config(['trivia.minimum_withdrawal_perfect_score_threshold' => 5]);
-
-        $this->seed(BonusSeeder::class);
 
         $banksMock = $this->banksMock;
         $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {

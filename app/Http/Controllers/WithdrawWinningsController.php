@@ -57,6 +57,7 @@ class WithdrawWinningsController extends BaseController
             $debitAmount = config('trivia.max_withdrawal_amount');
         }
 
+      
         $banks = Cache::get('banks');
 
         if (is_null($banks)) {
@@ -88,11 +89,24 @@ class WithdrawWinningsController extends BaseController
             Log::info($this->user->username . " valid account names are {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']} ");
             return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
         }
-        
+
         $recipientCode = $withdrawalService->createTransferRecipient($bankCode, $verifyAccount->data->account_name, $request->account_number);
 
         if (is_null($recipientCode)) {
             return $this->sendError(false, 'Recipient code could not be generated');
+        }
+
+        $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
+        $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
+        $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
+
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            if (
+                $hasRecentRegistrationBonus
+                and $perfectGamesCount < config('trivia.minimum_withdrawal_perfect_score_threshold')
+            ) {
+                return $this->sendError(false, 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus');
+            }
         }
 
         Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
@@ -104,18 +118,11 @@ class WithdrawWinningsController extends BaseController
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
-            $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
             if ($hasRecentRegistrationBonus) {
-                $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
-
-                if ($perfectGamesCount < config('trivia.minimum_withdrawal_perfect_score_threshold')) {
-                    return $this->sendError(false, 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus');
-                } else {
-                    $registrationBonusService->updateAmountWithdrawn($this->user, $request->amount);
-                }
+                $registrationBonusService->updateAmountWithdrawn($this->user, $request->amount);
             }
         }
+
         $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
         Log::info('withdrawal transaction created ' . $this->user->username);
 
