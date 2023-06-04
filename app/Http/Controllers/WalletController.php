@@ -257,7 +257,8 @@ class WalletController extends BaseController
 
         if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
             $registrationBonusService = new RegistrationBonusService;
-            $hasRecentRegistrationBonus = $registrationBonusService->hasRecentRegistrationBonus($user);
+            $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
+            $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
             if ($hasRecentRegistrationBonus) {
                 $registrationBonusService->reverseAmountWithdrawn($user, ($amount) / 100);
             }

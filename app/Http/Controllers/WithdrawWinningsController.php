@@ -104,7 +104,8 @@ class WithdrawWinningsController extends BaseController
         }
 
         if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            $hasRecentRegistrationBonus = $registrationBonusService->hasRecentRegistrationBonus($this->user);
+            $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
+            $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
             if ($hasRecentRegistrationBonus) {
                 $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
 
