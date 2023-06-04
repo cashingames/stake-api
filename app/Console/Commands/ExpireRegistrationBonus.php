@@ -41,7 +41,7 @@ class ExpireRegistrationBonus extends Command
                 ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
                 ->chunkById(10, function ($registrationBonuses) {
                     foreach ($registrationBonuses as $bonus) {
-                        if ($bonus->user()->wallet->bonus >= $bonus->amount_remaining_after_staking) {
+                        if($bonus->amount_remaining_after_staking > 0){
                             $newBonus = $bonus->user()->wallet->bonus - $bonus->amount_remaining_after_staking;
                             $bonus->user()->wallet->bonus = $newBonus;
                             $bonus->user()->wallet->save();
