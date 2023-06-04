@@ -464,6 +464,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function rewards()
     {
-        return $this->belongsToMany(Reward::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'release_on');
+        return $this->belongsToMany(Reward::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on');
     }
 }
