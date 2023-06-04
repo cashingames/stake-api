@@ -128,10 +128,11 @@ class WalletController extends BaseController
 
             case 'transfer.reversed' || 'transfer.failed':
                 Log::info("transfer failed or reversed");
+                $email = $event->obj->data->recipient->email;
                 if ('reversed' === $status || 'failed' === $status) {
                     $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
-                        $this->reverseWithdrawalTransaction($reference, $amount);
+                        $this->reverseWithdrawalTransaction($reference, $amount, $email);
                     }
                 }
                 break;
@@ -244,29 +245,34 @@ class WalletController extends BaseController
         return response("", 200);
     }
 
-    private function reverseWithdrawalTransaction($reference, $amount)
+    private function reverseWithdrawalTransaction($reference, $amount, $email)
     {
         $transaction = WalletTransaction::where('reference', $reference)->first();
+        $user = User::where('email', $email)->first();
 
         if (is_null($transaction)) {
             Log::info('trying to reverse non existent transaction');
             return response("", 200);
         }
 
-        $transaction->wallet->withdrawable += ($amount) / 100;
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            $registrationBonusService = new RegistrationBonusService;
+            $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
+            $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
+            if ($hasRecentRegistrationBonus) {
+                $registrationBonusService->reverseAmountWithdrawn($user, ($amount) / 100);
+            }
+        }
 
-        WalletTransaction::create([
-            'wallet_id' =>  $transaction->wallet_id,
-            'transaction_type' => 'CREDIT',
-            'amount' => ($amount) / 100,
-            'balance' => $transaction->wallet->withdrawable,
-            'description' => 'Winnings Withdrawal Reversed',
-            'reference' => $reference,
-            'balance_type' => WalletBalanceType::WinningsBalance->value,
-            'transaction_action' => WalletTransactionAction::FundsReversed->value
-        ]);
-        $transaction->wallet->save();
+        $walletRepository = new WalletRepository;
 
+        $walletRepository->credit(
+            $user->wallet,
+            ($amount / 100),
+            'Winnings Withdrawal Reversed',
+            null,
+        );
+        
         Log::info('withdrawal reversed for transaction reference ' . $reference);
         return response("", 200);
     }

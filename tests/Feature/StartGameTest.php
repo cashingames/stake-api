@@ -257,7 +257,7 @@ class StartGameTest extends TestCase
         ]);
     }
 
-    public function test_that_game_cannot_be_started_if_staking_amout_is_less_than_registration_bonus()
+    public function test_that_game_cannot_be_started_if_staking_amount_is_less_than_registration_bonus()
     {
         config(['features.registration_bonus.enabled' => true]);
         config(['trivia.minimum_exhibition_staking_amount' => 400]);
