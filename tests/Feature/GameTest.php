@@ -827,8 +827,8 @@ class GameTest extends TestCase
             'amount_remaining_after_withdrawal' => 0
         ]);
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
-        
-        ExhibitionStaking::factory()->create(['game_session_id'=>GameSession::first()->id, 'staking_id' => Staking::first()->id]);
+
+        ExhibitionStaking::factory()->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
 
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
@@ -847,13 +847,18 @@ class GameTest extends TestCase
             "chosenOptions" => $chosenOptions,
             "consumedBoosts" => []
         ]);
-        $userBonus = UserBonus::where('user_id', $this->user->id)->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)->first();
+        $userBonus = UserBonus::where('user_id', $this->user->id)
+            ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
+            ->first();
 
         $this->assertGreaterThan(
             0,
             $userBonus->total_amount_won
         );
-    }
 
-  
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->wallet->id,
+            'withdrawable' => $userBonus->total_amount_won
+        ]);
+    }
 }
