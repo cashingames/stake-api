@@ -67,7 +67,23 @@ class RegistrationBonusService implements BonusInterface
     public function updateAmountWon($user, $amount){
         $this->bonusRepository->updateWonAmount($this->bonus, $user, $amount);
     }
+
+    public function updateAmountWithdrawn($user, $amount){
+        $this->bonusRepository->updateAmountWithdrawn($this->bonus, $user, $amount);
+    }
     
+    public function reverseAmountWithdrawn($user,$amount){
+        $this->bonusRepository->reverseAmountWithdrawn($this->bonus, $user, $amount);
+    }
+
+    public function hasRecentRegistrationBonus(User $user)
+    {
+        return UserBonus::where('user_id', $user->id)
+            ->where('bonus_id', $this->bonus->id)
+            ->whereBetween('created_at', [now()->subDays(7), now()])
+            ->exists();
+    }
+
     private function userBonusQuery($user)
     {
         return UserBonus::where('user_id', $user->id)

@@ -59,4 +59,9 @@ class GameSession extends Model
     {
         return $this->hasOne(ExhibitionStaking::class);
     }
+
+    public function scopePerfectGames($query)
+    {
+        return $query->where('correct_count', config('trivia.user_scores.perfect_score'));
+    }
 }

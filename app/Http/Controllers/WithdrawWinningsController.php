@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ClientPlatform;
+use App\Enums\FeatureFlags;
 use App\Enums\WalletTransactionAction;
 use App\Models\WalletTransaction;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
+use App\Services\FeatureFlag;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -17,12 +20,16 @@ class WithdrawWinningsController extends BaseController
 {
     //
     //@TODO - enforce hours between which withdrawals can be made
-    public function __invoke(Request $request, PaystackService $withdrawalService, WalletRepository $walletRepository)
-    {
+    public function __invoke(
+        Request $request,
+        PaystackService $withdrawalService,
+        WalletRepository $walletRepository,
+        RegistrationBonusService $registrationBonusService
+    ) {
         $request->validate([
             'account_number' => ['required', 'numeric'],
             'bank_name' => ['required', 'string', 'max:200'],
-            'amount' => ['required','integer', 'max:' . $this->user->wallet->withdrawable],
+            'amount' => ['required', 'integer', 'max:' . $this->user->wallet->withdrawable],
             'account_name' => ['required', 'string']
         ]);
 
@@ -76,12 +83,12 @@ class WithdrawWinningsController extends BaseController
         $verifiedAccountName = $this->getValidAccountName($verifyAccount->data->account_name);
 
         if (
-            ($verifiedAccountName['firstAndLastName'] !== strtoupper($fullName) )
+            ($verifiedAccountName['firstAndLastName'] !== strtoupper($fullName))
         ) {
             Log::info($this->user->username . " valid account names are {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']} ");
             return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
         }
-
+        
         $recipientCode = $withdrawalService->createTransferRecipient($bankCode, $verifyAccount->data->account_name, $request->account_number);
 
         if (is_null($recipientCode)) {
@@ -96,8 +103,19 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
+        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
+            $hasRecentRegistrationBonus = $registrationBonusService->hasRecentRegistrationBonus($this->user);
+            if ($hasRecentRegistrationBonus) {
+                $perfectGamesCount = $this->user->gameSessions->perfectGames()->count();
 
+                if ($perfectGamesCount < config('trivia.minimum_withdrawal_perfect_score_threshold')) {
+                    return $this->sendError(false, 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus');
+                } else {
+                    $registrationBonusService->updateAmountWithdrawn($this->user, $request->amount);
+                }
+            }
+        }
+        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status === 'pending') {

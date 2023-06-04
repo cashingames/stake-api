@@ -290,6 +290,43 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
+    public function test_that_user_cannot_withdraw_bonus_win_if_he_did_not_get_perfect_scores()
+    {   
+        config(['features.registration_bonus.enabled' => true]);
+        $this->seed(BonusSeeder::class);
+        
+        $banksMock = $this->banksMock;
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+            $mock->shouldReceive('getBanks')->once()->andReturn(
+                $banksMock
+            );
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => 'TEST ACCOUNT'
+                ]
+            ]);
+            $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
+            $mock->shouldReceive('initiateTransfer')->andReturn((object)[
+                'status' => 'success',
+                'reference' => 'randomref'
+            ]);
+        });
+        
+        $this->user->wallet->withdrawable = 1000;
+        $this->user->wallet->save();
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+
+        ]);
+        $response->assertJson([
+            'message' => 'Account name does not match your registration name. Please contact support.',
+        ]);
+    }
 
     public function test_that_a_deleted_account_cannot_make_withdrawal()
     {
