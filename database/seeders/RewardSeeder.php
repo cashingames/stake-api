@@ -17,7 +17,7 @@ class RewardSeeder extends Seeder
         DB::table('rewards')->insert(
             [
                 'id' => 1,
-                'name' => 'Daily rewards',
+                'name' => 'daily_rewards',
                 'life_span' => 168
             ]
         );

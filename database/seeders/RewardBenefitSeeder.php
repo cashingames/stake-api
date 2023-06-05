@@ -20,7 +20,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 1,
                 'total_hours' =>  24,
                 'reward_type' => 'boost',
-                'reward_name' => 'skip',
+                'reward_name' => 'Skip',
                 'reward_count' => 1
             ]
         );
@@ -32,7 +32,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 2,
                 'total_hours' =>  48,
                 'reward_type' => 'boost',
-                'reward_name' => 'bomb',
+                'reward_name' => 'Bomb',
                 'reward_count' => 1
             ]
         );
@@ -44,7 +44,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 3,
                 'total_hours' =>  72,
                 'reward_type' => 'boost',
-                'reward_name' => 'time freeze',
+                'reward_name' => 'Time Freeze',
                 'reward_count' => 2
             ]
         );
@@ -78,7 +78,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 5,
                 'total_hours' =>  120,
                 'reward_type' => 'boost',
-                'reward_name' => 'bomb',
+                'reward_name' => 'Bomb',
                 'reward_count' => 3
             ]
         );
@@ -101,7 +101,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 6,
                 'total_hours' =>  144,
                 'reward_type' => 'boost',
-                'reward_name' => 'skip',
+                'reward_name' => 'Skip',
                 'reward_count' => 3
             ]
         );
@@ -124,7 +124,7 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 7,
                 'total_hours' =>  168,
                 'reward_type' => 'boost',
-                'reward_name' => 'time freeze',
+                'reward_name' => 'Time Freeze',
                 'reward_count' => 5
             ]
         );
