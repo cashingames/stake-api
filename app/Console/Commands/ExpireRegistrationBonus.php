@@ -16,39 +16,41 @@ class ExpireRegistrationBonus extends Command
      *
      * @var string
      */
-    protected $signature = 'app:expire-registration-bonus';
+    protected $signature = 'registration-bonus:expire';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Deactivates all registratio bonuses';
+    protected $description = 'Deactivates all registration bonuses';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $freePlan = Plan::where('is_free', true)->first();
-
-        UserPlan::where('plan_id', $freePlan->id)
-            ->whereNotNull('expire_at')
-            ->update(['is_active' => false]);
-
+        $regBonus = Bonus::where('name', BonusType::RegistrationBonus->value)->first();
         if (FeatureFlag::isEnabled((FeatureFlags::REGISTRATION_BONUS))) {
             UserBonus::tobeExpired()
-                ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
+                ->where('bonus_id', $regBonus->id)
                 ->chunkById(10, function ($registrationBonuses) {
                     foreach ($registrationBonuses as $bonus) {
-                        if($bonus->amount_remaining_after_staking > 0){
-                            $newBonus = $bonus->user()->wallet->bonus - $bonus->amount_remaining_after_staking;
-                            $bonus->user()->wallet->bonus = $newBonus;
-                            $bonus->user()->wallet->save();
+                        $wallet = $bonus->user->wallet;
+                        if (
+                            $bonus->amount_remaining_after_staking > 0 and
+                            $wallet->bonus >= $bonus->amount_remaining_after_staking
+                        ) {
+                            $newBonus = $wallet->bonus - $bonus->amount_remaining_after_staking;
+                            $wallet->bonus = $newBonus;
+                            $wallet->save();
                         }
-                        if ($bonus->amount_remaining_after_withdrawal > 0) {
-                            $bonus->user()->wallet->withdrawable = $bonus->user()->wallet->withdrawable - $bonus->amount_remaining_after_withdrawal;
-                            $bonus->user()->wallet->save();
+                        if (
+                            $bonus->amount_remaining_after_withdrawal > 0 and
+                            $wallet->withdrawable >= $bonus->amount_remaining_after_withdrawal
+                        ) {
+                            $wallet->withdrawable = $wallet->withdrawable - $bonus->amount_remaining_after_withdrawal;
+                            $wallet->save();
                         }
                     }
                     $registrationBonuses->each->update(['is_on' => false]);
