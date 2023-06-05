@@ -7,15 +7,19 @@ use Illuminate\Http\Request;
 
 class DismissUserRewardController extends Controller
 {
-    public function __invoke(User $user)
+    public function __invoke()
     {
+        $user = auth()->user();
+
         $userLastRecord = $user->rewards()
         ->wherePivot('reward_count', 0)
         ->latest('pivot_created_at')
-        ->withPivot('reward_count', 'reward_date', 'release_on')
+        ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
         ->first();
 
-        $userLastRecord->pivot->reward_count = -1;
-        $userLastRecord->save();
+        if ($userLastRecord) {
+            $userLastRecord->pivot->reward_count = -1;
+            $userLastRecord->pivot->save();
+        }
     }
 }
