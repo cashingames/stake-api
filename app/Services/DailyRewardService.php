@@ -26,7 +26,7 @@ class DailyRewardService
                 'release_on' => now(),
                 'reward_milestone' => 1,
             ]);
-            $rewardClaimableDay = $this->getTodayReward(5);
+            $rewardClaimableDay = $this->getTodayReward(1);
             return response()->json([
                 "shouldShowPopup" => true,
                 'reward' => $rewardClaimableDay], 200);
