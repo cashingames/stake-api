@@ -14,6 +14,7 @@ use PlanSeeder;
 use App\Models\User;
 use App\Models\UserPlan;
 use Carbon\Carbon;
+use Database\Seeders\RewardSeeder;
 
 class ProfileTest extends TestCase
 {
@@ -34,6 +35,7 @@ class ProfileTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->seed(PlanSeeder::class);
+        $this->seed(RewardSeeder::class);
         $this->user = User::first();
 
         $this->actingAs($this->user);
@@ -44,8 +46,6 @@ class ProfileTest extends TestCase
         $response = $this->withHeaders([
             'x-brand-id' => 10,
         ])->get(self::PROFILE_DATA_URL);
-
-        dd($response);
         $response->assertJson([
             'data' => [
                 'username' => $this->user->username,
