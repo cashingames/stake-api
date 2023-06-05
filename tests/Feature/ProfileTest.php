@@ -45,6 +45,7 @@ class ProfileTest extends TestCase
             'x-brand-id' => 10,
         ])->get(self::PROFILE_DATA_URL);
 
+        dd($response);
         $response->assertJson([
             'data' => [
                 'username' => $this->user->username,

@@ -21,6 +21,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  24,
                 'reward_type' => 'boost',
                 'reward_name' => 'Skip',
+                'icon' => 'icons/skip_icon.png',
                 'reward_count' => 1
             ]
         );
@@ -33,6 +34,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  48,
                 'reward_type' => 'boost',
                 'reward_name' => 'Bomb',
+                'icon' => 'icons/bomb_icon.png',
                 'reward_count' => 1
             ]
         );
@@ -45,6 +47,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  72,
                 'reward_type' => 'boost',
                 'reward_name' => 'Time Freeze',
+                'icon' => 'icons/time_freeze_icon.png',
                 'reward_count' => 2
             ]
         );
@@ -56,6 +59,8 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 4,
                 'total_hours' =>  96,
                 'reward_type' => 'coins',
+                'reward_name' => 'Coins',
+                'icon' => 'icons/coin_icon.png',
                 'reward_count' => 20
             ]
         );
@@ -67,6 +72,8 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 5,
                 'total_hours' =>  120,
                 'reward_type' => 'coins',
+                'reward_name' => 'Coins',
+                'icon' => 'icons/coin_icon.png',
                 'reward_count' => 30
             ]
         );
@@ -79,6 +86,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  120,
                 'reward_type' => 'boost',
                 'reward_name' => 'Bomb',
+                'icon' => 'icons/bomb_icon.png',
                 'reward_count' => 3
             ]
         );
@@ -90,6 +98,8 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 6,
                 'total_hours' =>  144,
                 'reward_type' => 'coins',
+                'reward_name' => 'Coins',
+                'icon' => 'icons/coin_icon.png',
                 'reward_count' => 60
             ]
         );
@@ -102,6 +112,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  144,
                 'reward_type' => 'boost',
                 'reward_name' => 'Skip',
+                'icon' => 'icons/skip_icon.png',
                 'reward_count' => 3
             ]
         );
@@ -113,6 +124,8 @@ class RewardBenefitSeeder extends Seeder
                 'reward_benefit_id' => 7,
                 'total_hours' =>  168,
                 'reward_type' => 'coins',
+                'reward_name' => 'Coins',
+                'icon' => 'icons/coin_icon.png',
                 'reward_count' => 80
             ]
         );
@@ -125,6 +138,7 @@ class RewardBenefitSeeder extends Seeder
                 'total_hours' =>  168,
                 'reward_type' => 'boost',
                 'reward_name' => 'Time Freeze',
+                'icon' => 'icons/time_freeze_icon.png',
                 'reward_count' => 5
             ]
         );

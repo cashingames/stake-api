@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('reward_id')->references('id')->on('rewards')->onDelete('cascade');;
             $table->integer('reward_count');
-            $table->date('reward_date');
-            $table->timestamp('release_on');
+            $table->date('reward_date')->nullable();
+            $table->timestamp('release_on')->nullable();
             $table->timestamps();
         });
     }
