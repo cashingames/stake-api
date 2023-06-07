@@ -50,10 +50,5 @@ class DebitWalletForStaking
     {
         $registrationBonus->amount_remaining_after_staking -= $amount;
         $registrationBonus->save();
-
-        if ($registrationBonus->amount_remaining_after_staking <= 0) {
-            $registrationBonus->is_on = false;
-            $registrationBonus->save();
-        }
     }
 }

@@ -135,7 +135,7 @@ class StartSinglePlayerRequest extends FormRequest
                 ) {
                     return $validator->errors()->add(
                         'staking_amount',
-                        'Registration bonus is remaining '. $registrationBonus->amount_remaining_after_staking
+                        'Registration bonus is remaining '. $registrationBonus->amount_remaining_after_staking.' please stake '.$registrationBonus->amount_remaining_after_staking
                     );
                 }
             }

@@ -287,7 +287,7 @@ class GameController extends BaseController
 
             $staking = $exhibitionStaking->staking ?? null;
             $amountWon = 0;
-            
+
             if (!is_null($staking)) {
                 $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
@@ -298,19 +298,36 @@ class GameController extends BaseController
                 }
 
                 $walletRepository = new WalletRepository;
-                $description = 'Staking winning of ' . $amountWon . ' cash';
-                $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
-                $staking->update(['amount_won' => $amountWon]);
 
-               
-                if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS) ) {
-                   
+                if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
                     $registrationBonusService = new RegistrationBonusService;
                     $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
                     if ($hasRegistrationBonus) {
-                        $registrationBonusService->updateAmountWon($this->user, $amountWon);
+                        if ($points == config('trivia.user_scores.perfect_score')) {
+                            $walletRepository->creditBonusAccount(
+                                $this->user->wallet,
+                                $amountWon,
+                                'Bonus Credited',
+                                null,
+                            );
+                            $staking->update(['amount_won' => $amountWon]);
+                            $registrationBonusService->updateAmountWon($this->user, $amountWon);
+
+                            //dispatch event listenerr to count games and credit
+                        }
+                    } else {
+                        $walletRepository = new WalletRepository;
+                        $description = 'Staking winning of ' . $amountWon . ' cash';
+                        $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
+                        $staking->update(['amount_won' => $amountWon]);
                     }
+                } else {
+                    $walletRepository = new WalletRepository;
+                    $description = 'Staking winning of ' . $amountWon . ' cash';
+                    $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
+                    $staking->update(['amount_won' => $amountWon]);
                 }
+
                 if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
                     ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
                 } else {
@@ -374,6 +391,4 @@ class GameController extends BaseController
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
-
- 
 }

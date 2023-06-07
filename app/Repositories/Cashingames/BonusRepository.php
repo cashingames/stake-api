@@ -35,27 +35,27 @@ class BonusRepository
             ->where('is_on', true)->first();
 
         $userBonus->total_amount_won = $userBonus->total_amount_won + $amount;
-        $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal + $amount;
+        $userBonus->amount_remaining_after_staking = $userBonus->amount_remaining_after_staking + $amount;
 
         $userBonus->save();
     }
 
-    public function updateAmountWithdrawn(Bonus $bonus, User $user, float $amount)
-    {
+    // public function updateAmountWithdrawn(Bonus $bonus, User $user, float $amount)
+    // {
 
-        $userBonus = UserBonus::where('user_id', $user->id)
-            ->where('bonus_id', $bonus->id)->first();
+    //     $userBonus = UserBonus::where('user_id', $user->id)
+    //         ->where('bonus_id', $bonus->id)->first();
 
-        $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal - $amount;
-        $userBonus->save();
-    }
+    //     $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal - $amount;
+    //     $userBonus->save();
+    // }
 
-    public function reverseAmountWithdrawn(Bonus $bonus, User $user, float $amount)
-    {
-        $userBonus = UserBonus::where('user_id', $user->id)
-            ->where('bonus_id', $bonus->id)->first();
+    // public function reverseAmountWithdrawn(Bonus $bonus, User $user, float $amount)
+    // {
+    //     $userBonus = UserBonus::where('user_id', $user->id)
+    //         ->where('bonus_id', $bonus->id)->first();
 
-        $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal + $amount;
-        $userBonus->save();
-    }
+    //     $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal + $amount;
+    //     $userBonus->save();
+    // }
 }

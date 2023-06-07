@@ -45,13 +45,6 @@ class ExpireRegistrationBonus extends Command
                             $wallet->bonus = $newBonus;
                             $wallet->save();
                         }
-                        if (
-                            $bonus->amount_remaining_after_withdrawal > 0 and
-                            $wallet->withdrawable >= $bonus->amount_remaining_after_withdrawal
-                        ) {
-                            $wallet->withdrawable = $wallet->withdrawable - $bonus->amount_remaining_after_withdrawal;
-                            $wallet->save();
-                        }
                     }
                     $registrationBonuses->each->update(['is_on' => false]);
                 }, $column = 'id');

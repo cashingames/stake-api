@@ -85,12 +85,6 @@ class ArtisanCommandsTest extends TestCase
 
         $this->artisan('registration-bonus:expire')->assertExitCode(0);
 
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'bonus' => 0,
-            'withdrawable' => 0
-        ]);
-
         $this->assertDatabaseHas('user_bonuses', [
             'user_id' => $user->id,
             'total_amount_won'  => 1000,
