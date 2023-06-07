@@ -41,12 +41,24 @@ class DismissUserRewardTest extends TestCase
             'release_on' => Carbon::now(),
             'reward_milestone' => 1,
         ]);
+        UserReward::create([
+            'user_id' => $this->user->id,
+            'reward_id' => 1,
+            'reward_count' => 1,
+            'reward_date' => Carbon::now(),
+            'release_on' => Carbon::now(),
+            'reward_milestone' => 1,
+        ]);
 
         $response = $this->post('/api/v3/dismiss/user-reward');
 
         $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
             'reward_count' => -1,
+        ]);
+        $this->assertDatabaseMissing('user_rewards', [
+            'user_id' => $this->user->id,
+            'reward_count' => 1,
         ]);
     }
 }

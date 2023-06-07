@@ -11,19 +11,18 @@ class ClaimUserRewardController extends Controller
 {
     public function __invoke()
     {
-
         $user = auth()->user();
         $userLastRecord = $user->rewards()
-            ->wherePivot('reward_count', 0)
-            ->latest('pivot_created_at')
-            ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
-            ->first();
+        ->orderBy('reward_date', 'desc')
+        ->latest('pivot_created_at')
+        ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
+        ->first();
             if ($userLastRecord) {
                 $userLastRecord->pivot->reward_count = 1;
                 $userLastRecord->pivot->save();
             }
 
-            $userRewardRecordCount = $user->rewards()->count();
+            $userRewardRecordCount = $userLastRecord->pivot->reward_milestone;
 
         $rewardClaimableDays = RewardBenefit::where('reward_benefit_id', $userRewardRecordCount)->get();
         foreach ($rewardClaimableDays as $rewardEachDay) {

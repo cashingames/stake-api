@@ -89,10 +89,10 @@ class ClaimUserRewardTest extends TestCase
             'reward_count' => 0,
             'reward_date' => Carbon::now(),
             'release_on' => Carbon::now(),
-            'reward_milestone' => 1,
+            'reward_milestone' => 4,
         ]);
-        $userRewardRecordCount = $this->user->rewards()->count();
-
+        $userRewardRecord = UserReward::where('user_id', $this->user->id)->where('reward_milestone', 4)->first();
+        $userRewardRecordCount = $userRewardRecord->reward_milestone;
         $rewardBenefit = RewardBenefit::where('reward_benefit_id', $userRewardRecordCount)->first();
 
         $response = $this->post('/api/v3/claim/user-reward');
