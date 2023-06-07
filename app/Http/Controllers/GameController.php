@@ -35,6 +35,7 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Events\CreditBonusWinnings;
 use stdClass;
 
 class GameController extends BaseController
@@ -313,7 +314,10 @@ class GameController extends BaseController
                             $staking->update(['amount_won' => $amountWon]);
                             $registrationBonusService->updateAmountWon($this->user, $amountWon);
 
-                            //dispatch event listenerr to count games and credit
+                            $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
+                            if ($perfectGamesCount == config('trivia.minimum_withdrawal_perfect_score_threshold')) {
+                                Event::dispatch(new CreditBonusWinnings($this->user, $amountWon));
+                            }
                         }
                     } else {
                         $walletRepository = new WalletRepository;
