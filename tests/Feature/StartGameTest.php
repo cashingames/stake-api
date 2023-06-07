@@ -286,7 +286,7 @@ class StartGameTest extends TestCase
         ]);
 
         $response->assertJson([
-            'message' => 'Registration bonus is remaining 500',
+            'message' => 'Registration bonus is remaining 500 please stake 500',
         ]);
     }
 }

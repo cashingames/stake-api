@@ -327,7 +327,7 @@ class GameController extends BaseController
                     $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
                     $staking->update(['amount_won' => $amountWon]);
                 }
-                
+
                 if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
                     ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
                 } else {

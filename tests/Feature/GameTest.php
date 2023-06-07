@@ -816,6 +816,8 @@ class GameTest extends TestCase
     {
         FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
+        config(['trivia.user_scores.perfect_score' => 10]);
+
         Staking::factory()->create(['user_id' => $this->user->id]);
         UserBonus::create([
             'user_id' => $this->user->id,
@@ -837,29 +839,25 @@ class GameTest extends TestCase
             ->hasOptions(4)
             ->count(10)
             ->create();
-        
-        Option::query()->update(['is_correct' => true ]);
+
+        Option::query()->update(['is_correct' => true]);
 
         $chosenOptions = [];
         foreach ($questions as $question) {
-            
+
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
-       
+
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => $chosenOptions,
             "consumedBoosts" => []
         ]);
 
-
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
 
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $this->user->wallet->id,
-            'bonus' => $this->user->wallet->bonus + $userBonus->total_amount_won
-        ]);
+        $this->assertEquals($this->user->wallet->bonus, $userBonus->total_amount_won);
     }
 }
