@@ -255,15 +255,6 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            $registrationBonusService = new RegistrationBonusService;
-            $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
-            $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
-            if ($hasRecentRegistrationBonus) {
-                $registrationBonusService->reverseAmountWithdrawn($user, ($amount) / 100);
-            }
-        }
-
         $walletRepository = new WalletRepository;
 
         $walletRepository->credit(

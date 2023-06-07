@@ -2,18 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientPlatform;
-use App\Enums\FeatureFlags;
 use App\Enums\WalletTransactionAction;
-use App\Models\WalletTransaction;
 use App\Repositories\Cashingames\WalletRepository;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
-use App\Services\FeatureFlag;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WithdrawWinningsController extends BaseController
@@ -24,7 +17,6 @@ class WithdrawWinningsController extends BaseController
         Request $request,
         PaystackService $withdrawalService,
         WalletRepository $walletRepository,
-        RegistrationBonusService $registrationBonusService
     ) {
         $request->validate([
             'account_number' => ['required', 'numeric'],
@@ -96,31 +88,12 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Recipient code could not be generated');
         }
 
-        $withdrawableRegistrationBonusWinning = $registrationBonusService->withdrawableRegistrationBonus($this->user);
-        $hasRecentRegistrationBonus = !is_null($withdrawableRegistrationBonusWinning);
-        $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
-
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            if (
-                $hasRecentRegistrationBonus
-                and $perfectGamesCount < config('trivia.minimum_withdrawal_perfect_score_threshold')
-            ) {
-                return $this->sendError(false, 'Sorry, you did not get up to ' . config('trivia.minimum_withdrawal_perfect_score_threshold') . ' perfect scores with registration bonus');
-            }
-        }
-
         Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
 
         try {
             $transferInitiated = $withdrawalService->initiateTransfer($recipientCode, ($debitAmount * 100));
         } catch (\Throwable $th) {
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
-        }
-
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            if ($hasRecentRegistrationBonus) {
-                $registrationBonusService->updateAmountWithdrawn($this->user, $request->amount);
-            }
         }
 
         $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);

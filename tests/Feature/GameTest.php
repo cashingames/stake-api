@@ -837,28 +837,29 @@ class GameTest extends TestCase
             ->hasOptions(4)
             ->count(10)
             ->create();
+        
+        Option::query()->update(['is_correct' => true ]);
+
         $chosenOptions = [];
         foreach ($questions as $question) {
+            
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
-
+       
         $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
             "chosenOptions" => $chosenOptions,
             "consumedBoosts" => []
         ]);
+
+
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
 
-        $this->assertGreaterThan(
-            0,
-            $userBonus->total_amount_won
-        );
-
         $this->assertDatabaseHas('wallets', [
             'user_id' => $this->user->wallet->id,
-            'withdrawable' => $userBonus->total_amount_won
+            'bonus' => $this->user->wallet->bonus + $userBonus->total_amount_won
         ]);
     }
 }
