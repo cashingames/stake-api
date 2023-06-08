@@ -14,7 +14,6 @@ class ClaimUserRewardController extends Controller
         $user = auth()->user();
         $userLastRecord = $user->rewards()
         ->orderBy('reward_date', 'desc')
-        ->latest('pivot_created_at')
         ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
         ->first();
             if ($userLastRecord) {

@@ -15,10 +15,10 @@ class DailyRewardService
     public function shouldShowDailyReward(User $user)
     {
         $userRewardRecordCount = $user->rewards()->count();
+        
         $reward = Reward::find(1);
         $userLastRecord = $user->rewards()
         ->orderBy('reward_date', 'desc')
-        ->latest('pivot_created_at')
         ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
         ->first();
        
@@ -91,7 +91,6 @@ class DailyRewardService
 
         $userLastRecord = $user->rewards()
             ->wherePivot('reward_count', 0)
-            ->latest('pivot_created_at')
             ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
             ->first();
 
