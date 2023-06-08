@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ClientPlatform;
-use App\Models\User;
-use Illuminate\Support\Carbon;
 use App\Http\ResponseHelpers\CommonDataResponse;
+use App\Models\User;
+use App\Services\DailyRewardService;
+use Illuminate\Support\Carbon;
 use stdClass;
 
 class UserController extends BaseController
 {
 
-    public function profile(ClientPlatform $clientPlatform)
+    public function profile(ClientPlatform $clientPlatform, DailyRewardService $daillyRewardService)
     {
         $this->user->load(['profile', 'wallet']);
 
@@ -37,23 +38,19 @@ class UserController extends BaseController
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->bookBalance = $this->user->bookBalance();
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
-
-        if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
-            $result->points = $this->user->points();
-            $result->todaysPoints = $this->user->todaysPoints();
-            $result->globalRank = $this->user->rank;
-            $result->gamesCount = $this->user->played_games_count;
-            $result->totalChallenges = $this->user->challenges_played;
-            $result->winRate = $this->user->win_rate;
-            $result->badge = $this->user->achievement;
-            $result->achievements = $this->user->userAchievements();
-            $result->activePlans = $this->composeUserPlans();
-            $result->hasActivePlan = $this->user->hasActivePlan();
-            $result->boosts = $this->user->gameArkUserBoosts();
-            $result->coinsBalance = $this->user->getUserCoins();
-        } else {
-            $result->boosts = $this->user->userBoosts();
-        }
+        $result->dailyReward = $daillyRewardService->shouldShowDailyReward($this->user)->original;
+        $result->points = $this->user->points();
+        $result->todaysPoints = $this->user->todaysPoints();
+        $result->globalRank = $this->user->rank;
+        $result->gamesCount = $this->user->played_games_count;
+        $result->totalChallenges = $this->user->challenges_played;
+        $result->winRate = $this->user->win_rate;
+        $result->badge = $this->user->achievement;
+        $result->achievements = $this->user->userAchievements();
+        $result->activePlans = $this->composeUserPlans();
+        $result->hasActivePlan = $this->user->hasActivePlan();
+        $result->boosts = $this->user->gameArkUserBoosts();
+        $result->coinsBalance = $this->user->getUserCoins();
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }
@@ -65,7 +62,6 @@ class UserController extends BaseController
         if ($subscribedPlan->count() === 0) {
             return [];
         }
-
 
         $sumOfPurchasedPlanGames = 0;
         $sumOfBonusPlanGames = 0;
@@ -80,7 +76,7 @@ class UserController extends BaseController
 
         $subscribedPlans = [];
 
-        $purchasedPlan =  new stdClass;
+        $purchasedPlan = new stdClass;
         $purchasedPlan->name = "Purchased Games";
         $purchasedPlan->background_color = "#D9E0FF";
         $purchasedPlan->is_free = false;
@@ -95,7 +91,6 @@ class UserController extends BaseController
         $bonusPlan->description = $sumOfBonusPlanGames . " games remaining";
         $bonusPlan->game_count = $sumOfBonusPlanGames;
         $subscribedPlans[] = $bonusPlan;
-
 
         return $subscribedPlans;
     }

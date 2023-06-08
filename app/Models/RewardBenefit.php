@@ -12,7 +12,9 @@ class RewardBenefit extends Model
     protected $fillable = [
         'total_hours',
         'reward_type',
-        'reward_count'
+        'icon',
+        'reward_count',
+        'reward_benefit_id'
     ];
 
     public function reward()

@@ -17,7 +17,7 @@ class Reward extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'release_on');
+        return $this->belongsToMany(User::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on');
     }
 
     public function rewardsBenefits()

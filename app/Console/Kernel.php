@@ -54,6 +54,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
         $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
         $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
+        $schedule->job(ReactivateUserReward::class)->daily();
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
