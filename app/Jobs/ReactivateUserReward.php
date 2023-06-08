@@ -28,7 +28,6 @@ class ReactivateUserReward implements ShouldQueue
     {
         $userLastRecord = $user->rewards()
             ->wherePivot('reward_count', -1)
-            ->latest('pivot_created_at')
             ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
             ->first();
 
