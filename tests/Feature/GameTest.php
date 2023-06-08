@@ -857,7 +857,7 @@ class GameTest extends TestCase
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
-
-        $this->assertEquals($this->user->wallet->withdrawable, $userBonus->total_amount_won);
+            
+        $this->assertEquals($this->user->wallet->withdrawable, $userBonus->total_amount_won + $userBonus->amount_credited);
     }
 }

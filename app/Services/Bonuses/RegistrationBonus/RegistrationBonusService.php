@@ -42,11 +42,6 @@ class RegistrationBonusService implements BonusInterface
         $this->bonusRepository->deactivateBonus($this->bonus, $user);
     }
 
-    public function resetBonus(User $user)
-    {
-        $this->bonusRepository->resetBonus($user);
-    }
-
     public function inactiveRegistrationBonus($user)
     {
         return $this->userBonusQuery($user)

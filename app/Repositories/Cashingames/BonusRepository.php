@@ -34,6 +34,8 @@ class BonusRepository
             ->where('is_on', true)->update([
                 'is_on' => false
             ]);
+        $user->wallet->bonus = $user->wallet->bonus - $bonus->amount_remaining_after_staking;
+        $user->wallet->save();
     }
 
     public function updateWonAmount(Bonus $bonus, User $user, float $amount)

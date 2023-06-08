@@ -32,16 +32,7 @@ class RegistrationBonusWinningsCredited
             'Bonus Winnings Credited',
             null
         );
-        //debit users bonus of the turnover
-        $this->walletRepository->debit(
-            $event->user->wallet,
-            $this->bonusService->activeRegistrationBonus($event->user)->total_amount_won,
-            'Bonus Turnover Migrated To Winnings',
-            null,
-            'bonus',
-            WalletTransactionAction::BonusTurnoverMigrated->value
-        );
-        //deactivate registration bonus
+    
         $this->bonusService->deactivateBonus($event->user);
     }
 }
