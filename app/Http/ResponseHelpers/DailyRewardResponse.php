@@ -24,33 +24,30 @@ class DailyRewardResponse
 
     private function canClaim($reward)
     {
-        $users = User::all();
-        foreach ($users as $user) {
-            $userLastRecord = UserReward::where('user_id', $user->id)->where('reward_count', 0)->first();
-            if ($userLastRecord && $reward->reward_benefit_id == $userLastRecord->reward_milestone) {
-                $userRecord = UserReward::where('user_id', $user->id)
-                    ->where('reward_count', 1)
-                    ->where('reward_milestone', $reward->reward_benefit_id)
-                    ->first();
-                if (!$userRecord) {
-                    return true;
-                } else {
-                    return false;
-                }
+        $user = auth()->user();
+        $userLastRecord = UserReward::where('user_id', $user->id)->where('reward_count', 0)->first();
+        if ($userLastRecord && $reward->reward_benefit_id == $userLastRecord->reward_milestone) {
+            $userRecord = UserReward::where('user_id', $user->id)
+                ->where('reward_count', 1)
+                ->where('reward_milestone', $reward->reward_benefit_id)
+                ->first();
+            if (!$userRecord) {
+                return true;
+            } else {
+                return false;
             }
         }
-        return false; 
+
+        return false;
     }
-    
- 
+
+
     private function isClaimed($reward)
     {
-        $users = User::all();
-        foreach ($users as $user) {
-            $userRecords = UserReward::where('user_id', $user->id)->where('reward_count', 1)->where('reward_milestone', $reward->reward_benefit_id)->get();
-            foreach($userRecords as $userRecord){
-                return $userRecord->reward_milestone == $reward->reward_benefit_id;
-            }
+        $user = auth()->user();
+        $userRecords = UserReward::where('user_id', $user->id)->where('reward_count', 1)->where('reward_milestone', $reward->reward_benefit_id)->get();
+        foreach ($userRecords as $userRecord) {
+            return $userRecord->reward_milestone == $reward->reward_benefit_id;
         }
     }
 }
