@@ -10,6 +10,6 @@ interface BonusInterface
 
     public function activateBonus(User $user, float $amount);
 
-    public function deactivateBonus();
+    public function deactivateBonus(User $user);
 
 }

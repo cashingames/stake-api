@@ -11,17 +11,17 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CreditBonusWinnings
+class CreditRegistrationBonusWinnings
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user , $amount;
+    public $user , $amount , $bonus;
 
     /**
      * Create a new event instance.
      */
     public function __construct(User $user, $amount)
-    {
+    {   
         $this->user = $user;
         $this->amount = $amount;
     }
@@ -34,7 +34,7 @@ class CreditBonusWinnings
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('bonusWinnings-credit'),
+            new PrivateChannel('registrationBonusWinnings-credit'),
         ];
     }
 }

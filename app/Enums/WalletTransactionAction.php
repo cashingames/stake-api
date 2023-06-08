@@ -12,4 +12,5 @@ enum WalletTransactionAction: string {
     case BonusCredited = "BONUS_CREDITED";
     case LiveTriviaFeePaid = "LIVE_TRIVIA_FEE_PAID";
     case FundsReversed = "FUNDS_REVERSED";
+    case BonusTurnoverMigrated = "BONUS_TURNOVER_MIGRATED";
 }

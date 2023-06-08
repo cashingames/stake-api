@@ -31,11 +31,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\PlayGame\ReferralService;
-
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
-use App\Events\CreditBonusWinnings;
+use App\Events\CreditRegistrationBonusWinnings;
 use stdClass;
 
 class GameController extends BaseController
@@ -263,7 +262,6 @@ class GameController extends BaseController
 
         DB::transaction(function () use ($chosenOptions, $game) {
             foreach ($chosenOptions as $value) {
-                //  dd($value['id']);
                 GameSessionQuestion::where('game_session_id', $game->id)
                     ->where('question_id', $value['question_id'])
                     ->update(['option_id' => $value['id']]);
@@ -313,10 +311,10 @@ class GameController extends BaseController
                             );
                             $staking->update(['amount_won' => $amountWon]);
                             $registrationBonusService->updateAmountWon($this->user, $amountWon);
-
                             $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
-                            if ($perfectGamesCount == config('trivia.minimum_withdrawal_perfect_score_threshold')) {
-                                Event::dispatch(new CreditBonusWinnings($this->user, $amountWon));
+                            if ($perfectGamesCount >= config('trivia.minimum_withdrawal_perfect_score_threshold')) {
+                                $amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
+                                Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
                             }
                         }
                     } else {

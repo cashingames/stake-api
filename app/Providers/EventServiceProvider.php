@@ -7,9 +7,9 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
-use App\Events\CreditBonusWinnings;
+use App\Events\CreditRegistrationBonusWinnings;
 use App\Listeners\AchievementBadgeEventListener;
-use App\Listeners\BonusWinningsCredited;
+use App\Listeners\RegistrationBonusWinningsCredited;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,8 +22,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        CreditBonusWinnings::class => [
-            BonusWinningsCredited::class,
+        CreditRegistrationBonusWinnings::class => [
+            RegistrationBonusWinningsCredited::class,
         ],
     ];
 

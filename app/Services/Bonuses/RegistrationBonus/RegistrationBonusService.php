@@ -37,8 +37,14 @@ class RegistrationBonusService implements BonusInterface
         return false;
     }
 
-    public function deactivateBonus()
+    public function deactivateBonus(User $user)
     {
+        $this->bonusRepository->deactivateBonus($this->bonus, $user);
+    }
+
+    public function resetBonus(User $user)
+    {
+        $this->bonusRepository->resetBonus($user);
     }
 
     public function inactiveRegistrationBonus($user)
@@ -68,24 +74,6 @@ class RegistrationBonusService implements BonusInterface
     {
         $this->bonusRepository->updateWonAmount($this->bonus, $user, $amount);
     }
-
-    // public function updateAmountWithdrawn($user, $amount)
-    // {
-    //     $this->bonusRepository->updateAmountWithdrawn($this->bonus, $user, $amount);
-    // }
-
-    // public function reverseAmountWithdrawn($user, $amount)
-    // {
-    //     $this->bonusRepository->reverseAmountWithdrawn($this->bonus, $user, $amount);
-    // }
-
-    // public function withdrawableRegistrationBonus(User $user)
-    // {
-    //     return $this->userBonusQuery($user)
-    //         ->whereBetween('created_at', [now()->subDays(7), now()])
-    //         ->first();
-    // }
-
     private function userBonusQuery($user)
     {
         return UserBonus::where('user_id', $user->id)
