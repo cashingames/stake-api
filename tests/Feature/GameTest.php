@@ -828,7 +828,7 @@ class GameTest extends TestCase
             'total_amount_won'  => 0,
             'amount_remaining_after_withdrawal' => 0
         ]);
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
         ExhibitionStaking::factory()->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
 
@@ -857,7 +857,7 @@ class GameTest extends TestCase
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
-
-        $this->assertEquals($this->user->wallet->bonus, $userBonus->total_amount_won);
+            
+        $this->assertEquals($this->user->wallet->withdrawable, $userBonus->total_amount_won + $userBonus->amount_credited);
     }
 }

@@ -22,9 +22,20 @@ class BonusRepository
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
                 'is_on' => true,
-                'amount_credited' => 500,
+                'amount_credited' => $amount,
                 'amount_remaining_after_staking' => $amount
             ]);
+    }
+
+    public function deactivateBonus(Bonus $bonus, User $user)
+    {
+        UserBonus::where('user_id', $user->id)
+            ->where('bonus_id', $bonus->id)
+            ->where('is_on', true)->update([
+                'is_on' => false
+            ]);
+        $user->wallet->bonus = $user->wallet->bonus - $bonus->amount_remaining_after_staking;
+        $user->wallet->save();
     }
 
     public function updateWonAmount(Bonus $bonus, User $user, float $amount)
@@ -39,23 +50,4 @@ class BonusRepository
 
         $userBonus->save();
     }
-
-    // public function updateAmountWithdrawn(Bonus $bonus, User $user, float $amount)
-    // {
-
-    //     $userBonus = UserBonus::where('user_id', $user->id)
-    //         ->where('bonus_id', $bonus->id)->first();
-
-    //     $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal - $amount;
-    //     $userBonus->save();
-    // }
-
-    // public function reverseAmountWithdrawn(Bonus $bonus, User $user, float $amount)
-    // {
-    //     $userBonus = UserBonus::where('user_id', $user->id)
-    //         ->where('bonus_id', $bonus->id)->first();
-
-    //     $userBonus->amount_remaining_after_withdrawal = $userBonus->amount_remaining_after_withdrawal + $amount;
-    //     $userBonus->save();
-    // }
 }
