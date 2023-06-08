@@ -54,7 +54,6 @@ class DailyRewardService
                 $this->missDailyReward();
                 dispatch(new ReactivateUserReward());
                 return response()->json([
-                    "today" => 2,
                     "shouldShowPopup" => false,
                     'reward' => []], 200);
             }
