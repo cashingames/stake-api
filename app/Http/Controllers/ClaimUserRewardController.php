@@ -26,7 +26,8 @@ class ClaimUserRewardController extends Controller
         $rewardClaimableDays = RewardBenefit::where('reward_benefit_id', $userRewardRecordCount)->get();
         foreach ($rewardClaimableDays as $rewardEachDay) {
             if ($rewardEachDay->reward_type == 'boost' && $userRewardRecordCount > 0) {
-                $userBoost = $user->boosts()->where('name', $rewardEachDay->reward_name)->first();
+                $boostId = Boost::where('name', $rewardEachDay->reward_name)->first()->id;
+                $userBoost = $user->boosts()->where('boost_id', $boostId)->first();
               
                 if ($userBoost === null) {
                     $user->boosts()->create([
