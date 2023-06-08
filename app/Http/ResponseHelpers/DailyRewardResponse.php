@@ -27,18 +27,26 @@ class DailyRewardResponse
         $users = User::all();
         foreach ($users as $user) {
             $userLastRecord = $user->rewards()
-            ->wherePivot('reward_count', 0)
-            ->latest('pivot_created_at')
-            ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
-            ->first();
-            $userRewardRecordCount = $userLastRecord->pivot->reward_milestone;
-            $userRecord = UserReward::where('user_id', $user->id)->where('reward_count', 1)->where('reward_milestone', $reward->reward_benefit_id)->first();
-            if ($reward->reward_benefit_id == $userRewardRecordCount && !$userRecord) {
-                return true;
-            } else{
-                return false;
+                ->wherePivot('reward_count', 0)
+                ->latest('pivot_created_at')
+                ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
+                ->first();
+            
+            if ($userLastRecord && $reward->reward_benefit_id == $userLastRecord->pivot->reward_milestone) {
+                $userRecord = UserReward::where('user_id', $user->id)
+                    ->where('reward_count', 1)
+                    ->where('reward_milestone', $reward->reward_benefit_id)
+                    ->first();
+                
+                if (!$userRecord) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
+        
+        return false; 
     }
  
     private function isClaimed($reward)
