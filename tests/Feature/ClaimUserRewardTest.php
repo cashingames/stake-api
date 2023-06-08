@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Boost;
 use App\Models\RewardBenefit;
 use App\Models\User;
+use App\Models\UserBoost;
 use App\Models\UserReward;
 use Carbon\Carbon;
 use Carbon\Factory;
@@ -55,6 +56,33 @@ class ClaimUserRewardTest extends TestCase
         $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
             'reward_count' => 1,
+        ]);
+    }
+
+    public function test_a_user_boost_count_is_updated_after_claiming_daily_reward()
+    {
+        UserReward::create([
+            'user_id' => $this->user->id,
+            'reward_id' => 1,
+            'reward_count' => 0,
+            'reward_date' => Carbon::now(),
+            'release_on' => Carbon::now(),
+            'reward_milestone' => 1,
+        ]);
+        $rewardBenefit = RewardBenefit::first();
+       $userBoost = UserBoost::create([
+            'id' => 1,
+            'user_id' => $this->user->id,
+            'boost_id' => Boost::where('name', $rewardBenefit->reward_name)->first()->id,
+            'boost_count' => 1,
+            'used_count' => 0
+        ]);
+        $response = $this->post('/api/v3/claim/user-reward');
+
+        $this->assertDatabaseHas('user_boosts', [
+            'user_id' => $this->user->id,
+            'boost_id' => Boost::where('name', $rewardBenefit->reward_name)->first()->id,
+            'boost_count' => $userBoost->boost_count + $rewardBenefit->reward_count,
         ]);
     }
 
