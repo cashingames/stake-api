@@ -33,10 +33,12 @@ class UserController extends BaseController
         $result->referralCode = $this->user->username;
         $result->walletBalance = $this->user->wallet->non_withdrawable + $this->user->wallet->withdrawable;
         $result->bonusBalance = $this->user->wallet->bonus;
+        $result->hasBonus = $this->user->wallet->hasBonus();
         $result->withdrawableBalance = $this->user->wallet->withdrawable;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
+
 
         if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
             $result->points = $this->user->points();

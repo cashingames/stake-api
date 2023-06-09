@@ -173,15 +173,15 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         //if total session is greater than 10
-        $todaysSessions = Staking::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->toDateString())
-            ->count();
-        if ($todaysSessions > 10) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You have reached your daily limit of 10 games, please try again tomorrow'
-            );
-        }
+        // $todaysSessions = Staking::where('user_id', auth()->id())
+        //     ->whereDate('created_at', now()->toDateString())
+        //     ->count();
+        // if ($todaysSessions > 10) {
+        //     return $validator->errors()->add(
+        //         'staking_amount',
+        //         'You have reached your daily limit of 10 games, please try again tomorrow'
+        //     );
+        // }
     }
 
     private function validateLiveTrivia($validator)
