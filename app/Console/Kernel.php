@@ -41,20 +41,20 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:daily-activate')->withoutOverlapping()
             ->dailyAt('00:03');
 
-        if (FeatureFlag::isEnabled(FeatureFlags::SEND_AUTOMATED_REPORTS)) {
-            $schedule->command('daily-report:send')
-                ->dailyAt('01:00');
-            $schedule->command('weekly-report:send')
-                ->dailyAt('01:00');
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::SEND_AUTOMATED_REPORTS)) {
+        //     $schedule->command('daily-report:send')
+        //         ->dailyAt('01:00');
+        //     $schedule->command('weekly-report:send')
+        //         ->dailyAt('01:00');
+        // }
 
         $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
         // fcm:contraint-reminder
-        $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
-        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
-        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
-        $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
-        $schedule->job(ReactivateUserReward::class)->daily();
+        // $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
+        // $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
+        // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
+        // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
+        $schedule->job(ReactivateUserReward::class)->dailyAt('00:05');
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
@@ -88,9 +88,9 @@ class Kernel extends ConsoleKernel
         // }
 
         //This command matures users winnings based on their viable dates
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            $schedule->command('winnings:credit')->withoutOverlapping()->hourly();
-        }
+        // if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
+        //     $schedule->command('winnings:credit')->withoutOverlapping()->hourly();
+        // }
     }
 
     /**
