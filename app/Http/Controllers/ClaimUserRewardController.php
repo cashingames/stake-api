@@ -7,16 +7,24 @@ use App\Models\Reward;
 use App\Models\RewardBenefit;
 use App\Models\User;
 use App\Models\UserReward;
+use Illuminate\Http\Request;
 
 class ClaimUserRewardController extends BaseController
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
+
+        $request->validate([
+            'day' => ['required', 'integer'],
+        ]);
+
         $user = auth()->user();
-        $userLastRecord = $user->rewards()
-            ->orderBy('reward_date', 'desc')
-            ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
-            ->first();
+
+        $userLastRecord  = $user->rewards()->where('reward_milestone', $request->day)->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')->first();
+
+        if ($userLastRecord->pivot->reward_count > 0) {
+            return $this->sendResponse('Reward Claimed', 'Reward Claimed');
+        }
 
         if ($userLastRecord) {
             $userLastRecord->pivot->reward_count = 1;
@@ -54,16 +62,19 @@ class ClaimUserRewardController extends BaseController
                 ]);
             }
         }
-        $reward = Reward::where('name', 'daily_rewards')->first();
 
-        UserReward::create([
-            'user_id' => $user->id,
-            'reward_id' => $reward->id,
-            'reward_count' => 0,
-            'reward_date' => now(),
-            'release_on' => now(),
-            'reward_milestone' => $userRewardRecordCount + 1
-        ]);
+        if ($request->day < 7) {
+            $reward = Reward::where('name', 'daily_rewards')->first();
+
+            UserReward::create([
+                'user_id' => $user->id,
+                'reward_id' => $reward->id,
+                'reward_count' => 0,
+                'reward_date' => now(),
+                'release_on' => now(),
+                'reward_milestone' => $userRewardRecordCount + 1
+            ]);
+        }
 
         return $this->sendResponse('Reward Claimed', 'Reward Claimed');
     }
