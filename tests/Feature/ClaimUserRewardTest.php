@@ -52,7 +52,7 @@ class ClaimUserRewardTest extends TestCase
             'reward_milestone' => 1,
         ]);
 
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 1
         ]);
 
@@ -80,7 +80,7 @@ class ClaimUserRewardTest extends TestCase
             'boost_count' => 1,
             'used_count' => 0
         ]);
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 1
         ]);
 
@@ -103,7 +103,7 @@ class ClaimUserRewardTest extends TestCase
         ]);
 
         $rewardBenefit = RewardBenefit::first();
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 1
         ]);
         $this->assertDatabaseHas('user_boosts', [
@@ -129,7 +129,7 @@ class ClaimUserRewardTest extends TestCase
         $userRewardRecordCount = $userRewardRecord->reward_milestone;
         $rewardBenefit = RewardBenefit::where('reward_benefit_id', $userRewardRecordCount)->first();
 
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 4
         ]);
         $this->assertDatabaseHas('user_coins', [
@@ -150,7 +150,7 @@ class ClaimUserRewardTest extends TestCase
         ]);
 
         $userRewardRecordCount = $this->user->rewards()->count();
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 1
         ]);
 
@@ -176,7 +176,7 @@ class ClaimUserRewardTest extends TestCase
 
         $userRewardRecordCount = $this->user->rewards()->count();
 
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 1
         ]);
 
@@ -198,7 +198,7 @@ class ClaimUserRewardTest extends TestCase
             'reward_milestone' => 7,
         ]);
 
-        $this->post('/api/v3/claim/user-reward', [
+        $this->post('/api/v3/user-reward/claim', [
             'day' => 7
         ]);
 

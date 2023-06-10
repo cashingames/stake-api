@@ -15,13 +15,13 @@ class DailyRewardService
     public function shouldShowDailyReward(User $user)
     {
         $userRewardRecordCount = $user->rewards()->count();
-        
+
         $reward = Reward::find(1);
         $userLastRecord = $user->rewards()
-        ->orderBy('reward_date', 'desc')
-        ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
-        ->first();
-       
+            ->orderBy('reward_date', 'desc')
+            ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
+            ->first();
+
         if ($userRewardRecordCount == 0) {
             $newUserRewardRecord = $user->rewards()->attach($reward->id, [
                 'reward_count' => 0,
@@ -32,7 +32,8 @@ class DailyRewardService
             $rewardClaimableDay = $this->getTodayReward();
             return response()->json([
                 "shouldShowPopup" => true,
-                'reward' => $rewardClaimableDay], 200);
+                'reward' => $rewardClaimableDay
+            ], 200);
         }
 
         if ($userRewardRecordCount > 0 && $userRewardRecordCount <= 7) {
@@ -41,32 +42,37 @@ class DailyRewardService
             if ($userLastRewardClaimDate->isSameDay($currentDate)) {
                 return response()->json([
                     "shouldShowPopup" => false,
-                    'reward' => []], 200);
+                    'reward' => []
+                ], 200);
             }
             $userRewardCount = $userLastRecord->pivot->reward_count;
             if ($userRewardCount == 0 && !$userLastRewardClaimDate->isSameDay($currentDate)) {
                 $rewardClaimableDay = $this->getTodayReward();
                 return response()->json([
                     "shouldShowPopup" => true,
-                    'reward' => $rewardClaimableDay], 200);
+                    'reward' => $rewardClaimableDay
+                ], 200);
             }
             if ($userLastRewardClaimDate->diffInDays($currentDate) > 1) {
                 $this->missDailyReward();
                 dispatch(new ReactivateUserReward());
                 return response()->json([
                     "shouldShowPopup" => false,
-                    'reward' => []], 200);
+                    'reward' => []
+                ], 200);
             }
             if ($userRewardCount == -1) {
                 dispatch(new ReactivateUserReward());
                 return response()->json([
                     "shouldShowPopup" => false,
-                    'reward' => []], 200);
+                    'reward' => []
+                ], 200);
             }
         } else {
             return response()->json([
                 "shouldShowPopup" => false,
-                'reward' => []], 200);
+                'reward' => []
+            ], 200);
         }
     }
 
@@ -84,11 +90,6 @@ class DailyRewardService
     public function missDailyReward()
     {
         $user = auth()->user();
-        $userClaimedRewards = UserReward::where('user_id', $user->id)->where('reward_count', 1)->get();
-        foreach($userClaimedRewards as $userClaimedReward){
-            $userClaimedReward->delete();
-        }
-
         $userLastRecord = $user->rewards()
             ->wherePivot('reward_count', 0)
             ->withPivot('reward_count', 'reward_date', 'release_on', 'reward_milestone')
@@ -97,7 +98,11 @@ class DailyRewardService
         if ($userLastRecord) {
             $userLastRecord->pivot->reward_count = -1;
             $userLastRecord->pivot->save();
+
+            $userClaimedRewards = UserReward::where('user_id', $user->id)->where('reward_count', 1)->get();
+            foreach ($userClaimedRewards as $userClaimedReward) {
+                $userClaimedReward->delete();
+            }
         }
     }
 }
- 

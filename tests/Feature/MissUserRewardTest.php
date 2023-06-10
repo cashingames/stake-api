@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class DismissUserRewardTest extends TestCase
+class MissUserRewardTest extends TestCase
 {
     /**
      * A basic feature test example.
@@ -30,7 +30,7 @@ class DismissUserRewardTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_a_user_can_dismiss_reward()
+    public function test_a_user_can_miss_reward()
     {
 
         UserReward::create([
@@ -50,7 +50,7 @@ class DismissUserRewardTest extends TestCase
             'reward_milestone' => 1,
         ]);
 
-        $response = $this->post('/api/v3/dismiss/user-reward');
+        $response = $this->post('/api/v3/user-reward/miss');
 
         $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,

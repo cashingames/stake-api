@@ -35,7 +35,7 @@ use App\Http\Controllers\GetLiveTriviaLeaderboardController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\ChallengeGlobalLeadersController;
 use App\Http\Controllers\ClaimUserRewardController;
-use App\Http\Controllers\DismissUserRewardController;
+use App\Http\Controllers\MissUserRewardController;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetContestDetailsController;
 use App\Http\Controllers\GetSingleContestController;
@@ -128,8 +128,8 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
         Route::post('challenges/create', StartChallengeRequestController::class);
         Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
-        Route::post('claim/user-reward', ClaimUserRewardController::class);
-        Route::post('dismiss/user-reward', DismissUserRewardController::class);
+        Route::post('user-reward/claim', ClaimUserRewardController::class);
+        Route::post('user-reward/miss', MissUserRewardController::class);
     }
 );
 
