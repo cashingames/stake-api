@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
+use App\Models\UserReward;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,17 +24,9 @@ class ReactivateUserReward implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(User $user): void
+    public function handle(): void
     {
-        $userLastRecord = $user->rewards()
-            ->wherePivot('reward_count', -1)
-            ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
-            ->first();
-
-        if ($userLastRecord) {
-            $userLastRecord->pivot->reward_count = 0;
-            $userLastRecord->pivot->reward_milestone = 1;
-            $userLastRecord->save();
-        }
+        UserReward::where('reward_count', -1)
+            ->update(['reward_count' => 0, 'reward_milestone' => 1]);
     }
 }
