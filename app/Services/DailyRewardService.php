@@ -14,16 +14,17 @@ class DailyRewardService
 {
     public function shouldShowDailyReward(User $user)
     {
-        $userRewardRecordCount = $user->rewards()->count();
 
-        $reward = Reward::find(1);
         $userLastRecord = $user->rewards()
             ->orderBy('reward_date', 'desc')
             ->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')
             ->first();
 
+        $userRewardRecordCount = $user->rewards()->count();
+
         if ($userRewardRecordCount == 0) {
-            $newUserRewardRecord = $user->rewards()->attach($reward->id, [
+            $reward = Reward::where('name', 'daily_rewards')->first();
+            $user->rewards()->attach($reward->id, [
                 'reward_count' => 0,
                 'reward_date' => now(),
                 'release_on' => now(),
