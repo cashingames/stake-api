@@ -24,12 +24,16 @@ class DailyRewardService
 
         if ($userRewardRecordCount == 0) {
             $reward = Reward::where('name', 'daily_rewards')->first();
-            $user->rewards()->attach($reward->id, [
-                'reward_count' => 0,
-                'reward_date' => now(),
-                'release_on' => now(),
-                'reward_milestone' => 1,
-            ]);
+            if ($reward) {
+                UserReward::create([
+                    'user_id' => $user->id,
+                    'reward_id' => $reward->id,
+                    'reward_count' => 0,
+                    'reward_date' => now(),
+                    'release_on' => now(),
+                    'reward_milestone' => 1,
+                ]);
+            }
             $rewardClaimableDay = $this->getTodayReward();
             return response()->json([
                 "shouldShowPopup" => true,
