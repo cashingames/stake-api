@@ -105,6 +105,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('profile/me/edit-bank', [ProfileController::class, 'editBank']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);
         Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
+        Route::post('referrer/update', [ProfileController::class, 'updateReferrer']);
         Route::get('wallet/me', [WalletController::class, 'me']);
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
         Route::get('wallet/me/transactions/earnings', [WalletController::class, 'earnings']);

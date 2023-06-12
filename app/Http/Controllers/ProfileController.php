@@ -11,6 +11,9 @@ use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Enums\ClientPlatform;
+use Illuminate\Support\Facades\Event;
+use App\Events\AchievementBadgeEvent;
+use App\Enums\AchievementType;
 
 class ProfileController extends BaseController
 {
@@ -100,6 +103,30 @@ class ProfileController extends BaseController
         }
 
         return $this->sendResponse($this->user, "Profile Updated.");
+    }
+
+    public function updateReferrer(Request $request)
+    {
+
+        $data = $request->validate([
+            'referrer' => ['required', 'string', 'exists:users,username']
+        ]);
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if ($profile == null) {
+            return $this->sendError(['Profile not found'], "Unable to update profile");
+        }
+
+        $profile->referrer = $data['referrer'];
+        $profile->save();
+
+        $profileReferral = User::where('username', $data["referrer"])->first();
+        if ($profileReferral != null) {
+            Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
+        }
+
+        return $this->sendResponse($user, "Profile Updated.");
     }
 
     public function editBank(Request $request)

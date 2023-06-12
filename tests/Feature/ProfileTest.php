@@ -27,6 +27,7 @@ class ProfileTest extends TestCase
 
     const PROFILE_DATA_URL = '/api/v3/user/profile';
     const CHANGE_PASSWORD_URL = '/api/v2/profile/me/password/change';
+    const UPDATE_REFERRER_URL = '/api/v3/referrer/update';
     protected $user;
 
     protected function setUp(): void
@@ -223,6 +224,17 @@ class ProfileTest extends TestCase
         $this->assertEquals($response->first_name, $profile1->first_name);
     }
 
+    public function test_that_referrer_can_be_updated()
+    {
+        $response = $this->postjson(self::UPDATE_REFERRER_URL, [
+            'referrer' => User::skip(1)->first()->username,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => "Profile Updated.",
+        ]);
+    }
     public function test_that_password_can_be_changed()
     {
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
