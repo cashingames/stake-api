@@ -141,36 +141,36 @@ class StartSinglePlayerRequest extends FormRequest
             }
         }
 
-        $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
-        if ($userProfit > 300) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again tomorrow'
-            );
-        }
+        // $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
+        // if ($userProfit > 300) {
+        //     return $validator->errors()->add(
+        //         'staking_amount',
+        //         'You are a genius!, please try again tomorrow'
+        //     );
+        // }
 
-        $platformProfit = Cache::remember(
-            'platform-profit-today',
-            60 * 3,
-            fn () => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
-        );
+        // $platformProfit = Cache::remember(
+        //     'platform-profit-today',
+        //     60 * 3,
+        //     fn () => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
+        // );
 
-        if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again later'
-            );
-        }
+        // if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
+        //     return $validator->errors()->add(
+        //         'staking_amount',
+        //         'You are a genius!, please try again later'
+        //     );
+        // }
 
-        $percentWonThisYear = $this->walletRepository
-            ->getUserProfitPercentageOnStakingThisYear(auth()->id());
+        // $percentWonThisYear = $this->walletRepository
+        //     ->getUserProfitPercentageOnStakingThisYear(auth()->id());
 
-        if ($percentWonThisYear > 300 && $platformProfit < config('trivia.platform_target')) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again tomorrow'
-            );
-        }
+        // if ($percentWonThisYear > 300 && $platformProfit < config('trivia.platform_target')) {
+        //     return $validator->errors()->add(
+        //         'staking_amount',
+        //         'You are a genius!, please try again tomorrow'
+        //     );
+        // }
 
         //if total session is greater than 10
         // $todaysSessions = Staking::where('user_id', auth()->id())

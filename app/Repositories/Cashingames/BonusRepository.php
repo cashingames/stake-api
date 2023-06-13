@@ -5,6 +5,7 @@ namespace App\Repositories\Cashingames;
 use App\Models\Bonus;
 use App\Models\User;
 use App\Models\UserBonus;
+use App\Models\Wallet;
 
 class BonusRepository
 {
@@ -28,14 +29,19 @@ class BonusRepository
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
-    {
-        UserBonus::where('user_id', $user->id)
-            ->where('bonus_id', $bonus->id)
-            ->where('is_on', true)->update([
-                'is_on' => false
-            ]);
-        $user->wallet->bonus = $user->wallet->bonus - $bonus->amount_remaining_after_staking;
-        $user->wallet->save();
+    {   
+        $userBonus = UserBonus::where('user_id', $user->id)
+        ->where('bonus_id', $bonus->id)
+        ->where('is_on', true)->first();
+        
+        $wallet = Wallet::where('user_id',$user->id)->first();
+      
+        $wallet->bonus = $wallet->bonus - $userBonus->amount_remaining_after_staking;
+        $wallet->save();
+        
+        $userBonus->update([
+            'is_on' => false
+        ]);
     }
 
     public function updateWonAmount(Bonus $bonus, User $user, float $amount)
