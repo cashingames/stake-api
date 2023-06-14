@@ -51,6 +51,13 @@ class DailyRewardService
                 ], 200);
             }
             $userRewardCount = $userLastRecord->pivot->reward_count;
+            if ($userRewardCount >= 1 && !$userLastRewardClaimDate->isSameDay($currentDate)) {
+                $rewardClaimableDay = $this->getTodayReward();
+                return response()->json([
+                    "shouldShowPopup" => true,
+                    'reward' => $rewardClaimableDay
+                ], 200);
+            }
             if ($userRewardCount == 0 && !$userLastRewardClaimDate->isSameDay($currentDate)) {
                 $rewardClaimableDay = $this->getTodayReward();
                 return response()->json([
