@@ -55,6 +55,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
         // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
         $schedule->job(ReactivateUserReward::class)->dailyAt('00:05');
+        $schedule->command('app:send-user-game-stats-email')
+        ->everyTwoWeeks();
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
