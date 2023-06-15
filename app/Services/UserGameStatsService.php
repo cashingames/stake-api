@@ -31,7 +31,7 @@ class UserGameStatsService
             ->where('created_at', '<=', $endDate)
             ->count();
 
-        $totalQuestions = GameSession::where('user_id', $user->id)
+        $totalGamePlayed = GameSession::where('user_id', $user->id)
             ->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
             ->count();
@@ -41,7 +41,7 @@ class UserGameStatsService
             ->where('created_at', '<=', $endDate)
             ->sum('correct_count');
 
-        $this->correctCountAverage = ($totalQuestions/$totalCorrectAnswers) * 100;
+            $this->correctCountAverage = ($totalGamePlayed !== 0) ? ($totalGamePlayed / $totalCorrectAnswers) * 100 : 0;
 
         $this->userTotalBoost = DB::table('user_boosts')
             ->where('user_id', $user->id)
