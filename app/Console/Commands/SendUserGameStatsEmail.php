@@ -9,8 +9,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use App\Traits\Utils\DateUtils;
 use Carbon\Carbon;
-
-
+use Illuminate\Support\Facades\Log;
 
 class SendUserGameStatsEmail extends Command
 {
@@ -44,7 +43,7 @@ class SendUserGameStatsEmail extends Command
             if($eligibleUser > 0){
                 $data = $userGameReport->getBiWeeklyUserGameStats($user);
                 Mail::to($user->email)->send(new UserGameStatsEmail($data));
-                $this->info('User Game Stats email sent to test address successfully.');
+                Log::info('User Game Stats email sent to test address successfully.');
             }
            
         }
