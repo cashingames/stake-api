@@ -46,7 +46,7 @@
             </tr>
              <tr>
                 <td style="border: 1px solid #0D2859; padding: 10px; font-size: 0.8rem;  color: #fff">Category played the most</td>
-                <td style="border: 1px solid #0D2859; padding: 10px; font-size: 0.8rem;  color: #000;  font-weight: 600">{{$data['category']['name']}}</td>
+                <td style="border: 1px solid #0D2859; padding: 10px; font-size: 0.8rem;  color: #000;  font-weight: 600"> {{ $data['category']['name'] ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <td style="border: 1px solid #0D2859; padding: 10px; font-size: 0.8rem;  color: #fff">Win Rate</td>

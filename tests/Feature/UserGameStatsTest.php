@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Mail\UserGameStatsEmail;
 use App\Models\GameSession;
 use App\Models\User;
 use App\Services\UserGameStatsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class UserGameStatsTest extends TestCase
@@ -35,4 +37,14 @@ class UserGameStatsTest extends TestCase
         $dailyReports = $this->userStatsService->getBiWeeklyUserGameStats($this->user);
         $this->assertCount(6, $dailyReports);
     }
+    public function test_that_send_user_game_stats_command_runs()
+    {
+        Mail::fake();
+
+        $this->artisan('app:send-user-game-stats-email')
+        ->assertExitCode(0);
+
+        Mail::assertSent(UserGameStatsEmail::class);
+    }
+
 }
