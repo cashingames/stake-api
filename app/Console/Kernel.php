@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpireDailyBonusGames::class,
         Commands\GiveDailyBonusGames::class,
         Commands\CreditWinnings::class,
+        Commands\SendUserGameStatsEmail::class
         // Commands\SendInAppActivityUpdates::class,
         // ComputeUsersLevelsCommand::class
     ];
@@ -56,6 +57,10 @@ class Kernel extends ConsoleKernel
         // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
         // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
         $schedule->job(ReactivateUserReward::class)->dailyAt('00:05');
+        $schedule->command('app:send-user-game-stats-email')->when(function () {
+            return now()->weekOfYear % 2 == 0;
+        });
+        
 
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
