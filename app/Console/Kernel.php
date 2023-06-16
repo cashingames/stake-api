@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Enums\FeatureFlags;
+use App\Jobs\ReactivateUserReward;
 use App\Services\FeatureFlag;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
