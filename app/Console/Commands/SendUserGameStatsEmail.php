@@ -37,10 +37,10 @@ class SendUserGameStatsEmail extends Command
         foreach ($users as $user) {
             $startDate = Carbon::now()->subWeeks(2)->startOfDay();
             $endDate = Carbon::now();
-            $eligibleUser = $user->gameSessions()->where('created_at', '>=', $startDate)
+            $userGameCount = $user->gameSessions()->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
             ->count();
-            if($eligibleUser > 0){
+            if($userGameCount > 0){
                 $data = $userGameReport->getBiWeeklyUserGameStats($user);
                 Mail::to($user->email)->send(new UserGameStatsEmail($data));
                 Log::info('User Game Stats email sent to test address successfully.');
