@@ -57,11 +57,11 @@ class Kernel extends ConsoleKernel
         // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
         // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
         $schedule->job(ReactivateUserReward::class)->dailyAt('00:05');
-        $schedule->command('app:send-user-game-stats-email')->when(function () {
-            return now()->weekOfYear % 2 == 0;
-        });
         
-
+        $schedule->command('app:send-user-game-stats-email')->weekly()->mondays()
+        ->when(function () {
+            return date('W') % 2;
+         })->at("13:38");
 
         // if (FeatureFlag::isEnabled(FeatureFlags::LIVE_TRIVIA_START_TIME_NOTIFICATION)) {
         //     $schedule->command('live-trivia:notify')->withoutOverlapping()->everyMinute();
