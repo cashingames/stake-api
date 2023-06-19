@@ -38,6 +38,7 @@ class UserController extends BaseController
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
+        $result->meta = $this->user->meta_data;
 
 
         if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {

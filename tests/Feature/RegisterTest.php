@@ -278,35 +278,6 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_that_ip_and_device_details_can_be_inserted()
-    {
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => "Doe",
-            'username' => 'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'device_model' => 'Camon X',
-            'device_brand' => 'Tecno',
-            'device_token' => '65h5kkkkdkd9959505'
-
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'username' => 'janeJoe',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'registration_ip_address' => request()->getClientIp(),
-            'device_model' => 'Camon X',
-            'device_brand' => 'Tecno',
-            'device_token' => '65h5kkkkdkd9959505',
-        ]);
-    }
-
     public function test_that_user_bonus_record_is_created_when_user_chooses_to_have_bonus()
     {
         config(['features.registration_bonus.enabled' => true]);

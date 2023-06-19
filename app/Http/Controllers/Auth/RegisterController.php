@@ -107,6 +107,12 @@ class RegisterController extends BaseController
     {
         //create the user
 
+        //    $metaArray = array(
+        //         'device_brand' => $data['device_brand'] ?? " ",
+        //         'device_token' => $data['device_token'] ?? " ",
+        //         'registration_ip_address' => request()->getClientIp(),
+        //         'device_model' => json_encode($data['device_model']) ?? " ",
+        //     );
         $user =
             User::create([
                 'username' => $data['username'],
@@ -118,10 +124,14 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
-                'registration_ip_address' => request()->getClientIp(),
-                'device_model' => $data['device_model'] ?? null,
-                'device_brand' => $data['device_brand'] ?? null,
-                'device_token' => $data['device_token'] ?? null,
+                'meta_data' => json_encode([
+                    'device_model' => $data['device_model'] ?? " ",
+                    'device_brand' => $data['device_brand'] ?? " ",
+                    'device_token' => $data['device_token'] ?? " ",
+                    'registration_ip_address' => request()->ip(),
+                ])
+
+
             ]);
 
         //create the profile
