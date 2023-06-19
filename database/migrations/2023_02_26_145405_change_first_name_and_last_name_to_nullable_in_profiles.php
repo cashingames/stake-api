@@ -26,9 +26,11 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('nullable_in_profiles', function (Blueprint $table) {
-            $table->string('first_name')->nullable()->change();
-            $table->string('last_name')->nullable()->change();
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->string('first_name')->nullable(false)->change();
+        });
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->string('last_name')->nullable(false)->change();
         });
     }
 };

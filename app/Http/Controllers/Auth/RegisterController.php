@@ -90,7 +90,10 @@ class RegisterController extends BaseController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
-            'bonus_checked' => ['nullable', 'boolean']
+            'bonus_checked' => ['nullable', 'boolean'],
+            'device_model' => ['nullable', 'string'],
+            'device_brand' => ['nullable', 'string'],
+            'device_token' => ['nullable', 'string']
         ]);
     }
 
@@ -115,6 +118,10 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
+                'registration_ip_address' => request()->getClientIp(),
+                'device_model' => $data['device_model'] ?? null,
+                'device_brand' => $data['device_brand'] ?? null,
+                'device_token' => $data['device_token'] ?? null,
             ]);
 
         //create the profile
@@ -155,7 +162,7 @@ class RegisterController extends BaseController
         } else {
             $this->cashingamesSignupBonus($user);
         }
-        
+
         if (
             config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
@@ -250,7 +257,7 @@ class RegisterController extends BaseController
         Request $request,
         SMSProviderInterface $smsService,
     ) {
-        
+
         $this->validator($request->all())->validate();
 
         $user = $this->create($request->all());

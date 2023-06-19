@@ -32,7 +32,12 @@ class User extends Authenticatable implements JWTSubject
         'brand_id',
         'apple_user_id',
         'email_verified_at',
-        'last_activity_time'
+        'last_activity_time',
+        'device_model',
+        'device_token',
+        'device_brand',
+        'registration_ip_address',
+        'login_ip_address'
     ];
 
     /**

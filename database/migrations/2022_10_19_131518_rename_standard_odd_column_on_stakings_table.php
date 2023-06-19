@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('odds_rules', function(Blueprint $table){ 
+        Schema::table('stakings', function(Blueprint $table){ 
             $table->renameColumn('odd_applied_during_staking', 'standard_odd');
         });
     }

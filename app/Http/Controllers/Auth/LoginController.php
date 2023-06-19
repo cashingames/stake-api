@@ -52,8 +52,8 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if($clientPlatform != ClientPlatform::GameArkMobile){
-            if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
+        if ($clientPlatform != ClientPlatform::GameArkMobile) {
+            if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
                 if ($user->phone_verified_at == null) {
 
                     return $this->sendError([
@@ -62,7 +62,7 @@ class LoginController extends BaseController
                         'phoneNumber' => $user->phone_number
                     ], 'Account not verified');
                 }
-            }else{
+            } else {
                 if ($user->email_verified_at == null) {
                     return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
                 }
@@ -92,7 +92,7 @@ class LoginController extends BaseController
     protected function respondWithToken($token)
     {
         $user =  auth()->user();
-        $user->update(["is_on_line" => true]);
+        $user->update(['login_ip_address' => request()->getClientIp()]);
         return $this->sendResponse($token, 'Token');
     }
 }
