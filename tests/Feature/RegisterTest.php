@@ -254,13 +254,13 @@ class RegisterTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_brand_id_can_be_inserted_stakers_app()
+    public function test_brand_id_can_be_inserted()
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -270,7 +270,7 @@ class RegisterTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
             'country_code' => '+234',
@@ -278,26 +278,32 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_brand_id_can_be_inserted_in_fun_app()
+    public function test_that_ip_and_device_details_can_be_inserted()
     {
 
-        $this->postjson(self::REGISTER_URL, [
+        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
             'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
+            'last_name' => "Doe",
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
             'password' => 'password',
-            'password_confirmation' => 'password'
+            'password_confirmation' => 'password',
+            'device_model' => 'Camon X',
+            'device_brand' => 'Tecno',
+            'device_token' => '65h5kkkkdkd9959505'
 
         ]);
 
         $this->assertDatabaseHas('users', [
+            'username' => 'janeJoe',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
-            'country_code' => '+234',
-            'brand_id' => 1
+            'registration_ip_address' => request()->getClientIp(),
+            'device_model' => 'Camon X',
+            'device_brand' => 'Tecno',
+            'device_token' => '65h5kkkkdkd9959505',
         ]);
     }
 
@@ -307,9 +313,9 @@ class RegisterTest extends TestCase
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -319,23 +325,23 @@ class RegisterTest extends TestCase
 
         ]);
 
-        $user = User::where('email', 'email@email.com' )->first();
+        $user = User::where('email', 'email@email.com')->first();
 
         $this->assertDatabaseHas('user_bonuses', [
-            'user_id'=> $user->id,
+            'user_id' => $user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }
 
     public function test_that_user_bonus_record_is_not_created_when_user_does_not_choose_to_have_bonus()
-    {   
+    {
         config(['features.registration_bonus.enabled' => true]);
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -344,10 +350,10 @@ class RegisterTest extends TestCase
 
         ]);
 
-        $user = User::where('email', 'email@email.com' )->first();
+        $user = User::where('email', 'email@email.com')->first();
 
         $this->assertDatabaseMissing('user_bonuses', [
-            'user_id'=> $user->id,
+            'user_id' => $user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }
