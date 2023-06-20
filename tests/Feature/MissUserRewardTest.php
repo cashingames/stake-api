@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserReward;
+use App\Services\DailyRewardService;
 use Carbon\Carbon;
 use Database\Seeders\RewardSeeder;
 use Database\Seeders\UserSeeder;
@@ -17,9 +18,9 @@ class MissUserRewardTest extends TestCase
      * A basic feature test example.
      */
 
-     use RefreshDatabase, WithFaker;
+    use RefreshDatabase, WithFaker;
 
-     protected $user;
+    protected $user;
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,7 +33,6 @@ class MissUserRewardTest extends TestCase
 
     public function test_a_user_can_miss_reward()
     {
-
         UserReward::create([
             'user_id' => $this->user->id,
             'reward_id' => 1,
@@ -51,6 +51,37 @@ class MissUserRewardTest extends TestCase
         ]);
 
         $response = $this->post('/api/v3/user-reward/miss');
+
+        $this->assertDatabaseHas('user_rewards', [
+            'user_id' => $this->user->id,
+            'reward_count' => -1,
+        ]);
+        $this->assertDatabaseMissing('user_rewards', [
+            'user_id' => $this->user->id,
+            'reward_count' => 1,
+        ]);
+    }
+
+    public function test_a_user_reward_record_resets_when_a_day_or_more_is_missed()
+    {
+        UserReward::create([
+            'user_id' => $this->user->id,
+            'reward_id' => 1,
+            'reward_count' => 0,
+            'reward_date' => Carbon::now()->subDays(3),
+            'release_on' => Carbon::now(),
+            'reward_milestone' => 1,
+        ]);
+        UserReward::create([
+            'user_id' => $this->user->id,
+            'reward_id' => 1,
+            'reward_count' => 1,
+            'reward_date' =>  Carbon::now()->subDays(2),
+            'release_on' => Carbon::now(),
+            'reward_milestone' => 1,
+        ]);
+        $service = new DailyRewardService();
+        $service->shouldShowDailyReward($this->user);
 
         $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
