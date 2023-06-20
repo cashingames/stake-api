@@ -107,12 +107,6 @@ class RegisterController extends BaseController
     {
         //create the user
 
-        //    $metaArray = array(
-        //         'device_brand' => $data['device_brand'] ?? " ",
-        //         'device_token' => $data['device_token'] ?? " ",
-        //         'registration_ip_address' => request()->getClientIp(),
-        //         'device_model' => json_encode($data['device_model']) ?? " ",
-        //     );
         $user =
             User::create([
                 'username' => $data['username'],

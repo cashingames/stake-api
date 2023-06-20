@@ -38,25 +38,14 @@ class UserController extends BaseController
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
-        $result->meta = $this->user->meta_data;
-
-
-        if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
-            $result->points = $this->user->points();
-            $result->todaysPoints = $this->user->todaysPoints();
-            $result->globalRank = $this->user->rank;
-            $result->gamesCount = $this->user->played_games_count;
-            $result->totalChallenges = $this->user->challenges_played;
-            $result->winRate = $this->user->win_rate;
-            $result->badge = $this->user->achievement;
-            $result->achievements = $this->user->userAchievements();
-            $result->activePlans = $this->composeUserPlans();
-            $result->hasActivePlan = $this->user->hasActivePlan();
-            $result->boosts = $this->user->gameArkUserBoosts();
-            $result->coinsBalance = $this->user->getUserCoins();
-        } else {
-            $result->boosts = $this->user->userBoosts();
-        }
+        $result->points = $this->user->points();
+        $result->todaysPoints = $this->user->todaysPoints();
+        $result->globalRank = $this->user->rank;
+        $result->gamesCount = $this->user->played_games_count;
+        $result->winRate = $this->user->win_rate;
+        $result->badge = $this->user->achievement;
+        $result->achievements = $this->user->userAchievements();
+        $result->boosts = $this->user->userBoosts();
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }
