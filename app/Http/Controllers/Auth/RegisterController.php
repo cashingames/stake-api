@@ -90,7 +90,10 @@ class RegisterController extends BaseController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
-            'bonus_checked' => ['nullable', 'boolean']
+            'bonus_checked' => ['nullable', 'boolean'],
+            'device_model' => ['nullable', 'string'],
+            'device_brand' => ['nullable', 'string'],
+            'device_token' => ['nullable', 'string']
         ]);
     }
 
@@ -115,6 +118,12 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
+                'meta_data' => json_encode([
+                    'device_model' => $data['device_model'] ?? "",
+                    'device_brand' => $data['device_brand'] ?? "",
+                    'device_token' => $data['device_token'] ?? "",
+                    'registration_ip_address' => request()->ip(),
+                ])
             ]);
 
         //create the profile
