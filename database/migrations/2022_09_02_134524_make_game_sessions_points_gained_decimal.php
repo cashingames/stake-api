@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('game_sessions', function (Blueprint $table) {
-            $table->tinyInteger('points_gained')->change();
+            $table->integer('points_gained')->change();
         });
     }
 };

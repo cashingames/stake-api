@@ -28,8 +28,9 @@ class AddNewColumnsToGameModes extends Migration
     public function down()
     {
         Schema::table('game_modes', function (Blueprint $table) {
-            //
             $table->dropColumn('icon');
+        });
+        Schema::table('game_modes', function (Blueprint $table) {
             $table->dropColumn('background_color');
         });
     }

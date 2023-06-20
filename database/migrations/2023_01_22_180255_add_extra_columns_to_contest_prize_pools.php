@@ -28,6 +28,8 @@ return new class extends Migration
     {
         Schema::table('contest_prize_pools', function (Blueprint $table) {
             $table->dropColumn('each_prize');
+        });
+        Schema::table('contest_prize_pools', function (Blueprint $table) {
             $table->dropColumn('net_prize');
         });
     }

@@ -28,6 +28,8 @@ return new class extends Migration
     {
         Schema::table('game_sessions', function (Blueprint $table) {
             $table->dropColumn(['odd_multiplier']);
+        });
+        Schema::table('game_sessions', function (Blueprint $table) {
             $table->dropColumn(['odd_condition']);
         });
     }
