@@ -92,7 +92,11 @@ class LoginController extends BaseController
     protected function respondWithToken($token)
     {
         $user =  auth()->user();
-        $user->update(["is_on_line" => true]);
+
+        $metaData = json_decode($user->meta_data, true);
+        $metaData['login_ip_address'] = request()->ip();
+        $user->meta_data = json_encode($metaData);
+        $user->save();
         return $this->sendResponse($token, 'Token');
     }
 }

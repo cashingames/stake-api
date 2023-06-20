@@ -116,4 +116,17 @@ class LoginTest extends TestCase
             'errors' => 'Invalid email or password',
         ]);
     }
+
+    public function test_that_ip_address_is_updated_on_login()
+    {
+
+        $response = $this->postjson(self::AUTH_URL, [
+            "email" => $this->user->email,
+            "password" => "password",
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'meta_data->login_ip_address' => request()->ip(),
+        ]);
+    }
 }
