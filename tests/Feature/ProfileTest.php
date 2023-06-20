@@ -59,6 +59,7 @@ class ProfileTest extends TestCase
                 'withdrawableBalance' => $this->user->wallet->withdrawable,
                 'boosts' => [],
                 'achievements' => [],
+                'hasActivePlan' => false,
                 'unreadNotificationsCount' => 0,
             ]
         ]);

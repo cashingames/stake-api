@@ -45,7 +45,10 @@ class UserController extends BaseController
         $result->winRate = $this->user->win_rate;
         $result->badge = $this->user->achievement;
         $result->achievements = $this->user->userAchievements();
+        $result->activePlans = $this->composeUserPlans();
+        $result->hasActivePlan = $this->user->hasActivePlan();
         $result->boosts = $this->user->userBoosts();
+
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }
