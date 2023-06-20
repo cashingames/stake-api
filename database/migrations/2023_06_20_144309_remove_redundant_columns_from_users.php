@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn(['is_on_line']);
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['apple_user_id']);
         });
     }
 
@@ -22,7 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->boolean('is_on_line');
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('apple_user_id');
         });
     }
 };
