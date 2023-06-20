@@ -119,9 +119,9 @@ class RegisterController extends BaseController
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
                 'meta_data' => json_encode([
-                    'device_model' => $data['device_model'] ?? " ",
-                    'device_brand' => $data['device_brand'] ?? " ",
-                    'device_token' => $data['device_token'] ?? " ",
+                    'device_model' => $data['device_model'] ?? "",
+                    'device_brand' => $data['device_brand'] ?? "",
+                    'device_token' => $data['device_token'] ?? "",
                     'registration_ip_address' => request()->ip(),
                 ])
             ]);
