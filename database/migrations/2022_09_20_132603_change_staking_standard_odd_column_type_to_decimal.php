@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('stakings', function (Blueprint $table) {
-            $table->tinyInteger('standard_odd')->change();
+            $table->Integer('standard_odd')->change();
         });
     }
 };

@@ -29,8 +29,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('trivias', function (Blueprint $table) {
-            //
             $table->dropColumn('game_duration');
+        });
+        Schema::table('trivias', function (Blueprint $table) {
             $table->dropColumn('question_count');
         });
     }

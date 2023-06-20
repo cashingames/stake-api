@@ -51,7 +51,7 @@ return new class extends Migration
     {
         
         Schema::table('odds_rules', function(Blueprint $table){
-            $table->dropColumn(['odds_operation', 'odds_symbol']);
+            $table->dropColumn(['odds_operation']);
             // $table->renameColumn('display_name', 'condition');
         });
         Schema::rename("odds_rules", "odds_conditions_and_rules");
@@ -63,6 +63,9 @@ return new class extends Migration
 
         Schema::table('stakings', function (Blueprint $table) {
             $table->renameColumn('amount_staked', 'amount');
+        });
+
+        Schema::table('stakings', function (Blueprint $table) {
             $table->dropColumn(['amount_won']);
         });
 
