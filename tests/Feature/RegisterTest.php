@@ -351,4 +351,30 @@ class RegisterTest extends TestCase
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }
+
+    public function test_that_meta_details_can_be_created_for_user()
+    {
+
+        $this->postjson(self::REGISTER_URL, [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'username' => 'janeDoe',
+            'country_code' => '+234',
+            'phone_number' => '7098498884',
+            'email' => 'email@email.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'device_model' => "Camon",
+            'device_brand' => "Tecno",
+            'device_token' => "255366367484THD"
+
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'meta_data->device_model' => "Camon",
+            'meta_data->device_brand' => "Tecno",
+            'meta_data->device_token' => "255366367484THD",
+            'meta_data->registration_ip_address' => request()->ip(),
+        ]);
+    }
 }
