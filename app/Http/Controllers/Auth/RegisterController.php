@@ -115,6 +115,9 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
+                'device_model' => ['nullable', 'string'],
+                'device_brand' => ['nullable', 'string'],
+                'device_token' => ['nullable', 'string']
             ]);
 
         //create the profile
