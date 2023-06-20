@@ -111,7 +111,6 @@ class SocialSignInController extends BaseController
             'phone_number' =>  str_starts_with($data['phone_number'], '0') ?
                 ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'],
             'password' => bcrypt(Str::random(8)),
-            'is_on_line' => true,
             'email_verified_at' => now(),
             'phone_verified_at' => now()
         ]);

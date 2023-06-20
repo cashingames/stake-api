@@ -115,7 +115,6 @@ class RegisterController extends BaseController
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'email_verified_at' =>  null,
-                'is_on_line' => true,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
                 'meta_data' => json_encode([

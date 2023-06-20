@@ -602,7 +602,6 @@ class GameTest extends TestCase
             'phone_number' => '08133445858',
             'email' => 'testaccount@gmail.com',
             'password' => 'xcvb',
-            'is_on_line' => true,
             'country_code' => 'NGN'
         ]);
         $newUser
