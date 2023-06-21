@@ -44,8 +44,6 @@ class AdsRewardController extends Controller
             ]);
         }
         
-         return response()->json([
-           "message" => "Reward Earned"
-        ], 200);
+        return response("Reward Earned", 200);
     }
 }
