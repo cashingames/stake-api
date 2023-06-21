@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Boost;
 use Illuminate\Http\Request;
 
-class AdsRewardController extends Controller
+class AdsRewardController extends BaseController
 {
     public function __invoke(Request $request)
     {
@@ -17,32 +17,33 @@ class AdsRewardController extends Controller
 
         $user = auth()->user();
 
-        if ($request->adRewardType == 'boost') {
-            $boostId = Boost::where('name', $request->adRewardPrize)->first()->id;
+        if ($request->input('adRewardType') == 'boost') {
+            $boostId = Boost::where('name', $request->input('adRewardPrize'))->first()->id;
             $userBoost = $user->boosts()->where('boost_id', $boostId)->first();
 
             if ($userBoost === null) {
                 $user->boosts()->create([
-                    'boost_id' => Boost::where('name', $request->adRewardPrize)->first()->id,
-                    'boost_count' => $request->rewardCount,
+                    'boost_id' => Boost::where('name', $request->input('adRewardPrize'))->first()->id,
+                    'boost_count' => $request->input('rewardCount'),
                     'used_count' => 0,
                 ]);
             } else {
-                $userBoost->update(['boost_count' => $userBoost->boost_count + $request->rewardCount]);
+                $userBoost->update(['boost_count' => $userBoost->boost_count + $request->input('rewardCount')]);
             }
         }
 
         if ($request->adRewardType == 'coins') {
             $userCoin = $user->userCoins()->firstOrNew();
-            $userCoin->coins_value = $userCoin->coins_value + $request->rewardCount;
+            $userCoin->coins_value = $userCoin->coins_value + $request->input('rewardCount');
             $userCoin->save();
 
             $user->coinsTransaction()->create([
                 'transaction_type' => 'CREDIT',
                 'description' => 'In-app reward coins awarded',
-                'value' => $request->rewardCount,
+                'value' => $request->input('rewardCount'),
             ]);
         }
-        return $this->sendResponse('Reward Earned', 'Reward Earned');
+        
+        return $this->sendResponse("Reward Earned", "Reward Earned");
     }
 }
