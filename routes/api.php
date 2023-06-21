@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AchievementBadeController;
+use App\Http\Controllers\AdsRewardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TriviaController;
 use App\Http\Controllers\WalletController;
@@ -47,6 +48,7 @@ use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\SendOtpToEmailController;
 use App\Http\Controllers\EmailOtpVerificationController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
+use App\Http\Controllers\RewardAdsController;
 use App\Http\Controllers\V3\GetGlobalLeaderboardController;
 
 Route::get('playground', PlayGroundController::class);
@@ -131,6 +133,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
         Route::post('user-reward/claim', ClaimUserRewardController::class);
         Route::post('user-reward/miss', MissUserRewardController::class);
+        Route::post('ads-reward/award', AdsRewardController::class);
     }
 );
 
