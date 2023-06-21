@@ -82,8 +82,10 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
+        $fundSource = $this->user->wallet->hasBonus() ? "BONUS" : "CREDIT";
+
         $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
-        
+
         $odd = 1;
 
         /**
@@ -98,7 +100,8 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $staking = Staking::create([
             'amount_staked' => $stakingAmount,
             'odd_applied_during_staking' => $odd,
-            'user_id' => $this->user->id //@TODO remove from exhibition staking, not in use
+            'user_id' => $this->user->id, //@TODO remove from exhibition staking, not in use
+            'fund_source' => $fundSource
         ]);
 
         return $staking->id;
