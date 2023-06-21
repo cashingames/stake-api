@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Boost;
 use Illuminate\Http\Request;
 
-class RewardAdsController extends Controller
+class AdsRewardController extends Controller
 {
     public function __invoke(Request $request)
     {
@@ -43,6 +43,6 @@ class RewardAdsController extends Controller
                 'value' => $request->rewardCount,
             ]);
         }
-        return $this->sendResponse('Reward Claimed', 'Reward Claimed');
+        return $this->sendResponse('Reward Earned', 'Reward Earned');
     }
 }

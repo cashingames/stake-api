@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class RewardAdsTest extends TestCase
+class AdsRewardTest extends TestCase
 {
     /**
      * A basic feature test example.
@@ -31,7 +31,7 @@ class RewardAdsTest extends TestCase
      
      public function test_user_receieves_boost_ads_reward()
      {
-        $response = $this->post('/api/v3/user-reward/ads-reward', [
+        $response = $this->post('/api/v3/ads-reward/award', [
             'adRewardType' => 'boost',
             'rewardCount' => 4,
             'adRewardPrize' => 'Time Freeze'
@@ -46,7 +46,7 @@ class RewardAdsTest extends TestCase
 
      public function test_user_receieves_coins_ads_reward()
      {
-        $response = $this->post('/api/v3/user-reward/ads-reward', [
+        $response = $this->post('/api/v3/ads-reward/award', [
             'adRewardType' => 'coins',
             'rewardCount' => 30,
             'adRewardPrize' => 'coins'

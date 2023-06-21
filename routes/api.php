@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AchievementBadeController;
+use App\Http\Controllers\AdsRewardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TriviaController;
 use App\Http\Controllers\WalletController;
@@ -132,7 +133,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
         Route::post('user-reward/claim', ClaimUserRewardController::class);
         Route::post('user-reward/miss', MissUserRewardController::class);
-        Route::post('user-reward/ads-reward', RewardAdsController::class);
+        Route::post('ads-reward/award', AdsRewardController::class);
     }
 );
 
