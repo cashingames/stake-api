@@ -17,18 +17,18 @@ class AdsRewardController extends Controller
 
         $user = auth()->user();
 
-        if ($request->adRewardType == 'boost') {
-            $boostId = Boost::where('name', $request->adRewardPrize)->first()->id;
+        if ($request->input('adRewardType') == 'boost') {
+            $boostId = Boost::where('name', $request->input('adRewardPrize'))->first()->id;
             $userBoost = $user->boosts()->where('boost_id', $boostId)->first();
 
             if ($userBoost === null) {
                 $user->boosts()->create([
                     'boost_id' => Boost::where('name', $request->adRewardPrize)->first()->id,
-                    'boost_count' => $request->rewardCount,
+                    'boost_count' => $request->input('rewardCount'),
                     'used_count' => 0,
                 ]);
             } else {
-                $userBoost->update(['boost_count' => $userBoost->boost_count + $request->rewardCount]);
+                $userBoost->update(['boost_count' => $userBoost->boost_count + $request->input('rewardCount')]);
             }
         }
 
@@ -40,9 +40,12 @@ class AdsRewardController extends Controller
             $user->coinsTransaction()->create([
                 'transaction_type' => 'CREDIT',
                 'description' => 'In-app reward coins awarded',
-                'value' => $request->rewardCount,
+                'value' => $request->input('rewardCount'),
             ]);
         }
-        return $this->sendResponse('Reward Earned', 'Reward Earned');
+        
+         return response()->json([
+           "message" => "Reward Earned"
+        ], 200);
     }
 }
