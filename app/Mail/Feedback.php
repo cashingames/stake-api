@@ -14,18 +14,19 @@ class Feedback extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $first_name, $last_name ,$email, $message_body, $appType;
+    public $first_name, $last_name, $email, $phone, $message_body, $appType;
 
     /**
      * Create a new message instance.
      */
 
-    public function __construct($first_name,$last_name,$email,$message_body, $appType)
+    public function __construct($first_name, $last_name, $phone, $email, $message_body, $appType)
     {
         //
 
         $this->first_name = $first_name;
         $this->last_name = $last_name;
+        $this->phone = $phone;
         $this->email = $email;
         $this->message_body = $message_body;
         $this->appType = $appType;
@@ -52,6 +53,7 @@ class Feedback extends Mailable
             with: [
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
+                'phone' => $this->phone,
                 'message' =>  $this->message_body
             ],
         );

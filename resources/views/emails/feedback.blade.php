@@ -54,8 +54,9 @@
                             <tr>
                                 <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box;">
                                     <span class="button button-primary" target="_blank" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; box-sizing: border-box; border-radius: 3px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); display: inline-block; text-decoration: none; -webkit-text-size-adjust: none;">User's Name : {{$first_name}} {{$last_name}}<br>
-                                    Sender's email address: {{$email}} <br>
-                                    Sender's message : {{ $message_body}}
+                                    User's email : {{$email}} <br>
+                                    User's Phone : {{$phone}}<br>
+                                    Message : {{ $message_body}}
 
 
 

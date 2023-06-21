@@ -21,7 +21,7 @@ class SupportTicketService
         $this->ticketKey = config('app.osticket_support_key');
     }
 
-    public function createTicket($firstName, $lastName, $email, $message, $ip,)
+    public function createTicket($firstName, $lastName, $phone, $email, $message, $ip,)
     {
         try {
             Http::withHeaders([
@@ -31,6 +31,7 @@ class SupportTicketService
             ])->post($this->ticketUrl, [
                 'name'     =>   $firstName . ' ' . $lastName,
                 'email'    =>   $email,
+                'phone' => $phone,
                 'subject'   =>  'Inquiry/Complaint',
                 'message'   =>  $message,
                 'ip'       =>   $ip,

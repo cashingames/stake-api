@@ -29,6 +29,7 @@ class FeedbackTest extends TestCase
         $response = $this->post('/api/v2/client/feedback', [
             "first_name" => "Test",
             "last_name" => "User",
+            'phone_number' => '07039999999',
             "email" => "email@user.com",
             "message_body" => "Lorem Ipsum dorem bla bla bla"
         ]);
@@ -77,6 +78,7 @@ class FeedbackTest extends TestCase
         ])->post(config('app.osticket_support_url'), [
             'name'     =>     'Test User',
             'email'    =>     'user@email.com',
+            'phone'     => '07030004949',
             'subject'   =>      'Inquiry/Complaint',
             'message'   =>   'testing feedback',
             'topicId'   =>      '1',
@@ -84,7 +86,6 @@ class FeedbackTest extends TestCase
         ]);
 
         $this->assertEquals($response->getStatusCode(), 200);
-
     }
 
     public function test_faq_and_answers_can_be_fetched()
