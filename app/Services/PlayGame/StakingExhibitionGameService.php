@@ -81,9 +81,13 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
     }
 
     public function stakeAmount($stakingAmount)
-    {
-        $fundSource = $this->user->wallet->hasBonus() ? "BONUS" : "CREDIT";
+    {   
+        $fundSource = "CREDIT";
 
+        if($this->user->wallet->hasBonus() && $this->user->wallet->bonus >= $stakingAmount ){
+            $fundSource = "BONUS" ;
+        }
+        
         $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
 
         $odd = 1;
