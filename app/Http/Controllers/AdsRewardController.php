@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Boost;
 use Illuminate\Http\Request;
 
-class AdsRewardController extends Controller
+class AdsRewardController extends BaseController
 {
     public function __invoke(Request $request)
     {
@@ -23,7 +23,7 @@ class AdsRewardController extends Controller
 
             if ($userBoost === null) {
                 $user->boosts()->create([
-                    'boost_id' => Boost::where('name', $request->adRewardPrize)->first()->id,
+                    'boost_id' => Boost::where('name', $request->input('adRewardPrize'))->first()->id,
                     'boost_count' => $request->input('rewardCount'),
                     'used_count' => 0,
                 ]);
@@ -34,7 +34,7 @@ class AdsRewardController extends Controller
 
         if ($request->adRewardType == 'coins') {
             $userCoin = $user->userCoins()->firstOrNew();
-            $userCoin->coins_value = $userCoin->coins_value + $request->rewardCount;
+            $userCoin->coins_value = $userCoin->coins_value + $request->input('rewardCount');
             $userCoin->save();
 
             $user->coinsTransaction()->create([
@@ -44,6 +44,6 @@ class AdsRewardController extends Controller
             ]);
         }
         
-        return response("Reward Earned", 200);
+        return $this->sendResponse("Reward Earned", "Reward Earned");
     }
 }

@@ -28,6 +28,16 @@ class AdsRewardTest extends TestCase
          $this->user = User::first();
          $this->actingAs($this->user);
      }
+
+     public function test_that_ads_reward_enpoint_returns_successful()
+     {
+        $response = $this->post('/api/v3/ads-reward/award', [
+            'adRewardType' => 'boost',
+            'rewardCount' => 4,
+            'adRewardPrize' => 'Time Freeze'
+        ]);
+        $response->assertStatus(200);
+     }
      
      public function test_user_receieves_boost_ads_reward()
      {
