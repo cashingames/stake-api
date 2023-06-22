@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stakings', function (Blueprint $table) {
-            $table->enum('fund_source',['BONUS','CREDIT','WINNINGS'])->default('CREDIT');
+            $table->string('fund_source')->default('CREDIT');
         });
     }
 
