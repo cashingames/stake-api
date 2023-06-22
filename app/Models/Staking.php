@@ -13,7 +13,8 @@ class Staking extends Model
     'user_id',
     'amount_staked',
     'odd_applied_during_staking',
-    'amount_won'
+    'amount_won',
+    'fund_source'
   ];
 
   public function user()

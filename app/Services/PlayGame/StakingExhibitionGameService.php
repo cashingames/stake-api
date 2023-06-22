@@ -5,6 +5,7 @@ namespace App\Services\PlayGame;
 use App\Actions\Wallet\DebitWalletAction;
 use App\Actions\Wallet\DebitWalletForStaking;
 use App\Enums\FeatureFlags;
+use App\Enums\StakingFundSource;
 use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
@@ -82,8 +83,14 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
+        $fundSource = StakingFundSource::Credit->value;
+
+        if ($this->user->wallet->hasBonus() && $this->user->wallet->bonus >= $stakingAmount) {
+            $fundSource = StakingFundSource::Bonus->value;
+        }
+
         $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
-        
+
         $odd = 1;
 
         /**
@@ -98,7 +105,8 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $staking = Staking::create([
             'amount_staked' => $stakingAmount,
             'odd_applied_during_staking' => $odd,
-            'user_id' => $this->user->id //@TODO remove from exhibition staking, not in use
+            'user_id' => $this->user->id, //@TODO remove from exhibition staking, not in use
+            'fund_source' => $fundSource
         ]);
 
         return $staking->id;
