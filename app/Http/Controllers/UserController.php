@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ClientPlatform;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\User;
+use App\Models\UserBoost;
 use App\Services\DailyRewardService;
 use Illuminate\Support\Carbon;
 use stdClass;
@@ -15,7 +16,6 @@ class UserController extends BaseController
     public function profile(ClientPlatform $clientPlatform, DailyRewardService $daillyRewardService)
     {
         $this->user->load(['profile', 'wallet']);
-
         $result = new stdClass;
         $result->username = $this->user->username;
         $result->email = $this->user->email;
@@ -51,6 +51,7 @@ class UserController extends BaseController
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->boosts = $this->user->gameArkUserBoosts();
         $result->coinsBalance = $this->user->getUserCoins();
+        $result->usedBoost = $this->user->getUserUsedBoostCount();
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }

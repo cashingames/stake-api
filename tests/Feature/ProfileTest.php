@@ -2,19 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\Plan;
 use App\Models\Profile;
+use App\Models\User;
+use Database\Seeders\RewardSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use UserSeeder;
 use PlanSeeder;
-use App\Models\User;
-use App\Models\UserPlan;
-use Carbon\Carbon;
-use Database\Seeders\RewardSeeder;
+use Tests\TestCase;
+use UserSeeder;
 
 class ProfileTest extends TestCase
 {
@@ -63,8 +59,20 @@ class ProfileTest extends TestCase
                 'achievements' => [],
                 'hasActivePlan' => false,
                 'unreadNotificationsCount' => 0,
-                'coinsBalance' => $this->user->getUserCoins()
-            ]
+                'coinsBalance' => $this->user->getUserCoins(),
+            ],
+        ]);
+    }
+
+    public function test_relevant_user_profile_can_be_retrieved_with_used_boost_count()
+    {
+        $response = $this->withHeaders([
+            'x-brand-id' => 10,
+        ])->get(self::PROFILE_DATA_URL);
+        $response->assertJson([
+            'data' => [
+                'usedBoost' => $this->user->getUserUsedBoostCount(),
+            ],
         ]);
     }
 
@@ -79,7 +87,7 @@ class ProfileTest extends TestCase
             'email' => 'johndoe@email.com',
             'password' => 'password111',
             'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
+            'dateOfBirth' => '23-09-1998',
         ]);
         $this->assertEquals(($this->user->profile->first_name . ' ' . $this->user->profile->last_name), 'John Doe');
     }
@@ -95,7 +103,7 @@ class ProfileTest extends TestCase
             'email' => 'johndoe@email.com',
             'password' => 'password111',
             'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
+            'dateOfBirth' => '23-09-1998',
         ]);
         $this->assertEquals($this->user->username, 'JayDee');
     }
@@ -111,7 +119,7 @@ class ProfileTest extends TestCase
             'email' => 'johndoe@email.com',
             'password' => 'password111',
             'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
+            'dateOfBirth' => '23-09-1998',
         ]);
         $this->assertEquals($this->user->email, 'johndoe@email.com');
     }
@@ -119,11 +127,11 @@ class ProfileTest extends TestCase
     public function test_gameark_profile_can_be_edited()
     {
 
-        $response = $this->withHeaders(['x-brand-id'=> 10])->postjson('/api/v2/profile/me/edit-personal', [
+        $response = $this->withHeaders(['x-brand-id' => 10])->postjson('/api/v2/profile/me/edit-personal', [
             'username' => 'JayDee',
             'email' => 'johndoe@email.com',
             'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
+            'dateOfBirth' => '23-09-1998',
         ]);
         $response->assertStatus(200);
     }
@@ -167,7 +175,6 @@ class ProfileTest extends TestCase
 
         //assert
 
-
         $this->assertNull($response);
     }
 
@@ -182,7 +189,6 @@ class ProfileTest extends TestCase
 
         //assert
 
-
         $this->assertNull($response);
     }
 
@@ -192,7 +198,7 @@ class ProfileTest extends TestCase
         //setup
         $newUser = User::factory()->create();
         $profile = Profile::factory()->for($newUser)->create([
-            'referrer' => $this->user->username
+            'referrer' => $this->user->username,
         ]);
 
         //act
@@ -209,12 +215,12 @@ class ProfileTest extends TestCase
         //user1 referred user 2 with old referral code format
         $newUser1 = User::factory()->create();
         $profile1 = Profile::factory()->for($newUser1)->create([
-            'referral_code' => "random-referral-code"
+            'referral_code' => "random-referral-code",
         ]);
 
         $newUser2 = User::factory()->create();
         $profile2 = Profile::factory()->for($newUser2)->create([
-            'referrer' => $profile1->referral_code
+            'referrer' => $profile1->referral_code,
         ]);
 
         //act
@@ -240,7 +246,7 @@ class ProfileTest extends TestCase
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password',
             'new_password' => 'password123',
-            'new_password_confirmation' => 'password123'
+            'new_password_confirmation' => 'password123',
         ]);
 
         $response->assertStatus(200);
@@ -254,7 +260,7 @@ class ProfileTest extends TestCase
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password111',
             'new_password' => 'password123',
-            'new_password_confirmation' => 'password123'
+            'new_password_confirmation' => 'password123',
         ]);
 
         $response->assertStatus(400);
@@ -268,7 +274,7 @@ class ProfileTest extends TestCase
         $response = $this->postjson(self::CHANGE_PASSWORD_URL, [
             'password' => 'password111',
             'new_password' => 'password111',
-            'new_password_confirmation' => 'password111'
+            'new_password_confirmation' => 'password111',
         ]);
 
         $response->assertStatus(400);
@@ -286,7 +292,7 @@ class ProfileTest extends TestCase
         $response->assertJson([
             'data' => [
                 'coinsBalance' => $this->user->getUserCoins(),
-            ]
+            ],
         ]);
     }
 }
