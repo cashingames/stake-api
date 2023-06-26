@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientPlatform;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\Feedback;
-use App\Mail\TokenGenerated;
-use App\Models\Notification;
-use App\Models\User;
+use Illuminate\Http\Request;
+use App\Enums\ClientPlatform;
+use Illuminate\Support\Facades\Mail;
 use App\Services\SupportTicketService;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Http;
 
 class MessagesController extends BaseController
 {
@@ -51,11 +45,10 @@ class MessagesController extends BaseController
             }
         }
 
-        $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
-
-        Mail::to(config('app.admin_email'))->send(new Feedback($firstName, $lastName, $phone, $data["email"], $data["message_body"], $appType));
-
-        //create automated ticket for support
+        Mail::to(config('app.admin_email'))
+            ->send(
+                new Feedback($firstName, $lastName, $phone, $data["email"], $data["message_body"], "Cashingames")
+            );
 
         $ticketService->createTicket(
             $firstName,

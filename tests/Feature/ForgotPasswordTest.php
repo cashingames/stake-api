@@ -2,19 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Enums\AuthTokenType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
-use App\Mail\TokenGenerated;
 use App\Models\AuthToken;
-use App\Services\SMS\SMSProviderInterface;
-use Illuminate\Support\Carbon;
-use UserSeeder;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Mockery\MockInterface;
+use App\Enums\AuthTokenType;
+use App\Mail\TokenGenerated;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ForgotPasswordTest extends TestCase
 {
@@ -25,7 +23,9 @@ class ForgotPasswordTest extends TestCase
      * @return void
      */
 
-    protected $user, $authTokenRecord;
+    protected $user;
+    protected $authTokenRecord;
+
     const RESET_EMAIL_URL = '/api/auth/password/email';
     const VERIFY_TOKEN_URL = '/api/auth/token/verify';
 
@@ -67,15 +67,6 @@ class ForgotPasswordTest extends TestCase
         Mail::assertSent(TokenGenerated::class);
         $response->assertStatus(200);
     }
-
-    // public function test_email_must_be_registered()
-    // {
-    //     $response = $this->postjson(self::RESET_EMAIL_URL,[
-    //         "email" => "example@example.com",
-    //     ]);
-
-    //     $response->assertStatus(200);
-    // }
 
     public function test_that_reset_token_can_be_verified()
     {
@@ -137,9 +128,7 @@ class ForgotPasswordTest extends TestCase
     }
 
     public function test_that_reset_token_can_be_verified_for_stakers_app()
-    {   
-        // dd($this->authTokenRecord);
-
+    {
         $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::VERIFY_TOKEN_URL, [
             "token" => strval($this->authTokenRecord->token),
         ]);

@@ -2,24 +2,20 @@
 
 namespace App\Services\PlayGame;
 
-use App\Actions\Wallet\DebitWalletAction;
-use App\Actions\Wallet\DebitWalletForStaking;
+use App\Models\Staking;
 use App\Enums\FeatureFlags;
+use App\Models\GameSession;
+use Illuminate\Support\Str;
+use App\Services\FeatureFlag;
+use Illuminate\Support\Carbon;
 use App\Enums\StakingFundSource;
 use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
-use App\Models\GameSession;
-use App\Models\Staking;
-use App\Models\WalletTransaction;
-use App\Repositories\Cashingames\WalletRepository;
-use App\Services\FeatureFlag;
-use App\Services\QuestionsHardeningServiceInterface;
-use App\Services\StakeQuestionsHardeningService;
-use App\Services\TriviaStaking\OddsService;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Foundation\Auth\User;
+use App\Services\TriviaStaking\OddsService;
+use App\Actions\Wallet\DebitWalletForStaking;
+use App\Services\StakeQuestionsHardeningService;
 
 class StakingExhibitionGameService implements PlayGameServiceInterface
 {
@@ -31,6 +27,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
         private readonly DebitWalletForStaking $walletDebitAction,
+        private readonly StakingFundSource $fundSource
     ) {
         $this->user = auth()->user();
     }
@@ -68,8 +65,8 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
     {
         $gameSession = new GameSession();
         $gameSession->user_id = auth()->user()->id;
-        $gameSession->game_mode_id = $this->validatedRequest->mode;
-        $gameSession->game_type_id = $this->validatedRequest->type;
+        $gameSession->game_mode_id = 1;
+        $gameSession->game_type_id = 2;
         $gameSession->category_id = $this->validatedRequest->category;
         $gameSession->session_token = Str::random(40);
         $gameSession->start_time = Carbon::now();
@@ -83,12 +80,6 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
 
     public function stakeAmount($stakingAmount)
     {
-        $fundSource = StakingFundSource::Credit->value;
-
-        if ($this->user->wallet->hasBonus() && $this->user->wallet->bonus >= $stakingAmount) {
-            $fundSource = StakingFundSource::Bonus->value;
-        }
-
         $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
 
         $odd = 1;
@@ -106,13 +97,11 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
             'amount_staked' => $stakingAmount,
             'odd_applied_during_staking' => $odd,
             'user_id' => $this->user->id, //@TODO remove from exhibition staking, not in use
-            'fund_source' => $fundSource
+            'fund_source' => $this->fundSource,
         ]);
 
         return $staking->id;
     }
-
-
     public function createExhibitionStaking($stakingId, $gameSessionId): void
     {
         ExhibitionStaking::create([

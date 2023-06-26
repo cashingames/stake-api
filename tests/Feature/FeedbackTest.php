@@ -2,21 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Mail\Feedback;
-use App\Models\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Mail\Feedback;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
-use Database\Seeders\UserSeeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 class FeedbackTest extends TestCase
 {
     use RefreshDatabase;
+
+    const FEEDBACK_URL = '/api/v3/client/feedback';
+
     /**
      * A basic feature test example.
      *
@@ -26,7 +25,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $response = $this->post('/api/v2/client/feedback', [
+        $response = $this->post(self::FEEDBACK_URL, [
             "first_name" => "Test",
             "last_name" => "User",
             'phone_number' => '07039999999',
@@ -43,7 +42,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/api/v2/client/feedback', [
+        $this->post(self::FEEDBACK_URL, [
             "first_name" => "",
             "last_name" => "",
             "email" => "",
@@ -57,7 +56,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/api/v2/client/feedback', [
+        $this->post(self::FEEDBACK_URL, [
             "email" => 'email@email.com',
             "message_body" => "lorem ipsum "
         ]);
@@ -90,7 +89,7 @@ class FeedbackTest extends TestCase
 
     public function test_faq_and_answers_can_be_fetched()
     {
-        $response = $this->get('/api/v2/faq/fetch');
+        $response = $this->get('/api/v3/faq/fetch');
 
         $response->assertJsonStructure([
             'data' => [

@@ -34,7 +34,7 @@ class StartSinglePlayerGameController extends Controller
         $startResponse = $gameService->startGame($validatedRequest);
 
         //@TODO: Handle business error states in the services
-        if (count($startResponse->questions) < 10 && $customType != GameType::LiveTrivia) {
+        if (count($startResponse->questions) < 10) {
             Log::info('SSTART_SINGLE_PLAYER_CANNOT_START', [
                 'user' => $request->user()->username,
             ]);

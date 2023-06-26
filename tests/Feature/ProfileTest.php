@@ -2,18 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Models\Plan;
 use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use UserSeeder;
 use PlanSeeder;
 use App\Models\User;
-use App\Models\UserPlan;
-use Carbon\Carbon;
 
 class ProfileTest extends TestCase
 {
@@ -25,7 +21,9 @@ class ProfileTest extends TestCase
      */
 
     const PROFILE_DATA_URL = '/api/v3/user/profile';
-    const CHANGE_PASSWORD_URL = '/api/v2/profile/me/password/change';
+    const CHANGE_PASSWORD_URL = '/api/v3/profile/me/password/change';
+    const EDIT_PROFILE_URL = '/api/v3/profile/me/edit-personal';
+
     protected $user;
 
     protected function setUp(): void
@@ -42,7 +40,7 @@ class ProfileTest extends TestCase
     public function test_relevant_user_profile_can_be_retrieved_with_data()
     {
         $response = $this->withHeaders([
-            'x-brand-id' => 10,
+            'x-brand-id' => 1,
         ])->get(self::PROFILE_DATA_URL);
 
         $response->assertJson([
@@ -53,15 +51,10 @@ class ProfileTest extends TestCase
                 'firstName' => $this->user->profile->first_name,
                 'countryCode' => $this->user->country_code,
                 'phoneNumber' => $this->user->phone_number,
-                'points' => $this->user->points(),
                 'walletBalance' => $this->user->wallet->non_withdrawable + $this->user->wallet->withdrawable,
                 'bonusBalance' => $this->user->wallet->bonus_balance,
                 'withdrawableBalance' => $this->user->wallet->withdrawable,
                 'boosts' => [],
-                'achievements' => [],
-                'hasActivePlan' => false,
-                'unreadNotificationsCount' => 0,
-                'coinsBalance' => $this->user->getUserCoins()
             ]
         ]);
     }
@@ -69,7 +62,7 @@ class ProfileTest extends TestCase
     public function test_personal_details_can_be_edited_with_all_fields_set()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson(self::EDIT_PROFILE_URL, [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -85,7 +78,7 @@ class ProfileTest extends TestCase
     public function test_username_can_be_edited()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson(self::EDIT_PROFILE_URL, [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -101,7 +94,7 @@ class ProfileTest extends TestCase
     public function test_email_can_be_edited()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson(self::EDIT_PROFILE_URL, [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -114,28 +107,7 @@ class ProfileTest extends TestCase
         $this->assertEquals($this->user->email, 'johndoe@email.com');
     }
 
-    public function test_gameark_profile_can_be_edited()
-    {
 
-        $response = $this->withHeaders(['x-brand-id'=> 10])->postjson('/api/v2/profile/me/edit-personal', [
-            'username' => 'JayDee',
-            'email' => 'johndoe@email.com',
-            'gender' => 'male',
-            'dateOfBirth' => '23-09-1998'
-        ]);
-        $response->assertStatus(200);
-    }
-
-    public function test_bank_details_can_be_edited()
-    {
-
-        $this->postjson('/api/v2/profile/me/edit-bank', [
-            'accountName' => 'John',
-            'bankName' => 'Access bank',
-            'accountNumber' => '09098989898',
-        ]);
-        $this->assertEquals($this->user->profile->bank_name, 'Access bank');
-    }
 
     public function test_profile_image_can_be_uploaded()
     {
@@ -143,7 +115,7 @@ class ProfileTest extends TestCase
 
         $file = UploadedFile::fake()->image('avatar.jpg');
 
-        $this->post('/api/v2/profile/me/picture', [
+        $this->post('/api/v3/profile/me/picture', [
             'avatar' => $file,
         ]);
 
@@ -264,16 +236,4 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_gameark_users_receive_coinsBalance_payload()
-    {
-        $response = $this->withHeaders([
-            'x-brand-id' => 10,
-        ])->get(self::PROFILE_DATA_URL);
-
-        $response->assertJson([
-            'data' => [
-                'coinsBalance' => $this->user->getUserCoins(),
-            ]
-        ]);
-    }
 }

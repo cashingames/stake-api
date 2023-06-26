@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Question;
-use App\Models\GameType;
-use App\Models\GameSession;
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
