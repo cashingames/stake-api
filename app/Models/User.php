@@ -56,9 +56,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $appends = [
-        'rank',
-        'played_games_count',
-        'challenges_played', 'win_rate', 'full_phone_number'
+        'full_phone_number'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -100,16 +98,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function userPlan()
-    {
-        return $this->hasMany(UserPlan::class);
-    }
-
-    public function userPoints()
-    {
-        return $this->hasMany(UserPoint::class);
-    }
-
     public function boosts()
     {
         return $this->hasMany(UserBoost::class);
@@ -120,18 +108,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(ChallengeRequest::class);
     }
 
-
-
     public function getFullPhoneNumberAttribute()
     {
         return $this->country_code . $this->phone_number;
     }
-
-    public function scopeMostRecent($query)
-    {
-        return $query->orderByRaw('last_activity_time DESC');
-    }
-
 
     public function categories()
     {
@@ -158,67 +138,17 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserBonus::class);
     }
 
-    public function getRankAttribute()
-    {
-        $results = DB::select(
-            "select SUM(value) as score, user_id from user_points WHERE
-            point_flow_type = 'POINTS_ADDED'
-            group by user_id
-            order by score desc
-            limit 100"
-        );
-
-        $userIndex = -1;
-
-        if (count($results) > 0) {
-            $userIndex = collect($results)->search(function ($user) {
-                return $user->user_id == $this->id;
-            });
-        }
-
-        if ($userIndex === false || $userIndex === -1) {
-            return 786;
-        }
-
-        return $userIndex + 1;
-    }
-
-    public function getPlayedGamesCountAttribute()
-    {
-        return GameSession::where('user_id', $this->id)->count();
-    }
-
     public function getAverageOfRecentGames()
     {
-        $lastTwoGamesAverage = $this->gameSessions()
+        return $this->gameSessions()
             ->completed()
             ->latest()
             ->limit(2)
             ->get()
             ->avg('correct_count');
 
-        return $lastTwoGamesAverage;
     }
 
-
-    public function getWinRateAttribute()
-    {
-        $gameWins = GameSession::where('correct_count', '>=', 5)->count();
-        return ($gameWins / 100);
-    }
-
-    public function pointTransactions()
-    {
-        return $this->hasMany(UserPoint::class);
-    }
-
-    public function getUserPointTransactions()
-    {
-        return $this->pointTransactions()
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
-    }
 
     public function userTransactions()
     {
@@ -227,16 +157,6 @@ class User extends Authenticatable implements JWTSubject
             ->orderBy('transactionDate', 'desc')
             ->limit(10)
             ->get();
-    }
-
-    public function recentGames()
-    {
-        return $this->gameSessions()->latest()
-            ->select('category_id')
-            ->groupBy('category_id')->limit(3)->get()
-            ->map(function ($x) {
-                return $x->category()->select('id', 'name', 'description', 'background_color as bgColor', 'icon as icon')->first();
-            });
     }
 
     /**
@@ -249,16 +169,19 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_id', $this->id)
             ->join('boosts', function ($join) {
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'boosts.point_value', 'boosts.pack_count', 'boosts.currency_value', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
+            })->select(
+                'boosts.id',
+                'boosts.point_value',
+                'boosts.pack_count',
+                'boosts.currency_value',
+                'boosts.icon',
+                'boosts.description',
+                'name',
+                'user_boosts.boost_count as count'
+            )
             ->whereNull('boosts.deleted_at')
             ->where('name', '!=', 'Bomb')
             ->where('user_boosts.boost_count', '>', 0)->get();
-    }
-
-
-    public function totalWithdrawals()
-    {
-        return $this->transactions()->withdrawals()->sum('amount');
     }
 
     public function notifications()
@@ -274,10 +197,5 @@ class User extends Authenticatable implements JWTSubject
 
     public function authTokens(){
         return $this->hasMany(AuthToken::class);
-    }
-
-    public function getChallengesPlayedAttribute()
-    {
-        return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
     }
 }
