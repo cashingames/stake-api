@@ -275,4 +275,9 @@ class User extends Authenticatable implements JWTSubject
     public function authTokens(){
         return $this->hasMany(AuthToken::class);
     }
+
+    public function getChallengesPlayedAttribute()
+    {
+        return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
+    }
 }

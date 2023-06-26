@@ -49,6 +49,10 @@ class ResetPasswordTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @todo this rest is faulty
+     * @return void
+     */
     public function test_a_user_can_reset_password()
     {
 
