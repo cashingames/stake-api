@@ -466,4 +466,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Reward::class, 'user_rewards')->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on');
     }
+
+    public function getUserUsedBoostCount()
+    {
+        $usedBoostCount = UserBoost::where('user_id', $this->id)->sum('used_count');
+        return $usedBoostCount;
+    }
 }
