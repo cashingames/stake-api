@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\ClientPlatform;
 use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
 use App\Mail\VerifyEmail;
-use App\Mail\WelcomeEmail;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -22,10 +20,6 @@ use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Event;
-use App\Events\AchievementBadgeEvent;
-use App\Enums\AchievementType;
 use App\Enums\AuthTokenType;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
@@ -163,19 +157,7 @@ class RegisterController extends BaseController
         } else {
             $this->cashingamesSignupBonus($user);
         }
-        
-        if (
-            config('trivia.bonus.enabled') &&
-            config('trivia.bonus.signup.referral') &&
-            config('trivia.bonus.signup.referral_on_signup') &&
-            isset($data['referrer'])
-        ) {
-
-            $profileReferral = User::where('username', $data["referrer"])->first();
-            if ($profileReferral != null) {
-                Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
-            }
-        }
+      
         return $user;
     }
 

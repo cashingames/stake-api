@@ -19,8 +19,6 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             GameTypeSeeder::class,
             GameModeSeeder::class,
-            AchievementSeeder::class,
-            AchievementBadgeSeeder::class,
             BoostSeeder::class,
             UserSeeder::class,
             PlanSeeder::class,

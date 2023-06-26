@@ -9,11 +9,9 @@ use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
 use App\Models\Boost;
-use App\Models\Plan;
 use App\Models\Category;
 use App\Models\GameType;
 use App\Models\UserBoost;
-use App\Models\Achievement;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSessionQuestion;
 use App\Models\Question;
@@ -34,7 +32,7 @@ use stdClass;
 
 class GameController extends BaseController
 {
-    public function getCommonData(Request $request, ClientPlatform $platform)
+    public function getCommonData()
     {
         $result = new stdClass;
 
@@ -146,7 +144,7 @@ class GameController extends BaseController
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
         $result->minimumBoostScore = $this->MINIMUM_GAME_BOOST_SCORE;
 
-        return $this->sendResponse((new CommonDataResponse())->transform($result, $platform), "Common data");
+        return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
     public function endSingleGame(Request $request, ReferralService $referralService, )
     {
@@ -171,7 +169,7 @@ class GameController extends BaseController
         $wrongs = 0;
 
         //@TODO: Change our encryption method from base 64. It is not secure
-        $questionsCount = !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
+        $questionsCount = 10;
         $chosenOptions = [];
 
         if (count($request->chosenOptions) > $questionsCount) {
