@@ -35,21 +35,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class GameTest extends TestCase
 {
     use RefreshDatabase;
+    
     /**
      * A basic feature test example.
      *
      * @return void
      */
     const COMMON_DATA_URL = '/api/v3/game/common';
-    const CLAIM_ACHIEVEMENT_URL = '/api/v3/claim/achievement/';
     const START_EXHIBITION_GAME_URL = '/api/v3/game/start/single-player';
     const END_EXHIBITION_GAME_URL = '/api/v3/game/end/single-player';
-    const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
-    const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
 
     protected $user;
     protected $category;
-    protected $plan;
     protected $staking;
 
     protected function setUp(): void
@@ -120,39 +117,6 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_used_boost_is_saved_when_exhibition_game_ends()
-    {   
-        Staking::factory()->count(5)->create(['user_id' => $this->user->id]);
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
-        $game = $this->user->gameSessions()->first();
-        $game->update(['state' => 'ONGOING']);
-        ExhibitionStaking::factory()->create(['staking_id' => Staking::first()->id, 'game_session_id' => $game->id]);
-
-        $boost = Boost::inRandomOrder()->first();
-
-        UserBoost::create([
-            'user_id' => $this->user->id,
-            'boost_id' => $boost->id,
-            'boost_count' => $boost->pack_count,
-            'used_count' => 0
-        ]);
-
-        $userBoost = $this->user->userBoosts();
-
-        $this->postjson(self::END_EXHIBITION_GAME_URL, [
-            "token" => $game->session_token,
-            "chosenOptions" => [],
-            "consumedBoosts" => [
-                ['boost' => Boost::where('id', $userBoost[0]->id)->first()]
-            ]
-        ]);
-
-        $this->assertDatabaseHas('exhibition_boosts', [
-            'boost_id' => Boost::where('id', $userBoost[0]->id)->first()->id,
-            'game_session_id' => $game->id,
-        ]);
-    }
-
     public function test_exhibition_game_can_be_started_with_staking()
     {
         $questions = Question::factory()
@@ -215,45 +179,13 @@ class GameTest extends TestCase
             'non_withdrawable' => 1000
         ]);
 
-        $this->postjson('/api/v3/game/start/single-player', [
+        $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
             "staking_amount" => 1000
         ]);
         $this->assertDatabaseCount('exhibition_stakings', 1);
-    }
-    public function test_exhibition_game_with_staking_does_not_require_game_lives()
-    {
-        $questions = Question::factory()
-            ->hasOptions(4)
-            ->count(250)
-            ->create();
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        $this->user->wallet->update([
-            'non_withdrawable' => 5000
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 1000
-        ]);
-        $response->assertOk();
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
@@ -379,81 +311,7 @@ class GameTest extends TestCase
             'amount_won' => $staking->amount_staked * $expectedOdd *  $stakingOddApplied
         ]);
     }
-    public function test_that_referral_can_be_rewarded_after_referee_ends_first_game()
-    {
-        // create new user
-        $newUser = User::create([
-            'username' => 'testUser',
-            'phone_number' => '08133445858',
-            'email' => 'testaccount@gmail.com',
-            'password' => 'xcvb',
-            'country_code' => 'NGN'
-        ]);
-        $newUser
-            ->profile()
-            ->create([
-                'first_name' => 'zxcv',
-                'last_name' => 'asdasd',
-                'referral_code' => 'zxczxc',
-                'referrer' => $this->user->profile->referrer,
-            ]);
 
-        $newUser->wallet()
-            ->create([]);
-
-        DB::table('user_plans')->insert([
-            'user_id' => $newUser->id,
-            'plan_id' => 1,
-            'description' => "Registration Daily bonus plan for " . $newUser->username,
-            'is_active' => true,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-
-        // play game and end
-        #start
-        $questions = Question::factory()
-            ->count(250)
-            ->create();
-        $data = [];
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-        DB::table('categories_questions')->insert($data);
-        $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2
-        ]);
-
-        #end game
-        GameSession::factory()
-            ->count(20)
-            ->create();
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
-        $game = $this->user->gameSessions()->first();
-        $game->update(['state' => 'ONGOING', 'user_id' => $newUser->id]);
-
-        $this->postjson(self::END_EXHIBITION_GAME_URL, [
-            "token" => $game->session_token,
-            "chosenOptions" => [],
-            "consumedBoosts" => []
-        ]);
-
-        # check if referrer has a new gifted game
-        $this->assertDatabaseHas('user_plans', [
-            'user_id' => $newUser->id,
-            'plan_id' => 1
-        ]);
-    }
 
     public function test_bonus_balance_is_being_deducted_for_staking_when_a_user_has_bonus()
     {
@@ -482,7 +340,7 @@ class GameTest extends TestCase
             'bonus' => 1000
         ]);
 
-        $this->postjson('/api/v3/game/start/single-player', [
+        $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
@@ -524,7 +382,7 @@ class GameTest extends TestCase
             'bonus' => 100
         ]);
 
-        $response = $this->postjson('/api/v3/game/start/single-player', [
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
@@ -552,9 +410,11 @@ class GameTest extends TestCase
             'total_amount_won'  => 0,
             'amount_remaining_after_withdrawal' => 0
         ]);
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id, 'correct_count' => 10]);
+        GameSession::where('user_id', '!=', $this->user->id)
+            ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
-        ExhibitionStaking::factory()->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
+        ExhibitionStaking::factory()
+            ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
 
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
@@ -581,7 +441,10 @@ class GameTest extends TestCase
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
-            
-        $this->assertEquals($this->user->wallet->withdrawable, $userBonus->total_amount_won + $userBonus->amount_credited);
+
+        $this->assertEquals(
+            $this->user->wallet->withdrawable,
+            $userBonus->total_amount_won + $userBonus->amount_credited
+        );
     }
 }

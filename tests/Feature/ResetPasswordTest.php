@@ -3,12 +3,10 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 use App\Models\User;
 use UserSeeder;
-use PlanSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +20,9 @@ class ResetPasswordTest extends TestCase
      * @return void
      */
 
-    protected $user, $token, $now;
+    protected $user;
+    protected $token;
+    protected $now;
     const VALIDATE_URL = '/api/auth/token/verify';
     const RESET_PASSWORD_URL = '/api/auth/password/reset';
 
@@ -30,7 +30,6 @@ class ResetPasswordTest extends TestCase
     {
         parent::setUp();
         $this->seed(UserSeeder::class);
-        $this->seed(PlanSeeder::class);
         $this->user = User::first();
         $this->now = Carbon::now();
         $this->actingAs($this->user);
@@ -40,7 +39,10 @@ class ResetPasswordTest extends TestCase
     public function test_a_token_can_be_validated()
     {
 
-        DB::insert('insert into password_resets (email, token, created_at) values (?, ?, ?)', [$this->user->email, $this->token, $this->now]);
+        DB::insert(
+            'insert into password_resets (email, token, created_at) values (?, ?, ?)',
+            [$this->user->email, $this->token, $this->now]
+        );
 
         $response = $this->postjson(self::VALIDATE_URL, [
             "token" => strval($this->token),
@@ -49,6 +51,10 @@ class ResetPasswordTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @todo this rest is faulty
+     * @return void
+     */
     public function test_a_user_can_reset_password()
     {
 

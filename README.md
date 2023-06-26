@@ -67,7 +67,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 # Tech Improvements
-- Achievement in code and database
+- x Achievement in code and database
 - Create EndSinglePlayerController.cs
 - Cleanup feature flags in the project
 - Rework ClientPlatform based on where we are

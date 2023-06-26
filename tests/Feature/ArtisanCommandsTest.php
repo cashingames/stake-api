@@ -3,21 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\BonusType;
-use App\Mail\DailyReportEmail;
-use App\Mail\WeeklyReportEmail;
 use App\Models\Bonus;
-use App\Models\ChallengeRequest;
-use App\Models\GameSession;
-use App\Models\Staking;
 use App\Models\User;
 use App\Models\UserBonus;
 use Database\Seeders\BonusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use UserSeeder;
-use PlanSeeder;
 
 class ArtisanCommandsTest extends TestCase
 {
@@ -33,7 +25,6 @@ class ArtisanCommandsTest extends TestCase
         parent::setUp();
 
         $this->seed(UserSeeder::class);
-        // $this->seed(PlanSeeder::class);
     }
     
     public function test_that_registration_bonuses_can_be_expired(){
