@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use App\Traits\Utils\DateUtils;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\AchievementBadge;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -30,7 +29,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'country_code',
         'brand_id',
-        'apple_user_id',
         'email_verified_at',
         'last_activity_time',
         'meta_data'
@@ -57,8 +55,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $appends = [
-        'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate', 'full_phone_number'
+        'played_games_count','win_rate', 'full_phone_number'
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -100,58 +97,13 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
     }
 
-    public function userPlan()
-    {
-        return $this->hasMany(UserPlan::class);
-    }
-
-    public function userPoints()
-    {
-        return $this->hasMany(UserPoint::class);
-    }
-
     public function boosts()
     {
         return $this->hasMany(UserBoost::class);
     }
-
-    public function achievements()
-    {
-        return $this->hasMany(Achievement::class);
-    }
-
     public function challengeRequests()
     {
         return $this->hasMany(ChallengeRequest::class);
-    }
-
-    public function userAchievementBadges()
-    {
-        return $this->belongsToMany(AchievementBadge::class, 'user_achievement_badges')->withPivot('id', 'count', 'is_claimed', 'is_rewarded', 'is_notified');
-    }
-
-    public function plans()
-    {
-        return $this
-            ->belongsToMany(Plan::class, 'user_plans')
-            ->withPivot('id', 'plan_count', 'is_active', 'expire_at', 'used_count');
-    }
-
-    public function scopeActivePlans()
-    {
-
-        //a plan is active if
-        // - isactive is true and
-        // - games_count * plan_count> used_count and
-        // - expiry is greater than the current datetime or expiry is null
-        return $this
-            ->plans()
-            ->wherePivot('is_active', true)
-            ->where(function ($query) {
-                $query->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
-                    ->orWhere('expire_at', '>', now())
-                    ->orWhere('expire_at', NULL);
-            });
     }
 
     public function getFullPhoneNumberAttribute()
@@ -162,52 +114,6 @@ class User extends Authenticatable implements JWTSubject
     public function scopeMostRecent($query)
     {
         return $query->orderByRaw('last_activity_time DESC');
-    }
-
-    public function getNextFreePlan()
-    {
-        //returns the first active free plan that will expire next
-
-        //return daily free plan that will expire this midnight
-        //if there is non
-        //return free plan that will expire in the future
-        //if there is non
-        //return free plan with no expiry date
-        return $this
-            ->activePlans()
-            ->where('is_free', true)
-            ->orderBy('expire_at', 'asc')
-            ->limit(1)
-            ->first();
-    }
-
-    public function getNextPaidPlan()
-    {
-        return $this
-            ->activePlans()
-            ->where('is_free', false)
-            ->orderBy('created_at', 'asc')
-            ->limit(1)
-            ->first();
-    }
-
-    public function hasActivePlan()
-    {
-        if (
-            is_null($this->getNextFreePlan())
-            && is_null($this->getNextPaidPlan())
-        ) {
-            return false;
-        }
-        return true;
-    }
-
-    public function hasActiveFreePlan()
-    {
-        if (is_null($this->getNextFreePlan())) {
-            return false;
-        }
-        return true;
     }
 
     public function categories()
@@ -225,11 +131,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(GameSessionQuestion::class, GameSession::class);
     }
 
-    public function challengegameSessions()
-    {
-        return $this->hasMany(ChallengeGameSession::class);
-    }
-
     public function bonuses()
     {
         return $this->hasManyThrough(Bonus::class, UserBonus::class);
@@ -239,48 +140,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserBonus::class);
     }
-
-    public function challenges()
-    {
-        return $this->hasMany(Challenge::class);
-    }
-
-    public function points()
-    {
-        return UserPoint::where('user_id', $this->id)
-            ->where('point_flow_type', 'POINTS_ADDED')
-            ->sum('value');
-    }
-
-    public function todaysPoints()
-    {
-
-        //start in nigeria 20 00:000:00
-        //in utc = 19 23:00:00
-        $now = $this->toNigeriaTimeZoneFromUtc(now());
-        $startOfToday = $this->toUtcFromNigeriaTimeZone($now->startOfDay());
-        $endOfToday = $this->toUtcFromNigeriaTimeZone($now->endOfDay());
-        return $this->userPoints()
-            ->addedBetween(
-                $startOfToday,
-                $endOfToday
-            )->sum('value');
-    }
-
-
-    public function getAchievementAttribute()
-    {
-        $latestAchievement = DB::table('user_achievements')
-            ->where('user_id', $this->id)->latest()->first();
-
-        if ($latestAchievement === null) {
-            return " ";
-        }
-        $achievement = Achievement::where('id', $latestAchievement->achievement_id)->first();
-
-        return ($achievement->title);
-    }
-
 
     public function getRankAttribute()
     {
@@ -312,10 +171,6 @@ class User extends Authenticatable implements JWTSubject
         return GameSession::where('user_id', $this->id)->count();
     }
 
-    public function getChallengesPlayedAttribute()
-    {
-        return GameSession::where('user_id', $this->id)->where('game_mode_id', 2)->count();
-    }
 
     public function getAverageOfRecentGames()
     {
@@ -334,19 +189,6 @@ class User extends Authenticatable implements JWTSubject
     {
         $gameWins = GameSession::where('correct_count', '>=', 5)->count();
         return ($gameWins / 100);
-    }
-
-    public function pointTransactions()
-    {
-        return $this->hasMany(UserPoint::class);
-    }
-
-    public function getUserPointTransactions()
-    {
-        return $this->pointTransactions()
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
     }
 
     public function userTransactions()
@@ -376,18 +218,6 @@ class User extends Authenticatable implements JWTSubject
             })->select('achievements.id', 'title', 'medal as logoUrl')->get();
     }
 
-    public function userAchievementBadge()
-    {
-        $db = AchievementBadge::join('user_achievement_badges', function ($join) {
-            $join->on('achievement_badges.id', '=', 'user_achievement_badges.achievement_badge_id');
-        })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'milestone_count', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl', 'quality_image')->get();
-
-        DB::table('user_achievement_badges')->where('user_id', $this->id)->where('is_claimed', 1)->update(array(
-            'is_notified' => 1
-        ));
-        return $db;
-    }
-
     /**
      * @TODO eradicate this method
      * @return \Illuminate\Support\Collection
@@ -404,38 +234,9 @@ class User extends Authenticatable implements JWTSubject
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
 
-    public function gameArkUserBoosts()
-    {
-        return DB::table('user_boosts')
-            ->where('user_id', $this->id)
-            ->join('boosts', function ($join) {
-                $join->on('boosts.id', '=', 'user_boosts.boost_id');
-            })->select('boosts.id', 'boosts.point_value', 'boosts.pack_count', 'boosts.currency_value', 'boosts.icon', 'boosts.description', 'name', 'user_boosts.boost_count as count')
-            ->whereNull('boosts.deleted_at')
-            ->where('user_boosts.boost_count', '>', 0)->get();
-    }
-
     public function totalWithdrawals()
     {
         return $this->transactions()->withdrawals()->sum('amount');
-    }
-
-    public function userChallenges()
-    {
-
-        return DB::table('challenges')
-            ->join('categories', 'categories.id', '=', 'challenges.category_id')
-            ->join('users as u', 'u.id', '=', 'challenges.user_id')
-            ->join('users as o', 'o.id', '=', 'challenges.opponent_id')
-            ->select('challenges.id', 'u.username', 'o.username as opponentUsername', 'categories.name', 'challenges.status', 'challenges.created_at')
-            ->where('u.id', $this->id)
-            ->orWhere('o.id', $this->id)
-            ->orderBy('challenges.created_at', 'DESC')
-            ->paginate(10);
-    }
-    public function hasPlayedTrivia($triviaId)
-    {
-        return $this->gameSessions()->where('trivia_id', $triviaId)->exists();
     }
 
     public function notifications()
@@ -443,28 +244,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->morphMany(UserNotification::class, 'notifiable')->orderBy('created_at', 'desc');
     }
 
-    public function userCoins()
-    {
-        return $this->hasOne(UserCoin::class);
-    }
-
-    public function getUserCoins()
-    {
-        $userCoin = UserCoin::where('user_id', $this->id)->first();
-        if (is_null($userCoin)) {
-            return 0;
-        }
-        return $userCoin->coins_value;
-    }
-
     public function getUnreadNotificationsCount()
     {
         return $this->unreadNotifications()->count();
-    }
-
-    public function coinsTransaction()
-    {
-        return $this->hasMany(UserCoinTransaction::class);
     }
 
     public function authTokens(){

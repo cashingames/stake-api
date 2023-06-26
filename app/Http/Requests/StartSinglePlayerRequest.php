@@ -128,7 +128,8 @@ class StartSinglePlayerRequest extends FormRequest
     }
 
     private function validateRegistrationBonus($validator, $user, $bonus, $stakingAmount)
-    {
+    {   
+
         if ($stakingAmount > $bonus->amount_remaining_after_staking) {
             $validator->errors()->add(
                 'staking_amount',
