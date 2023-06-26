@@ -31,9 +31,4 @@ class Staking extends Model
   {
     return $this->hasManyThrough(GameSession::class, ExhibitionStaking::class);
   }
-
-  public function challengeStakings()
-  {
-    return $this->hasMany(ChallengeStaking::class);
-  }
 }

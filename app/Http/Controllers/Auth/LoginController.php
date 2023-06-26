@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use App\Enums\FeatureFlags;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BaseController;
 use App\Enums\ClientPlatform;
-use App\Models\User;
-use Illuminate\Support\Carbon;
-use App\Models\UserPoint;
-use App\Models\Profile;
-use App\Models\Wallet;
-use App\Models\Boost;
-use App\Models\WalletTransaction;
 use App\Services\FeatureFlag;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\BaseController;
 
 class LoginController extends BaseController
 {
@@ -52,21 +45,17 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if($clientPlatform != ClientPlatform::GameArkMobile){
-            if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)){
-                if ($user->phone_verified_at == null) {
+        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
+            if ($user->phone_verified_at == null) {
 
-                    return $this->sendError([
-                        'username' => $user->username,
-                        'email' => $user->email,
-                        'phoneNumber' => $user->phone_number
-                    ], 'Account not verified');
-                }
-            }else{
-                if ($user->email_verified_at == null) {
-                    return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
-                }
+                return $this->sendError([
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'phoneNumber' => $user->phone_number
+                ], 'Account not verified');
             }
+        } elseif ($user->email_verified_at == null) {
+            return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
         }
 
         return $this->respondWithToken($token);
@@ -91,7 +80,7 @@ class LoginController extends BaseController
      */
     protected function respondWithToken($token)
     {
-        $user =  auth()->user();
+        $user = auth()->user();
 
         $metaData = json_decode($user->meta_data, true);
         $metaData['login_ip_address'] = request()->ip();

@@ -38,70 +38,12 @@ class UserController extends BaseController
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
+        $result->boosts = $this->user->userBoosts();
 
+        $result = (new CommonDataResponse())->transform($result);
 
-        if (ClientPlatform::GameArkMobile == $clientPlatform || ClientPlatform::CashingamesMobile == $clientPlatform) {
-            $result->points = $this->user->points();
-            $result->todaysPoints = $this->user->todaysPoints();
-            $result->globalRank = $this->user->rank;
-            $result->gamesCount = $this->user->played_games_count;
-            $result->totalChallenges = $this->user->challenges_played;
-            $result->winRate = $this->user->win_rate;
-            $result->badge = $this->user->achievement;
-            $result->achievements = $this->user->userAchievements();
-            $result->activePlans = $this->composeUserPlans();
-            $result->hasActivePlan = $this->user->hasActivePlan();
-            $result->boosts = $this->user->gameArkUserBoosts();
-            $result->coinsBalance = $this->user->getUserCoins();
-        } else {
-            $result->boosts = $this->user->userBoosts();
-        }
-
-        return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
+        return $this->sendResponse($result, "User details");
     }
-
-    private function composeUserPlans()
-    {
-        $subscribedPlan = $this->user->activePlans()->get();
-
-        if ($subscribedPlan->count() === 0) {
-            return [];
-        }
-
-
-        $sumOfPurchasedPlanGames = 0;
-        $sumOfBonusPlanGames = 0;
-        foreach ($subscribedPlan as $activePlan) {
-            $activePlanCount = ($activePlan->game_count * $activePlan->pivot->plan_count) - $activePlan->pivot->used_count;
-            if ($activePlan->is_free) {
-                $sumOfBonusPlanGames += $activePlanCount;
-            } else {
-                $sumOfPurchasedPlanGames += $activePlanCount;
-            }
-        };
-
-        $subscribedPlans = [];
-
-        $purchasedPlan =  new stdClass;
-        $purchasedPlan->name = "Purchased Games";
-        $purchasedPlan->background_color = "#D9E0FF";
-        $purchasedPlan->is_free = false;
-        $purchasedPlan->game_count = $sumOfPurchasedPlanGames;
-        $purchasedPlan->description = $sumOfPurchasedPlanGames . " games remaining";
-        $subscribedPlans[] = $purchasedPlan;
-
-        $bonusPlan = new stdClass;
-        $bonusPlan->name = "Bonus Games";
-        $bonusPlan->background_color = "#FFFFFF";
-        $bonusPlan->is_free = true;
-        $bonusPlan->description = $sumOfBonusPlanGames . " games remaining";
-        $bonusPlan->game_count = $sumOfBonusPlanGames;
-        $subscribedPlans[] = $bonusPlan;
-
-
-        return $subscribedPlans;
-    }
-
     public function deleteAccount()
     {
         $user = User::find($this->user->id);

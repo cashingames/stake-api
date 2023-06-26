@@ -30,14 +30,12 @@ class GameSessionFactory extends Factory
         return [
             //
             'user_id' => User::factory()->hasProfile(1),
-            'plan_id' => Plan::factory(),
             'game_mode_id' => GameMode::factory(),
             'game_type_id' => GameType::factory(),
             'category_id' => Category::factory(),
             'start_time' => Carbon::now(),
             'end_time' => Carbon::now()->addMinutes(1),
             'session_token' => Str::random(20),
-            // 'trivia_id' => $this->faker->randomElement(array(1,2,3,4,5)),
             'state' => 'COMPLETED',
             'correct_count' => $this->faker->randomNumber(1),
             'wrong_count' => $this->faker->randomNumber(1),

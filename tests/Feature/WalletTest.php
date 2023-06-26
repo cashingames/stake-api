@@ -20,6 +20,8 @@ class WalletTest extends TestCase
 
     protected $user;
 
+    const BASE_URL = '/api/v3/wallet/me/transactions';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,13 +34,13 @@ class WalletTest extends TestCase
 
     public function test_transactions_can_be_gotten()
     {
-        $response = $this->get('/api/v2/wallet/me/transactions');
+        $response = $this->get(self::BASE_URL);
         $response->assertStatus(200);
     }
 
     public function test_earnings_transactions_can_be_gotten()
     {
-        $response = $this->get('/api/v2/wallet/me/transactions/earnings');
+        $response = $this->get(self::BASE_URL . '/earnings');
         $response->assertStatus(200);
     }
 

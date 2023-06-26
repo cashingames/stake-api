@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\WalletTransaction;
 use App\Services\OddsComputer;
 use Tests\TestCase;
-use Database\Seeders\PlanSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
@@ -19,7 +18,10 @@ class OddsMakerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public $user, $latestThreeGames, $specialHours, $currentHour;
+    public $user;
+    public $latestThreeGames;
+    public $specialHours;
+    public $currentHour;
 
     protected function setUp(): void
     {
@@ -29,7 +31,6 @@ class OddsMakerTest extends TestCase
         $this->seed(CategorySeeder::class);
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
-        $this->seed(PlanSeeder::class);
         $this->seed(OddsConditionsAndRulesSeeder::class);
 
         $this->user = User::first();
@@ -39,7 +40,6 @@ class OddsMakerTest extends TestCase
             ->create([
                 'user_id' => $this->user->id
             ]);
-        // GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $this->latestThreeGames = $this->user->gameSessions()->latest()->limit(3)->get();
         $this->specialHours = config('odds.special_hours');
         $this->currentHour = date("H");
@@ -56,7 +56,6 @@ class OddsMakerTest extends TestCase
         if (in_array($currentHour, $this->specialHours)){
             $expectation += 1.5;
         }
-        // dd($expectation, $oddEffect);
         $this->assertEquals($expectation, $oddEffect['oddsMultiplier']);
     }
 
