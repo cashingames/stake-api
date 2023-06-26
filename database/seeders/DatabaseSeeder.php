@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             GameModeSeeder::class,
             BoostSeeder::class,
             UserSeeder::class,
-            PlanSeeder::class,
             OddsConditionsAndRulesSeeder::class,
             StakingOddsRulesSeeder::class,
             ContestSeeder::class,

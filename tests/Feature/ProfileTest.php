@@ -8,7 +8,6 @@ use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use UserSeeder;
-use PlanSeeder;
 use App\Models\User;
 
 class ProfileTest extends TestCase
@@ -31,7 +30,6 @@ class ProfileTest extends TestCase
         parent::setUp();
 
         $this->seed(UserSeeder::class);
-        $this->seed(PlanSeeder::class);
         $this->user = User::first();
 
         $this->actingAs($this->user);

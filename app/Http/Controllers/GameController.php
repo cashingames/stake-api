@@ -16,7 +16,6 @@ use App\Models\ExhibitionStaking;
 use App\Models\GameSessionQuestion;
 use App\Models\Question;
 use App\Models\StakingOdd;
-use App\Models\Trivia;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
@@ -25,7 +24,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\CreditRegistrationBonusWinnings;
 use stdClass;
@@ -146,7 +144,7 @@ class GameController extends BaseController
 
         return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
-    public function endSingleGame(Request $request, ReferralService $referralService, )
+    public function endSingleGame(Request $request)
     {
 
         Log::info($request->all());
@@ -291,9 +289,6 @@ class GameController extends BaseController
                 ]);
             }
         });
-
-        // call for referral logic
-        $referralService->gift();
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }

@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\GameMode;
 use App\Models\GameSession;
 use App\Models\GameType;
-use App\Models\Plan;
 use App\Models\User;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;

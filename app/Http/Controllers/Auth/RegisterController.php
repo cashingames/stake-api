@@ -133,19 +133,6 @@ class RegisterController extends BaseController
         $user->wallet()
             ->create([]);
 
-        //subscribe user to free plan
-        DB::table('user_plans')->insert([
-            'user_id' => $user->id,
-            'plan_id' => 1,
-            'description' => "Registration Daily bonus plan for " . $user->username,
-            'is_active' => true,
-            'used_count' => 0,
-            'plan_count' => 20,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-
         //give user sign up bonus
         if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
             if (isset($data['bonus_checked']) && $data['bonus_checked']) {

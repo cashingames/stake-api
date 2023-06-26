@@ -47,7 +47,6 @@ class GameTest extends TestCase
 
     protected $user;
     protected $category;
-    protected $plan;
     protected $staking;
 
     protected function setUp(): void
@@ -309,81 +308,7 @@ class GameTest extends TestCase
             'amount_won' => $staking->amount_staked * $expectedOdd *  $stakingOddApplied
         ]);
     }
-    public function test_that_referral_can_be_rewarded_after_referee_ends_first_game()
-    {
-        // create new user
-        $newUser = User::create([
-            'username' => 'testUser',
-            'phone_number' => '08133445858',
-            'email' => 'testaccount@gmail.com',
-            'password' => 'xcvb',
-            'country_code' => 'NGN'
-        ]);
-        $newUser
-            ->profile()
-            ->create([
-                'first_name' => 'zxcv',
-                'last_name' => 'asdasd',
-                'referral_code' => 'zxczxc',
-                'referrer' => $this->user->profile->referrer,
-            ]);
 
-        $newUser->wallet()
-            ->create([]);
-
-        DB::table('user_plans')->insert([
-            'user_id' => $newUser->id,
-            'plan_id' => 1,
-            'description' => "Registration Daily bonus plan for " . $newUser->username,
-            'is_active' => true,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-
-        // play game and end
-        #start
-        $questions = Question::factory()
-            ->count(250)
-            ->create();
-        $data = [];
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-        DB::table('categories_questions')->insert($data);
-        $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2
-        ]);
-
-        #end game
-        GameSession::factory()
-            ->count(20)
-            ->create();
-        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
-        $game = $this->user->gameSessions()->first();
-        $game->update(['state' => 'ONGOING', 'user_id' => $newUser->id]);
-
-        $this->postjson(self::END_EXHIBITION_GAME_URL, [
-            "token" => $game->session_token,
-            "chosenOptions" => [],
-            "consumedBoosts" => []
-        ]);
-
-        # check if referrer has a new gifted game
-        $this->assertDatabaseHas('user_plans', [
-            'user_id' => $newUser->id,
-            'plan_id' => 1
-        ]);
-    }
 
     public function test_bonus_balance_is_being_deducted_for_staking_when_a_user_has_bonus()
     {

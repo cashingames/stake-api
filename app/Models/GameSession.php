@@ -25,25 +25,11 @@ class GameSession extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
-    public function plan()
-    {
-        return $this->belongsTo(Plan::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function trivia()
-    {
-        return $this->belongsTo(Trivia::class);
-    }
-
-    public function liveTrivia()
-    {
-        return $this->belongsTo(LiveTrivia::class, 'trivia_id');
-    }
 
     public function scopeCompleted($query)
     {
