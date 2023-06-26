@@ -98,10 +98,14 @@ class GameTest extends TestCase
     }
 
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
-    {
+    {   
+        Staking::factory()->count(5)->create(['user_id' => $this->user->id]);
+      
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
+
+        ExhibitionStaking::factory()->create(['staking_id' => Staking::first()->id, 'game_session_id' => $game->id]);
 
         $response = $this->postjson(self::END_EXHIBITION_GAME_URL, [
             "token" => $game->session_token,
@@ -112,7 +116,6 @@ class GameTest extends TestCase
             'message' => 'Game Ended',
         ]);
     }
-
 
     public function test_exhibition_game_can_be_started_with_staking()
     {

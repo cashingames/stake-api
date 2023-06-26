@@ -165,7 +165,7 @@ class WalletRepository
         if ($balanceAccount == "bonus") {
             $wallet->bonus -= $amount;
             $wallet->save();
-
+          
             $balanceAmount = $wallet->bonus;
             $balanceType = WalletBalanceType::BonusBalance->value;
         }

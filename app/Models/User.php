@@ -29,7 +29,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'country_code',
         'brand_id',
-        'apple_user_id',
         'email_verified_at',
         'last_activity_time',
         'meta_data'
@@ -138,6 +137,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserBonus::class);
     }
 
+
     public function getAverageOfRecentGames()
     {
         return $this->gameSessions()
@@ -148,7 +148,6 @@ class User extends Authenticatable implements JWTSubject
             ->avg('correct_count');
 
     }
-
 
     public function userTransactions()
     {
@@ -183,6 +182,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('name', '!=', 'Bomb')
             ->where('user_boosts.boost_count', '>', 0)->get();
     }
+
 
     public function notifications()
     {
