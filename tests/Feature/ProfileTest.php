@@ -71,7 +71,7 @@ class ProfileTest extends TestCase
         ])->get(self::PROFILE_DATA_URL);
         $response->assertJson([
             'data' => [
-                'usedBoost' => $this->user->getUserUsedBoostCount(),
+                'usedBoostCount' => $this->user->getUserUsedBoostCount(),
             ],
         ]);
     }

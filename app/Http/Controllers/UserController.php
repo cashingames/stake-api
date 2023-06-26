@@ -51,7 +51,7 @@ class UserController extends BaseController
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->boosts = $this->user->gameArkUserBoosts();
         $result->coinsBalance = $this->user->getUserCoins();
-        $result->usedBoost = $this->user->getUserUsedBoostCount();
+        $result->usedBoostCount = $this->user->getUserUsedBoostCount();
 
         return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
     }
