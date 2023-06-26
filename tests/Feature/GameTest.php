@@ -167,16 +167,6 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
         $this->user->wallet->update([
             'non_withdrawable' => 5000
         ]);
@@ -218,17 +208,8 @@ class GameTest extends TestCase
         $this->user->wallet->update([
             'non_withdrawable' => 1000
         ]);
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-        $this->postjson('/api/v2/game/start/single-player', [
+
+        $this->postjson('/api/v3/game/start/single-player', [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
@@ -256,17 +237,6 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => $this->plan->game_count,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-
         $this->user->wallet->update([
             'non_withdrawable' => 5000
         ]);
@@ -293,16 +263,6 @@ class GameTest extends TestCase
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
 
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
         $this->user->wallet->update([
             'non_withdrawable' => 5000
         ]);
@@ -365,16 +325,6 @@ class GameTest extends TestCase
             $chosenOptions[] = $question->options()->inRandomOrder()->first();
         }
 
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
         $this->user->wallet->update([
             'non_withdrawable' => 5000
         ]);
@@ -423,19 +373,6 @@ class GameTest extends TestCase
             'amount_won' => $staking->amount_staked * $expectedOdd *  $stakingOddApplied
         ]);
     }
-
-    public function test_standard_exhibition_game_cannot_be_started_if_no_plan()
-    {
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2
-        ]);
-        $response->assertJson([
-            'message' => 'You do not have a valid plan',
-        ]);
-    }
-
     public function test_that_referral_can_be_rewarded_after_referee_ends_first_game()
     {
         // create new user
@@ -539,7 +476,7 @@ class GameTest extends TestCase
             'bonus' => 1000
         ]);
 
-        $this->postjson('/api/v2/game/start/single-player', [
+        $this->postjson('/api/v3/game/start/single-player', [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
@@ -553,7 +490,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_amount_is_deducted_from_funding_balance_if_bonus_is_insufficient()
+    public function test_message_is_shown_if_staking_amount_is_less_than_bonus()
     {
         Staking::factory()->count(5)->create(['user_id' => $this->user->id]);
         $questions = Question::factory()
@@ -581,17 +518,15 @@ class GameTest extends TestCase
             'bonus' => 100
         ]);
 
-        $response = $this->postjson('/api/v2/game/start/single-player', [
+        $response = $this->postjson('/api/v3/game/start/single-player', [
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
             "staking_amount" => 500
         ]);
 
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $this->user->wallet->id,
-            'bonus' => 100,
-            'non_withdrawable' => 1500
+        $response->assertJson([
+            'message' => 'Insufficient bonus balance. Please exhaust your bonuses to proceed',
         ]);
     }
 

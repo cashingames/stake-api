@@ -270,8 +270,6 @@ class GameController extends BaseController
         }
 
         $game->total_count = $points + $wrongs;
-        $game->amount_staked = $staking ? $staking->amount_staked : null;
-        $game->with_staking = $staking ? true : false;
         $game->save();
 
         if ($points > 0) {
