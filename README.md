@@ -64,3 +64,18 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+# Tech Improvements
+- Achievement in code and database
+- Create EndSinglePlayerController.cs
+- Cleanup feature flags in the project
+- Rework ClientPlatform based on where we are
+- Review feature flags controller
+- Review profile controller
+- Review UserController
+- Review Notifications and UserNotifications
+- Cleanup questions hardening services
+- Re-implement daily reports
+- Drop uneeded columns and tables
+- Optimize common data endpoint

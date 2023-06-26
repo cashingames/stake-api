@@ -20,8 +20,8 @@ class GetStakingOddsTest extends TestCase
     {
         parent::setUp();
         $this->actingAs(User::factory()->create());
-
     }
+
     public function test_that_odds_are_halved_when_platform_target_is_not_met_when_staking_odds_is_on()
     {
         FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);

@@ -15,16 +15,6 @@ use App\Http\Controllers\RedirectUnverifiedUserController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/redirect-respond-to-challenge', function () {
-    return view('redirectToRespondToChallenge');
-});
-Route::get('/redirect-home', function () {
-    return view('redirectToHome');
-});
-Route::get('/redirect-instructions', function () {
-    return view('redirectToInstructions');
-});
-
 Route::get('/redirect-verified-email/{email}', RedirectUnverifiedUserController::class);
 
 Route::get('test-fcm', function(){

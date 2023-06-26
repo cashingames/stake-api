@@ -2,15 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\FeatureFlags;
 use App\Enums\GameType;
-use App\Models\LiveTrivia;
-use App\Models\Staking;
+use App\Enums\StakingFundSource;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
-use App\Services\FeatureFlag;
-use Illuminate\Support\Facades\Cache;
 
 class StartSinglePlayerRequest extends FormRequest
 {
@@ -51,11 +47,8 @@ class StartSinglePlayerRequest extends FormRequest
     {
         return [
             'category' => ['required', 'numeric'],
-            'type' => ['required', 'numeric'],
-            'mode' => ['required', 'numeric'],
-            'trivia' => ['nullable', 'numeric'],
             'staking_amount' => [
-                'nullable',
+                'required',
                 'numeric',
                 "max:" . config('trivia.maximum_exhibition_staking_amount'),
                 "min:" . config('trivia.minimum_exhibition_staking_amount')
@@ -76,163 +69,79 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         $validator->after(function ($validator) {
-            $this->validateStartGame($validator);
+            $this->validate($validator);
         });
 
         if ($validator->passes()) {
-            app()->instance(GameType::class, GameType::detect($this->all()));
+            app()->instance(GameType::class, GameType::StakingExhibition);
         }
     }
 
-    private function validateStartGame($validator)
+    private function validate($validator)
     {
-        $gameType = GameType::detect($this->all());
-
-        if (!$gameType) {
-            $validator->errors()->add('type', 'Invalid game type');
-            return;
-        }
-
-        switch ($gameType) {
-            case GameType::StakingExhibition:
-                $this->validateStakingExhibition($validator);
-                break;
-            case GameType::LiveTrivia:
-                $this->validateLiveTrivia($validator);
-                break;
-            case GameType::StandardExhibition:
-                $this->validateStandardExhibition($validator);
-                break;
-            default:
-                $validator->errors()->add('type', 'Invalid game type');
-                break;
-        }
+        $this->validateStakingAmount($validator);
     }
 
-    private function validateStakingExhibition($validator)
+    private function validateStakingAmount($validator)
     {
 
         $stakingAmount = $this->input('staking_amount');
         $user = auth()->user();
 
-        if ($stakingAmount <= 0) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You cannot stake 0 amount'
-            );
-        }
-        if (!$user->wallet->hasBonus()) {
-            if ($user->wallet->non_withdrawable < $stakingAmount) {
-                return $validator->errors()->add(
-                    'staking_amount',
-                    'Insufficient Balance'
-                );
-            }
-        }
         if ($user->wallet->hasBonus()) {
-            if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-                $hasRegistrationBonus = $this->registrationBonusService->hasActiveRegistrationBonus($user);
-                if ($hasRegistrationBonus) {
-                    $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($user);
-                    if ($stakingAmount <= $registrationBonus->amount_remaining_after_staking) {
-                        $hasPlayedCategory = $this->registrationBonusService->hasPlayedCategory($user, $this->input('category'));
-                        if ($hasPlayedCategory) {
-                            return $validator->errors()->add(
-                                'category',
-                                'Sorry, you cannot play a category twice using your welcome bonus, Please play another.'
-                            );
-                        }
-                    }
-                    if (
-                        ($stakingAmount > $registrationBonus->amount_remaining_after_staking)
-                        and
-                        ($registrationBonus->amount_remaining_after_staking > config('trivia.minimum_exhibition_staking_amount'))
-                    ) {
-                        return $validator->errors()->add(
-                            'staking_amount',
-                            'Registration bonus is remaining ' . $registrationBonus->amount_remaining_after_staking . ' please stake ' . $registrationBonus->amount_remaining_after_staking
-                        );
-                    }
-                }
-            }
+            $this->validateBonusAccount($validator, $user, $stakingAmount);
+        } else {
+            $this->validateDepositAccount($validator, $user, $stakingAmount);
         }
-
-        // $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
-        // if ($userProfit > 300) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'You are a genius!, please try again tomorrow'
-        //     );
-        // }
-
-        // $platformProfit = Cache::remember(
-        //     'platform-profit-today',
-        //     60 * 3,
-        //     fn () => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
-        // );
-
-        // if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'You are a genius!, please try again later'
-        //     );
-        // }
-
-        // $percentWonThisYear = $this->walletRepository
-        //     ->getUserProfitPercentageOnStakingThisYear(auth()->id());
-
-        // if ($percentWonThisYear > 300 && $platformProfit < config('trivia.platform_target')) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'You are a genius!, please try again tomorrow'
-        //     );
-        // }
-
-        //if total session is greater than 10
-        // $todaysSessions = Staking::where('user_id', auth()->id())
-        //     ->whereDate('created_at', now()->toDateString())
-        //     ->count();
-        // if ($todaysSessions > 10) {
-        //     return $validator->errors()->add(
-        //         'staking_amount',
-        //         'You have reached your daily limit of 10 games, please try again tomorrow'
-        //     );
-        // }
     }
 
-    private function validateLiveTrivia($validator)
+    private function validateDepositAccount($validator, $user, $stakingAmount)
     {
+        app()->instance(StakingFundSource::class, StakingFundSource::DEPOSIT);
 
-        $trivia = LiveTrivia::find($this->input('trivia'));
-        if (!$trivia) {
-            $validator->errors()->add('trivia', 'Unknown trivia');
+        if ($user->wallet->non_withdrawable < $stakingAmount) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Insufficient Deposit'
+            );
+
+        }
+    }
+
+    private function validateBonusAccount($validator, $user, $stakingAmount)
+    {
+        app()->instance(StakingFundSource::class, StakingFundSource::BONUS);
+
+        if ($user->wallet->bonus < $stakingAmount) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Insufficient bonus balance. Please exhaust your bonuses to proceed'
+            );
             return;
         }
 
-        //@TODO cover these edge cases
-
-        // if ($trivia->status != 'active') {
-        //     $validator->errors()->add('trivia', 'Trivia is not active');
-        // }
-
-        // if ($trivia->start_time > now()) {
-        //     $validator->errors()->add('trivia', 'Trivia has not started');
-        // }
-
-        // if ($trivia->end_time < now()) {
-        //     $validator->errors()->add('trivia', 'Trivia has ended');
-        // }
-
-        if (auth()->user()->gameSessions()->where('trivia_id', $trivia->id)->exists()) {
-            $validator->errors()->add('trivia', 'You have already played this trivia');
+        $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($user);
+        if ($registrationBonus != null) {
+            $this->validateRegistrationBonus($validator, $user, $registrationBonus, $stakingAmount);
         }
+
     }
 
-    private function validateStandardExhibition($validator)
+    private function validateRegistrationBonus($validator, $user, $bonus, $stakingAmount)
     {
-        $plan = auth()->user()->getNextFreePlan() ?? auth()->user()->getNextPaidPlan();
-        if ($plan == null) {
-            $validator->errors()->add('type', 'You do not have a valid plan');
+        if ($stakingAmount > $bonus->amount_remaining_after_staking) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Registration bonus is remaining ' .
+                $bonus->amount_remaining_after_staking .
+                ' please stake ' . $bonus->amount_remaining_after_staking
+            );
+        } elseif ($this->registrationBonusService->hasPlayedCategory($user, $this->input('category'))) {
+            $validator->errors()->add(
+                'category',
+                'Sorry, you cannot play a category twice using your welcome bonus, Please play another category.'
+            );
         }
     }
+
 }

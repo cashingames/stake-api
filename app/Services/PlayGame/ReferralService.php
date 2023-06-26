@@ -5,7 +5,6 @@ namespace App\Services\PlayGame;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\GameSession;
-use Illuminate\Foundation\Auth\User;
 use Carbon\Carbon;
 use App\Actions\SendPushNotification;
 
@@ -13,11 +12,6 @@ class ReferralService
 {
 
     private $user;
-
-    // public function __construct()
-    // {
-    //     $this->user = auth()->user();
-    // }
 
     public function gift()
     {
@@ -31,7 +25,10 @@ class ReferralService
         $referrerProfile = $this->user->profile->getReferrerProfile();
 
         if ($referrerProfile == null) {
-            Log::info('This user has no referrer: ' . $this->user->username . " referrer_code " . $this->user->profile->referrer);
+            Log::info(
+                'This user has no referrer: ' .
+                $this->user->username . " referrer_code " . $this->user->profile->referrer
+            );
             return;
         }
 
@@ -45,7 +42,7 @@ class ReferralService
             Log::info('Giving : ' . $this->user->profile->referrer . " bonus for " . $this->user->username);
             Log::info($referrerProfile);
 
-            $plan_count = config('trivia.bonus.signup.referral_on_signup_bonus_amount');
+            $planCount = config('trivia.bonus.signup.referral_on_signup_bonus_amount');
 
             DB::table('user_plans')->insert([
                 'user_id' => $referrerProfile->user_id,
@@ -54,13 +51,13 @@ class ReferralService
 
                 'is_active' => true,
                 'used_count' => 0,
-                'plan_count' => $plan_count,
+                'plan_count' => $planCount,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);
 
             // send push notification ot user
-            (new SendPushNotification())->sendReferralBonusNotification($referrerProfile, $plan_count);
+            (new SendPushNotification())->sendReferralBonusNotification($referrerProfile, $planCount);
         }
     }
 }

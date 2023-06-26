@@ -32,7 +32,7 @@ class SendChallengeRefundNotification implements ShouldQueue
      * Execute the job.
      */
     public function handle(): void
-    {   
+    {
         $this->user->notify(new ChallengeStakingRefund($this->request->amount));
     
     }

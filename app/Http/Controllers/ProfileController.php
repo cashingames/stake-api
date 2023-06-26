@@ -3,75 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
-use URL;
-use App\Models\User;
-use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use App\Enums\ClientPlatform;
 
 class ProfileController extends BaseController
 {
-
-    public function editPIForGameArk(Request $request)
+    public function editPersonalInformation(Request $request)
     {
-        $data = $request->validate([
-            'username' => [
-                'required', 'string', 'max:20',
-                Rule::unique('users','username')->ignore($this->user->id),
-            ],
-            'email' => [
-                'required', 'string', 'max:255','email',
-                Rule::unique('users','email')->ignore($this->user->id),
-            ],
-            'gender' => ['nullable', 'string', 'max:20'],
-            'dateOfBirth' => ['nullable', 'date'],
-        ]);
 
-        $profile = $this->user->profile;
-
-        $this->user->username = $data['username'];
-        $this->user->email = $data['email'];
-        $this->user->save();
-
-        if (isset($data['gender']) &&  !is_null($data['gender'])) {
-            $profile->gender =  $data['gender'];
-        }
-
-        if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
-            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
-        }
-        $profile->save();
-    }
-
-    public function editPIForCashingames(Request $request)
-    {
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:20'],
             'lastName' => ['required', 'string', 'max:20'],
             'username' => [
-                'required', 'string', 'max:20',
-                Rule::unique('users','username')->ignore($this->user->id),
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('users', 'username')->ignore($this->user->id),
             ],
             'email' => [
-                'required', 'string', 'max:255','email',
-                Rule::unique('users','email')->ignore($this->user->id),
+                'required',
+                'string',
+                'max:255',
+                'email',
+                Rule::unique('users', 'email')->ignore($this->user->id),
             ],
 
-            // 'phoneNumber' => [
-            //     'required','min:11','max:11',
-            //     Rule::unique('users','phone_number')->ignore($this->user->id),
-            // ],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
         ]);
 
-        // if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
-        //     $this->user->phone_number = $data['phoneNumber'];
-        //     $this->user->save();
-        // }
         $profile = $this->user->profile;
         $profile->first_name = $data['firstName'];
         $profile->last_name = $data['lastName'];
@@ -80,24 +41,14 @@ class ProfileController extends BaseController
         $this->user->email = $data['email'];
         $this->user->save();
 
-        if (isset($data['gender']) &&  !is_null($data['gender'])) {
-            $profile->gender =  $data['gender'];
+        if (isset($data['gender']) && !is_null($data['gender'])) {
+            $profile->gender = $data['gender'];
         }
 
         if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
             $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
         $profile->save();
-    }
-
-    public function editPersonalInformation(Request $request, ClientPlatform $clientPlatform)
-    {
-
-        if($clientPlatform == ClientPlatform::GameArkMobile){
-            $this->editPIForGameArk($request);
-        }else{
-            $this->editPIForCashingames($request);
-        }
 
         return $this->sendResponse($this->user, "Profile Updated.");
     }
@@ -109,7 +60,9 @@ class ProfileController extends BaseController
             'accountName' => ['required', 'string', 'max:255'],
             'bankName' => ['required', 'string', 'max:255'],
             'accountNumber' => [
-                'required', 'string', 'max:255',
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('profiles', 'account_number')->ignore($this->user->id),
             ],
         ]);
@@ -133,30 +86,29 @@ class ProfileController extends BaseController
     public function addProfilePic(Request $request)
     {
 
-        // $data  = $request->validate([
-        //     'avatar'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
-        // ]);
+        $data = $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,base64|max:2048'
+        ]);
 
-        // if (!$data) {
-        //     return $this->sendError("The file must be an image", "The file must be an image");
-        // }
-
-        $profile = $this->user->profile;
-
-        if ($request->hasFile('avatar')) {
-            $image = $request->file('avatar');
-            $name = uniqid() . $this->user->username . "." . $image->guessExtension();
-            $destinationPath = public_path('avatar');
-            $profile->avatar = 'avatar/' . $name;
-            $image->move($destinationPath, $name);
-            // echo $destinationPath;
-
-            $profile->save();
-
-            return $this->sendResponse($profile, "Profile Updated.");
+        if (!$data) {
+            return $this->sendError("The file must be an image", "The file must be an image");
         }
 
-        return $this->sendResponse("No file found for upload", "No file found for upload");
+        if (!$request->hasFile('avatar')) {
+            return $this->sendResponse("No file found for upload", "No file found for upload");
+        }
+
+        $image = $request->file('avatar');
+        $name = uniqid() . $this->user->username . "." . $image->guessExtension();
+        $destinationPath = public_path('avatar');
+
+        $profile = $this->user->profile;
+        $profile->avatar = 'avatar/' . $name;
+        $image->move($destinationPath, $name);
+        $profile->save();
+
+        return $this->sendResponse($profile, "Profile Updated.");
+
     }
 
 

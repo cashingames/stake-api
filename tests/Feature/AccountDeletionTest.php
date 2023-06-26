@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AccountDeletionTest extends TestCase
-{   
+{
     use RefreshDatabase;
     protected $user;
 

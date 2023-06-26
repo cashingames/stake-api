@@ -35,32 +35,6 @@ class ArtisanCommandsTest extends TestCase
         $this->seed(UserSeeder::class);
         // $this->seed(PlanSeeder::class);
     }
-
-    public function test_that_daily_automated_report_command_runs()
-    {
-        Mail::fake();
-
-        $this->artisan('daily-report:send')->assertExitCode(0);
-
-        Mail::assertSent(DailyReportEmail::class);
-    }
-
-    public function test_that_weekly_automated_report_command_runs()
-    {
-        GameSession::factory()
-            ->count(5)
-            ->create(['created_at' => now()->yesterday()]);
-
-        Staking::factory()
-            ->count(5)
-            ->create(['created_at' => now()->yesterday()]);
-
-        Mail::fake();
-
-        $this->artisan('weekly-report:send')->assertExitCode(0);
-
-        Mail::assertSent(WeeklyReportEmail::class);
-    }
     
     public function test_that_registration_bonuses_can_be_expired(){
         config(['features.registration_bonus.enabled' => true]);

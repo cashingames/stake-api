@@ -2,32 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientPlatform;
-use App\Enums\UserAssetType;
 use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Models\WalletTransaction;
-use App\Models\Plan;
-use App\Models\UserPoint;
 use App\Models\User;
 use App\Models\Boost;
-use App\Models\Profile;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Yabacon\Paystack\Event as PaystackEvent;
 use Yabacon\Paystack;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
-use App\Enums\AchievementType;
 use App\Enums\FeatureFlags;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
-use Illuminate\Support\Facades\Event;
-use App\Events\AchievementBadgeEvent;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\FeatureFlag;
 
@@ -89,7 +80,6 @@ class WalletController extends BaseController
         $event = PaystackEvent::capture();
 
         Log::info("in paystaaack");
-        // Log::info("event from paystack ", $event->raw);
 
         $myKeys = [
             'key' => config('trivia.payment_key'),
@@ -201,7 +191,6 @@ class WalletController extends BaseController
         Log::info("Records reconciled ");
         return $this->sendResponse(true, 'Transactions reconciled');
     }
-
     private function savePaymentTransaction($reference, $email, $amount)
     {
 
@@ -268,7 +257,6 @@ class WalletController extends BaseController
         return response("", 200);
     }
 
-
     public function getBanks()
     {
         $result = cache('banks');
@@ -293,49 +281,6 @@ class WalletController extends BaseController
         Cache::forever('banks', $result);
 
         return response()->json($result, 200);
-    }
-
-    //when a user chooses to buy boost with points
-    public function buyBoostsWithPoints($boostId)
-    {
-
-        $boost = Boost::find($boostId);
-
-        if ($boost == null) {
-            return $this->sendError([], 'Wrong boost selected');
-        }
-
-        $points = $this->user->points();
-        if ($points < ($boost->point_value)) {
-            return $this->sendError(false, 'You do not have enough points');
-        }
-
-        //log point traffic
-        UserPoint::create([
-            'user_id' => $this->user->id,
-            'value' => $boost->point_value,
-            'description' => 'Points used for buying ' . $boost->name . ' boosts',
-            'point_flow_type' => 'POINTS_SUBTRACTED',
-        ]);
-
-        //credit user with bought boost
-        //if user already has boost, add to boost else create new boost for user
-        $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
-        if ($userBoost === null) {
-            $this->user->boosts()->create([
-                'user_id' => $this->user->id,
-                'boost_id' => $boostId,
-                'boost_count' => $boost->pack_count,
-                'used_count' => 0
-            ]);
-        } else {
-            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
-        }
-
-        // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
-
-        return $this->sendResponse($points - $boost->point_value, 'Boost Bought');
     }
 
     //when a user chooses to buy boost from wallet
@@ -380,132 +325,12 @@ class WalletController extends BaseController
             $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
         }
 
-        // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
-
         return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
     }
-
 
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
 
-    public function subscribeToPlan($planId)
-    {
-        $plan = Plan::find($planId);
-
-        if ($plan === null) {
-            return $this->sendError('Plan does not exist', 'Plan does not exist');
-        }
-
-        if ($plan->price > $this->user->wallet->non_withdrawable) {
-            return $this->sendError('Your wallet balance cannot afford this plan', 'Your wallet balance cannot afford this plan');
-        }
-
-        $this->user->wallet->non_withdrawable -= $plan->price;
-        $this->user->wallet->save();
-
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $plan->price,
-            'balance' => $this->user->wallet->non_withdrawable,
-            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
-            'reference' => Str::random(10),
-            'balance_type' => WalletBalanceType::CreditsBalance->value,
-            'transaction_action' => WalletTransactionAction::GamesBought->value
-        ]);
-
-
-        DB::table('user_plans')->insert([
-            'user_id' => $this->user->id,
-            'plan_id' => $plan->id,
-            'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
-            'is_active' => true,
-            'used_count' => 0,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
-        ]);
-
-        // trigger event for achievement
-        Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::GAME_BOUGHT, $plan));
-
-        return $this->sendResponse(
-            'You have successfully bought ' . $plan->game_count . ' games',
-            'You have successfully bought ' . $plan->game_count . ' games'
-        );
-    }
-
-    public function itemPurchased(Request $request, ClientPlatform $clientPlatform)
-    {
-        if ($clientPlatform != ClientPlatform::GameArkMobile) {
-            return $this->sendError('App type not supported', 'App type not supported');
-        }
-        $data = $request->validate([
-            'type' => ['required'],
-            'item_id' => ['required']
-        ]);
-
-        $type = null;
-
-        switch ($data['type']) {
-            case 'BOOST':
-                $type = UserAssetType::BOOST;
-                break;
-
-            default:
-                # code...
-                $type = UserAssetType::PLAN;
-                break;
-        }
-
-        if ($type == UserAssetType::BOOST) {
-            $boostId = $data['item_id'];
-            $boost = Boost::find($boostId);
-
-            if ($boost == null) {
-                return $this->sendError([], 'Wrong boost selected');
-            }
-
-            $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
-
-            if ($userBoost == null) {
-                $this->user->boosts()->create([
-                    'user_id' => $this->user->id,
-                    'boost_id' => $boostId,
-                    'boost_count' => $boost->pack_count,
-                    'used_count' => 0
-                ]);
-            } else {
-                $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
-            }
-
-            // trigger event for achievement
-            Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::BOOST_BOUGHT, $boost));
-        } else {
-            $planId = $data['item_id'];
-
-            $plan = Plan::find($planId);
-            if ($plan === null) {
-                return $this->sendError('Plan does not exist', 'Plan does not exist');
-            }
-
-            DB::table('user_plans')->insert([
-                'user_id' => $this->user->id,
-                'plan_id' => $plan->id,
-                'description' => 'BOUGHT ' . $plan->game_count . ' GAMES',
-                'is_active' => true,
-                'used_count' => 0,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-
-            // trigger event for achievement
-            Event::dispatch(new AchievementBadgeEvent($this->user, AchievementType::GAME_BOUGHT, $plan));
-
-            return response("Item purchased", 200);
-        }
-    }
 }

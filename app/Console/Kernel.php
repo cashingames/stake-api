@@ -2,12 +2,9 @@
 
 namespace App\Console;
 
-use App\Enums\FeatureFlags;
-use App\Services\FeatureFlag;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-// use App\Console\Commands\TriviaStaking\Analytics\ComputeUsersLevelsCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -18,11 +15,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        Commands\ExpireDailyBonusGames::class,
-        Commands\GiveDailyBonusGames::class,
-        // Commands\CreditWinnings::class,
-        // Commands\SendInAppActivityUpdates::class,
-        // ComputeUsersLevelsCommand::class
     ];
 
     /**
@@ -35,16 +27,12 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::SEND_AUTOMATED_REPORTS)) {
-            $schedule->command('daily-report:send')
-                ->dailyAt('01:00');
-            $schedule->command('weekly-report:send')
-                ->dailyAt('01:00');
-        }
+        // $schedule->command('daily-report:send')
+        //     ->dailyAt('01:00');
+        // $schedule->command('weekly-report:send')
+        //     ->dailyAt('01:00');
 
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            $schedule->command('registration-bonus:expire')->daily();
-        }
+        $schedule->command('registration-bonus:expire')->daily();
     }
 
     /**
