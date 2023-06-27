@@ -38,7 +38,8 @@ class DatabaseSeeder extends Seeder
             StakingOddSeeder::class,
             ChallengeRequestSeeder::class,
             RewardSeeder::class,
-            RewardBenefitSeeder::class
+            RewardBenefitSeeder::class,
+            GameSeeder::class
         ]);
     }
 }
