@@ -77,5 +77,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Review Notifications and UserNotifications
 - Cleanup questions hardening services
 - Re-implement daily reports
-- Drop uneeded columns and tables
+- x Drop uneeded columns and tables
 - Optimize common data endpoint
+- Move referral rewards notification on Login to backend instead of frontend
