@@ -20,7 +20,6 @@ return new class extends Migration {
         Schema::dropIfExists('user_coins');
         Schema::dropIfExists('trivias');
         Schema::dropIfExists('trivia_stakings');
-        Schema::dropIfExists('trivia_challenge_questions');
         Schema::dropIfExists('live_trivia_user_payments');
         Schema::dropIfExists('challenges');
         Schema::dropIfExists('challenge_game_sessions');
