@@ -38,32 +38,5 @@ class QuestionHardenerTest extends TestCase
             $questions
         );
     }
-
-//@TODO Delete question hardener totally
-
-// public function testAllQuestionsReturnedBelongToTheSameCategory()
-// {
-//     Question::factory()
-//         ->count(500)
-//         ->create();
-
-//     $questions = $this->questionHardener->determineQuestions(false);
-//     $questionCategories = [];
-
-//     foreach ($questions as $q) {
-//         $questionCategories[] = $q->category_id;
-//     }
-
-//     if (empty($questionCategories)) {
-//         $this->assertEmpty($questions);
-//     }
-
-//     if (array_unique($questionCategories) == array($this->category->id)) {
-//         $questionCategory = $this->category->id;
-//         $this->assertEquals($this->category->id, $questionCategory);
-//     }
-
-//     $this->assertNotEmpty($questionCategories);
-// }
    
 }
