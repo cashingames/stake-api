@@ -23,7 +23,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     {
     }
 
-    public function determineQuestions(string $userId, string $categoryId, ?string $triviaId): Collection
+    public function determineQuestions(string $userId, string $categoryId): Collection
     {
         $user = auth()->user();
 

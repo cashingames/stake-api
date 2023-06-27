@@ -25,10 +25,6 @@ return [
         'questions_count' => env('GAME_QUESTIONS_COUNT', 10),
         'demo_games_count' => env('DEMO_GAMES_COUNT', 5)
     ],
-    'live_trivia' => [
-        'enabled' => env('HAS_LIVE_TRIVIA', false),
-        'display_shelf_life' => env('LIVE_TRIVIA_DISPLAY_SHELF_LIFE', 1)
-    ],
     'wallet_funding' => [
         'min_amount' => env('MINIMUM_WALLET_FUNDABLE_AMOUNT', 100),
         'max_amount' => env('MAXIMUM_WALLET_FUNDABLE_AMOUNT', 100000)
@@ -59,8 +55,6 @@ return [
     'maximum_exhibition_staking_amount' => env('MAXIMUM_EXHIBITION_STAKING_AMOUNT', 1000),
     'minimum_challenge_staking_amount' => env('MINIMUM_CHALLENGE_STAKING_AMOUNT', 100),
     'maximum_challenge_staking_amount' => env('MAXIMUM_CHALLENGE_STAKING_AMOUNT', 1000000),
-    'minimum_live_trivia_staking_amount' => env('MINIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 100),
-    'maximum_live_trivia_staking_amount' => env('MAXIMUM_LIVE_TRIVIA_STAKING_AMOUNT', 1000),
     'email_verification_limit_threshold' => env('EMAIL_VERIFICATION_LIMIT_THRESHOLD', 1000),
     'minimum_withdrawal_perfect_score_threshold' => env('MINIMUM_WITHDRAWAL_PERFECT_SCORE_THRESHOLD', 5)
 ];

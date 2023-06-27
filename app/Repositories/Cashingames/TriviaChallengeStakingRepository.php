@@ -5,7 +5,6 @@ namespace App\Repositories\Cashingames;
 use App\Models\ChallengeRequest;
 use App\Models\Option;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\TriviaChallengeQuestion;
 

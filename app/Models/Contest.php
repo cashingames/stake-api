@@ -19,7 +19,4 @@ class Contest extends Model
       return $this->hasMany(ContestPrizePool::class);
     }
 
-    public function trivia(){
-        return $this->hasMany(Trivia::class);
-    }
 }

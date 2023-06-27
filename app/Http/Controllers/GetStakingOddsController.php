@@ -16,11 +16,11 @@ class GetStakingOddsController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(OddsService $oddsComputer): JsonResponse
+    public function __invoke(OddsService $oddsService): JsonResponse
     {
         $message = 'staking odds fetched';
 
-        $result = $oddsComputer->getOdds($this->user);
+        $result = $oddsService->getOdds($this->user);
 
         Log::info(
             'GET_ODDS_COMPUTED',

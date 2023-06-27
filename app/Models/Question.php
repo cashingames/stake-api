@@ -55,11 +55,6 @@ class Question extends Model
         return $this->hasMany(Game::class);
     }
 
-    public function triviaQuestions()
-    {
-        return $this->hasMany(TriviaQuestion::class);
-    }
-
     public function scopeEasy($query)
     {
         return $query->whereLevel(QuestionLevel::Easy);

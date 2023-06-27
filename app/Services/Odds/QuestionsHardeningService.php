@@ -63,11 +63,7 @@ class QuestionsHardeningService
     {
         //@TODO why get all the game sessions and then average them? why not just get the average from the database?
 
-        //if it is live trivia only get average of live trivia, else get average of all game types
         return $this->user->gameSessions()
-            ->when($mode === "trivia", function ($query) {
-                $query->whereNotNull("trivia_id");
-            })
             ->completed()
             ->latest()
             ->limit(3)
