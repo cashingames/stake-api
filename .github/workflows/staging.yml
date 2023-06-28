@@ -49,24 +49,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: deploy-staging
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: api-user@stg.cashingames.com
-          password: ${{ secrets.STG_FTP_PASSWORD }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
-            fileToExclude.txt
+      # - name: deploy-staging
+      #   uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      #   with:
+      #     server: ${{ secrets.FTP_HOST }}
+      #     username: api-user@stg.cashingames.com
+      #     password: ${{ secrets.STG_FTP_PASSWORD }}
+      #     exclude: |
+      #       **/.git*
+      #       **/.git*/**
+      #       **/node_modules/**
+      #       **/vendor/**
+      #       fileToExclude.txt
       - name: install_dependencies
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
             cd stg-api
-            composer install --optimize-autoloader --no-dev
+            /opt/cpanel/composer/bin/composer install --optimize-autoloader --no-dev
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
