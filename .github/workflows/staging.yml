@@ -61,3 +61,10 @@ jobs:
             **/node_modules/**
             **/vendor/**
             fileToExclude.txt
+      - name: optimize_deploy
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: ls -a
+          host: mocha3031.mochahost.com
+          username: cashinga
+          password: ${{ secrets.CPANEL_PASSWORD }}
