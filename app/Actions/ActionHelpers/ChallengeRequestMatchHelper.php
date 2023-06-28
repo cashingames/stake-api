@@ -22,7 +22,7 @@ class ChallengeRequestMatchHelper
     {
         self::$firestoreService = $firestoreService;
     }
-    
+
     public function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
         $questions = $this
@@ -64,7 +64,7 @@ class ChallengeRequestMatchHelper
         );
     }
 
-    public function parseQuestions(Collection $questions): array
+    private function parseQuestions(Collection $questions): array
     {
         return $questions->map(fn ($question) => [
             'id' => $question->id,
@@ -77,7 +77,7 @@ class ChallengeRequestMatchHelper
         ])->toArray();
     }
 
-    public function parseOpponent(ChallengeRequest $challengeRequest): array
+    private function parseOpponent(ChallengeRequest $challengeRequest): array
     {
         return [
             'challenge_request_id' => $challengeRequest->challenge_request_id,
