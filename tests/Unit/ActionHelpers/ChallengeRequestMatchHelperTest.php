@@ -2,6 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Models\Profile;
+use App\Models\Question;
+use App\Models\User;
+use App\Services\Firebase\FirestoreService;
 use Tests\TestCase;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
@@ -11,7 +15,6 @@ use App\Services\PlayGame\StakingChallengeGameService;
 
 class ChallengeRequestMatchHelperTest extends TestCase
 {
-
     public function test_questions_are_logged()
     {
         $challengeRequest = ChallengeRequest::factory()->make();
@@ -47,6 +50,53 @@ class ChallengeRequestMatchHelperTest extends TestCase
 
     }
 
+    public function test_that_firestore_is_updated_successfully()
+    {
+        $profile1 = Profile::factory()->create();
+        $profile2 = Profile::factory()->create();
+        $challengeRequest = ChallengeRequest::factory()->for($profile1->user)->create();
+        $matchedRequest = ChallengeRequest::factory()->for($profile2->user)->create();
+        $questions = collect([
+            Question::factory()->make(),
+            Question::factory()->make(),
+            Question::factory()->make(),
+        ]);
+        $firestoreService = $this->mockFirestoreService();
+        $firestoreService
+            ->expects($this->exactly(2))
+            ->method('updateDocument')
+            ->willReturnOnConsecutiveCalls(
+                [
+                    'trivia-challenge-requests',
+                    $challengeRequest->challenge_request_id,
+                    [
+                        'status' => 'MATCHED',
+                        'questions' => $this->anything(),
+                        'opponent' => $this->anything(),
+                    ]
+                ],
+                [
+                    'trivia-challenge-requests',
+                    $matchedRequest->challenge_request_id,
+                    [
+                        'status' => 'MATCHED',
+                        'questions' => $this->anything(),
+                        'opponent' => $this->anything(),
+                    ]
+                ]
+            );
+
+
+        $sut = new ChallengeRequestMatchHelper(
+            $this->mockTriviaChallengeStakingRepository(),
+            $this->mockTriviaQuestionRepository(),
+        );
+
+        $sut->setFirestoreService($firestoreService);
+
+        $sut->updateFirestore($challengeRequest, $matchedRequest, $questions);
+    }
+
     private function mockTriviaChallengeStakingRepository()
     {
         return $this->createMock(TriviaChallengeStakingRepository::class);
@@ -55,6 +105,11 @@ class ChallengeRequestMatchHelperTest extends TestCase
     private function mockTriviaQuestionRepository()
     {
         return $this->createMock(TriviaQuestionRepository::class);
+    }
+
+    private function mockFirestoreService()
+    {
+        return $this->createMock(FirestoreService::class);
     }
 
 }
