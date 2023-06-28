@@ -6,15 +6,17 @@ use App\Models\Profile;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\Firebase\FirestoreService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
-use App\Services\PlayGame\StakingChallengeGameService;
 
 class ChallengeRequestMatchHelperTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_questions_are_logged()
     {
         $challengeRequest = ChallengeRequest::factory()->make();
