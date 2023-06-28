@@ -7,7 +7,6 @@ use App\Models\ChallengeRequest;
 use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
-use App\Services\PlayGame\StakingChallengeGameService;
 
 class ChallengeRequestMatchHelper
 {
@@ -16,7 +15,6 @@ class ChallengeRequestMatchHelper
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
-        private readonly StakingChallengeGameService $triviaChallengeService,
     ) {
     }
 
