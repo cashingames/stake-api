@@ -61,13 +61,15 @@ jobs:
             **/node_modules/**
             **/vendor/**
             fileToExclude.txt
-      # - name: install_dependencies
-      #   uses: garygrossgarten/github-action-ssh@release
-      #   with:
-      #     command: cd stg-api && composer install --optimize-autoloader --no-dev
-      #     host: mocha3031.mochahost.com
-      #     username: cashinga
-      #     password: ${{ secrets.CPANEL_PASSWORD }}
+      - name: install_dependencies
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: |
+            cd stg-api
+            composer install --optimize-autoloader --no-dev
+          host: mocha3031.mochahost.com
+          username: cashinga
+          password: ${{ secrets.CPANEL_PASSWORD }}
       - name: optimize_deploy
         uses: garygrossgarten/github-action-ssh@release
         with:
