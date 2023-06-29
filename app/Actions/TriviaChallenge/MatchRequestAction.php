@@ -14,17 +14,13 @@ use Illuminate\Support\Lottery;
 
 class MatchRequestAction
 {
-    private ChallengeRequestMatchHelper $matchHelper;
 
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakingChallengeGameService $triviaChallengeService,
+        private readonly ChallengeRequestMatchHelper $challengeRequestMatchHelper,
     ) {
-        $this->matchHelper = new ChallengeRequestMatchHelper(
-            $this->triviaChallengeStakingRepository,
-            $this->triviaQuestionRepository,
-        );
     }
 
     public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
@@ -33,7 +29,7 @@ class MatchRequestAction
             return null;
         }
 
-        $this->matchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
+        $this->challengeRequestMatchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
         if (!$matchedRequest) {
@@ -42,9 +38,10 @@ class MatchRequestAction
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
 
-        $questions =  $this->matchHelper->processQuestions($challengeRequest, $matchedRequest);
+        $questions = $this->challengeRequestMatchHelper->processQuestions($challengeRequest, $matchedRequest);
 
-        $this->matchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
+        $this->challengeRequestMatchHelper
+            ->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
 
         return $matchedRequest;
     }
