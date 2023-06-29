@@ -23,13 +23,12 @@ class MatchRequestAction
     ) {
     }
 
-    public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
+    public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
         if ($challengeRequest->status !== 'MATCHING') {
             return null;
         }
 
-        $this->challengeRequestMatchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
         if (!$matchedRequest) {

@@ -43,6 +43,7 @@ class ChallengeRequestMatchHelperTest extends TestCase
         $sut = new ChallengeRequestMatchHelper(
             $triviaChallengeStakingRepo,
             $triviaQuestionRepo,
+            $this->mockFirestoreService(),
         );
 
         $result = $sut->processQuestions($challengeRequest, $matchedRequest);
@@ -91,9 +92,8 @@ class ChallengeRequestMatchHelperTest extends TestCase
         $sut = new ChallengeRequestMatchHelper(
             $this->mockTriviaChallengeStakingRepository(),
             $this->mockTriviaQuestionRepository(),
+            $firestoreService,
         );
-
-        $sut->setFirestoreService($firestoreService);
 
         $sut->updateFirestore($challengeRequest, $matchedRequest, $questions);
     }

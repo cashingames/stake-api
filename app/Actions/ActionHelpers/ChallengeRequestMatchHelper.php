@@ -10,17 +10,12 @@ use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
 class ChallengeRequestMatchHelper
 {
-    private static FirestoreService $firestoreService;
 
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
+        private readonly FirestoreService $firestoreService,
     ) {
-    }
-
-    public function setFirestoreService($firestoreService)
-    {
-        self::$firestoreService = $firestoreService;
     }
 
     public function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
@@ -44,7 +39,7 @@ class ChallengeRequestMatchHelper
         Collection $questions
     ): void {
 
-        self::$firestoreService->updateDocument(
+        $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
             $challengeRequest->challenge_request_id,
             [
@@ -53,7 +48,7 @@ class ChallengeRequestMatchHelper
                 'opponent' => $this->parseOpponent($matchedRequest),
             ]
         );
-        self::$firestoreService->updateDocument(
+        $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
             $matchedRequest->challenge_request_id,
             [

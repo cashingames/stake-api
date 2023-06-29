@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\ActionHelpers;
 
+use App\Services\Firebase\FirestoreService;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\ChallengeRequest;
@@ -15,6 +18,11 @@ use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 class MatchChallengeRequestActionTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
 
     public function test_that_only_matching_requests_can_be_matches()
     {
@@ -65,6 +73,10 @@ class MatchChallengeRequestActionTest extends TestCase
 
     public function test_that_challenge_request_is_matched_with_existing_request()
     {
+        $this->instance(
+            FirestoreService::class,
+            $this->createMock(FirestoreService::class)
+        );
 
         $challengeRequest = ChallengeRequest::factory()->create([
             'status' => 'MATCHING',
