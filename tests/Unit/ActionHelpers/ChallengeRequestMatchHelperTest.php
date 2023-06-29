@@ -1,10 +1,9 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\ActionHelpers;
 
 use App\Models\Profile;
 use App\Models\Question;
-use App\Models\User;
 use App\Services\Firebase\FirestoreService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

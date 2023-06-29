@@ -24,7 +24,6 @@ class MatchRequestAction
         $this->matchHelper = new ChallengeRequestMatchHelper(
             $this->triviaChallengeStakingRepository,
             $this->triviaQuestionRepository,
-            $this->triviaChallengeService
         );
     }
 
