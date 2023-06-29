@@ -11,23 +11,19 @@ use App\Services\PlayGame\StakingChallengeGameService;
 
 class MatchWithHumanRequestAction
 {
-    private ChallengeRequestMatchHelper $matchHelper;
+    // private ChallengeRequestMatchHelper $matchHelper;
 
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakingChallengeGameService $triviaChallengeService,
+        private readonly ChallengeRequestMatchHelper $challengeRequestMatchHelper,
     ) {
-        $this->matchHelper = new ChallengeRequestMatchHelper(
-            $this->triviaChallengeStakingRepository,
-            $this->triviaQuestionRepository,
-            $this->triviaChallengeService
-        );
     }
 
-    public function execute(ChallengeRequest $challengeRequest, string $env): ChallengeRequest|null
+    public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
-        $this->matchHelper->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
+        // $this->challengeRequest->setFirestoreService(app(FirestoreService::class, ['env' => $env]));
 
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
@@ -37,9 +33,9 @@ class MatchWithHumanRequestAction
 
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
 
-        $questions = $this->matchHelper->processQuestions($challengeRequest, $matchedRequest);
+        $questions = $this->challengeRequestMatchHelper->processQuestions($challengeRequest, $matchedRequest);
 
-        $this->matchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
+        $this->challengeRequestMatchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
 
         return $matchedRequest;
     }
