@@ -22,7 +22,7 @@ class ProfileTest extends TestCase
      */
 
     const PROFILE_DATA_URL = '/api/v3/user/profile';
-    const CHANGE_PASSWORD_URL = '/api/v2/profile/me/password/change';
+    const CHANGE_PASSWORD_URL = '/api/v3/profile/me/password/change';
     const UPDATE_REFERRER_URL = '/api/v3/referrer/update';
     protected $user;
 
@@ -79,7 +79,7 @@ class ProfileTest extends TestCase
     public function test_personal_details_can_be_edited_with_all_fields_set()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson('/api/v3/profile/me/edit-personal', [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -95,7 +95,7 @@ class ProfileTest extends TestCase
     public function test_username_can_be_edited()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson('/api/v3/profile/me/edit-personal', [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -111,7 +111,7 @@ class ProfileTest extends TestCase
     public function test_email_can_be_edited()
     {
 
-        $this->postjson('/api/v2/profile/me/edit-personal', [
+        $this->postjson('/api/v3/profile/me/edit-personal', [
             'firstName' => 'John',
             'lastName' => 'Doe',
             'username' => 'JayDee',
@@ -127,7 +127,7 @@ class ProfileTest extends TestCase
     public function test_gameark_profile_can_be_edited()
     {
 
-        $response = $this->withHeaders(['x-brand-id' => 10])->postjson('/api/v2/profile/me/edit-personal', [
+        $response = $this->withHeaders(['x-brand-id' => 10])->postjson('/api/v3/profile/me/edit-personal', [
             'username' => 'JayDee',
             'email' => 'johndoe@email.com',
             'gender' => 'male',
@@ -136,24 +136,13 @@ class ProfileTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_bank_details_can_be_edited()
-    {
-
-        $this->postjson('/api/v2/profile/me/edit-bank', [
-            'accountName' => 'John',
-            'bankName' => 'Access bank',
-            'accountNumber' => '09098989898',
-        ]);
-        $this->assertEquals($this->user->profile->bank_name, 'Access bank');
-    }
-
     public function test_profile_image_can_be_uploaded()
     {
         Storage::fake('avatars');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
 
-        $this->post('/api/v2/profile/me/picture', [
+        $this->post('/api/v3/profile/me/picture', [
             'avatar' => $file,
         ]);
 

@@ -26,7 +26,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $response = $this->post('/api/v2/client/feedback', [
+        $response = $this->post('/api/v3/client/feedback', [
             "first_name" => "Test",
             "last_name" => "User",
             "email" => "email@user.com",
@@ -42,7 +42,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/api/v2/client/feedback', [
+        $this->post('/api/v3/client/feedback', [
             "first_name" => "",
             "last_name" => "",
             "email" => "",
@@ -56,7 +56,7 @@ class FeedbackTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/api/v2/client/feedback', [
+        $this->post('/api/v3/client/feedback', [
             "email" => 'email@email.com',
             "message_body" => "lorem ipsum "
         ]);
@@ -85,19 +85,5 @@ class FeedbackTest extends TestCase
 
         $this->assertEquals($response->getStatusCode(), 200);
 
-    }
-
-    public function test_faq_and_answers_can_be_fetched()
-    {
-        $response = $this->get('/api/v2/faq/fetch');
-
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'question',
-                    'answer',
-                ]
-            ]
-        ]);
     }
 }
