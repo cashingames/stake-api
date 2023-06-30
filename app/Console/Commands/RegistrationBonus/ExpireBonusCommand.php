@@ -2,52 +2,31 @@
 
 namespace App\Console\Commands\RegistrationBonus;
 
-use App\Enums\BonusType;
-use App\Enums\FeatureFlags;
-use App\Models\Bonus;
-use App\Models\UserBonus;
-use App\Services\FeatureFlag;
+use \App\Actions\Bonus\ExpireRegistrationBonusAction;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\Isolatable;
 
-class ExpireBonusCommand extends Command
+class ExpireBonusCommand extends Command implements Isolatable
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'registration-bonus:expire';
+    protected $signature = 'bonus:registration:expire';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Deactivates all registration bonuses';
+    protected $description = 'Expire due registration bonus registration bonuses';
 
-    /**
+    /**amount_remaining_after_staking
      * Execute the console command.
      */
-    public function handle()
+    public function handle(ExpireRegistrationBonusAction $expireRegistrationBonusAction)
     {
-        $regBonus = Bonus::where('name', BonusType::RegistrationBonus->value)->first();
-        if (FeatureFlag::isEnabled((FeatureFlags::REGISTRATION_BONUS))) {
-            UserBonus::tobeExpired()
-                ->where('bonus_id', $regBonus->id)
-                ->chunkById(10, function ($registrationBonuses) {
-                    foreach ($registrationBonuses as $bonus) {
-                        $wallet = $bonus->user->wallet;
-                        if (
-                            $bonus->amount_remaining_after_staking > 0 and
-                            $wallet->bonus >= $bonus->amount_remaining_after_staking
-                        ) {
-                            $newBonus = $wallet->bonus - $bonus->amount_remaining_after_staking;
-                            $wallet->bonus = $newBonus;
-                            $wallet->save();
-                        }
-                    }
-                    $registrationBonuses->each->update(['is_on' => false]);
-                }, $column = 'id');
-        }
+        $expireRegistrationBonusAction->execute();
     }
 }

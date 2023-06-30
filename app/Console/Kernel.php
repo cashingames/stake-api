@@ -2,10 +2,11 @@
 
 namespace App\Console;
 
+use App\Console\Commands\RegistrationBonus\ExpireBonusCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-
+//#[CodeCoverageIgnore]
 class Kernel extends ConsoleKernel
 {
     /**
@@ -26,13 +27,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
+        $schedule->command(ExpireBonusCommand::class)->daily();
 
-        // $schedule->command('daily-report:send')
-        //     ->dailyAt('01:00');
-        // $schedule->command('weekly-report:send')
-        //     ->dailyAt('01:00');
-
-        $schedule->command('registration-bonus:expire')->daily();
     }
 
     /**
