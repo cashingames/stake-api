@@ -15,7 +15,6 @@ class StartSinglePlayerRequest extends FormRequest
 {
 
     public function __construct(
-        private WalletRepository $walletRepository
     ) {
     }
     /**
@@ -51,13 +50,6 @@ class StartSinglePlayerRequest extends FormRequest
             'category' => ['required', 'numeric', 'exists:categories,id'],
             'type' => ['required', 'numeric', 'exists:game_types,id'],
             'mode' => ['required', 'numeric','exists:game_modes,id'],
-            'trivia' => ['nullable', 'numeric','exists:trivias,id'],
-            'staking_amount' => [
-                'nullable',
-                'numeric',
-                "max:" . config('trivia.maximum_exhibition_staking_amount'),
-                "min:" . config('trivia.minimum_exhibition_staking_amount')
-            ]
         ];
     }
 
@@ -92,132 +84,12 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         switch ($gameType) {
-            case GameType::StakingExhibition:
-                $this->validateStakingExhibition($validator);
-                break;
-            case GameType::LiveTrivia:
-                $this->validateLiveTrivia($validator);
-                break;
             case GameType::StandardExhibition:
                 $this->validateStandardExhibition($validator);
                 break;
             default:
                 $validator->errors()->add('type', 'Invalid game type');
                 break;
-        }
-    }
-
-    private function validateStakingExhibition($validator)
-    {
-
-        $stakingAmount = $this->input('staking_amount');
-        $user = auth()->user();
-        $totalSessions = Staking::where('user_id', auth()->id())->count();
-
-        if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
-            if (
-                $totalSessions <= config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <= 0
-            ) {
-                return $validator->errors()->add(
-                    'staking_amount',
-                    'Your demo wallet has been exhausted. Fund your wallet now to stake and earn real withdrawable cash'
-                );
-            } elseif (
-                $totalSessions <= config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <  $stakingAmount
-            ) {
-                return $validator->errors()->add('staking_amount', 'Insufficient funds');
-            } elseif (
-                $totalSessions > config('trivia.game.demo_games_count') &&
-                $user->wallet->non_withdrawable_balance <  $stakingAmount
-            ) {
-                return $validator->errors()->add('staking_amount', 'Insufficient funds');
-            }
-        } else {
-
-            if ($totalSessions == 0 && $stakingAmount > config('trivia.bonus.signup.stakers_bonus_amount')) {
-                return $validator->errors()->add(
-                    'staking_amount',
-                    'You can only make a first time stake of '
-                        . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
-                );
-            } elseif ($totalSessions == 0 && $stakingAmount < config('trivia.bonus.signup.stakers_bonus_amount')) {
-                return $validator->errors()->add(
-                    'staking_amount',
-                    'First stake cannot be less than  '
-                        . config('trivia.bonus.signup.stakers_bonus_amount') . ' naira'
-                );
-            }
-        }
-        $userProfit = $this->walletRepository->getUserProfitPercentageOnStakingToday(auth()->id());
-        if ($userProfit > 300) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again tomorrow'
-            );
-        }
-
-        $platformProfit = Cache::remember(
-            'platform-profit-today',
-            60 * 3,
-            fn () => $this->walletRepository->getPlatformProfitPercentageOnStakingToday()
-        );
-
-        if ($platformProfit < config('trivia.platform_target') && $userProfit > 200) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again later'
-            );
-        }
-
-        $percentWonThisYear = $this->walletRepository
-            ->getUserProfitPercentageOnStakingThisYear(auth()->id());
-
-        if ($percentWonThisYear > 300 && $platformProfit < config('trivia.platform_target')) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You are a genius!, please try again tomorrow'
-            );
-        }
-
-        //if total session is greater than 10
-        $todaysSessions = Staking::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->toDateString())
-            ->count();
-        if ($todaysSessions > 10) {
-            return $validator->errors()->add(
-                'staking_amount',
-                'You have reached your daily limit of 10 games, please try again tomorrow'
-            );
-        }
-    }
-
-    private function validateLiveTrivia($validator)
-    {
-
-        $trivia = LiveTrivia::find($this->input('trivia'));
-        if (!$trivia) {
-            $validator->errors()->add('trivia', 'Unknown trivia');
-            return;
-        }
-
-        //@TODO cover these edge cases
-
-        // if ($trivia->status != 'active') {
-        //     $validator->errors()->add('trivia', 'Trivia is not active');
-        // }
-
-        // if ($trivia->start_time > now()) {
-        //     $validator->errors()->add('trivia', 'Trivia has not started');
-        // }
-
-        // if ($trivia->end_time < now()) {
-        //     $validator->errors()->add('trivia', 'Trivia has ended');
-        // }
-
-        if (auth()->user()->gameSessions()->where('trivia_id', $trivia->id)->exists()) {
-            $validator->errors()->add('trivia', 'You have already played this trivia');
         }
     }
 

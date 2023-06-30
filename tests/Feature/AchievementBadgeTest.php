@@ -3,10 +3,8 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
-use App\Listeners\AchievementBadgeEventListener;
 use Tests\TestCase;
 
 use PlanSeeder;
@@ -20,28 +18,14 @@ use App\Models\User;
 use App\Models\Boost;
 use AchievementSeeder;
 use App\Enums\FeatureFlags;
-use App\Mail\ChallengeInvite;
 use App\Models\Category;
-use App\Models\Question;
-use App\Models\UserPlan;
-use App\Models\UserBoost;
-use App\Models\UserPoint;
-use App\Models\Achievement;
-use App\Models\ExhibitionStaking;
+
 use App\Models\GameSession;
-use App\Models\Option;
-use App\Models\Staking;
-use App\Models\StakingOdd;
-use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
 use Database\Seeders\StakingOddsRulesSeeder;
 use Database\Seeders\AchievementBadgeSeeder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
-
 
 class AchievementBadgeTest extends TestCase
 {
@@ -76,9 +60,8 @@ class AchievementBadgeTest extends TestCase
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
-        $this->seed(StakingOddSeeder::class);
         $this->seed(StakingOddsRulesSeeder::class);
-        $this->seed(AchievementBadgeSeeder::Class);
+        $this->seed(AchievementBadgeSeeder::class);
         GameSession::factory()
             ->count(20)
             ->create();
@@ -86,8 +69,6 @@ class AchievementBadgeTest extends TestCase
         $this->category = Category::where('category_id', '!=', 0)->inRandomOrder()->first();
         $this->plan = Plan::inRandomOrder()->first();
         $this->actingAs($this->user);
-        FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING);
-        FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING);
         FeatureFlag::isEnabled(FeatureFlags::ACHIEVEMENT_BADGES);
         config(['odds.maximum_exhibition_staking_amount' => 1000]);
     }
@@ -100,7 +81,6 @@ class AchievementBadgeTest extends TestCase
 
     public function test_achievement_has_been_claimed()
     {
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::ACHIEVEMENT_BADGES);
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
@@ -124,7 +104,6 @@ class AchievementBadgeTest extends TestCase
 
     public function test_achievement_has_been_rewarded()
     {
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::ACHIEVEMENT_BADGES);
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
@@ -156,9 +135,7 @@ class AchievementBadgeTest extends TestCase
 
     public function test_is_achievement_feature_flag_functioning()
     {
-        // disable
         FeatureFlag::disable(FeatureFlags::ACHIEVEMENT_BADGES);
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);

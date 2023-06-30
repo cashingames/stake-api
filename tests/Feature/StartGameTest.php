@@ -90,37 +90,6 @@ class StartGameTest extends TestCase
 
     }
 
-    public function test_livetrivia_game_can_be_started_for_a_new_user()
-    {
-        $questions = Question::factory()
-            ->count(250)
-            ->create();
-
-        $this->seed(TriviaSeeder::class);
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "trivia" => Trivia::first()->id
-        ]);
-
-        $response->assertOk();
-    }
-
     public function test_exhibition_game_cannot_be_started_if_question_is_not_enough()
     {
         $questions = Question::factory()

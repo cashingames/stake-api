@@ -3,13 +3,7 @@
 namespace App\Services\PlayGame;
 
 use App\Enums\GameType;
-use App\Services\PlayGame\StakingExhibitionGameService;
-use App\Services\PlayGame\StakingLiveTriviaGameService;
-use App\Services\PlayGame\StakingChallengeGameService;
 use App\Services\PlayGame\StandardExhibitionGameService;
-use App\Services\PlayGame\LiveTriviaGameService;
-use App\Services\PlayGame\StandardChallengeGameService;
-
 class PlayGameServiceFactory
 {
 
@@ -28,21 +22,6 @@ class PlayGameServiceFactory
         switch ($this->gameType) {
             case GameType::StandardExhibition:
                 $result = new StandardExhibitionGameService();
-                break;
-            case GameType::StakingExhibition:
-                $result = app(StakingExhibitionGameService::class);
-                break;
-            case GameType::LiveTrivia:
-                $result = new LiveTriviaGameService();
-                break;
-            case GameType::LiveTriviaStaking:
-                $result = new StakingLiveTriviaGameService();
-                break;
-            case GameType::StandardChallenge:
-                $result = new StandardChallengeGameService();
-                break;
-            case GameType::StakingChallenge:
-                $result = new StakingChallengeGameService();
                 break;
             default:
                 throw new \UnhandledMatchError("Unknown game type: " . $this->gameType);

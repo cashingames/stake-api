@@ -1,10 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Enums\Contest\PrizeType;
-use App\Enums\ClientPlatform;
-use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
@@ -13,39 +9,24 @@ use App\Models\Plan;
 use App\Models\Category;
 use App\Models\GameType;
 use App\Models\UserBoost;
-use App\Models\Achievement;
-use App\Models\ExhibitionStaking;
 use App\Models\GameSessionQuestion;
 use App\Models\Question;
-use App\Models\StakingOdd;
-use App\Models\Trivia;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\WalletTransaction;
-use App\Services\FeatureFlag;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\PlayGame\ReferralService;
-
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
-use App\Models\Staking;
-use App\Models\UserCoin;
 use stdClass;
 
 class GameController extends BaseController
 {
-    public function getCommonData(Request $request, ClientPlatform $platform)
+    public function getCommonData(Request $request)
     {
         $result = new stdClass;
-
-        $result->achievements = Cache::rememberForever('achievements', function () {
-            Log::info('achievements cache miss');
-            return Achievement::all();
-        });
 
         $result->plans = Cache::rememberForever(
             'plans',
@@ -140,22 +121,14 @@ class GameController extends BaseController
         }
 
         $result->gameTypes = $toReturnTypes;
-
-        $result->minVersionCode = config('trivia.min_version_code');
-        $result->minVersionForce = config('trivia.min_version_force');
-
         $result->boosts = Boost::whereNull('deleted_at')
             ->where('name', '!=', 'Bomb')
             ->get();
 
-        switch ($platform) {
-            case ClientPlatform::GameArkMobile:
-                $result->minVersionCode = config('trivia.min_version_code_gameark');
-                $result->minVersionForce = config('trivia.min_version_force_gameark');
-                // $result->boosts = Cache::rememberForever('boosts', fn () => Boost::all());
-                $result->boosts = Boost::all();
-                break;
-        }
+        $result->minVersionCode = config('trivia.min_version_code_gameark');
+        $result->minVersionForce = config('trivia.min_version_force_gameark');
+        $result->boosts = Boost::all();
+
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
@@ -171,59 +144,10 @@ class GameController extends BaseController
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
         $result->minimumBoostScore = $this->MINIMUM_GAME_BOOST_SCORE;
 
-        return $this->sendResponse((new CommonDataResponse())->transform($result, $platform), "Common data");
+        return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
 
-    public function claimAchievement($achievementId)
-    {
-        $achievement = Achievement::find($achievementId);
-        if ($achievement === null) {
-            return $this->sendError('Invalid Achievement', 'Invalid Achievement');
-        }
-        $userPoints = $this->user->points();
-
-        if ($userPoints < $achievement->point_milestone) {
-            return $this->sendError('You do not have enough points to claim this achievement', 'You do not have enough points to claim this achievement');
-        }
-
-        $isClaimed = DB::table('user_achievements')
-            ->where('achievement_id', $achievement->id)
-            ->where('user_id', $this->user->id)->first();
-
-        if ($isClaimed !== null) {
-
-            return $this->sendError(
-                'You have already claimed this achievement',
-                'You have already claimed this achievement'
-            );
-        }
-
-        Achievement::orderBy('point_milestone', 'ASC')->get()->map(function ($a) {
-
-            $checkIsClaimed = DB::table('user_achievements')
-                ->where('achievement_id', $a->id)
-                ->where('user_id', $this->user->id)->first();
-
-            if ($checkIsClaimed === null) {
-                $userPoints = $this->user->points();
-                if ($a->point_milestone <= $userPoints) {
-                    DB::table('user_achievements')->insert([
-                        'user_id' => $this->user->id,
-                        'achievement_id' => $a->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                }
-            }
-        });
-
-        return $this->sendResponse(
-            $achievement,
-            'Achievement Claimed'
-        );
-    }
-
-    public function endSingleGame(Request $request, ReferralService $referralService, ClientPlatform $clientPlatform)
+    public function endSingleGame(Request $request, ReferralService $referralService)
     {
 
         Log::info($request->all());
@@ -246,7 +170,7 @@ class GameController extends BaseController
         $wrongs = 0;
 
         //@TODO: Change our encryption method from base 64. It is not secure
-        $questionsCount = !is_null($game->trivia_id) ? Trivia::find($game->trivia_id)->question_count : 10;
+        $questionsCount = 10;
         $chosenOptions = [];
 
         if (count($request->chosenOptions) > $questionsCount) {
@@ -261,7 +185,6 @@ class GameController extends BaseController
 
         DB::transaction(function () use ($chosenOptions, $game) {
             foreach ($chosenOptions as $value) {
-                //  dd($value['id']);
                 GameSessionQuestion::where('game_session_id', $game->id)
                     ->where('question_id', $value['question_id'])
                     ->update(['option_id' => $value['id']]);
@@ -280,95 +203,15 @@ class GameController extends BaseController
             }
         }
 
-        $staking = null;
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
-
-            $staking = $exhibitionStaking->staking ?? null;
-            $amountWon = 0;
-            if (!is_null($staking)) {
-                $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-
-                if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-                    $amountWon = $staking->amount_staked * $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
-                } else {
-                    $amountWon = $staking->amount_staked * $pointStandardOdd;
-                }
-
-                if (FeatureFlag::isEnabled((FeatureFlags::DEMO_GAMES))) {
-                    $totalStakedSessions = Staking::where('user_id', $this->user->id)->count();
-
-                    $transactionDescription = '';
-                    $viableDate = now();
-
-                    if ($totalStakedSessions <= config('trivia.game.demo_games_count')) {
-                        $transactionDescription = 'Demo Game Winnings';
-                    } else {
-                        $transactionDescription = 'Staking winning of ' . $amountWon . ' cash';
-                        $viableDate = now()->addHours(config('trivia.hours_before_withdrawal'));
-                    }
-                    WalletTransaction::create([
-                        'wallet_id' => $this->user->wallet->id,
-                        'transaction_type' => 'CREDIT',
-                        'amount' => $amountWon,
-                        'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
-                        'description' => $transactionDescription,
-                        'reference' => Str::random(10),
-                        'viable_date' => $viableDate
-                    ]);
-                } else {
-                    WalletTransaction::create([
-                        'wallet_id' => $this->user->wallet->id,
-                        'transaction_type' => 'CREDIT',
-                        'amount' => $amountWon,
-                        'balance' => ($this->user->wallet->withdrawable_balance + $this->user->wallet->non_withdrawable_balance),
-                        'description' => 'Staking winning of ' . $amountWon . ' cash',
-                        'reference' => Str::random(10),
-                        'viable_date' => now()->addHours(config('trivia.hours_before_withdrawal'))
-                    ]);
-                }
-
-                $staking->update(['amount_won' => $amountWon]);
-
-                if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-                    ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
-                } else {
-                    ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
-                }
-            }
-        }
-
-
-
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
 
-
-        if ($clientPlatform == ClientPlatform::GameArkMobile) {
-            $game = $this->processUserCoin($game);
-        }
-
-        if (FeatureFlag::isEnabled('odds') && $staking == null) {
-            $game->points_gained = $points * $game->odd_multiplier;
-        } else {
-            $game->points_gained = $points;
-        }
-
-        if (!is_null($game->trivia_id)) {
-            $prizeType = $game->liveTrivia->contest->prize_type;
-            if ($prizeType == PrizeType::Points->value) {
-                $game->points_gained = $points * $game->liveTrivia->prize_multiplier;
-            }
-        }
-
+        $game = $this->processUserCoin($game);
+        $game->points_gained = $points;
         $game->total_count = $points + $wrongs;
 
         $game->save();
 
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            $game->amount_staked = $staking ? $staking->amount_staked : null;
-            $game->with_staking = $staking ? true : false;
-        }
 
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
@@ -407,7 +250,7 @@ class GameController extends BaseController
     {
         $coinsEarned = 0;
         $userScore = $game->correct_count;
-        
+
         if ($userScore == config('trivia.coin_reward.user_scores.perfect_score')) {
             $coinsEarned =  config('trivia.coin_reward.coins_earned.perfect_coin');
         } else if ($userScore >= config('trivia.coin_reward.user_scores.high_score') && $userScore < config('trivia.coin_reward.user_scores.perfect_score')) {
