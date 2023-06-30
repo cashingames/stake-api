@@ -174,7 +174,7 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
+       
         $this->user->wallet->update([
             'non_withdrawable' => 1000
         ]);
@@ -190,8 +190,6 @@ class GameTest extends TestCase
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
     {
-        FeatureFlag::enable('odds');
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         $questions = Question::factory()
             ->hasOptions(4)
             ->count(10)
@@ -250,8 +248,6 @@ class GameTest extends TestCase
 
     public function test_exhibition_staking_with_odd_awards_required_amount_with_odd()
     {
-        FeatureFlag::enable('odds');
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);
 
         $questions = Question::factory()
@@ -333,7 +329,6 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         $this->user->wallet->update([
             'non_withdrawable' => 2000,
@@ -375,7 +370,6 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         $this->user->wallet->update([
             'non_withdrawable' => 2000,
@@ -396,7 +390,6 @@ class GameTest extends TestCase
 
     public function test_bonus_amount_is_credited_for_user_with_registration_bonus_when_game_ends()
     {
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
         FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         config(['trivia.user_scores.perfect_score' => 10]);
 
