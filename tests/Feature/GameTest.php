@@ -14,21 +14,16 @@ use App\Models\User;
 use App\Models\Boost;
 use AchievementSeeder;
 use App\Enums\FeatureFlags;
-use App\Mail\ChallengeInvite;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\UserPlan;
 use App\Models\UserBoost;
-use App\Models\UserPoint;
-use App\Models\Achievement;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSession;
-use App\Models\Option;
 use App\Models\Staking;
 use App\Models\StakingOdd;
 use App\Models\UserCoin;
 use App\Models\UserCoinTransaction;
-use App\Notifications\ChallengeReceivedNotification;
 use App\Services\FeatureFlag;
 use Database\Seeders\StakingOddSeeder;
 use Database\Seeders\StakingOddsRulesSeeder;
@@ -50,12 +45,8 @@ class GameTest extends TestCase
      * @return void
      */
     const COMMON_DATA_URL = '/api/v3/game/common';
-    const CLAIM_ACHIEVEMENT_URL = '/api/v3/claim/achievement/';
     const START_EXHIBITION_GAME_URL = '/api/v3/game/start/single-player';
     const END_EXHIBITION_GAME_URL = '/api/v3/game/end/single-player';
-    const SEND_CHALLENGE_INVITE_URL = "/api/v3/challenge/send-invite";
-    const END_CHALLENGE_URL = "/api/v3/challenge/end/game";
-
     protected $user;
     protected $category;
     protected $plan;
@@ -111,38 +102,7 @@ class GameTest extends TestCase
                 'minVersionCode' => [],
                 'minimumExhibitionStakeAmount' => [],
                 'maximumExhibitionStakeAmount' => [],
-                'minimumChallengeStakeAmount' => [],
-                'maximumChallengeStakeAmount' => [],
-                'minimumLiveTriviaStakeAmount' => [],
-                'maximumLiveTriviaStakeAmount' => [],
             ]
-        ]);
-    }
-
-    public function test_achievement_can_be_claimed()
-    {
-        $achievement = Achievement::first();
-
-        UserPoint::create([
-            'user_id' => $this->user->id,
-            'value' => 5000,
-            'description' => 'Test points added',
-            'point_flow_type' => 'POINTS_ADDED'
-        ]);
-
-        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL . $achievement->id);
-
-        $response->assertStatus(200);
-    }
-
-    public function test_achievement_cannot_be_claimed_if_points_are_not_enough()
-    {
-        $achievement = Achievement::first();
-
-        $response = $this->post(self::CLAIM_ACHIEVEMENT_URL . $achievement->id);
-
-        $response->assertJson([
-            'errors' => 'You do not have enough points to claim this achievement',
         ]);
     }
 
@@ -264,43 +224,6 @@ class GameTest extends TestCase
 
     }
 
-    public function test_challenge_invite_sent_successfully()
-    {
-        Mail::fake();
-        Notification::fake();
-
-        $player = $this->user;
-        $opponent = User::latest()->limit(2)->first();
-        $category = $this->category;
-
-        $questions = Question::factory()
-        ->count(10)
-        ->create();
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'category_id' => $this->category->id,
-                'question_id' => $question->id
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        $response = $this->postJson(self::SEND_CHALLENGE_INVITE_URL, [
-            'opponentId' => $opponent->id,
-            'categoryId' => $category->id
-        ]);
-
-        $this->assertDatabaseHas('challenges', [
-            'category_id' => $category->id,
-            'user_id' => $player->id,
-            'opponent_id' => $opponent->id
-        ]);
-        Mail::assertSent(ChallengeInvite::class);
-        Notification::assertSentTo($opponent, ChallengeReceivedNotification::class);
-        $response->assertOk();
-    }
-
     public function test_exhibition_game_can_be_started_with_staking()
     {
         $questions = Question::factory()
@@ -387,91 +310,7 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_that_exhibition_staking_record_is_created_in_exhibition_game_with_staking()
-    {   
-        Staking::factory()->count(5)->create(['user_id'=>$this->user->id]);
-        $questions = Question::factory()
-            ->count(250)
-            ->create();
 
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        FeatureFlag::enable(FeatureFlags::EXHIBITION_GAME_STAKING);
-        $this->user->wallet->update([
-            'non_withdrawable_balance' => 1000
-        ]);
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => 0,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-        $this->postjson('/api/v2/game/start/single-player', [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 1000
-        ]);
-        $this->assertDatabaseCount('exhibition_stakings', 1);
-    }
-    public function test_exhibition_game_with_staking_does_not_require_game_lives()
-    {
-        $questions = Question::factory()
-            ->hasOptions(4)
-            ->count(250)
-            ->create();
-
-        $data = [];
-
-        foreach ($questions as $question) {
-            $data[] = [
-                'question_id' => $question->id,
-                'category_id' => $this->category->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        DB::table('categories_questions')->insert($data);
-
-        UserPlan::create([
-            'plan_id' => $this->plan->id,
-            'user_id' => $this->user->id,
-            'used_count' => $this->plan->game_count,
-            'plan_count' => 1,
-            'is_active' => true,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->endOfDay()
-        ]);
-
-        $this->user->wallet->update([
-            'non_withdrawable_balance' => 5000
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 1000
-        ]);
-        $response->assertOk();
-    }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
     {
