@@ -45,19 +45,13 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
-            if ($user->phone_verified_at == null) {
-
-                return $this->sendError([
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phoneNumber' => $user->phone_number
-                ], 'Account not verified');
-            }
-        } elseif ($user->email_verified_at == null) {
-            return $this->sendError('Please verify your email address before signing in', 'Please verify your email address before signing in');
+        if ($user->phone_verified_at == null) {
+            return $this->sendError([
+                'username' => $user->username,
+                'email' => $user->email,
+                'phoneNumber' => $user->phone_number
+            ], 'Account not verified');
         }
-
         return $this->respondWithToken($token);
     }
 

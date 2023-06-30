@@ -26,10 +26,7 @@ class OddsService
     public function getOdds($user)
     {
         // @TODO Rename to TRIVIA_STAKING_WITH_DYNAMIC_ODDS
-
-        return FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS) ?
-            $this->getDynamicOdds($user) :
-            $this->getStandardOdds();
+        return $this->getDynamicOdds($user) ;
     }
 
     private function getStandardOdds(): Collection

@@ -59,7 +59,6 @@ class OddsServiceTest extends TestCase
     {
 
         config(['trivia.platform_target' => 50]);
-        FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);
 
         Cache::shouldReceive('remember')->withSomeOfArgs(
             "staking-odds",
