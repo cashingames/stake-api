@@ -18,6 +18,7 @@ class MatchEndWalletAction
 
     public function execute(string $requestId): ChallengeRequest|null
     {
+        //@note: $winner comes before isComplete because the request and matchRequest objects are need in isComplete
         $winner = $this->getChallengeWinner(
             $request = $this->triviaChallengeStakingRepository->getRequestById($requestId),
             $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)

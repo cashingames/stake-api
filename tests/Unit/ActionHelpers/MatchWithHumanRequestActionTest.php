@@ -2,24 +2,23 @@
 
 namespace Tests\Unit\ActionHelpers;
 
+use App\Actions\TriviaChallenge\MatchWithHumanRequestAction;
 use App\Services\Firebase\FirestoreService;
 use Tests\TestCase;
-use App\Models\User;
 use App\Models\ChallengeRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Actions\TriviaChallenge\MatchRequestAction;
 use App\Services\PlayGame\StakingChallengeGameService;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
-class MatchChallengeRequestActionTest extends TestCase
+class MatchWithHumanRequestActionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_that_only_matching_requests_can_be_matches()
+    public function test_that_null_is_returned_when_no_match()
     {
-        $sut = new MatchRequestAction(
+        $sut = new MatchWithHumanRequestAction(
             $this->mockTriviaChallengeStakingRepository(),
             $this->mockTriviaQuestionRepository(),
             $this->mockStakingChallengeGameService(),
@@ -28,40 +27,8 @@ class MatchChallengeRequestActionTest extends TestCase
 
         $challengeRequest = ChallengeRequest::factory()->create();
         $result = $sut->execute($challengeRequest);
-
         $this->assertNull($result);
-    }
 
-    public function test_that_challenge_request_is_matched_with_bot()
-    {
-
-        User::factory()->create([
-            'id' => 1,
-        ]);
-
-        $challengeRequest = ChallengeRequest::factory()->create([
-            'status' => 'MATCHING',
-        ]);
-        $matchedRequest = ChallengeRequest::factory()->make([
-            'user_id' => 1,
-        ]);
-        $mockedStakingChallengeGameService = $this->mockStakingChallengeGameService();
-        $mockedStakingChallengeGameService
-            ->expects($this->once())
-            ->method('create')
-            ->with($this->isInstanceOf(User::class), $this->anything())
-            ->willReturn($matchedRequest);
-
-        $sut = new MatchRequestAction(
-            $this->mockTriviaChallengeStakingRepository(),
-            $this->mockTriviaQuestionRepository(),
-            $mockedStakingChallengeGameService,
-            $this->mockChallengeRequestMatchHelper(),
-        );
-
-        $result = $sut->execute($challengeRequest);
-
-        $this->assertSame($matchedRequest->id, $result->id);
     }
 
     public function test_that_challenge_request_is_matched_with_existing_request()
@@ -85,7 +52,7 @@ class MatchChallengeRequestActionTest extends TestCase
             ->with($challengeRequest)
             ->willReturn($matchedRequest);
 
-        $sut = new MatchRequestAction(
+        $sut = new MatchWithHumanRequestAction(
             $mockedTriviaChallengeStakingRepository,
             $this->mockTriviaQuestionRepository(),
             $this->mockStakingChallengeGameService(),
@@ -116,6 +83,5 @@ class MatchChallengeRequestActionTest extends TestCase
     {
         return $this->createMock(ChallengeRequestMatchHelper::class);
     }
-
 
 }

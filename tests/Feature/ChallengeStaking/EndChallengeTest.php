@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use App\Services\Firebase\FirestoreService;
 use App\Jobs\SendChallengeRefundNotification;
+use App\Models\TriviaChallengeQuestion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class EndChallengeTest extends TestCase
@@ -138,6 +139,103 @@ class EndChallengeTest extends TestCase
         Queue::assertPushed(SendChallengeRefundNotification::class, 2);
     }
 
+    public function test_challenge_win_flow(): void
+    {
+        $this->instance(
+            FirestoreService::class,
+            Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('updateDocument')->times(4);
+            })
+        );
+
+        $category = Category::factory()->create();
+        $this->seedQuestions($category);
+
+        $firstUser = User::skip(2)->first();
+        $secondUser = User::skip(3)->first();
+
+        ChallengeRequest::factory()->for($firstUser)->create([
+            'session_token' => '123',
+            'challenge_request_id' => '1',
+            'status' => 'MATCHED',
+            'category_id' => $category->id,
+            'amount' => 500,
+            'started_at' => now(),
+        ]);
+
+        ChallengeRequest::factory()->for($secondUser)->create([
+            'session_token' => '123',
+            'challenge_request_id' => '2',
+            'status' => 'MATCHED',
+            'category_id' => $category->id,
+            'amount' => 500,
+            'started_at' => now()
+        ]);
+
+        //seed logged questions
+        TriviaChallengeQuestion::factory()->create([
+            'challenge_request_id' => '1',
+            'question_id' => Question::first()->id,
+            'option_id' => Question::first()->options->where('is_correct', 1)->first()->id,
+        ]);
+
+        $this
+            ->actingAs(User::first())
+            ->postJson(
+                self::URL,
+                [
+                    'challenge_request_id' => '1',
+                    'selected_options' => [
+                        [
+                            'question_id' => Question::first()->id,
+                            'option_id' => Question::first()->options->where('is_correct', 1)->first()->id,
+                        ]
+                    ]
+                ]
+            )
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('challenge_requests', [
+            'challenge_request_id' => '1',
+            'status' => 'COMPLETED',
+        ]);
+        $this->assertDatabaseHas('challenge_requests', [
+            'challenge_request_id' => '2',
+            'status' => 'MATCHED',
+        ]);
+
+        $this
+            ->actingAs(User::find(2))
+            ->postJson(
+                self::URL,
+                [
+                    'challenge_request_id' => '2',
+                    'selected_options' => []
+                ]
+            )
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('challenge_requests', [
+            'challenge_request_id' => '1',
+            'status' => 'COMPLETED',
+        ]);
+        $this->assertDatabaseHas('challenge_requests', [
+            'challenge_request_id' => '2',
+            'status' => 'COMPLETED',
+        ]);
+
+        //refund if both users got the same score
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $firstUser->id,
+            'withdrawable' => 500 * 2,
+        ]);
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $secondUser->id,
+            'withdrawable' => 0,
+            'non_withdrawable' => 0,
+        ]);
+    }
+
     private function seedQuestions(Category $category): array
     {
         $questions = Question::factory()
@@ -158,5 +256,6 @@ class EndChallengeTest extends TestCase
 
         return $data;
     }
+
 
 }
