@@ -248,7 +248,6 @@ class GameTest extends TestCase
 
     public function test_exhibition_staking_with_odd_awards_required_amount_with_odd()
     {
-        FeatureFlag::enable(FeatureFlags::STAKING_WITH_ODDS);
 
         $questions = Question::factory()
             ->hasOptions(4)

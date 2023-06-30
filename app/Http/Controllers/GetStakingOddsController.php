@@ -26,7 +26,7 @@ class GetStakingOddsController extends BaseController
             'GET_ODDS_COMPUTED',
             [
                 'user' => auth()->user()->username,
-                'staking_with_odds' => FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS),
+                'staking_with_odds' => true,
                 'staking_session_odds' => $result
             ]
         );

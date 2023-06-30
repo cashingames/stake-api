@@ -207,7 +207,6 @@ class RegisterTest extends TestCase
 
     public function test_a_user_recieves_sms_otp_on_registration()
     {
-        FeatureFlag::enable(FeatureFlags::PHONE_VERIFICATION);
         $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
             $mock->shouldReceive('deliverOTP')->once();
         });
@@ -229,11 +228,10 @@ class RegisterTest extends TestCase
 
     public function test_a_user_can_register_from_web_without_needing_email_verification()
     {
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
-            $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-                $mock->shouldReceive('deliverOTP')->once();
-            });
-        }
+
+        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
+            $mock->shouldReceive('deliverOTP')->once();
+        });
 
         $response = $this->withHeaders([
             'X-App-Source' => 'web',
@@ -256,9 +254,9 @@ class RegisterTest extends TestCase
     {
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -268,7 +266,7 @@ class RegisterTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
             'country_code' => '+234',
@@ -305,9 +303,9 @@ class RegisterTest extends TestCase
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -317,23 +315,23 @@ class RegisterTest extends TestCase
 
         ]);
 
-        $user = User::where('email', 'email@email.com' )->first();
+        $user = User::where('email', 'email@email.com')->first();
 
         $this->assertDatabaseHas('user_bonuses', [
-            'user_id'=> $user->id,
+            'user_id' => $user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }
 
     public function test_that_user_bonus_record_is_not_created_when_user_does_not_choose_to_have_bonus()
-    {   
+    {
         config(['features.registration_bonus.enabled' => true]);
         $this->seed(BonusSeeder::class);
 
         $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' =>'Jane',
+            'first_name' => 'Jane',
             'last_name' => "Doe",
-            'username'=>'janeJoe',
+            'username' => 'janeJoe',
             'country_code' => '+234',
             'phone_number' => '7098498884',
             'email' => 'email@email.com',
@@ -342,10 +340,10 @@ class RegisterTest extends TestCase
 
         ]);
 
-        $user = User::where('email', 'email@email.com' )->first();
+        $user = User::where('email', 'email@email.com')->first();
 
         $this->assertDatabaseMissing('user_bonuses', [
-            'user_id'=> $user->id,
+            'user_id' => $user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
         ]);
     }

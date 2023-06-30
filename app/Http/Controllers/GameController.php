@@ -207,15 +207,9 @@ class GameController extends BaseController
 
 
         $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-
-        if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            $amountWon = $staking->amount_staked * $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
-        } else {
-            $amountWon = $staking->amount_staked * $pointStandardOdd;
-        }
+        $amountWon = $staking->amount_staked * $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
 
         $walletRepository = new WalletRepository;
-
         $registrationBonusService = new RegistrationBonusService;
         $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
         if ($hasRegistrationBonus) {
@@ -240,13 +234,8 @@ class GameController extends BaseController
             $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
             $staking->update(['amount_won' => $amountWon]);
         }
-
-        if (FeatureFlag::isEnabled(FeatureFlags::STAKING_WITH_ODDS)) {
-            ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
-        } else {
-            ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd]);
-        }
-
+        ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
+        
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points;

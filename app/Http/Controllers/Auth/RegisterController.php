@@ -144,7 +144,7 @@ class RegisterController extends BaseController
         } else {
             $this->cashingamesSignupBonus($user);
         }
-      
+
         return $user;
     }
 
@@ -193,13 +193,13 @@ class RegisterController extends BaseController
         SMSProviderInterface $smsService,
         $user
     ) {
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
-            try {
-                $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-            } catch (\Throwable $th) {
-                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-            }
+
+        try {
+            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        } catch (\Throwable $th) {
+            Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
         }
+
         if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
             Mail::to($user->email)->send(new VerifyEmail($user));
 
@@ -227,7 +227,7 @@ class RegisterController extends BaseController
         Request $request,
         SMSProviderInterface $smsService,
     ) {
-        
+
         $this->validator($request->all())->validate();
 
         $user = $this->create($request->all());

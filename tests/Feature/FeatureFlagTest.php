@@ -21,15 +21,15 @@ class FeatureFlagTest extends TestCase
     }
 
     public function test_can_enable_feature(){
-        config(['features.notification_history.enabled' => false]);
-        FeatureFlag::enable('notification_history');
-        $this->assertTrue(config('features.notification_history.enabled'));
+        config(['features.email_verification.enabled' => false]);
+        FeatureFlag::enable('email_verification');
+        $this->assertTrue(config('features.email_verification.enabled'));
     }
 
     public function test_can_disable_feature(){
-        config(['features.notification_history.enabled' => true]);
-        FeatureFlag::disable('notification_history');
-        $this->assertTrue(config(['features.notification_history.enabled']) == false);
+        config(['features.email_verification.enabled' => true]);
+        FeatureFlag::disable('email_verification');
+        $this->assertTrue(config(['features.email_verification.enabled']) == false);
     }
 
     public function test_can_check_if_at_least_one_of_many_flags_enabled(){
