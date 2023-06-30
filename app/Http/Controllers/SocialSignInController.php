@@ -26,11 +26,10 @@ class SocialSignInController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function authenticateUser(Request $request, ClientPlatform $clientPlatform)
+    public function authenticateUser(Request $request)
     {
-        // check if user exist
         $returningUser = User::where('email', $request->email)->first();
-        if( ($returningUser == null) && (!is_null($request->appleUserId)) && ($clientPlatform == ClientPlatform::GameArkMobile)){
+        if (($returningUser == null) && (!is_null($request->appleUserId))) {
             $returningUser = User::where('apple_user_id', $request->appleUserId)->first();
         }
 
@@ -45,41 +44,27 @@ class SocialSignInController extends BaseController
             return $this->sendResponse($data, 'Returning user token');
         }
 
-        if($clientPlatform == ClientPlatform::GameArkMobile){
-            // automatically create this user
-
-            $payload = [
-                'email' => $request->email,
-                'firstName' => $request->firstName,
-                'lastName' => $request->lastName,
-                'username' => ( is_null($request->firstName)) ? strstr($request->email, '@', true) . mt_rand(10, 99) : ($request->firstName).''.rand(10,1000),
-                'country_code' => '',
-                'phone_number' => '',
-                'referrer' => null,
-                'apple_user_id' => $request->appleUserId
-            ];
-
-            $token = $this->createAction($payload);
-
-            Mail::to($request->email)->send(new WelcomeEmail());
-
-            $data = [
-                'token' => $token,
-                'isFirstTime' => true,
-
-            ];
-            return $this->sendResponse($data, 'Returning user token');
-        }
-
-        $data = [
+        $payload = [
             'email' => $request->email,
             'firstName' => $request->firstName,
             'lastName' => $request->lastName,
+            'username' => (is_null($request->firstName)) ? strstr($request->email, '@', true) . mt_rand(10, 99) : ($request->firstName) . '' . rand(10, 1000),
+            'country_code' => '',
+            'phone_number' => '',
+            'referrer' => null,
+            'apple_user_id' => $request->appleUserId
+        ];
+
+        $token = $this->createAction($payload);
+
+        Mail::to($request->email)->send(new WelcomeEmail());
+
+        $data = [
+            'token' => $token,
             'isFirstTime' => true,
 
         ];
-
-        return $this->sendResponse($data, 'username, phone number needed');
+        return $this->sendResponse($data, 'Returning user token');
     }
 
 
@@ -88,7 +73,7 @@ class SocialSignInController extends BaseController
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
-            'username' => ['required','string','alpha_num', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'alpha_num', 'max:255', 'unique:users'],
             'country_code' => ['nullable', 'string', 'max:4'],
             'phone_number' => ['required', 'numeric', new UniquePhoneNumberRule],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -101,7 +86,8 @@ class SocialSignInController extends BaseController
         return $this->sendResponse($token, 'Token');
     }
 
-    public function createAction($data){
+    public function createAction($data)
+    {
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
@@ -178,29 +164,19 @@ class SocialSignInController extends BaseController
                 'used_count' => 0
             ]);
         }
-        //credit referrer with points
+    
         if (
             config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
-            $referrerId = 0;
-            // $profileReferral = Profile::where('referral_code', $data["referrer"])->first();
-            // if ($profileReferral === null) {
-            //     $referrerId = User::where('username', $data["referrer"])->first()->id;
-            // } else {
-            //     $referrerId = $profileReferral->user_id;
-            // }
             $profileReferral = User::where('username', $data["referrer"])->first();
             if ($profileReferral != null) {
                 Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
             }
 
-            /** @TODO: this needs to be changed to plan */
-            // $this->creditPoints($referrerId, 50, "Referral bonus");
         }
         return auth()->tokenById($user->id);
-
     }
 }

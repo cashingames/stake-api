@@ -67,27 +67,6 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
     }
 
-    /** @test */
-    // public function country_code_is_required_for_phone_numbers()
-    // {
-
-    //     $response = $this->postjson(self::REGISTER_URL, [
-    //         'first_name' => 'User',
-    //         'last_name' => 'Test',
-    //         'username' => 'user',
-    //         'phone_number' => '8883888383',
-    //         'email' => 'user@user.com',
-    //         'password' => 'password',
-    //         'password_confirmation' => 'password'
-
-    //     ]);
-
-    //     $response->assertJson([
-    //         'message' => 'The country code field is required.',
-    //     ]);
-    // }
-
-    /** @test */
     public function email_field_must_accept_a_valid_email_format()
     {
 
@@ -183,119 +162,7 @@ class RegisterTest extends TestCase
             'message' => 'The phone number has been taken, contact support',
         ]);
     }
-
-    public function test_a_user_recieves_verification_email_on_registration()
-    {
-
-        config(['features.email_verification.enabled' => true]);
-        $response = $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'User',
-            'last_name' => 'Test',
-            'username' => 'username',
-            'country_code' => '+234',
-            'phone_number' => '88838883838',
-            'email' => 'user@user.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        Mail::assertSent(VerifyEmail::class);
-        $response->assertOk();
-    }
-
-    public function test_a_user_recieves_sms_otp_on_registration()
-    {
-        FeatureFlag::enable(FeatureFlags::PHONE_VERIFICATION);
-        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-            $mock->shouldReceive('deliverOTP')->once();
-        });
-        config(['features.phone_verification.enabled' => true]);
-        $response = $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'User',
-            'last_name' => 'Test',
-            'username' => 'userotp',
-            'country_code' => '+234',
-            'phone_number' => '88838883838',
-            'email' => 'user@user.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $response->assertOk();
-    }
-
-    public function test_a_user_can_register_from_web_without_needing_email_verification()
-    {
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
-            $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-                $mock->shouldReceive('deliverOTP')->once();
-            });
-        }
-
-        $response = $this->withHeaders([
-            'X-App-Source' => 'web',
-        ])->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
-            'country_code' => '+234',
-            'phone_number' => '08012345678',
-            'email' => 'jane@doe.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-        ]);
-
-
-        $response->assertOk();
-    }
-
-    public function test_a_user_can_register_without_first_and_last_name_from_stakers_app()
-    {
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-
-        $this->assertDatabaseHas('users', [
-            'username' => 'janeJoe',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'country_code' => '+234',
-        ]);
-    }
-
-    public function test_brand_id_can_be_inserted_stakers_app()
-    {
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'username'=>'janeJoe',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'country_code' => '+234',
-            'brand_id' => 2
-        ]);
-    }
-
-    public function test_brand_id_can_be_inserted_in_fun_app()
+    public function test_brand_id_can_be_inserted()
     {
 
         $this->postjson(self::REGISTER_URL, [
@@ -311,36 +178,15 @@ class RegisterTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
-            'phone_number' => '7098498884',
+            'phone_number' => ' ',
             'email' => 'email@email.com',
-            'country_code' => '+234',
+            'country_code' => '',
             'brand_id' => 1
         ]);
     }
 
-    public function test_new_user_gets_configurable_bonus_in_stakers_app()
-    {
-        config(['trivia.bonus.signup.stakers_bonus_amount' => 200]);
 
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable_balance' => 200.00,
-        ]);
-    }
-
-    public function test_new_user_gets_configurable_bonus_in_fun_app()
+    public function test_new_user_gets_configurable_bonus()
     {
         config(['trivia.bonus.signup.general_bonus_amount' => 50]);
 
@@ -364,36 +210,8 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_new_user_gets_boost_bonus_in_stakers_app()
-    {
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'username'=>'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
 
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-
-        $this->assertDatabaseHas('user_boosts', [
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-    }
-
-    public function test_new_user_gets_boost_bonus_in_fun_app()
+    public function test_new_user_gets_boost_bonus()
     {
         $this->postjson(self::REGISTER_URL, [
             'first_name' => 'Jane',
@@ -425,7 +243,7 @@ class RegisterTest extends TestCase
     }
 
     /** @test */
-    public function gameark_user_can_sign_in_with_social_auth_directly()
+    public function user_can_sign_in_with_social_auth_directly()
     {
 
         $response = $this->withHeaders([
@@ -441,7 +259,7 @@ class RegisterTest extends TestCase
     }
 
     /** @test */
-    public function gameark_user_can_register_without_otp()
+    public function user_can_register_without_otp()
     {
 
         $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::REGISTER_URL, [

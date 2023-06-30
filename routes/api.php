@@ -29,7 +29,6 @@ Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/login', [LoginController::class, 'login']);
 Route::post('auth/social-login/authenticate', [SocialSignInController::class, 'authenticateUser']);
 Route::post('auth/social-login/create-account', [SocialSignInController::class, 'createUser']);
-Route::post('auth/username/verify/{username}', [RegisterController::class, 'verifyUsername']);
 Route::post('auth/password/email', [ForgotPasswordController::class, 'sendEmail']);
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);

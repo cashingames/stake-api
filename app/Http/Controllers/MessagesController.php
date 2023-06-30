@@ -18,7 +18,7 @@ class MessagesController extends BaseController
 {
     //
 
-    public function feedback(Request $request, SupportTicketService $ticketService, ClientPlatform $platform)
+    public function feedback(Request $request, SupportTicketService $ticketService)
     {
         $data = $request->validate([
             'first_name' => ['nullable', 'string'],
@@ -46,7 +46,7 @@ class MessagesController extends BaseController
             }
         }
 
-        $appType = ($platform == ClientPlatform::GameArkMobile) ? "GameArk": "Cashingames";
+        $appType = "GameArk";
 
         Mail::to(config('app.admin_email'))->send(new Feedback($firstName, $lastName, $data["email"], $data["message_body"], $appType));
 

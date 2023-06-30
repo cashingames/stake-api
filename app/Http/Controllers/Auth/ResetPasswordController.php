@@ -29,24 +29,10 @@ class ResetPasswordController extends BaseController
 
         $data = $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'email' => ['email', Rule::requiredIf(fn () => ($platform !== ClientPlatform::StakingMobileWeb))],
-            'phone' => ['string', Rule::requiredIf(fn () => ($platform == ClientPlatform::StakingMobileWeb))],
+            'email' => ['email', 'nullable'],
+            'phone' => ['string','nullable'],
             'code' => ['string', 'required']
         ]);
-
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-
-            $user = User::where('phone_number', $data['phone'])->first();
-
-            if (!is_null($user)) {
-             
-                $user->password = bcrypt($data['password']);
-                $user->save();
-
-                return $this->sendResponse("Password reset successful.", 'Password reset successful');
-            }
-            return $this->sendError("Phone number does not exist", "Phone number does not exist");
-        }
 
         $user = User::where('email', $data['email'])->first();
 

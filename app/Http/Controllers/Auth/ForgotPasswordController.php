@@ -30,30 +30,9 @@ class ForgotPasswordController extends BaseController
     // use SendsPasswordResetEmails;
     public function sendEmail(
         Request $request,
-        ClientPlatform $platform,
-        SMSProviderInterface $smsService
     ) {
 
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-
-            $data = $request->validate([
-                'country_code' => ['required', 'string', 'max:4'],
-                'phone_number' => ['required', 'numeric'],
-            ]);
-            $user = User::where('phone_number', $data['phone_number'])->first();
-
-            if (!is_null($user)) {
-                try {
-                    $smsService->deliverOTP($user);
-                    return $this->sendResponse(true, 'OTP Sent');
-                } catch (\Throwable $th) {
-                    Log::info("Forgot Password: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                    return $this->sendError("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
-                }
-            }
-            return $this->sendError("Phone number does not exist", "Phone number does not exist");
-        }
-
+ 
         $data = $request->validate([
             'email' => ['required', 'string', 'email']
         ]);
@@ -85,24 +64,12 @@ class ForgotPasswordController extends BaseController
     }
 
 
-    public function verifyToken(Request $request,  ClientPlatform $platform,)
+    public function verifyToken(Request $request)
     {
 
         $data = $request->validate([
             'token' => ['required', 'string']
         ]);
-
-        if ($platform == ClientPlatform::StakingMobileWeb) {
-
-            $user = User::where('otp_token', $data['token'])->first();
-
-            if (!is_null($user)) {
-                $user->update(['otp_token' => null]);
-
-                return $this->sendResponse("Verification successful", 'Verification successful');
-            }
-            return $this->sendError("Invalid verification code", "Invalid verification code");
-        }
 
         if ($data) {
             $user = DB::selectOne('select * from password_resets where token = ?', [$data['token']]);

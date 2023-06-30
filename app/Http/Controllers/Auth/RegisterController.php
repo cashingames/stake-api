@@ -63,7 +63,7 @@ class RegisterController extends BaseController
      * @return \Illuminate\Contracts\Validation\Validator
      */
 
-    protected function validator(array $data, $platform = null)
+    protected function validator(array $data)
     {
         return Validator::make($data, [
 
@@ -95,21 +95,20 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \App\User
      */
-    protected function create(array $data, $platform)
+    protected function create(array $data)
     {
       //create the user
 
         $user =
             User::create([
                 'username' => $data['username'],
-                'phone_number' =>  ( ($platform == ClientPlatform::GameArkMobile) ? '' : (str_starts_with($data['phone_number'], '0') ?
-                    ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
+                'phone_number' =>  ' ',
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
-                'email_verified_at' =>  (($platform == ClientPlatform::GameArkMobile) ? now() : null),
+                'email_verified_at' => now() ,
                 'is_on_line' => true,
-                'country_code' => ( ($platform == ClientPlatform::GameArkMobile) ? '' : $data['country_code']),
+                'country_code' => '' ,
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
 
@@ -143,16 +142,13 @@ class RegisterController extends BaseController
         //give user sign up bonus
 
         if (config('trivia.bonus.enabled') && config('trivia.bonus.signup.enabled')) {
-
-            $platform == ClientPlatform::StakingMobileWeb ? $this->cashingamesSignupBonus($user) : $this->GamearkSingUpBonus($user);
-        //credit referrer with points
+             $this->GiveSingUpBonus($user);
         if (
             config('trivia.bonus.enabled') &&
             config('trivia.bonus.signup.referral') &&
             config('trivia.bonus.signup.referral_on_signup') &&
             isset($data['referrer'])
         ) {
-
             $profileReferral = User::where('username', $data["referrer"])->first();
             if ($profileReferral != null) {
                 Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
@@ -162,38 +158,7 @@ class RegisterController extends BaseController
         return $user;
     }
 
-    protected function cashingamesSignupBonus($user)
-    {
-        $bonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
-        DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable_balance += $bonusAmount;
-
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable_balance,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-            ]);
-            $user->wallet->save();
-        });
-
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-    }
-
-    protected function GamearkSingUpBonus($user)
+    protected function GiveSingUpBonus($user)
     {
         $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
         DB::transaction(function () use ($user, $bonusAmount) {
@@ -238,30 +203,8 @@ class RegisterController extends BaseController
      * @return mixed
      */
     protected function registered(
-        Request $request,
-        SMSProviderInterface $smsService,
         $user
     ) {
-        if (FeatureFlag::isEnabled(FeatureFlags::PHONE_VERIFICATION)) {
-            try {
-                $smsService->deliverOTP($user);
-            } catch (\Throwable $th) {
-                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-            }
-        }
-        if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
-            Mail::to($user->email)->send(new VerifyEmail($user));
-
-            Log::info("Email verification sent to " . $user->email);
-            if ($request->hasHeader('X-App-Source')) {
-
-                $token = auth()->tokenById($user->id);
-
-                return $this->sendResponse($token, 'Token');
-            }
-        }
-
-
 
         $result = [
             'username' => $user->username,
@@ -274,28 +217,8 @@ class RegisterController extends BaseController
 
     public function register(
         Request $request,
-        SMSProviderInterface $smsService,
-        ClientPlatform $platform
+       
     ) {
-        if($platform == ClientPlatform::GameArkMobile){
-            return $this->registerGameArk($request, $smsService, $platform);
-        }
-
-        $this->validator($request->all())->validate();
-
-        $user = $this->create($request->all(), $platform);
-
-        if ($response = $this->registered($request, $smsService, $user)) {
-            return $response;
-        }
-    }
-
-    public function registerGameArk(
-        Request $request,
-        SMSProviderInterface $smsService,
-        ClientPlatform $platform)
-    {
-        // $this->validator($request->all(), $platform)->validate();
         $request->validate([
 
             'first_name' => [
@@ -319,7 +242,7 @@ class RegisterController extends BaseController
             'referrer' => ['nullable', 'string', 'exists:users,username']
         ]);
 
-        $user = $this->create($request->all(), $platform);
+        $user = $this->create($request->all());
 
         $token = auth()->login($user);
 
@@ -330,37 +253,6 @@ class RegisterController extends BaseController
             'token' => $token,
         ];
         return $this->sendResponse($result, 'Account created successfully');
-
     }
-
-    public function resendOTP(
-        Request $request,
-        SMSProviderInterface $smsService
-    ) {
-        $this->validate($request, [
-            'username' => ['required', 'exists:users,username']
-        ]);
-
-        $user = User::where('username', $request->username)->first();
-
-        if ($user->phone_verified_at != null) {
-            return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
-        }
-
-        if (Cache::has($user->username . "_last_otp_time")) {
-            //otp was still recently sent to this user, so no need resending
-            return $this->sendResponse([], "You can not send OTP at this time, please try later");
-        } else {
-            try {
-                $smsService->deliverOTP($user);
-                return $this->sendResponse([
-                    'next_resend_minutes' => 2
-                ], "OTP has been resent to phone number");
-            } catch (\Throwable $th) {
-                //throw $th;
-                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
-            }
-        }
-    }
+  
 }

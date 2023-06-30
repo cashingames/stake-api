@@ -40,16 +40,6 @@ class ForgotPasswordTest extends TestCase
 
     public function test_reset_email_can_be_sent()
     {
-        $response = $this->postjson(self::RESET_EMAIL_URL, [
-            "email" => $this->user->email,
-        ]);
-
-        Mail::assertSent(TokenGenerated::class);
-        $response->assertStatus(200);
-    }
-
-    public function test_reset_email_can_be_sent_from_GameArk()
-    {
         $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::RESET_EMAIL_URL, [
             "email" => $this->user->email,
         ]);
@@ -57,15 +47,6 @@ class ForgotPasswordTest extends TestCase
         Mail::assertSent(TokenGenerated::class);
         $response->assertStatus(200);
     }
-
-    // public function test_email_must_be_registered()
-    // {
-    //     $response = $this->postjson(self::RESET_EMAIL_URL,[
-    //         "email" => "example@example.com",
-    //     ]);
-
-    //     $response->assertStatus(200);
-    // }
 
     public function test_that_reset_token_can_be_verified()
     {
@@ -105,39 +86,6 @@ class ForgotPasswordTest extends TestCase
 
         $response->assertJson([
             'message' => 'Invalid verification code',
-        ]);
-    }
-
-    public function test_a_user_recieves_sms_otp_on_forgot_password_reset_on_stakers_app()
-    {
-        $this->user->update(['phone_number' => 90958886969]);
-
-        $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-            $mock->shouldReceive('deliverOTP')->once();
-        });
-
-        $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::RESET_EMAIL_URL, [
-            'country_code' => '+234',
-            'phone_number' =>  90958886969,
-        ]);
-
-        $response->assertJson([
-            'message' => 'OTP Sent'
-        ]);
-    }
-
-    public function test_that_reset_token_can_be_verified_for_stakers_app()
-    {
-
-        $this->user->update(['otp_token' => 9095]);
-        $this->user->refresh();
-
-        $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::VERIFY_TOKEN_URL, [
-            "token" => "9095",
-        ]);
-
-        $response->assertJson([
-            'message' => 'Verification successful'
         ]);
     }
 }
