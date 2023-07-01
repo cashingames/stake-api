@@ -170,7 +170,7 @@ class WalletController extends BaseController
         try {
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
+                    'Authorization' => 'Bearer ' . config('trivia.payment_key')
                 ]
             ]);
         } catch (\Exception $ex) {
@@ -252,7 +252,7 @@ class WalletController extends BaseController
             'Winnings Withdrawal Reversed',
             null,
         );
-        
+
         Log::info('withdrawal reversed for transaction reference ' . $reference);
         return response("", 200);
     }
@@ -270,7 +270,7 @@ class WalletController extends BaseController
         try {
             $response = $client->request('GET', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' .  config('trivia.payment_key')
+                    'Authorization' => 'Bearer ' . config('trivia.payment_key')
                 ]
             ]);
         } catch (\Exception $ex) {

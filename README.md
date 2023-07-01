@@ -67,16 +67,19 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 # Tech Improvements
-- x Achievement in code and database
 - Create EndSinglePlayerController.cs
-- Cleanup feature flags in the project
-- Rework ClientPlatform based on where we are
-- Review feature flags controller
 - Review profile controller
 - Review UserController
 - Review Notifications and UserNotifications
 - Cleanup questions hardening services
 - Re-implement daily reports
-- x Drop uneeded columns and tables
 - Optimize common data endpoint
 - Move referral rewards notification on Login to backend instead of frontend
+
+//user_bonuss
+- change amount_credited to amount
+- change amount_remaining_after_stake to balance
+- change total_amount_won to amount_won
+- remove amount_remaining_after_withdrawal
+- change auth/email endpoint to verify/get-otp
+- test reset password endpoint

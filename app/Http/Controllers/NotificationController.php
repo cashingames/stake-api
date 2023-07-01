@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientPlatform;
 use App\Models\UserNotification;
-use Illuminate\Http\Request;
+
 class NotificationController extends BaseController
 {
     /**
      * Fetch all notifications
      */
-    public function index( Request $request)
+    public function index()
     {
         $notifications = $this->user->notifications();
 
@@ -19,7 +18,7 @@ class NotificationController extends BaseController
     /**
      * Mark single or all user notifications as read
      */
-    public function readNotification(Request $request, $notificationId)
+    public function readNotification($notificationId)
     {
         $notificationId == "all" ?
             $this->readAllNotifications() :

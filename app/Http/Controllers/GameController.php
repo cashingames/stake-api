@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Contest\PrizeType;
-use App\Enums\ClientPlatform;
-use App\Enums\FeatureFlags;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
@@ -19,7 +16,6 @@ use App\Models\StakingOdd;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
-use App\Services\FeatureFlag;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

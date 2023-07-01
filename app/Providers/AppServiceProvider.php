@@ -47,8 +47,8 @@ class AppServiceProvider extends ServiceProvider
             FirestoreService::class,
             fn() => new FirestoreService()
         );
-        
-        Notification::extend('fcm', function ($app) {
+
+        Notification::extend('fcm', function () {
             return new FcmNotificationChannel();
         });
     }

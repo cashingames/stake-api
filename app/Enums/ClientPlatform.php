@@ -2,23 +2,38 @@
 
 namespace App\Enums;
 
-use Illuminate\Support\Arr;
-
 enum ClientPlatform
 {
-    case StakingMobileWeb;
-    case StakingMobileApp;
-    case CashingamesMobile;
-    case CashingamesWeb;
+
+    case MobileAndroid;
+
+    case MobileIOS;
+
+    case MobileWebAndroid;
+
+    case MobileWebIOS;
+
+    case MobileWebMac;
+
+    case MobileWebWindows;
 
     public static function detect($brandId): self
     {
         switch ($brandId) {
-            case 2:
-                return self::StakingMobileWeb;
-            case 1 || 3:
+            case 1:
+                return self::MobileAndroid;
+            case 2: //works for mobile and mobile web
+                return self::MobileIOS;
+            case 3:
+                return self::MobileWebAndroid;
+            case 4:
+                return self::MobileWebIOS;
+            case 5:
+                return self::MobileWebMac;
+            case 6:
+                return self::MobileWebWindows;
             default:
-                return self::CashingamesMobile;
+                return self::MobileAndroid;
         }
 
     }
