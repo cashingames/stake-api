@@ -12,20 +12,14 @@ use Tests\TestCase;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Boost;
-use AchievementSeeder;
-use App\Enums\FeatureFlags;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\UserPlan;
 use App\Models\UserBoost;
 use App\Models\GameSession;
 use App\Models\UserCoin;
-use App\Services\FeatureFlag;
-use Database\Seeders\StakingOddsRulesSeeder;
 use Database\Seeders\AchievementBadgeSeeder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +46,6 @@ class GameTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
-        $this->seed(AchievementSeeder::class);
         $this->seed(BoostSeeder::class);
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);

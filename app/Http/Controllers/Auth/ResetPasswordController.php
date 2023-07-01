@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\ClientPlatform;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,13 +23,12 @@ class ResetPasswordController extends BaseController
 
     // use ResetsPasswords;
 
-    public function reset(Request $request,  ClientPlatform $platform)
+    public function reset(Request $request)
     {
 
         $data = $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'email' => ['email', 'nullable'],
-            'phone' => ['string','nullable'],
             'code' => ['string', 'required']
         ]);
 
@@ -51,6 +49,6 @@ class ResetPasswordController extends BaseController
 
         $validRecord->delete();
 
-        return $this->sendResponse($user, "Password reset successful.");
+        return $this->sendResponse(true, "Password reset successful.");
     }
 }

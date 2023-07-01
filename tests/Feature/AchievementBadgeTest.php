@@ -55,12 +55,10 @@ class AchievementBadgeTest extends TestCase
 
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
-        $this->seed(AchievementSeeder::class);
         $this->seed(BoostSeeder::class);
         $this->seed(GameTypeSeeder::class);
         $this->seed(GameModeSeeder::class);
         $this->seed(PlanSeeder::class);
-        $this->seed(StakingOddsRulesSeeder::class);
         $this->seed(AchievementBadgeSeeder::class);
         GameSession::factory()
             ->count(20)
@@ -70,7 +68,6 @@ class AchievementBadgeTest extends TestCase
         $this->plan = Plan::inRandomOrder()->first();
         $this->actingAs($this->user);
         FeatureFlag::isEnabled(FeatureFlags::ACHIEVEMENT_BADGES);
-        config(['odds.maximum_exhibition_staking_amount' => 1000]);
     }
 
     public function test_is_attached_to_event()

@@ -23,11 +23,11 @@ class ProfileController extends BaseController
         $data = $request->validate([
             'username' => [
                 'required', 'string', 'max:20',
-                Rule::unique('users','username')->ignore($this->user->id),
+                Rule::unique('users', 'username')->ignore($this->user->id),
             ],
             'email' => [
-                'required', 'string', 'max:255','email',
-                Rule::unique('users','email')->ignore($this->user->id),
+                'required', 'string', 'max:255', 'email',
+                Rule::unique('users', 'email')->ignore($this->user->id),
             ],
             'gender' => ['nullable', 'string', 'max:20'],
             'dateOfBirth' => ['nullable', 'date'],
@@ -47,62 +47,14 @@ class ProfileController extends BaseController
             $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
         }
         $profile->save();
+        
     }
 
-    public function editPIForCashingames(Request $request)
+
+    public function editPersonalInformation(Request $request)
     {
-        $data = $request->validate([
-            'firstName' => ['required', 'string', 'max:20'],
-            'lastName' => ['required', 'string', 'max:20'],
-            'username' => [
-                'required', 'string', 'max:20',
-                Rule::unique('users','username')->ignore($this->user->id),
-            ],
-            'email' => [
-                'required', 'string', 'max:255','email',
-                Rule::unique('users','email')->ignore($this->user->id),
-            ],
-
-            // 'phoneNumber' => [
-            //     'required','min:11','max:11',
-            //     Rule::unique('users','phone_number')->ignore($this->user->id),
-            // ],
-            'gender' => ['nullable', 'string', 'max:20'],
-            'dateOfBirth' => ['nullable', 'date'],
-        ]);
-
-        // if (isset($data['phoneNumber']) &&  !is_null($data['phoneNumber'])) {
-        //     $this->user->phone_number = $data['phoneNumber'];
-        //     $this->user->save();
-        // }
-        $profile = $this->user->profile;
-        $profile->first_name = $data['firstName'];
-        $profile->last_name = $data['lastName'];
-
-        $this->user->username = $data['username'];
-        $this->user->email = $data['email'];
-        $this->user->save();
-
-        if (isset($data['gender']) &&  !is_null($data['gender'])) {
-            $profile->gender =  $data['gender'];
-        }
-
-        if (isset($data['dateOfBirth']) && !is_null($data['dateOfBirth'])) {
-            $profile->date_of_birth = (new Carbon($data['dateOfBirth']))->toDateString();
-        }
-        $profile->save();
-    }
-
-    public function editPersonalInformation(Request $request, ClientPlatform $clientPlatform)
-    {
-
-        if($clientPlatform == ClientPlatform::GameArkMobile){
-            $this->editPIForGameArk($request);
-        }else{
-            $this->editPIForCashingames($request);
-        }
-
-        return $this->sendResponse($this->user, "Profile Updated.");
+        $this->editPIForGameArk($request);
+        return $this->sendResponse(true, "Profile Updated.");
     }
 
     public function updateReferrer(Request $request)
@@ -126,37 +78,10 @@ class ProfileController extends BaseController
             Event::dispatch(new AchievementBadgeEvent($profileReferral, AchievementType::REFERRAL, null));
         }
 
-        return $this->sendResponse($user, "Profile Updated.");
+        return $this->sendResponse(true, "Profile Updated.");
     }
 
-    public function editBank(Request $request)
-    {
-
-        $data = $request->validate([
-            'accountName' => ['required', 'string', 'max:255'],
-            'bankName' => ['required', 'string', 'max:255'],
-            'accountNumber' => [
-                'required', 'string', 'max:255',
-                Rule::unique('profiles', 'account_number')->ignore($this->user->id),
-            ],
-        ]);
-
-
-        $user = auth()->user();
-        $profile = $user->profile;
-
-        if ($profile == null) {
-            return $this->sendError(['Profile not found'], "Unable to update profile");
-        }
-
-        $profile->account_name = $data['accountName'];
-        $profile->bank_name = $data['bankName'];
-        $profile->account_number = $data['accountNumber'];
-        $profile->save();
-
-        return $this->sendResponse($user, "Profile Updated.");
-    }
-
+ 
     public function addProfilePic(Request $request)
     {
 

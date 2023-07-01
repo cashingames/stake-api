@@ -54,8 +54,6 @@ class ResetPasswordTest extends TestCase
 
         DB::table('password_resets')->insert(['email' => $this->user->email, 'token' => 8989]);
 
-        $resetDetails = DB::table('password_resets')->where('email', $this->user->email)->where('token', 8989)->first();
-
         $response = $this->postjson(self::RESET_PASSWORD_URL, [
             "email" => $this->user->email,
             "code" => "8989",

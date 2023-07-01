@@ -13,7 +13,7 @@ use stdClass;
 class UserController extends BaseController
 {
 
-    public function profile(ClientPlatform $clientPlatform, DailyRewardService $daillyRewardService)
+    public function profile(DailyRewardService $daillyRewardService)
     {
         $this->user->load(['profile', 'wallet']);
         $result = new stdClass;
@@ -36,14 +36,13 @@ class UserController extends BaseController
         $result->globalRank = $this->user->rank;
         $result->gamesCount = $this->user->played_games_count;
         $result->winRate = $this->user->win_rate;
-        $result->achievements = $this->user->userAchievements();
         $result->activePlans = $this->composeUserPlans();
         $result->hasActivePlan = $this->user->hasActivePlan();
         $result->boosts = $this->user->gameArkUserBoosts();
         $result->coinsBalance = $this->user->getUserCoins();
         $result->usedBoostCount = $this->user->getUserUsedBoostCount();
 
-        return $this->sendResponse((new CommonDataResponse())->transform($result, $clientPlatform), "User details");
+        return $this->sendResponse((new CommonDataResponse())->transform($result), "User details");
     }
 
     private function composeUserPlans()

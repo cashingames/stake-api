@@ -357,15 +357,6 @@ class User extends Authenticatable implements JWTSubject
                 return $x->category()->select('id', 'name', 'description', 'background_color as bgColor', 'icon as icon')->first();
             });
     }
-
-    public function userAchievements()
-    {
-        return DB::table('user_achievements')->where('user_id', $this->id)
-            ->join('achievements', function ($join) {
-                $join->on('achievements.id', '=', 'user_achievements.achievement_id');
-            })->select('achievements.id', 'title', 'medal as logoUrl')->get();
-    }
-
     public function userAchievementBadge()
     {
         $db = AchievementBadge::join('user_achievement_badges', function ($join) {

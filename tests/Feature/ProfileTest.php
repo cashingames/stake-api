@@ -51,7 +51,6 @@ class ProfileTest extends TestCase
                 'firstName' => $this->user->profile->first_name,
                 'points' => $this->user->points(),
                 'boosts' => [],
-                'achievements' => [],
                 'hasActivePlan' => false,
                 'unreadNotificationsCount' => 0,
                 'coinsBalance' => $this->user->getUserCoins(),
@@ -75,16 +74,12 @@ class ProfileTest extends TestCase
     {
 
         $this->postjson('/api/v3/profile/me/edit-personal', [
-            'firstName' => 'John',
-            'lastName' => 'Doe',
             'username' => 'JayDee',
-            'phoneNumber' => '09098989898',
             'email' => 'johndoe@email.com',
-            'password' => 'password111',
             'gender' => 'male',
             'dateOfBirth' => '23-09-1998',
         ]);
-        $this->assertEquals(($this->user->profile->first_name . ' ' . $this->user->profile->last_name), 'John Doe');
+        $this->assertEquals($this->user->username , 'JayDee');
     }
 
     public function test_username_can_be_edited()
@@ -121,7 +116,6 @@ class ProfileTest extends TestCase
 
     public function test_gameark_profile_can_be_edited()
     {
-
         $response = $this->withHeaders(['x-brand-id' => 10])->postjson('/api/v3/profile/me/edit-personal', [
             'username' => 'JayDee',
             'email' => 'johndoe@email.com',
