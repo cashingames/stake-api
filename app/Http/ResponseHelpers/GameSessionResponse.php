@@ -2,10 +2,7 @@
 
 namespace App\Http\ResponseHelpers;
 
-use App\Enums\FeatureFlags;
 use App\Models\GameSession;
-use App\Services\FeatureFlag;
-use App\Models\ExhibitionStaking;
 
 class GameSessionResponse{
 
@@ -25,18 +22,7 @@ class GameSessionResponse{
         $response->total_count = $gameSession->total_count;
         $response->points_gained = $gameSession->points_gained;
         $response->state = $gameSession->state;
-        $response->trivia_id = $gameSession->trivia_id;
-        
-
-        if (FeatureFlag::isEnabled(FeatureFlags::EXHIBITION_GAME_STAKING) or FeatureFlag::isEnabled(FeatureFlags::TRIVIA_GAME_STAKING)) {
-            if ($exhibitionStaking = ExhibitionStaking::where('game_session_id', $gameSession->id)->first()) {
-                $response->with_staking = true;
-                $response->amount_staked = $exhibitionStaking->staking->amount_staked;
-                $response->amount_won = $exhibitionStaking->staking->amount_won;
-                $response->staking_odd = $exhibitionStaking->odds_applied;
-            }    
-        }
-        
+    
         return $response;
     }
 }
