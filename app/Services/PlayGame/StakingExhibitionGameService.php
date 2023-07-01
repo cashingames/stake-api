@@ -37,7 +37,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $this->validatedRequest = $validatedRequest;
 
         $questions = $this->stakeQuestionsHardeningService
-            ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
+            ->determineQuestions($this->user->id, $this->validatedRequest->category);
 
         if ($questions->count() < 10) {
             return [

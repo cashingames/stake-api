@@ -68,7 +68,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # Tech Improvements
 - Create EndSinglePlayerController.cs
-- Review profile controller
 - Review UserController
 - Review Notifications and UserNotifications
 - Cleanup questions hardening services
@@ -83,3 +82,5 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - remove amount_remaining_after_withdrawal
 - change auth/email endpoint to verify/get-otp
 - test reset password endpoint
+- move profile::change password to password controller::change password
+- reverse relationship between user and profile
