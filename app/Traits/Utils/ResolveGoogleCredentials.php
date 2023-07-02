@@ -4,17 +4,17 @@ namespace App\Traits\Utils;
 
 trait ResolveGoogleCredentials
 {
-    
+
+    private static $SPECIALENVS = [
+        'development',
+        'stake-development',
+        'stake-production',
+        'stake-testing',
+    ];
+
     public function detectGoogleCredentialEnvironment($env)
     {
-        $specialEnv = [
-            'development',
-            'stake-development',
-            'stake-production',
-            'stake-testing',
-        ];
-        
-        if (in_array($env, $specialEnv)) {
+        if (in_array($env, self::$SPECIALENVS)) {
             putenv('GOOGLE_CREDENTIALS_ENV=' . ($env));
         }
     }
