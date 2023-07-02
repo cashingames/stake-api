@@ -97,6 +97,10 @@ class BonusRepository
                     ]);
                 });
 
+            if ($activeRegistrationBonuses->isEmpty()) {
+                return;
+            }
+
             $activeRegistrationBonuses->toQuery()->update([
                 'is_on' => false
             ]);

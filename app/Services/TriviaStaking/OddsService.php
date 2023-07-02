@@ -21,10 +21,10 @@ class OddsService
     {
     }
 
-    public function getOdds($user)
+    public function getOdds()
     {
         // @TODO Rename to TRIVIA_STAKING_WITH_DYNAMIC_ODDS
-        return $this->getDynamicOdds($user) ;
+        return $this->getDynamicOdds();
     }
 
     private function getStandardOdds(): Collection
@@ -36,10 +36,10 @@ class OddsService
         );
     }
 
-    public function getDynamicOdds(User $user): Collection
+    public function getDynamicOdds(): Collection
     {
         $odds = $this->getStandardOdds();
-        $oddsMultiplier = $this->computeDynamicOdds($user);
+        $oddsMultiplier = $this->computeDynamicOdds();
 
         //update odds multiplier variables inside Odds
         return $odds->map(function ($odd) use ($oddsMultiplier) {
@@ -48,7 +48,7 @@ class OddsService
         });
     }
 
-    public function computeDynamicOdds(User $user): array
+    public function computeDynamicOdds(): array
     {
         /**
          * @var \Illuminate\Support\Collection $stakingOddsRule
