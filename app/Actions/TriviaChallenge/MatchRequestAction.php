@@ -5,11 +5,11 @@ namespace App\Actions\TriviaChallenge;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
 use App\Models\User;
-use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Services\PlayGame\StakingChallengeGameService;
 use Faker\Factory as FakerFactory;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Lottery;
 
 class MatchRequestAction
@@ -25,6 +25,11 @@ class MatchRequestAction
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
+        Log::info('MatchRequestAction Executing', [
+            'google_env' => 'in match request action ' . env('GOOGLE_APPLICATION_CREDENTIALS'),
+            'challengeRequest' => $challengeRequest,
+        ]);
+
         if ($challengeRequest->status !== 'MATCHING') {
             return null;
         }

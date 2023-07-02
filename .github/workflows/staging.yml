@@ -75,11 +75,7 @@ jobs:
         with:
           command: |
             cd stg-api
-            php artisan optimize
-            php artisan config:cache
-            php artisan route:cache
-            php artisan event:cache
-            php artisan view:cache
+            php artisan optimize:clear
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
