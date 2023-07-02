@@ -16,6 +16,9 @@ class ExpireRegistrationBonusAction
     {
         $activeRegistrationBonuses = $this->bonusRepository->getActiveUserRegistrationBonusesToExpire();
 
+        if ($activeRegistrationBonuses->isEmpty()) {
+            return;
+        }
         $this->bonusRepository->expireBonuses($activeRegistrationBonuses);
     }
 }

@@ -74,6 +74,8 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Re-implement daily reports
 - Optimize common data endpoint
 - Move referral rewards notification on Login to backend instead of frontend
+- Refractor StakingExhibitionGameService to use repo pattern
+- Refractor StartSinglePlayerRequest Validation to use repo pattern
 
 //user_bonuss
 - change amount_credited to amount
