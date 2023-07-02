@@ -19,18 +19,23 @@ trait ResolveGoogleCredentials
         }
     }
 
-    public function detectGoogleCredentialName($header){
+    public function detectGoogleCredentialName()
+    {
+
+        $env = env('GOOGLE_CREDENTIALS_ENV') || request()->header('x-request-env');
+        $this->detectGoogleCredentialEnvironment($env);
+
         $credentials = 'google-credentials.json';
-        if ($header == 'development' || env('GOOGLE_CREDENTIALS_ENV') == 'development') {
+        if ($env == 'development' || env('GOOGLE_CREDENTIALS_ENV') == 'development') {
             $credentials = 'google-credentials-dev.json';
         }
-        if ($header == 'stake-development' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-development') {
+        if ($env == 'stake-development' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-development') {
             $credentials = 'google-credentials-stake-dev.json';
         }
-        if ($header == 'stake-production' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-production') {
+        if ($env == 'stake-production' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-production') {
             $credentials = 'google-credentials-stake-prod.json';
         }
-        if ($header == 'stake-testing' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-testing') {
+        if ($env == 'stake-testing' || env('GOOGLE_CREDENTIALS_ENV') == 'stake-testing') {
             $credentials = 'google-credentials-stake-test.json';
         }
         return $credentials;

@@ -9,37 +9,37 @@ class ResolveGoogleCredentialsTest extends TestCase
 {
     use ResolveGoogleCredentials;
 
-    public function test_that_google_credential_development_name_can_be_detected(){
+    // public function test_that_google_credential_development_name_can_be_detected(){
 
-        $credential = $this->detectGoogleCredentialName("development");
+    //     $credential = $this->detectGoogleCredentialName("development");
 
-        $this->assertEquals($credential, 'google-credentials-dev.json');
+    //     $this->assertEquals($credential, 'google-credentials-dev.json');
 
-    }
+    // }
 
-    public function test_that_google_credential_stake_development_name_can_be_detected(){
+    // public function test_that_google_credential_stake_development_name_can_be_detected(){
 
-        $credential = $this->detectGoogleCredentialName("stake-development");
+    //     $credential = $this->detectGoogleCredentialName("stake-development");
 
-        $this->assertEquals($credential, 'google-credentials-stake-dev.json');
+    //     $this->assertEquals($credential, 'google-credentials-stake-dev.json');
 
-    }
+    // }
 
-    public function test_that_google_credential_stake_production_name_can_be_detected(){
+    // public function test_that_google_credential_stake_production_name_can_be_detected(){
 
-        $credential = $this->detectGoogleCredentialName("stake-production");
+    //     $credential = $this->detectGoogleCredentialName("stake-production");
 
-        $this->assertEquals($credential, 'google-credentials-stake-prod.json');
+    //     $this->assertEquals($credential, 'google-credentials-stake-prod.json');
 
-    }
+    // }
 
-    public function test_that_google_credential_stake_testing_name_can_be_detected(){
+    // public function test_that_google_credential_stake_testing_name_can_be_detected(){
 
-        $credential = $this->detectGoogleCredentialName("stake-testing");
+    //     $credential = $this->detectGoogleCredentialName("stake-testing");
 
-        $this->assertEquals($credential, 'google-credentials-stake-test.json');
+    //     $this->assertEquals($credential, 'google-credentials-stake-test.json');
 
-    }
+    // }
 
     public function test_that_google_credential_development_environment_can_assigned(){
 

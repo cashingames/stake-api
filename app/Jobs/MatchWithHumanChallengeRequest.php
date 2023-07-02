@@ -40,7 +40,7 @@ class MatchWithHumanChallengeRequest implements ShouldQueue
             'env' => $this->env,
         ]);
 
-       $this->detectGoogleCredentialEnvironment($this->env);
+        $this->detectGoogleCredentialEnvironment($this->env);
 
         $action->execute($this->requestData);
     }

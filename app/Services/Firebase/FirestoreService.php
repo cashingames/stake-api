@@ -11,8 +11,7 @@ class FirestoreService
     private FirestoreClient $firestore;
     public function __construct()
     {
-        $this->detectGoogleCredentialEnvironment(env('GOOGLE_CREDENTIALS_ENV') || request()->header('x-request-env'));
-        $credentials = $this->detectGoogleCredentialName(request()->header('x-request-env'));
+        $credentials = $this->detectGoogleCredentialName();
         
         putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
         $this->firestore = app()->make(FirestoreClient::class);
