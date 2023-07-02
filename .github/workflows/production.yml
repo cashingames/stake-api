@@ -62,7 +62,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            cd stg-api
+            cd api
             /opt/cpanel/composer/bin/composer install --optimize-autoloader --no-dev
           host: mocha3031.mochahost.com
           username: cashinga
@@ -80,7 +80,7 @@ jobs:
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
-      - name: migrate_staging
+      - name: migrate
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: cd api && php artisan migrate

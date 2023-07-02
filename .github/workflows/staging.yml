@@ -83,7 +83,7 @@ jobs:
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
-      - name: migrate_staging
+      - name: migrate
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: cd stg-api && php artisan migrate
