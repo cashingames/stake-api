@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: deploy-production
+      - name: deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -83,7 +83,7 @@ jobs:
       - name: migrate
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd api && php artisan migrate
+          command: cd api && php artisan migrate --force
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
