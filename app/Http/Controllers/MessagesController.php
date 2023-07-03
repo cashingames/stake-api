@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Mail\Feedback;
 use Illuminate\Http\Request;
-use App\Enums\ClientPlatform;
 use Illuminate\Support\Facades\Mail;
 use App\Services\SupportTicketService;
 
@@ -12,7 +11,7 @@ class MessagesController extends BaseController
 {
     //
 
-    public function feedback(Request $request, SupportTicketService $ticketService, ClientPlatform $platform)
+    public function feedback(Request $request, SupportTicketService $ticketService)
     {
         $data = $request->validate([
             'first_name' => ['nullable', 'string'],

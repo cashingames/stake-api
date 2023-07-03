@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Option;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Lottery;
 
 class OptionFactory extends Factory
 {
@@ -26,7 +27,9 @@ class OptionFactory extends Factory
             //
             'question_id' => Question::factory(),
             'title' => $this->faker->word(),
-            'is_correct' => $this->faker->randomElement(array(true, false) ),
+            'is_correct' => Lottery::odds(1, 3)
+                ->winner(fn() => true)
+                ->loser(fn() => false)
         ];
     }
 }

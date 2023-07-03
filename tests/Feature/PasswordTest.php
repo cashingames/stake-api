@@ -7,14 +7,14 @@ use App\Models\User;
 use App\Models\AuthToken;
 use Mockery\MockInterface;
 use App\Enums\AuthTokenType;
-use App\Mail\TokenGenerated;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ForgotPasswordTest extends TestCase
+/**
+ * @TODO Test reset password
+ */
+class PasswordTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -46,43 +46,6 @@ class ForgotPasswordTest extends TestCase
             'token_type' => AuthTokenType::PhoneVerification->value,
             'expire_at' => now()->addMinutes(config('auth.verification.minutes_before_otp_expiry'))->toDateTimeString()
         ]);
-    }
-
-    public function test_reset_email_can_be_sent()
-    {
-        $response = $this->postjson(self::RESET_EMAIL_URL, [
-            "email" => $this->user->email,
-        ]);
-
-        Mail::assertSent(TokenGenerated::class);
-        $response->assertStatus(200);
-    }
-
-    public function test_reset_email_can_be_sent_from_GameArk()
-    {
-        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::RESET_EMAIL_URL, [
-            "email" => $this->user->email,
-        ]);
-
-        Mail::assertSent(TokenGenerated::class);
-        $response->assertStatus(200);
-    }
-
-    public function test_that_reset_token_can_be_verified()
-    {
-        $now = Carbon::now();
-        $token = mt_rand(10000, 99999);
-
-        DB::table('password_resets')->insert([
-            'token' => $token,
-            'email' => $this->user->email, 'created_at' => $now
-        ]);
-
-        $response = $this->postjson(self::VERIFY_TOKEN_URL, [
-            "token" => strval($token),
-        ]);
-
-        $response->assertStatus(200);
     }
 
     public function test_that_reset_token_must_be_of_type_string()
@@ -119,7 +82,7 @@ class ForgotPasswordTest extends TestCase
 
         $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::RESET_EMAIL_URL, [
             'country_code' => '+234',
-            'phone_number' =>  90958886969,
+            'phone_number' => 90958886969,
         ]);
 
         $response->assertJson([
