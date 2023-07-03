@@ -104,16 +104,32 @@ class BonusRepository
         });
     }
 
-    public function getWeeklyUserLosses(Carbon $startDate, Carbon $endDate)
+    public function getUserStakeLossBetween(Carbon $startDate, Carbon $endDate)
     {
       
-        $usersWithLosses = DB::select("SELECT user_id, sum(amount_won), sum(amount_staked), (sum(amount_won) - sum(amount_staked)) as loss, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
+        $usersWithLosses = DB::select(
+        "SELECT stakings.user_id, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
         FROM stakings
-        WHERE (DATE(created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
-        GROUP BY user_id
-        HAVING loss < 0
+        LEFT JOIN wallets ON stakings.user_id = wallets.user_id
+        WHERE (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
+        GROUP BY stakings.user_id
+        HAVING cashback < 0
         ");
 
         return collect($usersWithLosses);
+    }
+
+    public function giveCashback(Collection $usersLosses)
+    {
+        dd($usersLosses);
+        DB::transaction(function () use ($usersLosses) {
+           
+            $usersLosses->each(function ($userBonus) {
+               
+                $userBonus->user->wallet->update([
+                    'bonus' => $userBonus->user->wallet->bonus + $userBonus->amount_remaining_after_staking
+                ]);
+            });
+        });
     }
 }

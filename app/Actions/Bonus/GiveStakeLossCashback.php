@@ -5,11 +5,11 @@ namespace App\Actions\Bonus;
 use App\Repositories\Cashingames\BonusRepository;
 use App\Services\Bonuses\WeeklyBonuses\WeeklyLossCashbackService;
 
-class GiveWeeklyLossCashback
+class GiveStakeLossCashback
 {
     public function __construct(
         private readonly BonusRepository $bonusRepository,
-        private readonly WeeklyLossCashbackService $cashbackService
+       
     ) {
     }
 
@@ -18,7 +18,8 @@ class GiveWeeklyLossCashback
         $start = now()->startOfWeek();
         $end = now()->endOfWeek() ;
 
-        $usersWithLosses = $this->bonusRepository->getWeeklyUserLosses($start , $end);
-        $this->cashbackService->giveCashback($usersWithLosses);
+        $usersWithLosses = $this->bonusRepository->getUserStakeLossBetween($start , $end);
+
+        $this->bonusRepository->giveCashback($usersWithLosses);
     }
 }

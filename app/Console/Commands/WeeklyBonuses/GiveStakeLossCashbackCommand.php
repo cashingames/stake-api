@@ -2,17 +2,17 @@
 
 namespace App\Console\Commands\WeeklyBonuses;
 
-use App\Actions\Bonus\GiveWeeklyLossCashback as WeeklyLossAction;
+use App\Actions\Bonus\GiveStakeLossCashback as WeeklyLossAction;
 use Illuminate\Console\Command;
 
-class GiveWeeklyLossCashback extends Command
+class GiveStakeLossCashbackCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'weekly-loss:cashback';
+    protected $signature = 'bonus:stake:loss-cashback';
 
     /**
      * The console command description.
