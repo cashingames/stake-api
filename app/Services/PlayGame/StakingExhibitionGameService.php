@@ -3,10 +3,9 @@
 namespace App\Services\PlayGame;
 
 use App\Models\Staking;
-use App\Enums\FeatureFlags;
 use App\Models\GameSession;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Services\FeatureFlag;
 use Illuminate\Support\Carbon;
 use App\Enums\StakingFundSource;
 use App\Enums\GameSessionStatus;
@@ -37,9 +36,18 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         $this->validatedRequest = $validatedRequest;
 
         $questions = $this->stakeQuestionsHardeningService
-            ->determineQuestions($this->user->id, $this->validatedRequest->category, null);
+            ->determineQuestions($this->user->id, $this->validatedRequest->category);
 
         if ($questions->count() < 10) {
+            Log::info(
+                'User has less than 10 questions',
+                [
+                    'user' => $this->user->username,
+                    'category' => $this->validatedRequest->category,
+                    'questions' => $questions->count()
+                ]
+            );
+
             return [
                 'gameSession' => null,
                 'questions' => []

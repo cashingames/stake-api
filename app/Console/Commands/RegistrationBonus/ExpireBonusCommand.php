@@ -22,7 +22,7 @@ class ExpireBonusCommand extends Command implements Isolatable
      */
     protected $description = 'Expire due registration bonus registration bonuses';
 
-    /**amount_remaining_after_staking
+    /**
      * Execute the console command.
      */
     public function handle(ExpireRegistrationBonusAction $expireRegistrationBonusAction)

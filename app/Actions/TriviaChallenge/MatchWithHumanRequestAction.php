@@ -7,6 +7,7 @@ use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Services\PlayGame\StakingChallengeGameService;
+use Illuminate\Support\Facades\Log;
 
 class MatchWithHumanRequestAction
 {
@@ -20,6 +21,11 @@ class MatchWithHumanRequestAction
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
+        Log::info('MatchWithHumanRequestAction Executing', [
+            'google_env' => 'in MatchWithHumanRequestAction ' . env('GOOGLE_APPLICATION_CREDENTIALS'),
+            'challengeRequest' => $challengeRequest,
+        ]);
+
         $matchedRequest = $this->triviaChallengeStakingRepository->findMatch($challengeRequest);
 
         if (!$matchedRequest) {

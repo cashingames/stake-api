@@ -176,7 +176,7 @@ class EndChallengeTest extends TestCase
         TriviaChallengeQuestion::factory()->create([
             'challenge_request_id' => '1',
             'question_id' => Question::first()->id,
-            'option_id' => Question::first()->options->where('is_correct', 1)->first()->id,
+            'option_id' => Question::first()->options->where('is_correct', true)->first()->id,
         ]);
 
         $this
@@ -240,8 +240,10 @@ class EndChallengeTest extends TestCase
     {
         $questions = Question::factory()
             ->hasOptions(4)
-            ->count(250)
-            ->create();
+            ->count(20)
+            ->create([
+                'level' => 'easy',
+            ]);
 
         $data = [];
 
