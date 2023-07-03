@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class BaseController extends Controller
 {
-    public $token;
     public $user;
-    public $MINIMUM_GAME_BOOST_SCORE;
 
     function __construct()
     {
@@ -18,9 +16,6 @@ class BaseController extends Controller
         if ($this->user && $this->user->trashed()) {
             auth()->logout(true);
         }
-
-        // setting minimum game score
-        $this->MINIMUM_GAME_BOOST_SCORE = config("trivia.minimum_game_boost_score");
     }
 
     /**

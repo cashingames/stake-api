@@ -29,11 +29,9 @@ class GameController extends BaseController
     public function getCommonData()
     {
         $result = new stdClass;
-
-
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn () =>
+            fn() =>
             GameMode::select(
                 'id',
                 'name',
@@ -44,23 +42,25 @@ class GameController extends BaseController
             )
                 ->get()
         );
+        $result->boosts = Cache::rememberForever(
+            'gameBoosts',
+            fn() => Boost::where('name', '!=', 'Bomb')
+                ->get()
+        );
+        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
 
-        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
-
-        $categories = Cache::rememberForever('categories', fn () => Category::all());
+        $categories = Cache::rememberForever('categories', fn() => Category::all());
 
         $gameInfo = DB::select("
-        SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
-        c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
-        (SELECT name from categories WHERE categories.id = c.category_id) category_name,
-        (SELECT count(id) from game_sessions AS gs where gs.game_type_id = gt.id and
-        gs.category_id = c.id and gs.user_id = {$this->user->id}) AS played
-        FROM questions q
-        JOIN categories_questions cq ON cq.question_id = q.id
-        JOIN categories AS c ON c.id = cq.category_id
-        JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL
-        AND q.is_published = true AND c.is_enabled = true
-        GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
+            SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
+            c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
+            (SELECT name from categories WHERE categories.id = c.category_id) category_name
+            FROM questions q
+            JOIN categories_questions cq ON cq.question_id = q.id
+            JOIN categories AS c ON c.id = cq.category_id
+            JOIN game_types AS gt ON gt.id = q.game_type_id WHERE q.deleted_at IS NULL
+            AND q.is_published = true AND c.is_enabled = true
+            GROUP by cq.category_id, q.game_type_id HAVING count(q.id) > 0
         ");
 
         $gameInfo = collect($gameInfo);
@@ -97,7 +97,6 @@ class GameController extends BaseController
                 $c->description = $category->description;
                 $c->icon = $category->icon;
                 $c->bgColor = $category->background_color;
-                $c->played = $gameInfo->where('game_type_id', $type->id)->where('category_id', $category->id)->sum('played');
                 $c->subcategories = $toReturnSubcategories;
                 $toReturnCategories[] = $c;
             }
@@ -120,11 +119,6 @@ class GameController extends BaseController
 
         $result->minVersionCode = config('trivia.min_version_code');
         $result->minVersionForce = config('trivia.min_version_force');
-
-        $result->boosts = Boost::whereNull('deleted_at')
-            ->where('name', '!=', 'Bomb')
-            ->get();
-
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
@@ -136,7 +130,8 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
-        $result->minimumBoostScore = $this->MINIMUM_GAME_BOOST_SCORE;
+        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");
+        ;
 
         return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
@@ -231,7 +226,7 @@ class GameController extends BaseController
             $staking->update(['amount_won' => $amountWon]);
         }
         ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
-        
+
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points;

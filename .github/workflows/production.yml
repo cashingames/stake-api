@@ -55,6 +55,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
+            **/.github*/**
             **/node_modules/**
             **/vendor/**
             fileToExclude.txt
