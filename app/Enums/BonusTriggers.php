@@ -5,5 +5,5 @@ namespace App\Enums;
 enum BonusTriggers: string
 {
     case FirstTimeFunding = "FIRST_TIME_FUNDING";
-    case EndOfWeek = "END_OF_WEEK";
+    case LossOnStaking = "LOSS_ON_STAKING";
 }
