@@ -108,7 +108,7 @@ class BonusRepository
     {
       
         $usersWithLosses = DB::select(
-        "SELECT wallets.bonus, stakings.user_id, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
+        "SELECT wallets.id as wallet_id, stakings.user_id, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
         FROM stakings LEFT JOIN users on users.id = stakings.user_id LEFT JOIN wallets on wallets.user_id = users.id
         WHERE (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
         GROUP BY stakings.user_id
@@ -122,9 +122,10 @@ class BonusRepository
     {
         DB::transaction(function () use ($usersWithLosses) {
             $usersWithLosses->each(function ($data) {
-                // $data->wallet->update([
-                //     'bonus' => $data->user->wallet->bonus + abs($data->cashback)
-                // ]);
+                $wallet = Wallet::find($data->wallet_id);
+                $wallet->update([
+                    'bonus' => $wallet->bonus + abs($data->cashback)
+                ]);
             });
         });
     }
