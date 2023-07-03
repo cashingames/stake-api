@@ -7,6 +7,7 @@ use App\Models\Bonus;
 use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\Wallet;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -25,10 +26,10 @@ class BonusRepository
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
-                    'is_on' => true,
-                    'amount_credited' => $amount,
-                    'amount_remaining_after_staking' => $amount
-                ]);
+                'is_on' => true,
+                'amount_credited' => $amount,
+                'amount_remaining_after_staking' => $amount
+            ]);
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
@@ -100,8 +101,19 @@ class BonusRepository
             $activeRegistrationBonuses->toQuery()->update([
                 'is_on' => false
             ]);
-
         });
     }
 
+    public function getWeeklyUserLosses(Carbon $startDate, Carbon $endDate)
+    {
+      
+        $usersWithLosses = DB::select("SELECT user_id, sum(amount_won), sum(amount_staked), (sum(amount_won) - sum(amount_staked)) as loss, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
+        FROM stakings
+        
+        GROUP BY user_id
+        HAVING loss < 0
+        ");
+
+        return collect($usersWithLosses);
+    }
 }

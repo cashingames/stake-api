@@ -24,7 +24,20 @@ class BonusSeeder extends Seeder
                 'duration_measurement' => BonusDurations::Days->value,
                 'created_at' => now(),
                 'updated_at' => now()
-            ]
+            ],
+            
+        );
+
+        DB::table('bonuses')->insert(
+            [ 
+                'name' => BonusType::WeeklyLossCashback->value,
+                'trigger' => BonusTriggers::EndOfWeek->value,
+                'duration_count' => 3,
+                'duration_measurement' => BonusDurations::Days->value,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            
         );
 
     }
