@@ -109,7 +109,7 @@ class BonusRepository
       
         $usersWithLosses = DB::select("SELECT user_id, sum(amount_won), sum(amount_staked), (sum(amount_won) - sum(amount_staked)) as loss, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
         FROM stakings
-        
+        WHERE (DATE(created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
         GROUP BY user_id
         HAVING loss < 0
         ");

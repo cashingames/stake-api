@@ -40,6 +40,17 @@ class WeeklyLossCashbackService
                 'updated_at' => now(),
             ];
         }
+
         DB::table('user_bonuses')->insert($data);
+
+        $activeWeeklyBonuses = $this->bonusRepository->getActiveUsersBonuses(BonusType::WeeklyLossCashback);
+
+        DB::transaction(function () use ($activeWeeklyBonuses) {
+            $activeWeeklyBonuses->each(function ($userBonus) {
+                $userBonus->user->wallet->update([
+                    'bonus' => $userBonus->user->wallet->bonus + $userBonus->amount_remaining_after_staking
+                ]);
+            });
+        });
     }
 }

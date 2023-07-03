@@ -15,13 +15,10 @@ class GiveWeeklyLossCashback
 
     public function execute()
     {
-        $start = now()->endOfWeek();
-        $end = now()->startOfWeek();
+        $start = now()->startOfWeek();
+        $end = now()->endOfWeek() ;
 
         $usersWithLosses = $this->bonusRepository->getWeeklyUserLosses($start , $end);
-
-        // dd($usersWithLosses);
-
         $this->cashbackService->giveCashback($usersWithLosses);
     }
 }
