@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
 
         if ($this->app->request->header('x-request-env')) {
-            putenv('GOOGLE_CREDENTIALS_ENV=' . ($this->app->request->header('x-request-env')));
+            putenv('GOOGLE_CREDENTIALS_ENV=' . $this->app->request->header('x-request-env'));
         }
 
         $this->app->singleton(
@@ -47,8 +47,8 @@ class AppServiceProvider extends ServiceProvider
             FirestoreService::class,
             fn() => new FirestoreService()
         );
-        
-        Notification::extend('fcm', function ($app) {
+
+        Notification::extend('fcm', function () {
             return new FcmNotificationChannel();
         });
     }

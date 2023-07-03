@@ -3,10 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
-use App\Enums\FeatureFlags;
-use Illuminate\Http\Request;
-use App\Enums\ClientPlatform;
-use App\Services\FeatureFlag;
 use App\Http\Controllers\BaseController;
 
 class LoginController extends BaseController
@@ -26,7 +22,7 @@ class LoginController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request, ClientPlatform $clientPlatform)
+    public function login()
     {
 
         $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';

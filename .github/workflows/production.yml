@@ -40,14 +40,13 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-        run: php artisan test --coverage --min=64
+        run: php artisan test --coverage --min=65
   deploy:
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     needs: build-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: deploy-production
+      - name: deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -56,6 +55,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
+            **/.github*/**
             **/node_modules/**
             **/vendor/**
             fileToExclude.txt
@@ -63,7 +63,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            cd stg-api
+            cd api
             /opt/cpanel/composer/bin/composer install --optimize-autoloader --no-dev
           host: mocha3031.mochahost.com
           username: cashinga
@@ -81,10 +81,10 @@ jobs:
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}
-      - name: migrate_staging
+      - name: migrate
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd api && php artisan migrate
+          command: cd api && php artisan migrate --force
           host: mocha3031.mochahost.com
           username: cashinga
           password: ${{ secrets.CPANEL_PASSWORD }}

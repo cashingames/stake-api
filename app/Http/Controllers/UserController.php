@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientPlatform;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use App\Http\ResponseHelpers\CommonDataResponse;
@@ -11,7 +10,7 @@ use stdClass;
 class UserController extends BaseController
 {
 
-    public function profile(ClientPlatform $clientPlatform)
+    public function profile()
     {
         $this->user->load(['profile', 'wallet']);
 
