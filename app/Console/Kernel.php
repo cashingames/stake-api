@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\RegistrationBonus\ExpireBonusCommand;
+use App\Console\Commands\WeeklyBonuses\GiveStakeLossCashbackCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -28,7 +29,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
         $schedule->command(ExpireBonusCommand::class)->daily();
-
+        $schedule->command(GiveStakeLossCashbackCommand::class)->weekly()->saturdays()->at('23:59');;
     }
 
     /**

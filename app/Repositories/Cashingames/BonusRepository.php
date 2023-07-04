@@ -7,6 +7,7 @@ use App\Models\Bonus;
 use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\Wallet;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -25,10 +26,10 @@ class BonusRepository
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
-                    'is_on' => true,
-                    'amount_credited' => $amount,
-                    'amount_remaining_after_staking' => $amount
-                ]);
+                'is_on' => true,
+                'amount_credited' => $amount,
+                'amount_remaining_after_staking' => $amount
+            ]);
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
@@ -104,7 +105,32 @@ class BonusRepository
             $activeRegistrationBonuses->toQuery()->update([
                 'is_on' => false
             ]);
+        });
+    }
 
+    public function getUserStakeLossBetween(Carbon $startDate, Carbon $endDate)
+    {
+      
+        $usersWithLosses = DB::select(
+        "SELECT wallets.id as wallet_id, stakings.user_id, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
+        FROM stakings LEFT JOIN users on users.id = stakings.user_id LEFT JOIN wallets on wallets.user_id = users.id
+        WHERE (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
+        GROUP BY stakings.user_id
+        HAVING cashback < 0
+        ");
+
+        return collect($usersWithLosses);
+    }
+
+    public function giveCashback($usersWithLosses)
+    {
+        DB::transaction(function () use ($usersWithLosses) {
+            $usersWithLosses->each(function ($data) {
+                $wallet = Wallet::find($data->wallet_id);
+                $wallet->update([
+                    'bonus' => $wallet->bonus + abs($data->cashback)
+                ]);
+            });
         });
     }
 
