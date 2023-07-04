@@ -17,7 +17,7 @@ class GiveStakeLossCashback
         $start = now()->startOfWeek();
         $end = now()->endOfWeek() ;
 
-        $usersWithLosses = $this->bonusRepository->getUserStakeLossBetween($start , $end);
+        $usersWithLosses = $this->bonusRepository->getUsersStakeLossBetween($start, $end);
         $this->bonusRepository->giveCashback($usersWithLosses);
     }
 }

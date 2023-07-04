@@ -4,10 +4,8 @@ namespace App\Services\Bonuses\RegistrationBonus;
 
 use App\Models\Bonus;
 use App\Enums\BonusType;
-use App\Enums\WalletTransactionAction;
 use App\Models\User;
 use App\Models\UserBonus;
-use App\Models\WalletTransaction;
 use App\Repositories\Cashingames\BonusRepository;
 use App\Services\Bonuses\BonusInterface;
 

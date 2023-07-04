@@ -26,10 +26,10 @@ class BonusRepository
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
-                'is_on' => true,
-                'amount_credited' => $amount,
-                'amount_remaining_after_staking' => $amount
-            ]);
+                    'is_on' => true,
+                    'amount_credited' => $amount,
+                    'amount_remaining_after_staking' => $amount
+                ]);
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
@@ -108,30 +108,49 @@ class BonusRepository
         });
     }
 
-    public function getUserStakeLossBetween(Carbon $startDate, Carbon $endDate)
+    public function getUsersStakeLossBetween(Carbon $startDate, Carbon $endDate)
     {
-      
-        $usersWithLosses = DB::select(
-        "SELECT wallets.id as wallet_id, stakings.user_id, (sum(amount_won) - sum(amount_staked)) * 0.1 as cashback
-        FROM stakings LEFT JOIN users on users.id = stakings.user_id LEFT JOIN wallets on wallets.user_id = users.id
-        WHERE (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
-        GROUP BY stakings.user_id
-        HAVING cashback < 0
+        $usersWithLosses = DB::select("
+            SELECT
+                wallets.id as wallet_id,
+                stakings.user_id,
+                ABS(sum(amount_won) - sum(amount_staked)) loss
+            FROM
+                stakings
+            LEFT JOIN
+                users on users.id = stakings.user_id
+            LEFT JOIN
+                wallets on wallets.user_id = users.id
+            WHERE
+                (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}') AND
+                (sum(amount_won) - sum(amount_staked)) < 0
+            GROUP BY
+                stakings.user_id
         ");
 
         return collect($usersWithLosses);
     }
 
-    public function giveCashback($usersWithLosses)
+    public function giveCashback($usersWithLosses, $cashbackPercentage = 10)
     {
-        DB::transaction(function () use ($usersWithLosses) {
-            $usersWithLosses->each(function ($data) {
-                $wallet = Wallet::find($data->wallet_id);
-                $wallet->update([
-                    'bonus' => $wallet->bonus + abs($data->cashback)
-                ]);
+        DB::transaction(function () use ($usersWithLosses, $cashbackPercentage) {
+            $usersWithLosses->each(function ($data) use ($cashbackPercentage) {
+                $actualCashback = $data->loss * $cashbackPercentage / 100;
+                $this->updateBonusBalance($data->wallet_id, $actualCashback);
             });
         });
+    }
+
+    private function updateBonusBalance($walletId, $amount): void
+    {
+        DB::update("
+            UPDATE
+                wallets
+            SET
+                bonus = bonus + {$amount}
+            WHERE
+                id = {$walletId}
+        ");
     }
 
 }
