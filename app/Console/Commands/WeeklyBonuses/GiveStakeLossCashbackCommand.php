@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\WeeklyBonuses;
 
-use App\Actions\Bonus\GiveStakeLossCashback as WeeklyLossAction;
+use App\Actions\Bonus\GiveStakeLossCashbackAction;
 use Illuminate\Console\Command;
 
 class GiveStakeLossCashbackCommand extends Command
@@ -24,8 +24,8 @@ class GiveStakeLossCashbackCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(WeeklyLossAction $weeklyLossAction)
+    public function handle(GiveStakeLossCashbackAction $action)
     {
-        $weeklyLossAction->execute();
+        $action->execute();
     }
 }

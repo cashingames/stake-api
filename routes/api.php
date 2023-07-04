@@ -10,21 +10,22 @@ use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\VerifyOTPController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PlayGroundController;
+use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\FrontEndLogsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\GetStakingOddsController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\RegisterPushDeviceTokenController;
-use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
-use App\Http\Controllers\FeatureFlagController;
-use App\Http\Controllers\GetContestDetailsController;
+use App\Http\Controllers\SendOtpToEmailController;
 use App\Http\Controllers\GetSingleContestController;
 use App\Http\Controllers\WithdrawWinningsController;
-use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
-use App\Http\Controllers\SendOtpToEmailController;
+use App\Http\Controllers\GetContestDetailsController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EmailOtpVerificationController;
+use App\Http\Controllers\RegisterPushDeviceTokenController;
+use App\Http\Controllers\PlayGame\EndChallengeGameController;
+use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
 
 Route::get('playground', PlayGroundController::class);
@@ -79,7 +80,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('stakers/email/verify', EmailOtpVerificationController::class);
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
         Route::post('challenges/create', StartChallengeRequestController::class);
-        Route::post('challenges/submit', App\Http\Controllers\PlayGame\EndChallengeGameController::class);
+        Route::post('challenges/submit', EndChallengeGameController::class);
 
     }
 );

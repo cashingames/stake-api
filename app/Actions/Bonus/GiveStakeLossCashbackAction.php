@@ -4,18 +4,17 @@ namespace App\Actions\Bonus;
 
 use App\Repositories\Cashingames\BonusRepository;
 
-class GiveStakeLossCashback
+class GiveStakeLossCashbackAction
 {
     public function __construct(
         private readonly BonusRepository $bonusRepository,
-       
     ) {
     }
 
     public function execute()
     {
         $start = now()->startOfWeek();
-        $end = now()->endOfWeek() ;
+        $end = now()->endOfWeek();
 
         $usersWithLosses = $this->bonusRepository->getUsersStakeLossBetween($start, $end);
         $this->bonusRepository->giveCashback($usersWithLosses);
