@@ -41,10 +41,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
         // fcm:contraint-reminder
-        // $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
-        // $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
-        // $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
-        // $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
+        $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
+        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
+        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
+        $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly('13:00');
         $schedule->job(ReactivateUserReward::class)->dailyAt('00:05');
         
         $schedule->command('app:send-user-game-stats-email')->weekly()->mondays()
