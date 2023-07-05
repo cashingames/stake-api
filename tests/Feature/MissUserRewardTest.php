@@ -50,19 +50,19 @@ class MissUserRewardTest extends TestCase
             'reward_milestone' => 1,
         ]);
 
-        $response = $this->post('/api/v3/user-reward/miss');
+        $this->post('/api/v3/user-reward/miss');
 
         $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
             'reward_count' => -1,
         ]);
-        $this->assertDatabaseMissing('user_rewards', [
+        $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
             'reward_count' => 1,
         ]);
     }
 
-    public function test_a_user_reward_record_resets_when_a_day_or_more_is_missed()
+    public function test_a_user_reward_record_resets_when_a_day_is_missed()
     {
         UserReward::create([
             'user_id' => $this->user->id,
@@ -87,9 +87,10 @@ class MissUserRewardTest extends TestCase
             'user_id' => $this->user->id,
             'reward_count' => -1,
         ]);
-        $this->assertDatabaseMissing('user_rewards', [
+        $this->assertDatabaseHas('user_rewards', [
             'user_id' => $this->user->id,
             'reward_count' => 1,
+            'deleted_at' => now()
         ]);
     }
 }

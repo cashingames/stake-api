@@ -103,7 +103,7 @@ class DailyRewardService
         $userLastRecord = UserReward::where('user_id', $user->id)
             ->where('reward_count', 0)
             ->first();
-
+      
         if (!is_null($userLastRecord)) {
             $userLastRecord->reward_count = -1;
             $userLastRecord->save();
