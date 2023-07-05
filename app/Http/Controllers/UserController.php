@@ -13,7 +13,7 @@ use stdClass;
 class UserController extends BaseController
 {
 
-    public function profile(DailyRewardService $daillyRewardService)
+    public function profile(DailyRewardService $dailyRewardService)
     {
         $this->user->load(['profile', 'wallet']);
         $result = new stdClass;
@@ -30,7 +30,7 @@ class UserController extends BaseController
         $result->walletBalance = $this->user->wallet->non_withdrawable_balance;
         $result->withdrawableBalance = $this->user->wallet->withdrawable_balance;
         $result->unreadNotificationsCount = $this->user->getUnreadNotificationsCount();
-        $result->dailyReward = $daillyRewardService->shouldShowDailyReward($this->user)->original;
+        $result->dailyReward = $dailyRewardService->shouldShowDailyReward($this->user)->original;
         $result->points = $this->user->points();
         $result->todaysPoints = $this->user->todaysPoints();
         $result->globalRank = $this->user->rank;

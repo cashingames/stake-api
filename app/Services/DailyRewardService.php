@@ -28,41 +28,32 @@ class DailyRewardService
                     'reward_milestone' => 1,
                 ]);
             }
-            $rewardClaimableDay = $this->getTodayReward();
-            return response()->json([
-                "shouldShowPopup" => true,
-                'reward' => $rewardClaimableDay
-            ], 200);
+            return $this->returnRewardPayload($this->getTodayReward(), true);
         }
 
         if ($userRewardRecordCount > 0 && $userRewardRecordCount <= 7) {
             $userLastRecord = UserReward::where('user_id', $user->id)->latest()->first();
             $userLastRewardClaimDate = Carbon::parse($userLastRecord->reward_date);
             $currentDate = Carbon::now();
+
             if ($userLastRewardClaimDate->isSameDay($currentDate)) {
-                return response()->json([
-                    "shouldShowPopup" => false,
-                    'reward' => []
-                ], 200);
+
+                return $this->returnRewardPayload([], false);
             }
+
             if ($userLastRewardClaimDate->diffInDays($currentDate) > 1) {
                 if ($userLastRecord->reward_count >= 0) {
                     $this->missDailyReward();
                 }
-                return response()->json([
-                    "shouldShowPopup" => false,
-                    'reward' => []
-                ], 200);
+                return $this->returnRewardPayload([], false);
             }
+
             $userRewardCount = $userLastRecord->reward_count;
 
             if ($userRewardCount >= 0) {
-                $rewardClaimableDay = $this->getTodayReward();
-                return response()->json([
-                    "shouldShowPopup" => true,
-                    'reward' => $rewardClaimableDay
-                ], 200);
+                return $this->returnRewardPayload($this->getTodayReward(), true);
             }
+
             if ($userRewardCount == -1) {
 
                 UserReward::where('user_id', $user->id)->where('reward_count', -1)
@@ -72,17 +63,10 @@ class DailyRewardService
                         'reward_date' => now(),
                         'release_on' => now(),
                     ]);
-                $rewardClaimableDay = $this->getTodayReward();
-                return response()->json([
-                    "shouldShowPopup" => true,
-                    'reward' => $rewardClaimableDay
-                ], 200);
+                return $this->returnRewardPayload($this->getTodayReward(), true);
             }
         } else {
-            return response()->json([
-                "shouldShowPopup" => false,
-                'reward' => []
-            ], 200);
+            return $this->returnRewardPayload([], false);
         }
     }
 
@@ -103,7 +87,7 @@ class DailyRewardService
         $userLastRecord = UserReward::where('user_id', $user->id)
             ->where('reward_count', 0)
             ->first();
-      
+
         if (!is_null($userLastRecord)) {
             $userLastRecord->reward_count = -1;
             $userLastRecord->save();
@@ -113,5 +97,13 @@ class DailyRewardService
                 $userClaimedReward->delete();
             }
         }
+    }
+
+    private function returnRewardPayload(array $data, bool $shouldShowPopup)
+    {
+        return response()->json([
+            "shouldShowPopup" => $shouldShowPopup,
+            'reward' => $data
+        ], 200);
     }
 }
