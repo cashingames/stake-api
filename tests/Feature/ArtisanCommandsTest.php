@@ -2,14 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Mail\DailyReportEmail;
-use App\Mail\WeeklyReportEmail;
-use App\Models\ChallengeRequest;
-use App\Models\GameSession;
-use App\Models\Staking;
+use App\Models\User;
+use App\Models\UserReward;
+use Database\Seeders\RewardSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use UserSeeder;
 use PlanSeeder;
@@ -23,12 +19,14 @@ class ArtisanCommandsTest extends TestCase
      * @return void
      */
 
+    private $user ;
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(UserSeeder::class);
         $this->seed(PlanSeeder::class);
+        $this->user = User::first();
     }
 
 
@@ -65,6 +63,28 @@ class ArtisanCommandsTest extends TestCase
     public function test_contraint_reminder_reminder_command()
     {
         $this->artisan('fcm:inactive-user-reminder')->assertExitCode(0);
+    }
+
+    public function test_daily_reward_reactivation_command_reactivates_reward()
+    {   
+        $this->seed(RewardSeeder::class);  
+        
+        UserReward::create([
+            'user_id' => $this->user->id,
+            'reward_id' => 1,
+            'reward_count' => -1,
+            'reward_date' => now(),
+            'release_on' => now(),
+            'reward_milestone' => 3,
+        ]);
+
+        $this->artisan('user-reward:reactivate')->assertExitCode(0);
+
+        $this->assertDatabaseHas('user_rewards', [
+            'user_id' => $this->user->id,
+            'reward_count' => 0,
+            'reward_milestone' => 1,
+        ]);
     }
 
 }
