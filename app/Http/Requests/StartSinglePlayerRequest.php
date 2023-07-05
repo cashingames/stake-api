@@ -119,6 +119,14 @@ class StartSinglePlayerRequest extends FormRequest
             );
             return;
         }
+        
+        if (($user->wallet->bonus - $stakingAmount) < config('trivia.minimum_exhibition_staking_amount')) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Insufficient bonus amount will be left after this stake. Please stake ' . $user->wallet->bonus
+            );
+            return;
+        }
 
         $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($user);
         if ($registrationBonus != null) {
@@ -129,7 +137,6 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateRegistrationBonus($validator, $user, $bonus, $stakingAmount)
     {   
-
         if ($stakingAmount > $bonus->amount_remaining_after_staking) {
             $validator->errors()->add(
                 'staking_amount',
