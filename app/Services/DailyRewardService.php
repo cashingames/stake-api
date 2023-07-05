@@ -42,7 +42,7 @@ class DailyRewardService
         }
 
         if ($userRewardRecordCount > 0 && $userRewardRecordCount <= 7) {
-           
+
             $userLastRewardClaimDate = Carbon::parse($userLastRecord->pivot->reward_date);
             $currentDate = Carbon::now();
             if ($userLastRewardClaimDate->isSameDay($currentDate)) {
@@ -59,7 +59,7 @@ class DailyRewardService
                 ], 200);
             }
             $userRewardCount = $userLastRecord->pivot->reward_count;
-            if ($userRewardCount >= 0 ) {
+            if ($userRewardCount >= 0) {
                 $rewardClaimableDay = $this->getTodayReward();
                 return response()->json([
                     "shouldShowPopup" => true,
@@ -67,7 +67,10 @@ class DailyRewardService
                 ], 200);
             }
             if ($userRewardCount == -1) {
-                dispatch(new ReactivateUserReward());
+                
+                UserReward::where('user_id', $user->id)->where('reward_count', -1)
+                    ->update(['reward_count' => 0, 'reward_milestone' => 1]);
+
                 return response()->json([
                     "shouldShowPopup" => false,
                     'reward' => []
