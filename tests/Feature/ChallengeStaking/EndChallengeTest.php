@@ -173,10 +173,14 @@ class EndChallengeTest extends TestCase
         ]);
 
         //seed logged questions
+        //find question with correct options
+        $question = Question::whereHas('options', function ($query) {
+            $query->where('is_correct', true);
+        })->first();
         TriviaChallengeQuestion::factory()->create([
             'challenge_request_id' => '1',
-            'question_id' => Question::first()->id,
-            'option_id' => Question::first()->options->where('is_correct', true)->first()->id,
+            'question_id' => $question->id,
+            'option_id' => $question->id,
         ]);
 
         $this

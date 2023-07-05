@@ -86,3 +86,4 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - test reset password endpoint
 - move profile::change password to password controller::change password
 - reverse relationship between user and profile
+- cleanup debit wallet action and credit wallet action

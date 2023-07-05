@@ -4,11 +4,8 @@ namespace App\Actions\Wallet;
 
 use App\Enums\WalletTransactionAction;
 use App\Models\Wallet;
-use App\Models\WalletTransaction;
 use \App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class DebitWalletForStaking
 {
@@ -19,7 +16,7 @@ class DebitWalletForStaking
     }
     public function execute(Wallet $wallet, float $amount): float
     {
-        $balanceToDeduct = " ";
+        $balanceToDeduct = "";
         $action = WalletTransactionAction::StakingPlaced->value;
 
         if ($wallet->hasBonus() &&  $wallet->bonus >= $amount) {

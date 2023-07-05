@@ -1,4 +1,5 @@
 <?php
+namespace Tests\Feature;
 
 use App\Enums\BonusType;
 use App\Models\Bonus;

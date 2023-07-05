@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Console\Commands\WeeklyBonuses;
+namespace App\Console\Commands\Cashback;
 
-use App\Actions\Bonus\GiveStakeLossCashbackAction;
+use App\Actions\Bonus\GiveLossCashbackAction;
 use Illuminate\Console\Command;
 
-class GiveStakeLossCashbackCommand extends Command
+class GiveLossCashbackCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -19,12 +19,12 @@ class GiveStakeLossCashbackCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Give weekly loss cashback';
+    protected $description = 'Give loss cashback';
 
     /**
      * Execute the console command.
      */
-    public function handle(GiveStakeLossCashbackAction $action)
+    public function handle(GiveLossCashbackAction $action)
     {
         $action->execute();
     }

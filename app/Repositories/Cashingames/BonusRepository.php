@@ -108,12 +108,13 @@ class BonusRepository
         });
     }
 
-    public function getUsersStakeLossBetween(Carbon $startDate, Carbon $endDate)
+    public function getUsersLossBetween(Carbon $startDate, Carbon $endDate)
     {
         $usersWithLosses = DB::select("
             SELECT
                 wallets.id as wallet_id,
                 stakings.user_id,
+                sum(amount_won) - sum(amount_staked) as win,
                 ABS(sum(amount_won) - sum(amount_staked)) loss
             FROM
                 stakings
@@ -122,10 +123,12 @@ class BonusRepository
             LEFT JOIN
                 wallets on wallets.user_id = users.id
             WHERE
-                (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}') AND
-                (sum(amount_won) - sum(amount_staked)) < 0
+                (DATE(stakings.created_at) BETWEEN '{$startDate->toDateString()}' AND '{$endDate->toDateString()}')
             GROUP BY
                 stakings.user_id
+            HAVING
+                win < 0
+            
         ");
 
         return collect($usersWithLosses);
