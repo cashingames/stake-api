@@ -195,4 +195,25 @@ class StartExhibitionStakingTest extends TestCase
             'message' => 'Registration bonus is remaining 500 please stake 500',
         ]);
     }
+
+    public function test_that_user_is_asked_to_stake_all_bonus_if_bonus_left_is_not_sufficient()
+    {
+        config(['trivia.minimum_exhibition_staking_amount' => 400]);
+
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 1000
+        ]);
+
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 700
+        ]);
+
+        $response->assertJson([
+            'message' => 'Insufficient bonus amount will be left after this stake. Please stake 1000',
+        ]);
+    }
 }
