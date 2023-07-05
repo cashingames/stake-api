@@ -191,8 +191,8 @@ class EndChallengeTest extends TestCase
                     'challenge_request_id' => '1',
                     'selected_options' => [
                         [
-                            'question_id' => Question::first()->id,
-                            'option_id' => Question::first()->options->where('is_correct', 1)->first()->id,
+                            'question_id' => $question->id,
+                            'option_id' => $question->options->where('is_correct', 1)->first()->id,
                         ]
                     ]
                 ]
