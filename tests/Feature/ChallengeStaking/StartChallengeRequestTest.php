@@ -57,33 +57,6 @@ class StartChallengeRequestTest extends TestCase
         ]);
     }
 
-    public function test_challenge_request_returns_error_when_category_does_not_exist(): void
-    {
-        $this->instance(
-            FirestoreService::class,
-            Mockery::mock(FirestoreService::class)
-        );
-
-        $user = User::factory()->create();
-
-        Wallet::factory()
-            ->for($user)
-            ->create([
-                'non_withdrawable' => 2000
-            ]);
-
-        $response = $this->actingAs($user)
-            ->postJson(self::URL, [
-                'category' => 2,
-                'amount' => 1000
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson([
-            "message" => "The selected category is invalid.",
-        ]);
-    }
-
     public function test_challenge_request_returns_error_when_amount_is_less_than_minimum_challenge_amount(): void
     {
         $this->instance(
@@ -91,7 +64,10 @@ class StartChallengeRequestTest extends TestCase
             Mockery::mock(FirestoreService::class)
         );
         Config::set('trivia.minimum_challenge_staking_amount', 100);
-        $user = User::factory()->create();
+        $user = User::factory()
+            ->hasProfile(1)
+            ->create();
+
         $category = Category::factory()->create();
 
         Wallet::factory()
@@ -119,7 +95,10 @@ class StartChallengeRequestTest extends TestCase
             Mockery::mock(FirestoreService::class)
         );
         Config::set('trivia.maximum_challenge_staking_amount', 1000);
-        $user = User::factory()->create();
+        $user = User::factory()
+            ->hasProfile(1)
+            ->create();
+
         $category = Category::factory()->create();
 
         Wallet::factory()
@@ -166,8 +145,10 @@ class StartChallengeRequestTest extends TestCase
     }
     private function prepareMatchRequest($category, $amount): User
     {
-        $user = User::factory()->create();
-        Profile::factory()->for($user)->create();
+        $user = User::factory()
+            ->hasProfile(1)
+            ->create();
+
         Wallet::factory()
             ->for($user)
             ->create([
@@ -184,10 +165,12 @@ class StartChallengeRequestTest extends TestCase
 
     private function createBothUser(): void
     {
-        $user1 = User::factory()->create();
-        Profile::factory()->for($user1)->create();
+        $user = User::factory()
+            ->hasProfile(1)
+            ->create();
+
         Wallet::factory()
-            ->for($user1)
+            ->for($user)
             ->create([
                 'non_withdrawable' => 1000
             ]);

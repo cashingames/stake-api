@@ -35,9 +35,11 @@ class MatchChallengeRequestActionTest extends TestCase
     public function test_that_challenge_request_is_matched_with_bot()
     {
 
-        User::factory()->create([
-            'id' => 1,
-        ]);
+        User::factory()
+            ->count(5)
+            ->hasProfile(1)
+            ->hasWallet(1)
+            ->create();
 
         $challengeRequest = ChallengeRequest::factory()->create([
             'status' => 'MATCHING',
