@@ -20,18 +20,18 @@ class ClaimUserRewardController extends BaseController
 
         $user = auth()->user();
 
-        $userLastRecord = $user->rewards()->where('reward_milestone', $request->day)->withPivot('reward_count', 'reward_date', 'reward_milestone', 'release_on')->first();
+        $userLastRecord = UserReward::where('user_id', $user->id)->where('reward_milestone', $request->day)->first();
 
-        if ($userLastRecord->pivot->reward_count > 0) {
+        if ($userLastRecord->reward_count > 0) {
             return $this->sendResponse('Reward Claimed', 'Reward Claimed');
         }
 
         if ($userLastRecord) {
-            $userLastRecord->pivot->reward_count = 1;
-            $userLastRecord->pivot->save();
+            $userLastRecord->reward_count = 1;
+            $userLastRecord->save();
         }
 
-        $userRewardRecordCount = $userLastRecord->pivot->reward_milestone;
+        $userRewardRecordCount = $userLastRecord->reward_milestone;
 
         $rewardClaimableDays = RewardBenefit::where('reward_benefit_id', $userRewardRecordCount)->get();
         foreach ($rewardClaimableDays as $rewardEachDay) {

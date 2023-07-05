@@ -27,6 +27,11 @@ class ReactivateUserRewardCommand extends Command
     public function handle()
     {
         UserReward::where('reward_count', -1)
-        ->update(['reward_count' => 0, 'reward_milestone' => 1]);
+            ->update([
+                'reward_count' => 0,
+                'reward_milestone' => 1,
+                'reward_date' => now(),
+                'release_on' => now(),
+            ]);
     }
 }
