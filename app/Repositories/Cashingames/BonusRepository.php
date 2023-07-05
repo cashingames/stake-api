@@ -3,13 +3,17 @@
 namespace App\Repositories\Cashingames;
 
 use App\Enums\BonusType;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use App\Models\Bonus;
 use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\Wallet;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BonusRepository
 {
@@ -113,6 +117,7 @@ class BonusRepository
         $usersWithLosses = DB::select("
             SELECT
                 wallets.id as wallet_id,
+                wallets.bonus as bonus_balance,
                 stakings.user_id,
                 sum(amount_won) - sum(amount_staked) as win,
                 ABS(sum(amount_won) - sum(amount_staked)) loss
@@ -139,12 +144,13 @@ class BonusRepository
         DB::transaction(function () use ($usersWithLosses, $cashbackPercentage) {
             $usersWithLosses->each(function ($data) use ($cashbackPercentage) {
                 $actualCashback = $data->loss * $cashbackPercentage / 100;
-                $this->updateBonusBalance($data->wallet_id, $actualCashback);
+                $bonusBalance = $data->bonus_balance + $actualCashback;
+                $this->updateBonusBalance($data->wallet_id, $bonusBalance, $actualCashback);
             });
         });
     }
 
-    private function updateBonusBalance($walletId, $amount): void
+    private function updateBonusBalance($walletId, $bonusBalance, $amount): void
     {
         DB::update("
             UPDATE
@@ -154,6 +160,17 @@ class BonusRepository
             WHERE
                 id = {$walletId}
         ");
+
+        WalletTransaction::create([
+            'wallet_id' => $walletId,
+            'transaction_type' => 'CREDIT',
+            'amount' => $amount,
+            'balance' => $bonusBalance,
+            'description' => 'Casback Credited',
+            'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::BonusBalance->value,
+            'transaction_action' => WalletTransactionAction::BonusCredited->value
+        ]);
     }
 
 }
