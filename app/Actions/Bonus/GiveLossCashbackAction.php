@@ -2,6 +2,7 @@
 
 namespace App\Actions\Bonus;
 
+use App\Enums\Bonus\CashbackAccrualDuration;
 use App\Repositories\Cashingames\BonusRepository;
 
 class GiveLossCashbackAction
@@ -11,10 +12,15 @@ class GiveLossCashbackAction
     ) {
     }
 
-    public function execute()
+    public function execute(CashbackAccrualDuration $duration)
     {
-        $start = now()->startOfWeek();
-        $end = now()->endOfWeek();
+        $start = CashbackAccrualDuration::DAILY == $duration ?
+            now()->startOfDay() :
+            now()->startOfWeek();
+
+        $end = CashbackAccrualDuration::DAILY == $duration ?
+            now()->endOfDay() :
+            now()->endOfWeek();
 
         $usersWithLosses = $this->bonusRepository->getUsersLossBetween($start, $end);
         $this->bonusRepository->giveCashback($usersWithLosses);

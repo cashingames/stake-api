@@ -65,17 +65,6 @@ class BonusRepository
         $userBonus->save();
     }
 
-    //#[CodeCoverageIgnore]
-    public function getActiveUsersBonuses(BonusType $bonusType): Collection
-    {
-        return UserBonus::where('is_on', true)
-            ->whereHas('bonus', function ($query) use ($bonusType) {
-                $query->where('name', $bonusType->value);
-            })
-            ->with('user.wallet')
-            ->get();
-    }
-
     public function getActiveUserRegistrationBonusesToExpire(): Collection
     {
         return UserBonus::where('is_on', true)

@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands\Cashback;
 
-use App\Actions\Bonus\GiveLossCashbackAction;
 use Illuminate\Console\Command;
+use App\Actions\Bonus\GiveLossCashbackAction;
+use App\Enums\Bonus\CashbackAccrualDuration;
 
 class GiveLossCashbackCommand extends Command
 {
@@ -12,7 +13,7 @@ class GiveLossCashbackCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bonus:stake:loss-cashback';
+    protected $signature = 'bonus:stake:loss-cashback {--duration=}';
 
     /**
      * The console command description.
@@ -26,6 +27,7 @@ class GiveLossCashbackCommand extends Command
      */
     public function handle(GiveLossCashbackAction $action)
     {
-        $action->execute();
+        $duration = $this->option('duration');
+        $action->execute(CashbackAccrualDuration::tryFrom($duration) ?? CashbackAccrualDuration::DAILY);
     }
 }
