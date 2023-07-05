@@ -383,7 +383,7 @@ class GameTest extends TestCase
         ]);
 
         $response->assertJson([
-            'message' => 'Insufficient bonus balance. Please exhaust your bonuses to proceed',
+            'message' => 'Insufficient bonus balance.',
         ]);
     }
 

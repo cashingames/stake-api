@@ -115,7 +115,7 @@ class StartSinglePlayerRequest extends FormRequest
         if ($user->wallet->bonus < $stakingAmount) {
             $validator->errors()->add(
                 'staking_amount',
-                'Insufficient bonus balance. Please exhaust your bonuses to proceed'
+                'Insufficient bonus balance.'
             );
             return;
         }
