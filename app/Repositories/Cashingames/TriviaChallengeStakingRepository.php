@@ -39,7 +39,6 @@ class TriviaChallengeStakingRepository
 
     public function createPracticeRequestForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
     {
-       
         $requestId = uniqid($user->id, true);
         return ChallengeRequest::create([
             'challenge_request_id' => $requestId,

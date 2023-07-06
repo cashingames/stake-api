@@ -5,7 +5,6 @@ namespace App\Actions\TriviaChallenge;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
 use App\Models\User;
-use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Services\PlayGame\StakingChallengeGameService;
@@ -15,7 +14,6 @@ use Illuminate\Support\Lottery;
 
 class MatchWithBotRequestAction
 {
-    private ChallengeRequestMatchHelper $matchHelper;
 
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
@@ -34,11 +32,12 @@ class MatchWithBotRequestAction
         ]);
 
         $matchedRequest = $this->matchWithBot($challengeRequest);
+       
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
 
-        $questions = $this->matchHelper->processPracticeQuestions($challengeRequest, $matchedRequest);
+        $questions = $this->challengeRequestMatchHelper->processPracticeQuestions($challengeRequest, $matchedRequest);
 
-        $this->matchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
+        $this->challengeRequestMatchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
 
         return $matchedRequest;
     }
@@ -58,13 +57,14 @@ class MatchWithBotRequestAction
             })
             ->choose();
 
-        return $this->triviaChallengeService->create(
+        return $this->triviaChallengeService->createPracticeRequest(
             $bot,
             [
                 'category' => $challengeRequest->category_id,
                 'amount' => $challengeRequest->amount,
             ]
         );
+
     }
 
 

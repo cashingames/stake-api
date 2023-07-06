@@ -25,7 +25,7 @@ class StakingChallengeGameService
     ) {
     }
     public function create(User $user, array $data): ChallengeRequest|null
-    {
+    {   
         $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->debitWalletAction->execute(
@@ -61,11 +61,10 @@ class StakingChallengeGameService
     public function createPracticeRequest(User $user, array $data): ChallengeRequest|null
     {
         $response = null;
-        DB::transaction(function () use ($user, $data, &$response) {
-            $response = $this
-                ->triviaChallengeStakingRepository
-                ->createPracticeRequestForMatching($user, $data['amount'], $data['category']);
-        });
+
+        $response = $this
+            ->triviaChallengeStakingRepository
+            ->createPracticeRequestForMatching($user, $data['amount'], $data['category']);
 
         if (!$response) {
             return null;

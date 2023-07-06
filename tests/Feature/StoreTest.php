@@ -27,7 +27,7 @@ class StoreTest extends TestCase
         parent::setUp();
         $this->seed(UserSeeder::class);
         $this->seed(BoostSeeder::class);
-        $this->user = User::inRandomOrder()->first();
+        $this->user = User::first();
 
         $this->actingAs($this->user);
     }
