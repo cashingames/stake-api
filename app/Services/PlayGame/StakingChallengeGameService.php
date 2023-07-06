@@ -64,7 +64,7 @@ class StakingChallengeGameService
         DB::transaction(function () use ($user, $data, &$response) {
             $response = $this
                 ->triviaChallengeStakingRepository
-                ->createForMatching($user, $data['amount'], $data['category']);
+                ->createPracticeRequestForMatching($user, $data['amount'], $data['category']);
         });
 
         if (!$response) {

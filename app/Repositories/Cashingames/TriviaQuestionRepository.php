@@ -18,4 +18,13 @@ class TriviaQuestionRepository
             ->take(20)
             ->get();
     }
+
+    public function getPracticeQuestionsWithCategoryId(int $categoryId): Collection
+    {
+        return Category::find($categoryId)
+            ->questions()
+            ->easy()
+            ->take(30)
+            ->get();
+    }
 }

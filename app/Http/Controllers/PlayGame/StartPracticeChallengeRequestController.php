@@ -6,11 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\ChallengeRequest;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StartChallengeRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
 use Illuminate\Support\Facades\Log;
-use App\Jobs\MatchChallengeRequest;
-use App\Jobs\MatchWithHumanChallengeRequest;
+use App\Jobs\MatchWithBotChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
 class StartPracticeChallengeRequestController extends Controller
@@ -32,10 +30,8 @@ class StartPracticeChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->createPracticeRequest($request->user(), $data);
 
-        $matchedRequest = MatchWithHumanChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
-        if (!$matchedRequest) {
-            MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
-        }
+        MatchWithBotChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
+       
         return ResponseHelper::success($this->transformResponse($result));
     }
 
