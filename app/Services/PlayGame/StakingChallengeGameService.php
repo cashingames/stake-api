@@ -58,6 +58,33 @@ class StakingChallengeGameService
         return $response;
     }
 
+    public function createPracticeRequest(User $user, array $data): ChallengeRequest|null
+    {
+        $response = null;
+        DB::transaction(function () use ($user, $data, &$response) {
+            $response = $this
+                ->triviaChallengeStakingRepository
+                ->createForMatching($user, $data['amount'], $data['category']);
+        });
+
+        if (!$response) {
+            return null;
+        }
+
+        $this->firestoreService->createDocument(
+            'trivia-challenge-requests',
+            $response->challenge_request_id,
+            [
+                'challenge_request_id' => $response->challenge_request_id,
+                'username' => $response->username,
+                'avatar' => $response->user->profile->avatar,
+                'status' => $response->status,
+            ]
+        );
+
+        return $response;
+    }
+
     public function submit(array $data): ChallengeRequest|null
     {
         $requestId = $data['challenge_request_id'];

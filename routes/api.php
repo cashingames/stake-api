@@ -27,6 +27,7 @@ use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
+use App\Http\Controllers\PlayGame\StartPracticeChallengeRequestController;
 
 Route::get('playground', PlayGroundController::class);
 Route::post('auth/register', [RegisterController::class, 'register']);
@@ -81,6 +82,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('stakers/otp/send', SendOtpToEmailController::class);
         Route::post('challenges/create', StartChallengeRequestController::class);
         Route::post('challenges/submit', EndChallengeGameController::class);
-
+        Route::post('challenges/practice/create', StartPracticeChallengeRequestController::class);
     }
 );
