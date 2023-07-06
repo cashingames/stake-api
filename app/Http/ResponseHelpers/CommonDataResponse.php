@@ -20,7 +20,7 @@ class CommonDataResponse
             $d->pack_count = $boostItem->pack_count;
             $d->currency_value = $boostItem->currency_value;
             $d->count = is_null($boostItem->count) ? 0 : $boostItem->count;
-            $d->icon = str_ireplace("icons", "icons/", $boostItem->icon);
+            $d->icon = str_ireplace("icons", "icons", $boostItem->icon);
 
             $newBoost[] = $d;
         }
