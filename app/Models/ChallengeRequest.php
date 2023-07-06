@@ -9,7 +9,11 @@ class ChallengeRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['challenge_request_id', 'user_id','username','amount','category_id'];
+    protected $fillable = [
+        'challenge_request_id',
+        'user_id', 'username',
+        'amount', 'category_id', 'challenge_mode'
+    ];
 
     public function user()
     {
@@ -26,9 +30,9 @@ class ChallengeRequest extends Model
         return $this->hasMany(TriviaChallengeQuestion::class);
     }
 
-    public function scopeToBeCleanedUp($query){
+    public function scopeToBeCleanedUp($query)
+    {
         return $query->where('status', 'MATCHING')
-        ->where('created_at','<=',now()->subMinutes(2));
+            ->where('created_at', '<=', now()->subMinutes(2));
     }
-
 }
