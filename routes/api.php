@@ -23,6 +23,7 @@ use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
+use App\Http\Controllers\PlayGame\EndSinglePlayerPracticeGameController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
 use App\Http\Controllers\PlayGame\StartPracticeChallengeRequestController;
@@ -70,6 +71,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);
+        Route::post('single-player/practice/end', EndSinglePlayerPracticeGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
         Route::delete('account/delete', [UserController::class, 'deleteAccount']);
