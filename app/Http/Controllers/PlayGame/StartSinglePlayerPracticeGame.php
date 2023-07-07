@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers\PlayGame;
+
+use App\Http\Controllers\Controller;
+use App\Http\ResponseHelpers\ResponseHelper;
+use App\Models\ChallengeRequest;
+use App\Repositories\Cashingames\TriviaQuestionRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use stdClass;
+
+class StartSinglePlayerPracticeGame extends Controller
+{
+    public function __invoke(
+        Request $request,
+        TriviaQuestionRepository $questionRepository
+    )
+    {
+
+        $data = $request->validate([
+            'category' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric'],
+        ]);
+
+        Log::info('START_PRACTICE_SINGLE_GAME', [
+            'user' => auth()->user()->username,
+            'validatedRequest' => $data,
+        ]);
+
+        $questions = $questionRepository->getPracticeQuestionsWithCategoryId($data['category']);
+
+        $result = $this->prepare($questions);
+        return ResponseHelper::success($result);
+    }
+
+    private function prepare($questions): array
+    {
+        $gameInfo = new stdClass;
+        $gameInfo->token = Str::random(40);
+        $gameInfo->startTime = now();
+        $gameInfo->endTime = now()->addMinutes(1);
+
+        Log::info('PRACTICE_SINGLE_GAME_DATA', [
+            'user' => auth()->user()->username,
+            'gameData' => $gameInfo,
+        ]);
+
+        return [
+            'questions' => $questions,
+            'game' => $gameInfo
+        ];
+    }
+}
