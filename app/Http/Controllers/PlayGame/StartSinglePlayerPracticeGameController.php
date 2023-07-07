@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\PlayGame;
 
+use App\Enums\GameRequestMode;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
 use App\Models\ChallengeRequest;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use stdClass;
 
-class StartSinglePlayerPracticeGame extends Controller
+class StartSinglePlayerPracticeGameController extends Controller
 {
     public function __invoke(
         Request $request,
@@ -24,9 +25,20 @@ class StartSinglePlayerPracticeGame extends Controller
             'amount' => ['required', 'numeric'],
         ]);
 
+        $user = auth()->user();
         Log::info('START_PRACTICE_SINGLE_GAME', [
-            'user' => auth()->user()->username,
+            'user' => $user->username,
             'validatedRequest' => $data,
+        ]);
+
+        ChallengeRequest::create([
+            'challenge_request_id' => uniqid($user->id, true),
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'amount' => $data['amount'],
+            'category_id' => $data['category'],
+            'status' => 'COMPLETED',
+            'request_mode' => GameRequestMode::SINGLE_PRACTICE->value
         ]);
 
         $questions = $questionRepository->getPracticeQuestionsWithCategoryId($data['category']);

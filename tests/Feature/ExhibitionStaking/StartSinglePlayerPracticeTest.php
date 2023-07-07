@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ExhibitionStaking;
 
+use App\Enums\GameRequestMode;
 use App\Models\Category;
 use App\Models\User;
 use Database\Seeders\CategorySeeder;
@@ -41,6 +42,22 @@ class StartSinglePlayerPracticeTest extends TestCase
                 'questions' ,
                 'game'
             ]
+        ]);
+    }
+
+    public function test_that_single_player_practice_saves_data(): void
+    {   
+      
+        $this->postjson(self::URL, [
+            "category" => $this->category->id,
+            "amount" => 200
+        ]);
+
+        $this->assertDatabaseHas('challenge_requests', [
+            'user_id' =>  $this->user->id,
+            'category_id' => $this->category->id,
+            'amount' => 200,
+            'request_mode' => GameRequestMode::SINGLE_PRACTICE->value
         ]);
     }
 }

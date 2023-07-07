@@ -4,5 +4,6 @@ namespace App\Enums;
 
 enum GameRequestMode: string
 {
-    case PRACTICE = 'PRACTICE';
+    case CHALLENGE_PRACTICE = 'CHALLENGE_PRACTICE';
+    case SINGLE_PRACTICE = 'SINGLE_PRACTICE';
 }
