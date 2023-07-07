@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Cashingames;
 
-use App\Enums\GameModes;
+use App\Enums\GameRequestMode;
 use App\Models\ChallengeRequest;
 use App\Models\Option;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +47,7 @@ class TriviaChallengeStakingRepository
             'amount' => $amount,
             'category_id' => $categoryId,
             'status' => 'MATCHING',
-            'request_mode' => GameModes::PRACTICE->value
+            'request_mode' => GameRequestMode::PRACTICE->value
         ]);
     }
 
