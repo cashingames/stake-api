@@ -116,6 +116,32 @@ class StakingChallengeGameService
         return $request;
     }
 
+    public function submitPracticeChallenge(array $data): ChallengeRequest|null
+    {
+        $requestId = $data['challenge_request_id'];
+        $selectedOptions = $data['selected_options'];
+
+        //fix double submission bug from frontend
+        $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
+        if ($request->status == 'COMPLETED') {
+            Log::info('PRACTICE_CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
+            return $request;
+        }
+
+        $score = $selectedOptions == null ?
+            0 : $this->triviaChallengeStakingRepository->scoreLoggedQuestions($requestId, $selectedOptions);
+
+        [$request, $matchedRequest] = $this
+            ->triviaChallengeStakingRepository
+            ->updateCompletedRequest($requestId, $score);
+
+        [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
+
+        $this->updateEndMatchFirestore($request, $matchedRequest);
+
+        return $request;
+    }
+
     private function updateEndMatchFirestore(ChallengeRequest $request, ChallengeRequest $matchedRequest)
     {
         $request->refresh();

@@ -53,7 +53,7 @@ class StartPracticeChallengeRequestTest extends TestCase
             'user_id' => $user->id,
             'username' => $user->username,
             'status' => 'MATCHING',
-            'challenge_mode' => 'PRACTICE'
+            'request_mode' => 'PRACTICE'
         ]);
     }
 

@@ -47,7 +47,7 @@ class TriviaChallengeStakingRepository
             'amount' => $amount,
             'category_id' => $categoryId,
             'status' => 'MATCHING',
-            'challenge_mode' => GameModes::PRACTICE->value
+            'request_mode' => GameModes::PRACTICE->value
         ]);
     }
 

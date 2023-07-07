@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
 use App\Http\Controllers\PlayGame\StartPracticeChallengeRequestController;
@@ -77,5 +78,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('challenges/create', StartChallengeRequestController::class);
         Route::post('challenges/submit', EndChallengeGameController::class);
         Route::post('challenges/practice/create', StartPracticeChallengeRequestController::class);
+        Route::post('challenges/practice/submit', EndPracticeChallengeGameController::class);
     }
 );

@@ -49,7 +49,7 @@ class MatchWithBotRequestAction
     {
         $bot = User::find(1);
 
-        $bot->username = 'Trivia AI';
+        $bot->username = 'CG-bot';
 
         return $this->triviaChallengeService->createPracticeRequest(
             $bot,

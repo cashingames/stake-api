@@ -12,7 +12,7 @@ class ChallengeRequest extends Model
     protected $fillable = [
         'challenge_request_id',
         'user_id', 'username',
-        'amount', 'category_id', 'challenge_mode'
+        'amount', 'category_id', 'request_mode'
     ];
 
     public function user()
