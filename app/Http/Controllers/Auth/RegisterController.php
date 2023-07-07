@@ -6,19 +6,14 @@ use App\Models\User;
 use App\Models\Boost;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
-use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\BaseController;
 use App\Rules\UniquePhoneNumberRule;
-use App\Services\FeatureFlag;
 use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Facades\Cache;
 use App\Enums\AuthTokenType;
-use App\Enums\WalletBalanceType;
-use App\Enums\WalletTransactionAction;
 
 class RegisterController extends BaseController
 {
