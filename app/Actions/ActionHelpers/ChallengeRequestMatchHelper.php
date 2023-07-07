@@ -33,6 +33,21 @@ class ChallengeRequestMatchHelper
         return $questions;
     }
 
+    public function processPracticeQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
+    {
+        $questions = $this
+            ->triviaQuestionRepository
+            ->getPracticeQuestionsWithCategoryId($challengeRequest->category_id);
+
+        $this->triviaChallengeStakingRepository->logQuestions(
+            $questions->toArray(),
+            $challengeRequest,
+            $matchedRequest
+        );
+
+        return $questions;
+    }
+
     public function updateFirestore(
         ChallengeRequest $challengeRequest,
         ChallengeRequest $matchedRequest,

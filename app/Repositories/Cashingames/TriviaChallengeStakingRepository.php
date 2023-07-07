@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Cashingames;
 
+use App\Enums\GameModes;
 use App\Models\ChallengeRequest;
 use App\Models\Option;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,21 @@ class TriviaChallengeStakingRepository
             'status' => 'MATCHING',
         ])->fresh();
     }
+
+    public function createPracticeRequestForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
+    {
+        $requestId = uniqid($user->id, true);
+        return ChallengeRequest::create([
+            'challenge_request_id' => $requestId,
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'amount' => $amount,
+            'category_id' => $categoryId,
+            'status' => 'MATCHING',
+            'challenge_mode' => GameModes::PRACTICE->value
+        ])->fresh();
+    }
+
 
     public function findMatch(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
