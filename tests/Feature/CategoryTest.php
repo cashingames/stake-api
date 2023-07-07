@@ -5,13 +5,12 @@ namespace Tests\Feature;
 use App\Models\Category;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryTest extends TestCase
-{       
+{
     use RefreshDatabase;
     
     public $category ;
