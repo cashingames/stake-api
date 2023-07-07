@@ -25,7 +25,7 @@ class MatchWithBotRequestAction
     }
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
-    {   
+    {
         Log::info('MatchWithBotRequestAction Executing', [
             'google_env' => 'in MatchWithHumanRequestAction ' . env('GOOGLE_APPLICATION_CREDENTIALS'),
             'challengeRequest' => $challengeRequest,
@@ -37,7 +37,10 @@ class MatchWithBotRequestAction
 
         $questions = $this->challengeRequestMatchHelper->processPracticeQuestions($challengeRequest, $matchedRequest);
 
-        $this->challengeRequestMatchHelper->updateFirestore($challengeRequest->refresh(), $matchedRequest->refresh(), $questions);
+        $this->challengeRequestMatchHelper->updateFirestore(
+            $challengeRequest->refresh(), $matchedRequest->refresh(),
+            $questions
+        );
 
         return $matchedRequest;
     }
@@ -46,16 +49,7 @@ class MatchWithBotRequestAction
     {
         $bot = User::find(1);
 
-        $faker = FakerFactory::create('en_NG');
-
-        Lottery::odds(1, 2)
-            ->winner(function () use (&$bot, $faker) {
-                $bot->username = strtolower($faker->userName());
-            })
-            ->loser(function () use (&$bot, $faker) {
-                $bot->username = strtolower($faker->firstName());
-            })
-            ->choose();
+        $bot->username = 'Trivia AI';
 
         return $this->triviaChallengeService->createPracticeRequest(
             $bot,

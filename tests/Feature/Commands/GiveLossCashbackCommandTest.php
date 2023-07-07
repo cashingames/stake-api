@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Feature;
+namespace Tests\Feature\Commands;
 
 use App\Models\Staking;
 use App\Models\User;

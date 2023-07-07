@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\MatchWithBotChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
+// @TODO change to single player logic to avoid firebase
 class StartPracticeChallengeRequestController extends Controller
 {
     public function __invoke(

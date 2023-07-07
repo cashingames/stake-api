@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\BonusType;
-use App\Enums\FeatureFlags;
 use BoostSeeder;
 use Tests\TestCase;
 use App\Models\User;
-use App\Mail\VerifyEmail;
 use App\Models\Bonus;
-use App\Services\FeatureFlag;
 use Mockery\MockInterface;
 use Illuminate\Support\Facades\Mail;
 use App\Services\SMS\SMSProviderInterface;
@@ -19,22 +16,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    // public function testExample()
-    // {
-    //     $response = $this->get('/');
 
-    //     $response->assertStatus(200);
-    // }
 
     protected $user;
     const REGISTER_URL = '/api/auth/register';
     const RESEND_OTP_URL = '/api/auth/register/token/resend';
-    const SOCIAL_REGISTRATION_URL = '/api/auth/social-login/authenticate';
 
     protected function setUp(): void
     {
@@ -183,26 +169,6 @@ class RegisterTest extends TestCase
         $response->assertJson([
             'message' => 'The phone number has been taken, contact support',
         ]);
-    }
-
-    public function test_a_user_recieves_verification_email_on_registration()
-    {
-
-        config(['features.email_verification.enabled' => true]);
-        $response = $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'User',
-            'last_name' => 'Test',
-            'username' => 'username',
-            'country_code' => '+234',
-            'phone_number' => '88838883838',
-            'email' => 'user@user.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        Mail::assertSent(VerifyEmail::class);
-        $response->assertOk();
     }
 
     public function test_a_user_recieves_sms_otp_on_registration()

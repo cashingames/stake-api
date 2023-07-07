@@ -3,7 +3,6 @@
 use App\Enums\PushNotificationType;
 use Illuminate\Support\Facades\Route;
 use App\Services\Firebase\CloudMessagingService;
-use App\Http\Controllers\RedirectUnverifiedUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +14,6 @@ use App\Http\Controllers\RedirectUnverifiedUserController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/redirect-verified-email/{email}', RedirectUnverifiedUserController::class);
-
 Route::get('test-fcm', function(){
     $token = request()->get('device_token') ?? "cP4paGIpQOeXWkQsthIHTP:APA91bEiNMKotfTRFTmb6w8Zep19ZvMZQcOTQ-0rSleKC4fvsHMaY7ukTdpOQ81c6VLgr2k-Af2NGHkDlG03-WojelwP0g4nc-QAvIZc1N6VqgbaUnD0G3Ku7gcKm3cbp-_JdiN8vIwd";
     $messenger = new CloudMessagingService(config('services.firebase.server_key'));

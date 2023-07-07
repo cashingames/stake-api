@@ -34,7 +34,7 @@ class TriviaChallengeStakingRepository
             'amount' => $amount,
             'category_id' => $categoryId,
             'status' => 'MATCHING',
-        ])->fresh();
+        ]);
     }
 
     public function createPracticeRequestForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
@@ -48,7 +48,7 @@ class TriviaChallengeStakingRepository
             'category_id' => $categoryId,
             'status' => 'MATCHING',
             'challenge_mode' => GameModes::PRACTICE->value
-        ])->fresh();
+        ]);
     }
 
 

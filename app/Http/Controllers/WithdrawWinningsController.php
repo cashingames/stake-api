@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class WithdrawWinningsController extends BaseController
 {
-    //
-    //@TODO - enforce hours between which withdrawals can be made
     public function __invoke(
         Request $request,
         PaystackService $withdrawalService,
@@ -25,14 +23,6 @@ class WithdrawWinningsController extends BaseController
             'account_name' => ['required', 'string']
         ]);
 
-        $totalWithdrawals = $this->user->transactions()->withdrawals()->sum('amount');
-
-        if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
-            $data = [
-                'verifyEmailNavigation' => true,
-            ];
-            return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        }
 
         $debitAmount = $request->amount;
 
@@ -42,23 +32,33 @@ class WithdrawWinningsController extends BaseController
         }
 
         if ($debitAmount < config('trivia.min_withdrawal_amount')) {
-            return $this->sendError(false, 'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount'));
+            return $this->sendError(
+                false,
+                'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount')
+            );
         }
 
         if ($debitAmount > config('trivia.max_withdrawal_amount')) {
             $debitAmount = config('trivia.max_withdrawal_amount');
         }
 
-      
-        $banks = Cache::get('banks');
 
-        if (is_null($banks)) {
-            $banks = $withdrawalService->getBanks();
+        $totalWithdrawals = $this->user
+            ->transactions()
+            ->withdrawals()
+            ->sum('amount');
+
+        if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
+            $data = [
+                'verifyEmailNavigation' => true,
+            ];
+            return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
         }
 
-
+        $banks = Cache::rememberForever('banks', function () use ($withdrawalService) {
+            return $withdrawalService->getBanks();
+        });
         $bankCode = '';
-
         foreach ($banks->data as $bank) {
             if ($bank->name == $request->bank_name) {
                 $bankCode = $bank->code;

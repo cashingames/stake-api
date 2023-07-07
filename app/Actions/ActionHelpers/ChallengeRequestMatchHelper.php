@@ -7,6 +7,7 @@ use App\Models\ChallengeRequest;
 use App\Services\Firebase\FirestoreService;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use Illuminate\Support\Facades\Cache;
 
 class ChallengeRequestMatchHelper
 {
@@ -33,11 +34,20 @@ class ChallengeRequestMatchHelper
         return $questions;
     }
 
-    public function processPracticeQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
+    public function processPracticeQuestions(
+        ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest
+    ): Collection
     {
-        $questions = $this
-            ->triviaQuestionRepository
-            ->getPracticeQuestionsWithCategoryId($challengeRequest->category_id);
+
+        $questions = Cache::remember(
+            'practice_questions_' . $challengeRequest->category_id,
+            60 * 60 * 24,
+            function () use ($challengeRequest) {
+                return $this
+                    ->triviaQuestionRepository
+                    ->getPracticeQuestionsWithCategoryId($challengeRequest->category_id);
+            }
+        );
 
         $this->triviaChallengeStakingRepository->logQuestions(
             $questions->toArray(),

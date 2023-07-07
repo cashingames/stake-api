@@ -30,9 +30,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
         $schedule->command(ExpireBonusCommand::class)->daily();
-        // $schedule->command(GiveLossCashbackCommand::class, [
-        //     'duration' => CashbackAccrualDuration::DAILY
-        // ])->daily();
+        $schedule->command(GiveLossCashbackCommand::class, [
+            'duration' => CashbackAccrualDuration::DAILY
+        ])->daily();
     }
 
     /**

@@ -24,7 +24,7 @@ class TriviaQuestionRepository
         return Category::find($categoryId)
             ->questions()
             ->easy()
-            ->take(30)
+            ->take(20)
             ->get();
     }
 }

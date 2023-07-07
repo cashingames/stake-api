@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\FeatureFlags;
 use App\Models\User;
 use App\Models\Boost;
-use App\Mail\VerifyEmail;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -66,19 +62,31 @@ class RegisterController extends BaseController
         return Validator::make($data, [
 
             'first_name' => [
-                'required', 'string', 'max:255',
+                'required',
+                'string',
+                'max:255',
             ],
             'last_name' => [
-                'required', 'string', 'max:255',
+                'required',
+                'string',
+                'max:255',
             ],
             'username' => [
-                'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
+                'required',
+                'string',
+                'string',
+                'alpha_num',
+                'max:255',
+                'unique:users',
             ],
             'country_code' => [
-                'string', 'max:4', 'required'
+                'string',
+                'max:4',
+                'required'
             ],
             'phone_number' => [
-                'numeric', 'required',
+                'numeric',
+                'required',
                 new UniquePhoneNumberRule,
             ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -108,7 +116,7 @@ class RegisterController extends BaseController
                     ltrim($data['phone_number'], $data['phone_number'][0]) : $data['phone_number'])),
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
-                'email_verified_at' =>  null,
+                'email_verified_at' => null,
                 'country_code' => $data['country_code'] ?? '+234',
                 'brand_id' => request()->header('x-brand-id', 1),
                 'meta_data' => json_encode([
@@ -123,7 +131,7 @@ class RegisterController extends BaseController
         $user
             ->profile()
             ->create([
-                'first_name' =>  $data['first_name'] ?? null,
+                'first_name' => $data['first_name'] ?? null,
                 'last_name' => $data['last_name'] ?? null,
                 'referral_code' => $data['username'] ?? $user->username,
                 'referrer' => $data['referrer'] ?? null,
@@ -134,51 +142,42 @@ class RegisterController extends BaseController
             ->create([]);
 
         //give user sign up bonus
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            if (isset($data['bonus_checked']) && $data['bonus_checked']) {
+        if (isset($data['bonus_checked']) && $data['bonus_checked']) {
 
-                $registrationBonusService = new RegistrationBonusService;
+            $registrationBonusService = new RegistrationBonusService;
 
-                $registrationBonusService->giveBonus($user);
-            }
-        } else {
-            $this->cashingamesSignupBonus($user);
+            $registrationBonusService->giveBonus($user);
         }
+
+        $this->giveFreeBoosts($user);
 
         return $user;
     }
 
-    protected function cashingamesSignupBonus($user)
+    protected function giveFreeBoosts($user)
     {
-        $bonusAmount = config('trivia.bonus.signup.stakers_bonus_amount');
-        DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable += $bonusAmount;
 
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value,
-                'transaction_action' => WalletTransactionAction::BonusCredited->value
+        $boosts = Cache::remember('boosts', 60 * 60 * 24, function () {
+            return Boost::all();
+        });
+        DB::transaction(function () use ($user, $boosts) {
+
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => $boosts->firstWhere('name', 'Time Freeze')->id,
+                'boost_count' => 3,
+                'used_count' => 0
             ]);
-            $user->wallet->save();
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => $boosts->firstWhere('name', 'Skip')->id,
+                'boost_count' => 3,
+                'used_count' => 0
+            ]);
+
         });
 
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Time Freeze')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
-        $user->boosts()->create([
-            'user_id' => $user->id,
-            'boost_id' => Boost::where('name', 'Skip')->first()->id,
-            'boost_count' => 3,
-            'used_count' => 0
-        ]);
+
     }
 
     /**
@@ -189,7 +188,6 @@ class RegisterController extends BaseController
      * @return mixed
      */
     protected function registered(
-        Request $request,
         SMSProviderInterface $smsService,
         $user
     ) {
@@ -198,21 +196,11 @@ class RegisterController extends BaseController
             $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
         } catch (\Throwable $th) {
             Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+            return $this->sendResponse(
+                "Something went wrong. Please contact admin" . $th->getMessage(),
+                "Unable to deliver OTP via SMS"
+            );
         }
-
-        if (FeatureFlag::isEnabled(FeatureFlags::EMAIL_VERIFICATION)) {
-            Mail::to($user->email)->send(new VerifyEmail($user));
-
-            Log::info("Email verification sent to " . $user->email);
-            if ($request->hasHeader('X-App-Source')) {
-
-                $token = auth()->tokenById($user->id);
-
-                return $this->sendResponse($token, 'Token');
-            }
-        }
-
-
 
         $result = [
             'username' => $user->username,
@@ -232,7 +220,7 @@ class RegisterController extends BaseController
 
         $user = $this->create($request->all());
 
-        if ($response = $this->registered($request, $smsService, $user)) {
+        if ($response = $this->registered($smsService, $user)) {
             return $response;
         }
     }
@@ -257,7 +245,7 @@ class RegisterController extends BaseController
             return $this->sendResponse([], "You can not send OTP at this time, please try later");
         } else {
             try {
-                $smsService->deliverOTP($user,  AuthTokenType::PhoneVerification->value);
+                $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
                 return $this->sendResponse([
                     'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
                 ], "OTP has been resent to phone number");

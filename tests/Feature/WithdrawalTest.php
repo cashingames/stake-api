@@ -94,7 +94,7 @@ class WithdrawalTest extends TestCase
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
             'account_name' => 'Test User',
-            'amount' => 0,
+            'amount' => 500,
             'bank_name' => 'Test Bank'
 
         ]);
