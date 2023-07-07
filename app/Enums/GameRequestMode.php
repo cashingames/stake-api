@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum GameModes: string
+enum GameRequestMode: string
 {
     case PRACTICE = 'PRACTICE';
 }
