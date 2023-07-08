@@ -26,6 +26,7 @@ use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\PlayGame\StartChallengeRequestController;
 use App\Http\Controllers\PlayGame\StartPracticeChallengeRequestController;
+use App\Http\Controllers\PlayGame\StartSinglePlayerPracticeGameController;
 
 Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/login', [LoginController::class, 'login']);
@@ -71,6 +72,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
+        Route::post('single-player/practice/start', StartSinglePlayerPracticeGameController::class);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
         Route::delete('account/delete', [UserController::class, 'deleteAccount']);
         Route::get('contests', GetContestDetailsController::class);

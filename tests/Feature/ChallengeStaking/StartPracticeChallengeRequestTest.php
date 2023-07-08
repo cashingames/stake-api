@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ChallengeStaking;
 
+use App\Enums\GameRequestMode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -53,7 +54,7 @@ class StartPracticeChallengeRequestTest extends TestCase
             'user_id' => $user->id,
             'username' => $user->username,
             'status' => 'MATCHING',
-            'request_mode' => 'PRACTICE'
+            'request_mode' => GameRequestMode::CHALLENGE_PRACTICE->value
         ]);
     }
 
