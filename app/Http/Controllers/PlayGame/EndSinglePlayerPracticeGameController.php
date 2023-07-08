@@ -13,17 +13,15 @@ class EndSinglePlayerPracticeGameController extends Controller
     public function __invoke(Request $request)
     {
         $data = $request->validate([
-            'chosen_options' => ['required', 'array'],
+            'chosenOptions' => ['required', 'array'],
         ]);
 
-        $chosenOptions = $data['chosen_options'];
-
-        $questions = collect(Question::with('options')->whereIn('id', array_column($chosenOptions, 'question_id'))->get());
+        $questions = collect(Question::with('options')->whereIn('id', array_column($data['chosenOptions'], 'question_id'))->get());
 
         $points = 0;
         $wrongs = 0;
         $amountWon = 0;
-        foreach ($chosenOptions as $a) {
+        foreach ($data['chosenOptions'] as $a) {
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', true)->first();
 
             if ($isCorect != null) {

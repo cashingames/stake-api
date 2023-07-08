@@ -46,7 +46,7 @@ class EndExhibitionPracticeGameTest extends TestCase
         })->count();
 
         $response =  $this->postjson(self::URL, [
-            "chosen_options" =>  $chosenOptions,
+            "chosenOptions" =>  $chosenOptions,
         ]);
 
         $response->assertJson([
