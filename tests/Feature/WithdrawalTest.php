@@ -44,19 +44,6 @@ class WithdrawalTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_that_a_user_cannot_withdraw_zero_naira()
-    {
-        $response = $this->post(self::WITHDRAWAL_URL, [
-            'account_number' => '124567890',
-            'account_name' => 'Test User',
-            'amount' => 0,
-            'bank_name' => 'Test Bank'
-
-        ]);
-        $response->assertJson([
-            'message' => 'Invalid withdrawal amount. You can not withdraw NGN0',
-        ]);
-    }
 
     public function test_that_a_user_cannot_withdraw_less_than_configurable_one_time_minimum_withrawal_amount()
     {
@@ -65,17 +52,12 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->withdrawable = 150;
         $this->user->wallet->save();
 
-
-        $response = $this->post(self::WITHDRAWAL_URL, [
+        $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
             'account_name' => 'Test User',
             'amount' => 150,
             'bank_name' => 'Test Bank'
-
-        ]);
-        $response->assertJson([
-            'message' => 'You can not withdraw less than NGN' . config('trivia.staking.min_withdrawal_amount'),
-        ]);
+        ])->assertSessionHasErrors(['amount' => 'The amount must be at least 500.']);
     }
 
     public function test_that_a_user_cannot_withdraw_if_name_is_not_equal_to_account_name()

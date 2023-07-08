@@ -35,6 +35,10 @@ class CategoryTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+
+        // Delete the uploaded image
+        Storage::disk('icons')->delete($file->hashName());
+
     }
 
 }

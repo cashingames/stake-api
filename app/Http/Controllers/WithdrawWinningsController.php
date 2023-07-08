@@ -19,41 +19,17 @@ class WithdrawWinningsController extends BaseController
         $request->validate([
             'account_number' => ['required', 'numeric'],
             'bank_name' => ['required', 'string', 'max:200'],
-            'amount' => ['required', 'integer', 'max:' . $this->user->wallet->withdrawable],
+            'amount' => [
+                'required',
+                'integer',
+                'max:' . $this->user->wallet->withdrawable,
+                'min:' . config('trivia.min_withdrawal_amount')
+            ],
             'account_name' => ['required', 'string']
         ]);
 
 
         $debitAmount = $request->amount;
-
-
-        if ($debitAmount <= 0) {
-            return $this->sendError(false, 'Invalid withdrawal amount. You can not withdraw NGN0');
-        }
-
-        if ($debitAmount < config('trivia.min_withdrawal_amount')) {
-            return $this->sendError(
-                false,
-                'You can not withdraw less than NGN' . config('trivia.min_withdrawal_amount')
-            );
-        }
-
-        if ($debitAmount > config('trivia.max_withdrawal_amount')) {
-            $debitAmount = config('trivia.max_withdrawal_amount');
-        }
-
-
-        // $totalWithdrawals = $this->user
-        //     ->transactions()
-        //     ->withdrawals()
-        //     ->sum('amount');
-
-        // if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
-        //     $data = [
-        //         'verifyEmailNavigation' => true,
-        //     ];
-        //     return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        // }
 
         $banks = Cache::rememberForever('banks', function () use ($withdrawalService) {
             return $withdrawalService->getBanks();
@@ -62,6 +38,7 @@ class WithdrawWinningsController extends BaseController
         foreach ($banks->data as $bank) {
             if ($bank->name == $request->bank_name) {
                 $bankCode = $bank->code;
+                break;
             }
         }
 
