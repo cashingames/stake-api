@@ -2,23 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Enums\BonusType;
-use App\Enums\FeatureFlags;
-use App\Enums\WalletBalanceType;
-use App\Enums\WalletTransactionAction;
-use App\Models\Bonus;
-use App\Models\GameSession;
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\UserBonus;
 use Mockery\MockInterface;
-use Illuminate\Support\Str;
 use Database\Seeders\UserSeeder;
-use App\Models\WalletTransaction;
-use App\Services\FeatureFlag;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\Payments\PaystackService;
 use Database\Seeders\BonusSeeder;
@@ -67,40 +55,6 @@ class WithdrawalTest extends TestCase
         ]);
         $response->assertJson([
             'message' => 'Invalid withdrawal amount. You can not withdraw NGN0',
-        ]);
-    }
-
-    public function test_that_a_user_is_forced_to_verify_email_if_max_limit_is_exceeded()
-    {
-
-        Config::set('trivia.email_verification_limit_threshold', 10000);
-        $this->user->update(['email_verified_at' => null]);
-
-        $this->user->wallet->withdrawable = 20000;
-        $this->user->wallet->save();
-
-        WalletTransaction::create([
-            'wallet_id' => $this->user->wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => 15000,
-            'balance' => $this->user->wallet->withdrawable,
-            'description' => 'Winnings Withdrawal Made',
-            'reference' => Str::random(10),
-            'created_at' => now()->subHours(3),
-            'balance_type' => WalletBalanceType::WinningsBalance->value,
-            'description_action' => WalletTransactionAction::WinningsWithdrawn->value
-        ]);
-
-        $response = $this->post(self::WITHDRAWAL_URL, [
-            'account_number' => '124567890',
-            'account_name' => 'Test User',
-            'amount' => 500,
-            'bank_name' => 'Test Bank'
-
-        ]);
-
-        $response->assertJsonFragment([
-            'verifyEmailNavigation' => true,
         ]);
     }
 

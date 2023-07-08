@@ -43,17 +43,17 @@ class WithdrawWinningsController extends BaseController
         }
 
 
-        $totalWithdrawals = $this->user
-            ->transactions()
-            ->withdrawals()
-            ->sum('amount');
+        // $totalWithdrawals = $this->user
+        //     ->transactions()
+        //     ->withdrawals()
+        //     ->sum('amount');
 
-        if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
-            $data = [
-                'verifyEmailNavigation' => true,
-            ];
-            return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
-        }
+        // if (is_null($this->user->email_verified_at) && $totalWithdrawals > config('trivia.email_verification_limit_threshold')) {
+        //     $data = [
+        //         'verifyEmailNavigation' => true,
+        //     ];
+        //     return $this->sendError($data, 'Please verify your email address to make withdrawals  or contact support on hello@cashingames.com');
+        // }
 
         $banks = Cache::rememberForever('banks', function () use ($withdrawalService) {
             return $withdrawalService->getBanks();
