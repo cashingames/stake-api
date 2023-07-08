@@ -196,14 +196,14 @@ class StakingChallengeGameService
 
         /**
          * When Odds should win
-         * Current odds: 3/5 to help us recoop the lost amount
+         * Current odds: 2/5 to help us recoop the lost amount
          */
         Lottery::odds(2, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
-                $botScore = ($opponentScore == 10 || $opponentScore == 9) ? 10 : rand($opponentScore + 1, 10);
+                $botScore = ($opponentScore == 10 || $opponentScore == 9) ? 10 : rand($opponentScore, 10);
             })
             ->loser(function () use ($opponentScore, &$botScore) {
-                $botScore = rand($opponentScore, 10);
+                $botScore = rand(0, $opponentScore);
             })
             ->choose();
         return $botScore;
@@ -213,7 +213,9 @@ class StakingChallengeGameService
     {
         DB::transaction(function () use ($consumedBoosts, $request) {
             foreach ($consumedBoosts as $row) {
-                $userBoost = UserBoost::where('user_id', $request->user_id)->where('boost_id', $row['boost']['id'])->first();
+                $userBoost = UserBoost::
+                    where('user_id', $request->user_id)
+                    ->where('boost_id', $row['boost']['id'])->first();
 
                 $userBoost->update([
                     'used_count' => $userBoost->used_count + 1,
