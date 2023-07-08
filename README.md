@@ -67,6 +67,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 # Tech Improvements
+- Rewrite category upload icon test to stop generating random icons on disk
 - Create EndSinglePlayerController.cs
 - Review UserController
 - Review Notifications and UserNotifications

@@ -102,7 +102,7 @@ class StartSinglePlayerRequest extends FormRequest
         if ($user->wallet->non_withdrawable < $stakingAmount) {
             $validator->errors()->add(
                 'staking_amount',
-                'Insufficient Deposit'
+                'You do not have sufficient deposit balance. Please deposit more funds.'
             );
 
         }
