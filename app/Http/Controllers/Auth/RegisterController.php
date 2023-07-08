@@ -54,6 +54,8 @@ class RegisterController extends BaseController
 
     protected function validator(array $data, $platform = null)
     {
+        Log::info("Registration: Validating user data for registration ", $data['username']);
+
         return Validator::make($data, [
 
             'first_name' => [
@@ -134,7 +136,7 @@ class RegisterController extends BaseController
 
         //create the wallet
         $user->wallet()
-            ->create([]);
+            ->create();
 
         //give user sign up bonus
         if (isset($data['bonus_checked']) && $data['bonus_checked']) {
@@ -155,6 +157,7 @@ class RegisterController extends BaseController
         $boosts = Cache::remember('boosts', 60 * 60 * 24, function () {
             return Boost::all();
         });
+        
         DB::transaction(function () use ($user, $boosts) {
 
             $user->boosts()->create([
@@ -163,6 +166,7 @@ class RegisterController extends BaseController
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
+
             $user->boosts()->create([
                 'user_id' => $user->id,
                 'boost_id' => $boosts->firstWhere('name', 'Skip')->id,
@@ -190,7 +194,15 @@ class RegisterController extends BaseController
         try {
             $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
         } catch (\Throwable $th) {
-            Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+            Log::error(
+                "Registration: Unable to deliver OTP via SMS Reason: ",
+                [
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'phone_number' => $user->phone_number,
+                    'error' => $th->getMessage()
+                ]
+            );
             return $this->sendResponse(
                 "Something went wrong. Please contact admin" . $th->getMessage(),
                 "Unable to deliver OTP via SMS"
@@ -215,7 +227,19 @@ class RegisterController extends BaseController
 
         $user = $this->create($request->all());
 
+        Log::info("Registration: created user in DB", [
+            'username' => $user->username,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+        ]);
+
         if ($response = $this->registered($smsService, $user)) {
+
+            Log::info("Registration: complete", [
+                'username' => $user->username,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+            ]);
             return $response;
         }
     }
