@@ -111,16 +111,16 @@ class StartSinglePlayerRequest extends FormRequest
     private function validateBonusAccount($validator, $user, $stakingAmount)
     {
         app()->instance(StakingFundSource::class, StakingFundSource::BONUS);
-
         if ($user->wallet->bonus < $stakingAmount) {
             $validator->errors()->add(
                 'staking_amount',
-                'Insufficient bonus balance.'
+                'Insufficient bonus balance. Please contact support for help.'
             );
             return;
         }
+
         $leftOverAmount = ($user->wallet->bonus - $stakingAmount);
-        if ( $leftOverAmount > 0 and $leftOverAmount < config('trivia.minimum_exhibition_staking_amount')) {
+        if ($leftOverAmount < config('trivia.minimum_exhibition_staking_amount') && $leftOverAmount != 0) {
             $validator->errors()->add(
                 'staking_amount',
                 'Insufficient bonus amount will be left after this stake. Please stake ' . $user->wallet->bonus
@@ -136,7 +136,7 @@ class StartSinglePlayerRequest extends FormRequest
     }
 
     private function validateRegistrationBonus($validator, $user, $bonus, $stakingAmount)
-    {   
+    {
         if ($stakingAmount > $bonus->amount_remaining_after_staking) {
             $validator->errors()->add(
                 'staking_amount',
