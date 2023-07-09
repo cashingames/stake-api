@@ -52,9 +52,9 @@ class RegisterController extends BaseController
      * @return \Illuminate\Contracts\Validation\Validator
      */
 
-    protected function validator(array $data, $platform = null)
+    protected function validator(array $data)
     {
-        Log::info("Registration: Validating user data for registration ", $data['username']);
+        // Log::info("Registration: Validating user data for registration ", $data);
 
         return Validator::make($data, [
 

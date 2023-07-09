@@ -27,6 +27,8 @@ class LoginTest extends TestCase
         parent::setUp();
         $this->seed(UserSeeder::class);
         $this->user = User::first();
+        config(['services.termii.api_key' => 'termii_api_key']);
+
     }
 
     public function login_fields_cannot_be_empty()

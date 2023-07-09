@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\AuthTokenType;
 use App\Models\User;
 use App\Http\Controllers\BaseController;
+use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends BaseController
 {
@@ -41,13 +44,11 @@ class LoginController extends BaseController
             return $this->sendError('Invalid email or password', 'Invalid email or password');
         }
 
-        if ($user->phone_verified_at == null) {
-            return $this->sendError([
-                'username' => $user->username,
-                'email' => $user->email,
-                'phoneNumber' => $user->phone_number
-            ], 'Account not verified');
+        $returned = $this->triggerVerifyPhone(app(SMSProviderInterface::class), $user);
+        if ($returned != null) {
+            return $returned;
         }
+
         return $this->respondWithToken($token);
     }
 
@@ -78,4 +79,44 @@ class LoginController extends BaseController
         $user->save();
         return $this->sendResponse($token, 'Token');
     }
+
+    protected function triggerVerifyPhone(
+        SMSProviderInterface $smsService,
+        $user
+    ) {
+
+        if ($user->phone_verified_at != null) {
+            return null;
+        }
+
+        try {
+            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+            Log::info(
+                "Login: OTP sent successfully: "
+            );
+        } catch (\Throwable $th) {
+            Log::error(
+                "Login: Unable to deliver OTP via SMS Reason: ",
+                [
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'phone_number' => $user->phone_number,
+                    'error' => $th->getMessage()
+                ]
+            );
+            return $this->sendResponse(
+                "Something went wrong. Please contact admin" . $th->getMessage(),
+                "Unable to deliver OTP via SMS"
+            );
+        }
+
+        return $this->sendError([
+            'username' => $user->username,
+            'email' => $user->email,
+            'phoneNumber' => $user->phone_number
+        ], 'Account not verified');
+
+
+    }
+
 }
