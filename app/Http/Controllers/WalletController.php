@@ -44,26 +44,18 @@ class WalletController extends BaseController
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
+        $winningsTransactions = $this->user->transactions()->winningsTransactions()
+            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->orderBy('wallet_transactions.created_at', 'desc')
+            ->paginate(10);
 
         $data = [
             "mainTransactions" => (new WalletTransactionsResponse())->transform($mainTransactions)->original,
             "bonusTransactions" => (new WalletTransactionsResponse())->transform($bonusTransactions)->original,
+            "withdrawalsTransactions" => (new WalletTransactionsResponse())->transform($winningsTransactions)->original
         ];
         return $data;
     }
-
-    public function earnings()
-    {
-        $data = [
-            'earnings' => $this->user->transactions()
-                ->where('transaction_type', 'CREDIT')
-                ->where('description', '!=', 'Fund Wallet')
-                ->where('description', '!=', 'Sign Up Bonus')
-                ->orderBy('created_at', 'desc')->get()
-        ];
-        return $this->sendResponse($data, 'Earnings information');
-    }
-
     public function verifyTransaction(string $reference)
     {
         Log::info("payment successful from app verification $this->user->username");

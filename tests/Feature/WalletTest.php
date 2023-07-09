@@ -35,13 +35,12 @@ class WalletTest extends TestCase
     public function test_transactions_can_be_gotten()
     {
         $response = $this->get(self::BASE_URL);
+
+        $response->assertJson([
+            'mainTransactions' => [],
+            'bonusTransactions' => [],
+            'withdrawalsTransactions' => [],
+        ]);
         $response->assertStatus(200);
     }
-
-    public function test_earnings_transactions_can_be_gotten()
-    {
-        $response = $this->get(self::BASE_URL . '/earnings');
-        $response->assertStatus(200);
-    }
-
 }

@@ -67,7 +67,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
         Route::get('wallet/me', [WalletController::class, 'me']);
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
-        Route::get('wallet/me/transactions/earnings', [WalletController::class, 'earnings']);
         Route::get('wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"]);
         Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);

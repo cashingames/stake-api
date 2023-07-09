@@ -56,20 +56,18 @@ class WalletTransaction extends Model
             ->where('description', 'Fund Wallet');
     }
 
-    public function scopeDemoGameWinnings($query)
-    {
-        return $query->where('transaction_type', 'CREDIT')
-            ->where('description', 'Demo Game Winnings');
-    }
-
     public function scopeMainTransactions($query)
     {
-        return $query->where('balance_type',  WalletBalanceType::CreditsBalance->value)
-            ->orWhere('balance_type', WalletBalanceType::WinningsBalance->value);
+        return $query->where('balance_type',  WalletBalanceType::CreditsBalance->value);
     }
 
     public function scopeBonusTransactions($query)
     {
         return $query->where('balance_type',  WalletBalanceType::BonusBalance->value);
+    }
+
+    public function scopeWinningsTransactions($query)
+    {
+        return $query->where('balance_type', WalletBalanceType::WinningsBalance->value);
     }
 }
