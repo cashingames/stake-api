@@ -120,6 +120,8 @@ class ProfileTest extends TestCase
         $avatar = $this->user->profile->avatar;
 
         $this->assertTrue(!is_null($avatar));
+
+        Storage::disk('avatars')->delete($file->hashName());
     }
 
     public function test_that_referrer_profile_returns_null_when_not_referrer_not_found()

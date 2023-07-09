@@ -54,7 +54,7 @@ class RegisterController extends BaseController
 
     protected function validator(array $data)
     {
-        // Log::info("Registration: Validating user data for registration ", $data);
+        Log::info("Registration: Validating user data for registration ", $data);
 
         return Validator::make($data, [
 
