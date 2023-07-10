@@ -31,7 +31,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn() =>
+            fn () =>
             GameMode::select(
                 'id',
                 'name',
@@ -44,12 +44,12 @@ class GameController extends BaseController
         );
         $result->boosts = Cache::rememberForever(
             'gameBoosts',
-            fn() => Boost::where('name', '!=', 'Bomb')
+            fn () => Boost::where('name', '!=', 'Bomb')
                 ->get()
         );
-        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
+        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn() => Category::all());
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
 
         $gameInfo = DB::select("
             SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
@@ -130,8 +130,7 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
-        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");
-        ;
+        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");;
 
         return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
@@ -204,21 +203,23 @@ class GameController extends BaseController
         $registrationBonusService = new RegistrationBonusService;
         $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
         if ($hasRegistrationBonus) {
-            if ($points == config('trivia.user_scores.perfect_score')) {
-                $walletRepository->creditBonusAccount(
-                    $this->user->wallet,
-                    $amountWon,
-                    'Bonus Credited',
-                    null,
-                );
-                $staking->update(['amount_won' => $amountWon]);
-                $registrationBonusService->updateAmountWon($this->user, $amountWon);
-                $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
-                if ($perfectGamesCount >= config('trivia.minimum_withdrawal_perfect_score_threshold')) {
-                    $amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
-                    Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
-                }
-            }
+            // $walletRepository->creditBonusAccount(
+            //     $this->user->wallet,
+            //     $amountWon,
+            //     'Bonus Credited',
+            //     null,
+            // );
+            $walletRepository->credit(
+                $this->user->wallet,
+                $amountWon,
+                'Staking winning of ' . $amountWon . ' cash',
+                null,
+            );
+
+            $staking->update(['amount_won' => $amountWon]);
+            $registrationBonusService->updateAmountWon($this->user, $amountWon);
+            //$amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
+            //Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
         } else {
             $walletRepository = new WalletRepository;
             $description = 'Staking winning of ' . $amountWon . ' cash';

@@ -14,12 +14,12 @@ class DebitWalletForStaking
         private RegistrationBonusService $registrationBonusService
     ) {
     }
-    public function execute(Wallet $wallet, float $amount): float
+    public function execute(Wallet $wallet, float $amount, $walletType): float
     {
         $balanceToDeduct = "";
         $action = WalletTransactionAction::StakingPlaced->value;
-
-        if ($wallet->hasBonus() &&  $wallet->bonus >= $amount) {
+        
+        if ($walletType == "bonus_balance" &&  $wallet->bonus >= $amount) {
             $hasRegistrationBonus = $this->registrationBonusService->hasActiveRegistrationBonus($wallet->user);
             if ($hasRegistrationBonus) {
                 $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($wallet->user);
