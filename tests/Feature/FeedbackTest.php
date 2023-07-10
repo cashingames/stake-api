@@ -33,7 +33,13 @@ class FeedbackTest extends TestCase
             "message_body" => "Lorem Ipsum dorem bla bla bla"
         ]);
 
-        Mail::assertSent(Feedback::class);
+        Mail::assertSent(Feedback::class, function (Feedback $mail) {
+            $mail->assertSeeInHtml('Cashingames');
+            $mail->assertSeeInHtml('email@user.com');
+            $mail->assertSeeInHtml('07039999999');
+            // $mail->assertSeeInHtml('Lorem Ipsum dorem bla bla bla');
+            return true; // always make sure it returns true or it will result in a failed assertion;
+        });
 
         $response->assertStatus(200);
     }
@@ -61,7 +67,11 @@ class FeedbackTest extends TestCase
             "message_body" => "lorem ipsum "
         ]);
 
-        Mail::assertSent(Feedback::class);
+        Mail::assertSent(Feedback::class, function (Feedback $mail) {
+            $mail->assertSeeInHtml('lorem ipsum');
+
+            return true; // always make sure it returns true or it will result in a failed assertion;
+        });
     }
 
     public function test_a_support_ticket_can_be_sent()

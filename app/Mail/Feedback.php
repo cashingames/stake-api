@@ -24,7 +24,6 @@ class Feedback extends Mailable
         private readonly string $phone,
         private readonly string $email,
         private readonly string $messageBody,
-        private readonly string $appType
     ) {
     }
 
@@ -50,7 +49,8 @@ class Feedback extends Mailable
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
                 'phone' => $this->phone,
-                'message' => $this->messageBody
+                'message_body' => $this->messageBody,
+                'email' => $this->email,
             ],
         );
     }
