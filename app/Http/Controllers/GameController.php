@@ -203,16 +203,23 @@ class GameController extends BaseController
         $registrationBonusService = new RegistrationBonusService;
         $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
         if ($hasRegistrationBonus) {
-            $walletRepository->creditBonusAccount(
+            // $walletRepository->creditBonusAccount(
+            //     $this->user->wallet,
+            //     $amountWon,
+            //     'Bonus Credited',
+            //     null,
+            // );
+            $walletRepository->credit(
                 $this->user->wallet,
                 $amountWon,
-                'Bonus Credited',
+                'Staking winning of ' . $amountWon . ' cash',
                 null,
             );
+
             $staking->update(['amount_won' => $amountWon]);
             $registrationBonusService->updateAmountWon($this->user, $amountWon);
-            $amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
-            Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
+            //$amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
+            //Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
         } else {
             $walletRepository = new WalletRepository;
             $description = 'Staking winning of ' . $amountWon . ' cash';
