@@ -82,7 +82,8 @@ class StartExhibitionStakingTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 200
+            "staking_amount" => 200,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $this->assertDatabaseHas('user_bonuses', [
@@ -123,7 +124,8 @@ class StartExhibitionStakingTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 200
+            "staking_amount" => 200,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $response->assertJson([
@@ -156,7 +158,8 @@ class StartExhibitionStakingTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 800
+            "staking_amount" => 800,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $response->assertJson([
@@ -188,7 +191,8 @@ class StartExhibitionStakingTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 600
+            "staking_amount" => 600,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $response->assertJson([
@@ -209,7 +213,8 @@ class StartExhibitionStakingTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 700
+            "staking_amount" => 700,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $response->assertJson([
