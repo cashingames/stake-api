@@ -52,7 +52,8 @@ class StartSinglePlayerRequest extends FormRequest
                 'numeric',
                 "max:" . config('trivia.maximum_exhibition_staking_amount'),
                 "min:" . config('trivia.minimum_exhibition_staking_amount')
-            ]
+            ],
+            'wallet_type' => ['nullable', 'string']
         ];
     }
 
@@ -88,7 +89,7 @@ class StartSinglePlayerRequest extends FormRequest
         $stakingAmount = $this->input('staking_amount');
         $user = auth()->user();
 
-        if ($user->wallet->hasBonus()) {
+        if(!is_null($this->input('wallet_type')) && $this->input('wallet_type') == 'bonus_balance' ){
             $this->validateBonusAccount($validator, $user, $stakingAmount);
         } else {
             $this->validateDepositAccount($validator, $user, $stakingAmount);
@@ -98,7 +99,7 @@ class StartSinglePlayerRequest extends FormRequest
     private function validateDepositAccount($validator, $user, $stakingAmount)
     {
         app()->instance(StakingFundSource::class, StakingFundSource::DEPOSIT);
-
+        
         if ($user->wallet->non_withdrawable < $stakingAmount) {
             $validator->errors()->add(
                 'staking_amount',

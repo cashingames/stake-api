@@ -57,7 +57,7 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         DB::beginTransaction();
 
         $gameSession = $this->generateSession();
-        $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
+        $stakingId = $this->stakeAmount($validatedRequest->staking_amount, ($validatedRequest->wallet_type ?? null));
         $this->createExhibitionStaking($stakingId, $gameSession->id);
         $this->logQuestions($questions, $gameSession);
 
@@ -86,9 +86,9 @@ class StakingExhibitionGameService implements PlayGameServiceInterface
         return $gameSession;
     }
 
-    public function stakeAmount($stakingAmount)
+    public function stakeAmount($stakingAmount, $walletType)
     {
-        $this->walletDebitAction->execute($this->user->wallet, $stakingAmount);
+        $this->walletDebitAction->execute($this->user->wallet, $stakingAmount, $walletType);
 
         $odd = 1;
 

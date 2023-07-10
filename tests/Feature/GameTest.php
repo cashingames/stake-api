@@ -338,7 +338,8 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 500,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $this->assertDatabaseHas('wallets', [
@@ -379,7 +380,8 @@ class GameTest extends TestCase
             "category" => $this->category->id,
             "mode" => 1,
             "type" => 2,
-            "staking_amount" => 500
+            "staking_amount" => 500,
+            'wallet_type' => "bonus_balance"
         ]);
 
         $response->assertJson([
