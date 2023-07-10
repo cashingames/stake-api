@@ -210,7 +210,7 @@ class GameController extends BaseController
         //NOTE - odd_applied_during_staking is dynamic odds
         $totalOdds = $stakingOdd * $staking->odd_applied_during_staking;
         $amountWon = $staking->amount_staked * $totalOdds;
-
+        
         if ($staking->fund_source == WalletBalanceType::BonusBalance->value) {
             $this->handleBonusWalletFlow($staking, $amountWon, $points);
         } else {

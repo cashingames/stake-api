@@ -394,7 +394,7 @@ class GameTest extends TestCase
         FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         config(['trivia.user_scores.perfect_score' => 10]);
 
-        Staking::factory()->create(['user_id' => $this->user->id]);
+        Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
         UserBonus::create([
             'user_id' => $this->user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
@@ -435,7 +435,7 @@ class GameTest extends TestCase
         $userBonus = UserBonus::where('user_id', $this->user->id)
             ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
             ->first();
-
+            
         $this->assertEquals(
             $this->user->wallet->withdrawable,
             $userBonus->total_amount_won + $userBonus->amount_credited
