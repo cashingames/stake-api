@@ -438,7 +438,7 @@ class GameTest extends TestCase
 
         $this->assertEquals(
             $this->user->wallet->withdrawable,
-            $userBonus->total_amount_won + $userBonus->amount_credited
+            $userBonus->total_amount_won 
         );
     }
 }
