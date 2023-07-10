@@ -16,7 +16,7 @@ use App\Services\TriviaStaking\OddsService;
 use App\Actions\Wallet\DebitWalletForStaking;
 use App\Services\StakeQuestionsHardeningService;
 
-class StakingExhibitionGameService implements PlayGameServiceInterface
+class StakingExhibitionGameService
 {
 
     private \stdClass $validatedRequest;

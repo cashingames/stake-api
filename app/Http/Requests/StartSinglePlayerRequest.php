@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\GameType;
 use App\Enums\StakingFundSource;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
@@ -71,10 +70,6 @@ class StartSinglePlayerRequest extends FormRequest
         $validator->after(function ($validator) {
             $this->validate($validator);
         });
-
-        if ($validator->passes()) {
-            app()->instance(GameType::class, GameType::StakingExhibition);
-        }
     }
 
     private function validate($validator)

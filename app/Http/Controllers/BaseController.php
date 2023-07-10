@@ -10,11 +10,11 @@ class BaseController extends Controller
 {
     public $user;
 
-    function __construct()
+    public function __construct()
     {
         $this->user = auth()->user();
         if ($this->user && $this->user->trashed()) {
-            auth()->logout(true);
+            auth()->logout();
         }
     }
 
@@ -43,17 +43,5 @@ class BaseController extends Controller
         ];
 
         return response()->json($response, 400);
-    }
-
-    public function creditPoints($userId, $points, $description)
-    {
-
-        //create point traffic log
-        UserPoint::create([
-            'user_id' => $userId,
-            'value' => $points,
-            'description' => $description,
-            'point_flow_type' => 'POINTS_ADDED'
-        ]);
     }
 }

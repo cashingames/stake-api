@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\PlayGame;
 
-use App\Enums\GameType;
 use App\Http\Requests\StartSinglePlayerRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
 use App\Services\PlayGame\PlayGameServiceFactory;
+use App\Services\PlayGame\StakingExhibitionGameService;
 use Illuminate\Http\Request;
 
 use Illuminate\Routing\Controller;
@@ -18,8 +18,7 @@ class StartSinglePlayerGameController extends Controller
     public function __invoke(
         Request $request,
         StartSinglePlayerRequest $reqeuestModel,
-        GameType $customType,
-        PlayGameServiceFactory $gameService
+        StakingExhibitionGameService $stakeService
     )
     {
         $validated = $reqeuestModel->validated();
@@ -28,10 +27,9 @@ class StartSinglePlayerGameController extends Controller
         Log::info('START_SINGLE_PLAYER_PROCESS', [
             'user' => $request->user()->username,
             'validatedRequest' => $validatedRequest,
-            'gameType' => $customType
         ]);
 
-        $startResponse = $gameService->startGame($validatedRequest);
+        $startResponse = (object) $stakeService->startGame($validatedRequest);
 
         //@TODO: Handle business error states in the services
         if (count($startResponse->questions) < 10) {
