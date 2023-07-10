@@ -7,7 +7,7 @@ use App\Models\GameSession;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use App\Enums\StakingFundSource;
+use App\Enums\WalletBalanceType;
 use App\Enums\GameSessionStatus;
 use App\Models\ExhibitionStaking;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +26,7 @@ class StakingExhibitionGameService
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
         private readonly DebitWalletForStaking $walletDebitAction,
-        private readonly StakingFundSource $fundSource
+        private readonly WalletBalanceType $walletBalanceType
     ) {
         $this->user = auth()->user();
     }
@@ -57,7 +57,7 @@ class StakingExhibitionGameService
         DB::beginTransaction();
 
         $gameSession = $this->generateSession();
-        $stakingId = $this->stakeAmount($validatedRequest->staking_amount, ($validatedRequest->wallet_type ?? null));
+        $stakingId = $this->stakeAmount($validatedRequest->staking_amount);
         $this->createExhibitionStaking($stakingId, $gameSession->id);
         $this->logQuestions($questions, $gameSession);
 
@@ -86,9 +86,9 @@ class StakingExhibitionGameService
         return $gameSession;
     }
 
-    public function stakeAmount($stakingAmount, $walletType)
+    public function stakeAmount($stakingAmount)
     {
-        $this->walletDebitAction->execute($this->user->wallet, $stakingAmount, $walletType);
+        $this->walletDebitAction->execute($this->user->wallet, $stakingAmount, $this->walletBalanceType);
 
         $odd = 1;
 
@@ -100,11 +100,16 @@ class StakingExhibitionGameService
         $oddMultiplier = $oddMultiplierComputer->computeDynamicOdds($this->user);
         $odd = $oddMultiplier['oddsMultiplier'];
 
+        /**
+         * We are assuming that all bonus is registration bonus
+         * What if we have cashback bonus ?
+         * How do we different which bonus the user is playing with
+         */
         $staking = Staking::create([
             'amount_staked' => $stakingAmount,
             'odd_applied_during_staking' => $odd,
             'user_id' => $this->user->id, //@TODO remove from exhibition staking, not in use
-            'fund_source' => $this->fundSource,
+            'fund_source' => $this->walletBalanceType,
         ]);
 
         return $staking->id;

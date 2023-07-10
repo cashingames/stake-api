@@ -2,6 +2,7 @@
 
 namespace App\Actions\Wallet;
 
+use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use App\Models\Wallet;
 use \App\Repositories\Cashingames\WalletRepository;
@@ -14,12 +15,12 @@ class DebitWalletForStaking
         private RegistrationBonusService $registrationBonusService
     ) {
     }
-    public function execute(Wallet $wallet, float $amount, $walletType): float
+    public function execute(Wallet $wallet, float $amount, WalletBalanceType $walletType): float
     {
         $balanceToDeduct = "";
         $action = WalletTransactionAction::StakingPlaced->value;
-        
-        if ($walletType == "bonus_balance" &&  $wallet->bonus >= $amount) {
+
+        if ($walletType == WalletBalanceType::BonusBalance && $wallet->bonus >= $amount) {
             $hasRegistrationBonus = $this->registrationBonusService->hasActiveRegistrationBonus($wallet->user);
             if ($hasRegistrationBonus) {
                 $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($wallet->user);

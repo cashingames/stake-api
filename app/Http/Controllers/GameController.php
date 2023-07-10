@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WalletBalanceType;
+use App\Events\CreditRegistrationBonusWinnings;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
@@ -19,13 +21,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Event;
-use App\Events\CreditRegistrationBonusWinnings;
+use Illuminate\Support\Facades\Log;
+
 use stdClass;
 
 class GameController extends BaseController
 {
+
+    public function __construct(
+        private WalletRepository $walletRepository,
+        private RegistrationBonusService $registrationBonusService
+    ) {
+        parent::__construct();
+    }
+
     public function getCommonData()
     {
         $result = new stdClass;
@@ -190,43 +200,29 @@ class GameController extends BaseController
                 $wrongs = $wrongs + 1;
             }
         }
+
+
         $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
 
         $staking = $exhibitionStaking->staking;
-        $amountWon = 0;
+        $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
 
+        //NOTE - odd_applied_during_staking is dynamic odds
+        $totalOdds = $stakingOdd * $staking->odd_applied_during_staking;
+        $amountWon = $staking->amount_staked * $totalOdds;
 
-        $pointStandardOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-        $amountWon = $staking->amount_staked * $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking;
-
-        $walletRepository = new WalletRepository;
-        $registrationBonusService = new RegistrationBonusService;
-        $hasRegistrationBonus = $registrationBonusService->hasActiveRegistrationBonus($this->user);
-        if ($hasRegistrationBonus) {
-            // $walletRepository->creditBonusAccount(
-            //     $this->user->wallet,
-            //     $amountWon,
-            //     'Bonus Credited',
-            //     null,
-            // );
-            $walletRepository->credit(
-                $this->user->wallet,
-                $amountWon,
-                'Staking winning of ' . $amountWon . ' cash',
-                null,
-            );
-
-            $staking->update(['amount_won' => $amountWon]);
-            $registrationBonusService->updateAmountWon($this->user, $amountWon);
-            //$amountToBeCredited = $registrationBonusService->activeRegistrationBonus($this->user)->total_amount_won + $registrationBonusService->activeRegistrationBonus($this->user)->amount_credited;
-            //Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
+        if ($staking->fund_source == WalletBalanceType::BonusBalance->value) {
+            $this->handleBonusWalletFlow($staking, $amountWon, $points);
         } else {
             $walletRepository = new WalletRepository;
             $description = 'Staking winning of ' . $amountWon . ' cash';
             $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
             $staking->update(['amount_won' => $amountWon]);
         }
-        ExhibitionStaking::where('game_session_id', $game->id)->update(['odds_applied' => $pointStandardOdd * $exhibitionStaking->staking->odd_applied_during_staking]);
+
+
+        ExhibitionStaking::where('game_session_id', $game->id)
+            ->update(['odds_applied' => $totalOdds]);
 
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
@@ -253,5 +249,33 @@ class GameController extends BaseController
         });
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
+    }
+
+    private function handleBonusWalletFlow($staking, $amount, $points = 0)
+    {
+        $this->walletRepository->creditBonusAccount(
+            $this->user->wallet,
+            $amount,
+            'Bonus Credited',
+            null,
+        );
+
+        $staking->update(['amount_won' => $amount]);
+
+        $this->registrationBonusService->updateAmountWon($this->user, $amount);
+
+        if ($points < config('trivia.user_scores.perfect_score')) {
+            return false;
+        }
+
+        $perfectGamesCount = $this->user->gameSessions()->perfectGames()->count();
+        if ($perfectGamesCount >= config('trivia.minimum_withdrawal_perfect_score_threshold')) {
+            $activeBonus = $this
+                ->registrationBonusService
+                ->activeRegistrationBonus($this->user);
+
+            $amountToBeCredited = $activeBonus->total_amount_won + $activeBonus->amount_credited;
+            Event::dispatch(new CreditRegistrationBonusWinnings($this->user, $amountToBeCredited));
+        }
     }
 }

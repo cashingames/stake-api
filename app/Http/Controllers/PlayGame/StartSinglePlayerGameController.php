@@ -4,7 +4,6 @@ namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Requests\StartSinglePlayerRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Services\PlayGame\PlayGameServiceFactory;
 use App\Services\PlayGame\StakingExhibitionGameService;
 use Illuminate\Http\Request;
 

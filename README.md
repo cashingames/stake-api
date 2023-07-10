@@ -78,6 +78,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Refractor StakingExhibitionGameService to use repo pattern
 - Refractor StartSinglePlayerRequest Validation to use repo pattern
 - Remove GameModes from DB and Interface
+- Move registration bonus code out of debit wallet action
 
 //user_bonuss
 - change amount_credited to amount

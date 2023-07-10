@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\StakingFundSource;
+use App\Enums\WalletBalanceType;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
@@ -69,13 +69,8 @@ class StartSinglePlayerRequest extends FormRequest
         }
 
         $validator->after(function ($validator) {
-            $this->validate($validator);
+            $this->validateStakingAmount($validator);
         });
-    }
-
-    private function validate($validator)
-    {
-        $this->validateStakingAmount($validator);
     }
 
     private function validateStakingAmount($validator)
@@ -84,7 +79,7 @@ class StartSinglePlayerRequest extends FormRequest
         $stakingAmount = $this->input('staking_amount');
         $user = auth()->user();
 
-        if(!is_null($this->input('wallet_type')) && $this->input('wallet_type') == 'bonus_balance' ){
+        if ($this->input('wallet_type') == 'bonus_balance') {
             $this->validateBonusAccount($validator, $user, $stakingAmount);
         } else {
             $this->validateDepositAccount($validator, $user, $stakingAmount);
@@ -93,7 +88,7 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateDepositAccount($validator, $user, $stakingAmount)
     {
-        app()->instance(StakingFundSource::class, StakingFundSource::DEPOSIT);
+        app()->instance(WalletBalanceType::class, WalletBalanceType::CreditsBalance);
         
         if ($user->wallet->non_withdrawable < $stakingAmount) {
             $validator->errors()->add(
@@ -106,7 +101,7 @@ class StartSinglePlayerRequest extends FormRequest
 
     private function validateBonusAccount($validator, $user, $stakingAmount)
     {
-        app()->instance(StakingFundSource::class, StakingFundSource::BONUS);
+        app()->instance(WalletBalanceType::class, WalletBalanceType::BonusBalance);
         if ($user->wallet->bonus < $stakingAmount) {
             $validator->errors()->add(
                 'staking_amount',
