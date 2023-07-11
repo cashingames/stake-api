@@ -210,14 +210,16 @@ class GameController extends BaseController
         //NOTE - odd_applied_during_staking is dynamic odds
         $totalOdds = $stakingOdd * $staking->odd_applied_during_staking;
         $amountWon = $staking->amount_staked * $totalOdds;
-        
+
         if ($staking->fund_source == WalletBalanceType::BonusBalance->value) {
             $this->handleBonusWalletFlow($staking, $amountWon, $points);
         } else {
-            $walletRepository = new WalletRepository;
-            $description = 'Staking winning of ' . $amountWon . ' cash';
-            $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
-            $staking->update(['amount_won' => $amountWon]);
+            if ($amountWon > 0) {
+                $walletRepository = new WalletRepository;
+                $description = 'Staking winning of ' . $amountWon . ' cash';
+                $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
+                $staking->update(['amount_won' => $amountWon]);
+            }
         }
 
 
@@ -253,16 +255,19 @@ class GameController extends BaseController
 
     private function handleBonusWalletFlow($staking, $amount, $points = 0)
     {
-        $this->walletRepository->creditBonusAccount(
-            $this->user->wallet,
-            $amount,
-            'Bonus Credited',
-            null,
-        );
+        if ($amount > 0) {
+            $this->walletRepository->creditBonusAccount(
+                $this->user->wallet,
+                $amount,
+                'Bonus Credited',
+                null,
+            );
 
-        $staking->update(['amount_won' => $amount]);
+            $staking->update(['amount_won' => $amount]);
 
-        $this->registrationBonusService->updateAmountWon($this->user, $amount);
+            $this->registrationBonusService->updateAmountWon($this->user, $amount);
+        }
+
 
         if ($points < config('trivia.user_scores.perfect_score')) {
             return false;
