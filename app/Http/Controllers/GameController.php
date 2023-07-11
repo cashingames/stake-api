@@ -41,7 +41,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn () =>
+            fn() =>
             GameMode::select(
                 'id',
                 'name',
@@ -54,12 +54,12 @@ class GameController extends BaseController
         );
         $result->boosts = Cache::rememberForever(
             'gameBoosts',
-            fn () => Boost::where('name', '!=', 'Bomb')
+            fn() => Boost::where('name', '!=', 'Bomb')
                 ->get()
         );
-        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
+        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn () => Category::all());
+        $categories = Cache::rememberForever('categories', fn() => Category::all());
 
         $gameInfo = DB::select("
             SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
@@ -140,7 +140,8 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
-        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");;
+        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");
+        ;
 
         return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
@@ -202,51 +203,35 @@ class GameController extends BaseController
         }
 
 
-        $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
-
-        $staking = $exhibitionStaking->staking;
-
-        $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
-
-        //NOTE - odd_applied_during_staking is dynamic odds
-        $totalOdds = $stakingOdd * $staking->odd_applied_during_staking;
-        $amountWon = $staking->amount_staked * $totalOdds;
-
-        if ($staking->fund_source == WalletBalanceType::BonusBalance->value) {
-            foreach (config('bonusOdds') as $bonusOdd) {
-                if ($bonusOdd['score'] = $points) {
-                    $stakingOdd = $bonusOdd['odd'];
-                }
-            }
-            $amountWon = $staking->amount_staked * $stakingOdd;
-
-            ExhibitionStaking::where('game_session_id', $game->id)
-                ->update(['odds_applied' => $stakingOdd]);
-
-            if ($amountWon > 0) {
-                $this->registrationBonusService->updateAmountWon($this->user, $amountWon);
-            }
-        } else {
-            ExhibitionStaking::where('game_session_id', $game->id)
-                ->update(['odds_applied' => $totalOdds]);
-        }
-
-        if ($amountWon > 0) {
-            $walletRepository = new WalletRepository;
-            $description = 'Staking winning of ' . $amountWon . ' cash';
-            $walletRepository->credit($this->user->wallet, $amountWon, $description, null);
-            $staking->update(['amount_won' => $amountWon]);
-        }
-
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
         $game->points_gained = $points;
         $game->total_count = $points + $wrongs;
         $game->save();
 
+
+        $exhibitionStaking = ExhibitionStaking::where('game_session_id', $game->id)->first();
+
+        $staking = $exhibitionStaking->staking;
+
+        if ($staking->fund_source == WalletBalanceType::BonusBalance->value) {
+            $amountWon = $this->handleBonusStaking($staking, $points);
+        } else {
+            $amountWon = $this->handleNormalStaking($staking, $points);
+        }
+
+        if ($amountWon > 0) {
+            $description = 'Staking winning of ' . $amountWon . ' cash';
+            $this->walletRepository->credit($this->user->wallet, $amountWon, $description, null);
+            $staking->update(['amount_won' => $amountWon]);
+        }
+
+
         DB::transaction(function () use ($request, $game) {
             foreach ($request->consumedBoosts as $row) {
-                $userBoost = UserBoost::where('user_id', $this->user->id)->where('boost_id', $row['boost']['id'])->first();
+                $userBoost = UserBoost::where('user_id', $this->user->id)
+                    ->where('boost_id', $row['boost']['id'])
+                    ->first();
 
                 $userBoost->update([
                     'used_count' => $userBoost->used_count + 1,
@@ -263,5 +248,38 @@ class GameController extends BaseController
         });
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
+    }
+
+    private function handleBonusStaking($staking, $points)
+    {
+        foreach (config('bonusOdds') as $bonusOdd) {
+            if ($bonusOdd['score'] = $points) {
+                $stakingOdd = $bonusOdd['odd'];
+            }
+        }
+
+        $staking->exhibitionStaking
+            ->update(['odds_applied' => $stakingOdd]);
+
+        $amountWon = $staking->amount_staked * $stakingOdd;
+
+        if ($amountWon > 0) {
+            $this->registrationBonusService->updateAmountWon($this->user, $amountWon);
+        }
+
+        return $amountWon;
+
+    }
+
+    private function handleNormalStaking($staking, $points)
+    {
+        //NOTE - odd_applied_during_staking is dynamic odds
+        $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
+        $totalOdds = $stakingOdd * $staking->odd_applied_during_staking;
+        $staking->exhibitionStaking
+            ->update(['odds_applied' => $totalOdds]);
+
+        return $staking->amount_staked * $totalOdds;
+
     }
 }
