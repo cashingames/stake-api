@@ -58,11 +58,6 @@ class RegistrationBonusService implements BonusInterface
             ->where('is_on', true)->first();
     }
 
-    public function hasPlayedCategory($user, $category)
-    {
-        return $user->gameSessions()->where('category_id', $category)->exists();
-    }
-
     public function updateAmountWon($user, $amount)
     {
         $this->bonusRepository->updateWonAmount($this->bonus, $user, $amount);

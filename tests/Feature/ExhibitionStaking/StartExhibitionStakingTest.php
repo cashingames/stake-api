@@ -98,41 +98,6 @@ class StartExhibitionStakingTest extends TestCase
         ]);
 
     }
-    public function test_that_game_cannot_be_started_with_registration_bonus_for_the_same_category_twice()
-    {
-        config(['features.registration_bonus.enabled' => true]);
-
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' => Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won' => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
-
-        GameSession::factory()
-            ->create(['user_id' => $this->user->id, 'category_id' => $this->category->id]);
-
-        $this->user->wallet->update([
-            'non_withdrawable' => 2000,
-            'bonus' => 500
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 200,
-            'wallet_type' => "bonus_balance"
-        ]);
-
-        $response->assertJson([
-            'message' =>
-            'Sorry, you cannot play a category twice using your welcome bonus, Please play another category.',
-        ]);
-    }
 
     public function test_that_game_cannot_be_started_if_staking_amount_is_more_than_total_bonus_remaining()
     {
@@ -166,40 +131,6 @@ class StartExhibitionStakingTest extends TestCase
             'message' => 'Insufficient bonus balance. Please contact support for help.',
         ]);
     }
-
-    public function test_that_game_cannot_be_started_if_staking_amount_is_less_than_registration_bonus()
-    {
-        config(['features.registration_bonus.enabled' => true]);
-        config(['trivia.minimum_exhibition_staking_amount' => 400]);
-
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' => Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 1500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won' => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
-
-        $this->user->wallet->update([
-            'non_withdrawable' => 2000,
-            'bonus' => 1000
-        ]);
-
-        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
-            "category" => $this->category->id,
-            "mode" => 1,
-            "type" => 2,
-            "staking_amount" => 600,
-            'wallet_type' => "bonus_balance"
-        ]);
-
-        $response->assertJson([
-            'message' => 'Registration bonus is remaining 500 please stake 500',
-        ]);
-    }
-
     public function test_that_user_is_asked_to_stake_all_bonus_if_bonus_left_is_not_sufficient()
     {
         config(['trivia.minimum_exhibition_staking_amount' => 400]);
