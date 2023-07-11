@@ -30,10 +30,10 @@ class BonusRepository
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
-                    'is_on' => true,
-                    'amount_credited' => $amount,
-                    'amount_remaining_after_staking' => $amount
-                ]);
+                'is_on' => true,
+                'amount_credited' => $amount,
+                'amount_remaining_after_staking' => $amount
+            ]);
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
@@ -162,4 +162,13 @@ class BonusRepository
         ]);
     }
 
+    public function getBonusCategoryGamesCount($user , $category)
+    {
+        $count = DB::select("SELECT count(game_sessions.id) as gamesCount FROM stakings LEFT JOIN exhibition_stakings 
+        on exhibition_stakings.staking_id = stakings.id LEFT JOIN game_sessions 
+        on game_sessions.id = exhibition_stakings.game_session_id where stakings.user_id = {$user->id} 
+        and stakings.fund_source = 'BONUS_BALANCE' AND game_sessions.category_id = {$category}");
+
+        return $count[0]->gamesCount;
+    }
 }

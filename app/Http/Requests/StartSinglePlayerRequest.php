@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\WalletBalanceType;
+use App\Repositories\Cashingames\BonusRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
@@ -12,7 +13,8 @@ class StartSinglePlayerRequest extends FormRequest
 
     public function __construct(
         private WalletRepository $walletRepository,
-        private RegistrationBonusService $registrationBonusService
+        private RegistrationBonusService $registrationBonusService,
+        private BonusRepository $bonusRepository
     ) {
     }
     /**
@@ -135,7 +137,7 @@ class StartSinglePlayerRequest extends FormRequest
                 $bonus->amount_remaining_after_staking .
                 ' please stake ' . $bonus->amount_remaining_after_staking
             );
-        } elseif ($this->registrationBonusService->hasPlayedCategory($user, $this->input('category'))) {
+        } elseif ($this->bonusRepository->getBonusCategoryGamesCount($user, $this->input('category'))) {
             $validator->errors()->add(
                 'category',
                 'Sorry, you cannot play a category twice using your welcome bonus, Please play another category.'

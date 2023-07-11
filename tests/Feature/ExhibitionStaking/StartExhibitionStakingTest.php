@@ -8,8 +8,10 @@ use App\Models\Bonus;
 use App\Enums\BonusType;
 use App\Models\Question;
 use App\Models\Category;
+use App\Models\ExhibitionStaking;
 use App\Models\UserBonus;
 use App\Models\GameSession;
+use App\Models\Staking;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\BonusSeeder;
 use Illuminate\Support\Facades\DB;
@@ -96,7 +98,6 @@ class StartExhibitionStakingTest extends TestCase
             'bonus' => 300,
             'non_withdrawable' => 2000,
         ]);
-
     }
     public function test_that_game_cannot_be_started_with_registration_bonus_for_the_same_category_twice()
     {
@@ -111,9 +112,23 @@ class StartExhibitionStakingTest extends TestCase
             'total_amount_won' => 0,
             'amount_remaining_after_withdrawal' => 0
         ]);
+        $staking = Staking::factory()
+            ->create([
+                'user_id' => $this->user->id,
+                'fund_source' => 'BONUS_BALANCE'
+            ]);
+            
+        $gameSessions = GameSession::factory()
+            ->create([
+                'user_id' => $this->user->id,
+                'category_id' => $this->category->id
+            ]);
 
-        GameSession::factory()
-            ->create(['user_id' => $this->user->id, 'category_id' => $this->category->id]);
+        ExhibitionStaking::factory()
+            ->create([
+                'staking_id' =>  $staking->id,
+                'game_session_id' => $gameSessions->id
+            ]);
 
         $this->user->wallet->update([
             'non_withdrawable' => 2000,

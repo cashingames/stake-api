@@ -137,6 +137,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserBonus::class);
     }
 
+    public function stakings()
+    {
+        return $this->hasMany(Staking::class);
+    }
 
     public function getAverageOfRecentGames()
     {
