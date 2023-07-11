@@ -389,12 +389,17 @@ class GameTest extends TestCase
         ]);
     }
 
-    public function test_bonus_amount_is_credited_for_user_with_registration_bonus_when_game_ends()
+    public function test_user_is_credited_with_highest_bonus_odd_when_user_scores_perfect_with_registration_bonus()
     {
-        FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
-        config(['trivia.user_scores.perfect_score' => 10]);
+        config(['bonusOdds' => [
+            [
+                'id' => 1,
+                'score' => 10,
+                'odd' => 5
+            ],
+        ]]);
 
-        Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
+        $staking = Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
         UserBonus::create([
             'user_id' => $this->user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
@@ -404,11 +409,12 @@ class GameTest extends TestCase
             'total_amount_won'  => 0,
             'amount_remaining_after_withdrawal' => 0
         ]);
-        GameSession::where('user_id', '!=', $this->user->id)
-            ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
         ExhibitionStaking::factory()
             ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
+        
+        GameSession::where('user_id', '!=', $this->user->id)
+            ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
@@ -432,13 +438,60 @@ class GameTest extends TestCase
             "consumedBoosts" => []
         ]);
 
-        $userBonus = UserBonus::where('user_id', $this->user->id)
-            ->where('bonus_id', Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id)
-            ->first();
-            
         $this->assertEquals(
-            $this->user->wallet->withdrawable,
-            $userBonus->total_amount_won + $userBonus->amount_credited
+            $this->user->wallet->withdrawable, config('bonusOdds')[0]['odd'] * $staking->amount_staked
+        );
+    }
+
+    public function test_user_is_credited_with_zero_amount_when_user_does_not_score_perfect_with_registration_bonus()
+    {
+        config(['bonusOdds' => [
+            [
+                'id' => 1,
+                'score' => 10,
+                'odd' => 5
+            ],
+            [
+                'id' => 2,
+                'score' => 0,
+                'odd' => 0
+            ],
+
+        ]]);
+
+        $staking = Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 1500,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+
+        ExhibitionStaking::factory()
+            ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
+        
+        GameSession::where('user_id', '!=', $this->user->id)
+            ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
+
+        $game = $this->user->gameSessions()->first();
+        $game->update(['state' => 'ONGOING']);
+
+        Question::factory()
+            ->hasOptions(4)
+            ->count(10)
+            ->create();
+
+        $this->postjson(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+
+        $this->assertEquals(
+            $this->user->wallet->withdrawable, 0
         );
     }
 }
