@@ -119,28 +119,6 @@ class StartSinglePlayerRequest extends FormRequest
             return;
         }
 
-        $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($user);
-        if ($registrationBonus != null) {
-            $this->validateRegistrationBonus($validator, $user, $registrationBonus, $stakingAmount);
-        }
-
-    }
-
-    private function validateRegistrationBonus($validator, $user, $bonus, $stakingAmount)
-    {
-        if ($stakingAmount > $bonus->amount_remaining_after_staking) {
-            $validator->errors()->add(
-                'staking_amount',
-                'Registration bonus is remaining ' .
-                $bonus->amount_remaining_after_staking .
-                ' please stake ' . $bonus->amount_remaining_after_staking
-            );
-        } elseif ($this->registrationBonusService->hasPlayedCategory($user, $this->input('category'))) {
-            $validator->errors()->add(
-                'category',
-                'Sorry, you cannot play a category twice using your welcome bonus, Please play another category.'
-            );
-        }
     }
 
 }
