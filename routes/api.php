@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\GetBonusOddsController;
 use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
 use App\Http\Controllers\PlayGame\EndSinglePlayerPracticeGameController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
@@ -58,6 +59,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('game/common', [GameController::class, 'getCommonData'])->middleware(['cacheResponse:86400']);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStakingOddsController::class);
+        Route::get('odds/bonus', GetBonusOddsController::class);
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/read/{notificationId}', [NotificationController::class, "readNotification"]);
         Route::post('winnings/withdraw', WithdrawWinningsController::class);
