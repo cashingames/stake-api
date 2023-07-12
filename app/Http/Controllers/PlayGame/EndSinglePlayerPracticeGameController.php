@@ -37,16 +37,13 @@ class EndSinglePlayerPracticeGameController extends Controller
 
         $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
         $amountWon = $stakingOdd * $singlePlayerRequest->amount;
-       
-        $singlePlayerRequest->update([
-            'status' => 'COMPLETED',
-            'score' => $points,
-            'amount_won' => $amountWon,
-            'ended_at' => now()
-        ]);
-        $singlePlayerRequest->refresh();
         
-        dd($amountWon . " ". $singlePlayerRequest->status );
+        $singlePlayerRequest->status = 'COMPLETED';
+        $singlePlayerRequest->score = $points;
+        $singlePlayerRequest->amount_won = $amountWon;
+        $singlePlayerRequest->ended_at = now();
+        $singlePlayerRequest->save();
+        
         $result = $this->prepare($amountWon, $points , $wrongs);
         return ResponseHelper::success($result);
     }
