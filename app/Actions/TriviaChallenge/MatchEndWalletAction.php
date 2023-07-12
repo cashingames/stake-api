@@ -44,14 +44,14 @@ class MatchEndWalletAction
         $this->creditWalletAction->executeRefund(
             $request->user->wallet,
             $request->amount,
-            'Trivia challenge staking refund'
+            'Challenge game stake refund'
         );
         SendChallengeRefundNotification::dispatch( $request , $request->user);
         
         $this->creditWalletAction->executeRefund(
             $matchedRequest->user->wallet,
             $matchedRequest->amount,
-            'Trivia challenge staking refund'
+            'Challenge game stake refund'
         );
 
         SendChallengeRefundNotification::dispatch( $matchedRequest, $matchedRequest->user);
@@ -64,7 +64,7 @@ class MatchEndWalletAction
         $this->creditWalletAction->execute(
             $winner->user->wallet,
             $amountWon,
-            'Trivia challenge staking winning'
+            'Challenge game Winnings credited'
         );
         ChallengeRequest::where('challenge_request_id', $winner->challenge_request_id)
             ->update([

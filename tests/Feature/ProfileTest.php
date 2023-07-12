@@ -294,7 +294,7 @@ class ProfileTest extends TestCase
             'transaction_type' => 'CREDIT',
             'amount' => 200,
             'balance' => 200,
-            'description' => 'Fund Wallet',
+            'description' => 'Wallet Top-up',
             'reference' =>  'thsuu883930304900jdk',
             'balance_type' => WalletBalanceType::CreditsBalance->value,
             'transaction_action' => WalletTransactionAction::WalletFunded->value
