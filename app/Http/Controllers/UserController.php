@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WalletTransactionAction;
 use App\Models\User;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Support\Carbon;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use stdClass;
@@ -33,6 +35,7 @@ class UserController extends BaseController
         $result->walletBalance = $this->user->wallet->non_withdrawable + $this->user->wallet->withdrawable;
         $result->bonusBalance = $this->user->wallet->bonus;
         $result->hasBonus = $this->user->wallet->hasBonus();
+        $result->showRegistrationBonusNotice = $this->shouldShowRegistrationBonusNotice($this->user);
         $result->withdrawableBalance = $this->user->wallet->withdrawable;
         $result->isEmailVerified = is_null($this->user->email_verified_at) ? false : true;
         $result->isPhoneVerified = is_null($this->user->phone_verified_at) ? false : true;
@@ -55,5 +58,23 @@ class UserController extends BaseController
         auth()->logout(true);
 
         return $this->sendResponse('Your Account has been deleted', 'Your Account has been deleted');
+    }
+
+    
+    private function shouldShowRegistrationBonusNotice($user)
+    {   
+        $hasFundedBefore = $user->transactions()
+        ->where('transaction_action', WalletTransactionAction::WalletFunded->value)
+        ->exists();
+        
+        if ($hasFundedBefore) {
+            return false;
+        }
+        $registrationBonusService = new RegistrationBonusService;
+
+        if(!$hasFundedBefore &&  $registrationBonusService->hasActiveRegistrationBonus($user) ){
+            return true;
+        }
+        return false;
     }
 }
