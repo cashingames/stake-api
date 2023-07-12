@@ -3,11 +3,13 @@
 namespace App\Services\PlayGame;
 
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
+use App\Actions\TriviaChallenge\PracticeMatchEndWalletAction;
 use App\Models\ChallengeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
 use App\Services\Firebase\FirestoreService;
 use App\Actions\Wallet\DebitWalletAction;
+use App\Enums\GameRequestMode;
 use App\Enums\WalletTransactionAction;
 use App\Models\UserBoost;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
@@ -22,6 +24,7 @@ class StakingChallengeGameService
         private readonly MatchEndWalletAction $matchEndWalletAction,
         private readonly FirestoreService $firestoreService,
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
+        private readonly PracticeMatchEndWalletAction $practiceMatchEndWalletAction
     ) {
     }
     public function create(User $user, array $data): ChallengeRequest|null
@@ -136,7 +139,7 @@ class StakingChallengeGameService
             ->updateCompletedRequest($requestId, $score);
 
         [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
-
+        $this->practiceMatchEndWalletAction->execute($requestId, GameRequestMode::CHALLENGE_PRACTICE);
         $this->updateEndMatchFirestore($request, $matchedRequest);
 
         return $request;
