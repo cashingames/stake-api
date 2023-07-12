@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\BonusType;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Models\Bonus;
 use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -9,6 +13,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use UserSeeder;
 use App\Models\User;
+use App\Models\UserBonus;
+use App\Models\WalletTransaction;
+use Database\Seeders\BonusSeeder;
+use PHPUnit\Framework\Constraint\IsFalse;
 
 class ProfileTest extends TestCase
 {
@@ -36,7 +44,8 @@ class ProfileTest extends TestCase
     }
 
     public function test_relevant_user_profile_can_be_retrieved_with_data()
-    {
+    {   
+        $this->seed(BonusSeeder::class);
         $response = $this->withHeaders([
             'x-brand-id' => 1,
         ])->get(self::PROFILE_DATA_URL);
@@ -236,4 +245,67 @@ class ProfileTest extends TestCase
         ]);
     }
 
+    public function test_reg_bonus_popup_toggle_returns_true_if_user_has_not_funded_before_and_has_reg_bonus()
+    {
+        $this->seed(BonusSeeder::class);
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => true,
+            'amount_credited' => 0,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+        $response = $this->get(self::PROFILE_DATA_URL);
+
+        $response->assertJson([
+            'data' => [
+                'showRegistrationBonusNotice' => true,
+            ]
+        ]);
+    }
+
+    public function test_reg_bonus_popup_toggle_returns_false_if_user_has_not_funded_before_and_does_not_have_reg_bonus()
+    {
+        $this->seed(BonusSeeder::class);
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
+            'is_on' => false,
+            'amount_credited' => 0,
+            'amount_remaining_after_staking' => 500,
+            'total_amount_won'  => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+        $response = $this->get(self::PROFILE_DATA_URL);
+
+        $response->assertJson([
+            'data' => [
+                'showRegistrationBonusNotice' => false,
+            ]
+        ]);
+    }
+
+    public function test_registration_bonus_popup_toggle_returns_false_if_user_has_funded_before()
+    {
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 200,
+            'balance' => 200,
+            'description' => 'Fund Wallet',
+            'reference' =>  'thsuu883930304900jdk',
+            'balance_type' => WalletBalanceType::CreditsBalance->value,
+            'transaction_action' => WalletTransactionAction::WalletFunded->value
+        ]);
+
+        $response = $this->get(self::PROFILE_DATA_URL);
+
+        $response->assertJson([
+            'data' => [
+                'showRegistrationBonusNotice' => false,
+            ]
+        ]);
+    }
 }

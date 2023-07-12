@@ -328,7 +328,6 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-        FeatureFlag::enable(FeatureFlags::REGISTRATION_BONUS);
         $this->user->wallet->update([
             'non_withdrawable' => 2000,
             'bonus' => 1000
