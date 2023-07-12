@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\WalletBalanceType;
-use App\Events\CreditRegistrationBonusWinnings;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
@@ -21,7 +20,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 
 use stdClass;

@@ -18,17 +18,10 @@ class PracticeMatchEndWalletAction
     public function execute(string $requestId, GameRequestMode $mode): ChallengeRequest|null
     {
 
-        if ($mode == GameRequestMode::CHALLENGE_PRACTICE) {
-            $winner = $this->getChallengeWinner(
-                $this->triviaChallengeStakingRepository->getRequestById($requestId),
-                $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
-            );
-        } elseif ($mode == GameRequestMode::SINGLE_PRACTICE) {
-            $winner = $this->getSingleWinner(
-                $this->triviaChallengeStakingRepository->getRequestById($requestId),
-                $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
-            );
-        }
+        $winner = $this->getChallengeWinner(
+            $this->triviaChallengeStakingRepository->getRequestById($requestId),
+            $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
+        );
 
         if ($winner != null) {
             $this->creditWinner($winner);
@@ -49,20 +42,6 @@ class PracticeMatchEndWalletAction
         }
         return $winner;
     }
-
-
-    private function getSingleWinner(
-        ChallengeRequest $request, ChallengeRequest $matchedRequest
-    ): ChallengeRequest|null {
-        $winner = null;
-        if ($request->score > $matchedRequest->score) {
-            $winner = $request;
-        } elseif ($request->score < $matchedRequest->score) {
-            $winner = $matchedRequest;
-        }
-        return $winner;
-    }
-
 
     private function creditWinner(ChallengeRequest $winner): void
     {

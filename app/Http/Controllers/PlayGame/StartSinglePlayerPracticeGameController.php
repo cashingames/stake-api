@@ -31,26 +31,29 @@ class StartSinglePlayerPracticeGameController extends Controller
             'validatedRequest' => $data,
         ]);
 
+        $sessionToken = uniqid($user->id, true);
+
         ChallengeRequest::create([
-            'challenge_request_id' => uniqid($user->id, true),
+            'challenge_request_id' => $sessionToken,
             'user_id' => $user->id,
             'username' => $user->username,
             'amount' => $data['amount'],
             'category_id' => $data['category'],
-            'status' => 'COMPLETED',
+            'status' => 'ONGOING',
+            'session_token' => $sessionToken,
             'request_mode' => GameRequestMode::SINGLE_PRACTICE->value
         ]);
 
         $questions = $questionRepository->getPracticeQuestionsWithCategoryId($data['category']);
 
-        $result = $this->prepare($questions);
+        $result = $this->prepare($questions, $sessionToken);
         return ResponseHelper::success($result);
     }
 
-    private function prepare($questions): array
+    private function prepare($questions, $sessionToken): array
     {
         $gameInfo = new stdClass;
-        $gameInfo->token = Str::random(40);
+        $gameInfo->token = $sessionToken;
         $gameInfo->startTime = now();
         $gameInfo->endTime = now()->addMinutes(1);
 

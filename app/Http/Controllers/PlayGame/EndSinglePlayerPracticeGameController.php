@@ -4,7 +4,9 @@ namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
+use App\Models\ChallengeRequest;
 use App\Models\Question;
+use App\Models\StakingOdd;
 use Illuminate\Http\Request;
 use stdClass;
 
@@ -13,14 +15,15 @@ class EndSinglePlayerPracticeGameController extends Controller
     public function __invoke(Request $request)
     {
         $data = $request->validate([
+            'token' => ['required', 'string'],
             'chosenOptions' => ['required', 'array'],
         ]);
 
+        $singlePlayerRequest = ChallengeRequest::where('challenge_request_id', $data['token'])->first();
         $questions = collect(Question::with('options')->whereIn('id', array_column($data['chosenOptions'], 'question_id'))->get());
 
         $points = 0;
         $wrongs = 0;
-        $amountWon = 0;
         foreach ($data['chosenOptions'] as $a) {
             $isCorect = $questions->firstWhere('id', $a['question_id'])->options->where('id', $a['id'])->where('is_correct', true)->first();
 
@@ -31,9 +34,15 @@ class EndSinglePlayerPracticeGameController extends Controller
             }
         }
 
-        if($points > 0){
-            $amountWon = rand(100, 1000);
-        }
+        $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
+        $amountWon = $stakingOdd * $singlePlayerRequest->amount;
+        $singlePlayerRequest->update([
+            'status' => 'COMPLETED',
+            'score' => $points,
+            'amount' => $amountWon,
+            'ended_at' => now()
+        ]);
+
         $result = $this->prepare($amountWon, $points , $wrongs);
         return ResponseHelper::success($result);
     }
