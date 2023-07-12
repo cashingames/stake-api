@@ -209,7 +209,7 @@ class WalletController extends BaseController
                     $walletRepository->creditBonusAccount(
                         $user->wallet,
                         $bonusAmount,
-                        'Bonus Credited',
+                        'Bonus Top-up',
                         null,
                     );
                 }
@@ -218,7 +218,7 @@ class WalletController extends BaseController
         $walletRepository->creditFundingAccount(
             $user->wallet,
             ($amount / 100),
-            'Fund Wallet',
+            'Wallet Top-up',
             null,
         );
 
@@ -241,7 +241,7 @@ class WalletController extends BaseController
         $walletRepository->credit(
             $user->wallet,
             ($amount / 100),
-            'Winnings Withdrawal Reversed',
+            'Failed Withdrawal Reversed',
             null,
         );
 
@@ -298,7 +298,7 @@ class WalletController extends BaseController
             'transaction_type' => 'DEBIT',
             'amount' => $boost->currency_value,
             'balance' => $wallet->non_withdrawable,
-            'description' => 'Bought ' . strtoupper($boost->name) . ' boosts',
+            'description' => $boost->name . ' boost purchased',
             'reference' => Str::random(10),
             'balance_type' => WalletBalanceType::CreditsBalance->value,
             'transaction_action' => WalletTransactionAction::BoostBought->value

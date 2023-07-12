@@ -219,7 +219,7 @@ class GameController extends BaseController
         }
 
         if ($amountWon > 0) {
-            $description = 'Staking winning of ' . $amountWon . ' cash';
+            $description = 'Single game Winnings credited';
             $this->walletRepository->credit($this->user->wallet, $amountWon, $description, null);
             $staking->update(['amount_won' => $amountWon]);
         }

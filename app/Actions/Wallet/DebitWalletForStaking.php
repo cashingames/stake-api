@@ -38,7 +38,7 @@ class DebitWalletForStaking
         }
 
         $balanceToDeduct = "non_withdrawable";
-        $description = 'Placed a staking of ' . $amount;
+        $description = 'Single game stake debited';
 
         $this->walletRepository->debit($wallet, $amount, $description, null, $balanceToDeduct, $action);
         return $wallet->non_withdrawable;

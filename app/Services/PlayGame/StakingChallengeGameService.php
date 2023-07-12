@@ -34,7 +34,7 @@ class StakingChallengeGameService
             $this->debitWalletAction->execute(
                 $user->wallet,
                 $data['amount'],
-                'Trivia challenge staking request',
+                'Challenge game stake debited',
                 "non_withdrawable",
                 WalletTransactionAction::StakingPlaced->value
             );

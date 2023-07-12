@@ -132,7 +132,7 @@ class WithdrawalTest extends TestCase
         $this->assertDatabaseHas('wallet_transactions', [
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => "DEBIT",
-            'description' => 'Winnings Withdrawal Made',
+            'description' => 'Successful Withdrawal',
             'balance' => $this->user->wallet->withdrawable
         ]);
     }

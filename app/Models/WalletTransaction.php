@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -47,13 +48,13 @@ class WalletTransaction extends Model
     public function scopeWithdrawals($query)
     {
         return $query->where('transaction_type', 'DEBIT')
-            ->where('description', 'Winnings Withdrawal Made');
+            ->where('transaction_action', WalletTransactionAction::WinningsWithdrawn->value);
     }
 
     public function scopeTotalFundings($query)
     {
         return $query->where('transaction_type', 'CREDIT')
-            ->where('description', 'Fund Wallet');
+        ->where('transaction_action', WalletTransactionAction::WalletFunded->value);;
     }
 
     public function scopeMainTransactions($query)

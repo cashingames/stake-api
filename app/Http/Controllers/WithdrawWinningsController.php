@@ -73,7 +73,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
         }
 
-        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Winnings Withdrawal Made', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
+        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Successful Withdrawal', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status === 'pending') {
