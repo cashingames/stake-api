@@ -20,6 +20,7 @@ class EndSinglePlayerPracticeGameController extends Controller
         ]);
 
         $singlePlayerRequest = ChallengeRequest::where('challenge_request_id', $data['token'])->first();
+     
         $questions = collect(Question::with('options')->whereIn('id', array_column($data['chosenOptions'], 'question_id'))->get());
 
         $points = 0;
@@ -36,13 +37,16 @@ class EndSinglePlayerPracticeGameController extends Controller
 
         $stakingOdd = StakingOdd::where('score', $points)->active()->first()->odd ?? 1;
         $amountWon = $stakingOdd * $singlePlayerRequest->amount;
+       
         $singlePlayerRequest->update([
             'status' => 'COMPLETED',
             'score' => $points,
-            'amount' => $amountWon,
+            'amount_won' => $amountWon,
             'ended_at' => now()
         ]);
-
+        $singlePlayerRequest->refresh();
+        
+        dd($amountWon . " ". $singlePlayerRequest->status );
         $result = $this->prepare($amountWon, $points , $wrongs);
         return ResponseHelper::success($result);
     }
