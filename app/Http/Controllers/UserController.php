@@ -72,7 +72,7 @@ class UserController extends BaseController
         }
         $registrationBonusService = new RegistrationBonusService;
 
-        if(!$hasFundedBefore &&  $registrationBonusService->hasActiveRegistrationBonus($user) ){
+        if(!$hasFundedBefore &&  !is_null($registrationBonusService->inactiveRegistrationBonus($user) )){
             return true;
         }
         return false;
