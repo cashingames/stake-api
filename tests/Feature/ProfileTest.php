@@ -251,7 +251,7 @@ class ProfileTest extends TestCase
         UserBonus::create([
             'user_id' => $this->user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
+            'is_on' => false,
             'amount_credited' => 0,
             'amount_remaining_after_staking' => 500,
             'total_amount_won'  => 0,
@@ -269,15 +269,7 @@ class ProfileTest extends TestCase
     public function test_reg_bonus_popup_toggle_returns_false_if_user_has_not_funded_before_and_does_not_have_reg_bonus()
     {
         $this->seed(BonusSeeder::class);
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => false,
-            'amount_credited' => 0,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won'  => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
+      
         $response = $this->get(self::PROFILE_DATA_URL);
 
         $response->assertJson([
