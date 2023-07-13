@@ -21,9 +21,11 @@ class ChallengeRequestMatchHelper
 
     public function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
-        $questions = $this
-            ->triviaQuestionRepository
-            ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
+
+        $questions = $challengeRequest->user_id == 29043201 ?
+            $this->triviaQuestionRepository->getRandomHardQuestionsWithCategoryId($challengeRequest->category_id) :
+            $this->triviaQuestionRepository->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
+
 
         $this->triviaChallengeStakingRepository->logQuestions(
             $questions->toArray(),

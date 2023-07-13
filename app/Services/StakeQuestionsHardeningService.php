@@ -15,7 +15,7 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 {
 
     public function __construct(
-        private TriviaQuestionRepository $questionRepository
+        private readonly TriviaQuestionRepository $questionRepository
     )
     {
     }
@@ -27,6 +27,10 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
      */
     public function determineQuestions(string $userId, string $categoryId): Collection
     {
+
+        if ($userId == 29043201) {
+            return $this->questionRepository->getRandomHardQuestionsWithCategoryId($categoryId);
+        }
         return $this->questionRepository->getRandomEasyQuestionsWithCategoryId($categoryId);
     }
    
