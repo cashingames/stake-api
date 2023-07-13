@@ -35,7 +35,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class GameTest extends TestCase
 {
     use RefreshDatabase;
-    
+
     /**
      * A basic feature test example.
      *
@@ -81,6 +81,7 @@ class GameTest extends TestCase
 
     public function test_common_data_can_be_retrieved_with_data()
     {
+       
         $response = $this->get(self::COMMON_DATA_URL);
 
         $response->assertJsonStructure([
@@ -90,17 +91,21 @@ class GameTest extends TestCase
                 'gameTypes' => [],
                 'minVersionCode' => [],
                 'minimumExhibitionStakeAmount' => [],
-                'maximumExhibitionStakeAmount' => [],
+                'maximumExhibitionStakeAmount' =>[],
                 'minimumChallengeStakeAmount' => [],
                 'maximumChallengeStakeAmount' => [],
+                'minimumWithdrawableAmount' => [],
+                'maximumWithdrawableAmount' => [],
+                'minimumWalletFundableAmount' => [],
+                
             ]
         ]);
     }
 
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
-    {   
+    {
         Staking::factory()->count(5)->create(['user_id' => $this->user->id]);
-      
+
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
         $game = $this->user->gameSessions()->first();
         $game->update(['state' => 'ONGOING']);
@@ -174,7 +179,7 @@ class GameTest extends TestCase
 
         DB::table('categories_questions')->insert($data);
 
-       
+
         $this->user->wallet->update([
             'non_withdrawable' => 1000
         ]);
@@ -398,7 +403,7 @@ class GameTest extends TestCase
             ],
         ]]);
 
-        $staking = Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
+        $staking = Staking::factory()->create(['user_id' => $this->user->id, 'fund_source' => 'BONUS_BALANCE']);
         UserBonus::create([
             'user_id' => $this->user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
@@ -411,7 +416,7 @@ class GameTest extends TestCase
 
         ExhibitionStaking::factory()
             ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
-        
+
         GameSession::where('user_id', '!=', $this->user->id)
             ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
@@ -438,7 +443,8 @@ class GameTest extends TestCase
         ]);
 
         $this->assertEquals(
-            $this->user->wallet->withdrawable, config('bonusOdds')[0]['odd'] * $staking->amount_staked
+            $this->user->wallet->withdrawable,
+            config('bonusOdds')[0]['odd'] * $staking->amount_staked
         );
     }
 
@@ -458,7 +464,7 @@ class GameTest extends TestCase
 
         ]]);
 
-        $staking = Staking::factory()->create(['user_id' => $this->user->id,'fund_source' => 'BONUS_BALANCE' ]);
+        $staking = Staking::factory()->create(['user_id' => $this->user->id, 'fund_source' => 'BONUS_BALANCE']);
         UserBonus::create([
             'user_id' => $this->user->id,
             'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
@@ -471,7 +477,7 @@ class GameTest extends TestCase
 
         ExhibitionStaking::factory()
             ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
-        
+
         GameSession::where('user_id', '!=', $this->user->id)
             ->update(['user_id' => $this->user->id, 'correct_count' => 10]);
 
@@ -490,7 +496,8 @@ class GameTest extends TestCase
         ]);
 
         $this->assertEquals(
-            $this->user->wallet->withdrawable, 0
+            $this->user->wallet->withdrawable,
+            0
         );
     }
 }

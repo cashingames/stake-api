@@ -133,6 +133,8 @@ class GameController extends BaseController
         $result->minimumChallengeStakeAmount = config('trivia.minimum_challenge_staking_amount');
         $result->minimumWalletFundableAmount = config('trivia.wallet_funding.min_amount');
         $result->maximumWalletFundableAmount = config('trivia.wallet_funding.max_amount');
+        $result->maximumWithdrawableAmount = config('trivia.max_withdrawal_amount');
+        $result->minimumWithdrawableAmount = config('trivia.min_withdrawal_amount');
         $result->periodBeforeChallengeStakingExpiry =
             config('trivia.duration_hours_before_challenge_staking_expiry') . " hours";
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
