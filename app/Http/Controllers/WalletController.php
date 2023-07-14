@@ -24,6 +24,11 @@ use App\Services\FeatureFlag;
 
 class WalletController extends BaseController
 {
+    public function __construct(
+        private WalletRepository $walletRepository,
+    ) {
+        parent::__construct();
+    }
     public function me()
     {
         $data = [
@@ -276,7 +281,7 @@ class WalletController extends BaseController
     }
 
     //when a user chooses to buy boost from wallet
-    public function buyBoostsFromWallet($boostId)
+    public function buyBoostsFromWallet(Request $request, $boostId)
     {
         $boost = Boost::find($boostId);
 
@@ -285,24 +290,27 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
-        if ($wallet->non_withdrawable < ($boost->currency_value)) {
-            return $this->sendError([], 'You do not have enough money in your wallet.');
+        $walletType = 'non_withdrawable';
+
+        if ($request->wallet_type == 'bonus_balance') {
+            if ($wallet->bonus < ($boost->currency_value)) {
+                return $this->sendError([], 'You do not have enough money in your bonus wallet.');
+            }
+            $walletType = 'bonus';
+        } else {
+            if ($wallet->non_withdrawable < ($boost->currency_value)) {
+                return $this->sendError([], 'You do not have enough money in your deposit wallet.');
+            }
         }
 
-        $wallet->non_withdrawable -= $boost->currency_value;
-        $wallet->save();
-
-
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $boost->currency_value,
-            'balance' => $wallet->non_withdrawable,
-            'description' => $boost->name . ' boost purchased',
-            'reference' => Str::random(10),
-            'balance_type' => WalletBalanceType::CreditsBalance->value,
-            'transaction_action' => WalletTransactionAction::BoostBought->value
-        ]);
+        $this->walletRepository->debit(
+            $wallet,
+            $boost->currency_value,
+            ($boost->name . ' boost purchased'),
+            null,
+            $walletType,
+            WalletTransactionAction::BoostBought->value
+        );
 
         $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
 
@@ -320,9 +328,19 @@ class WalletController extends BaseController
         return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
     }
 
+    private function validateWalletBalance($walletType, $boost, $wallet)
+    {
+        if ($walletType == 'bonus_balance') {
+            if ($wallet->bonus < ($boost->currency_value)) {
+                return $this->sendError([], 'You do not have enough money in your bonus wallet.');
+            }
+        }
+        if ($wallet->non_withdrawable < ($boost->currency_value)) {
+            return $this->sendError([], 'You do not have enough money in your deposit wallet.');
+        }
+    }
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
-
 }
