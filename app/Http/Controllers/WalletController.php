@@ -280,53 +280,6 @@ class WalletController extends BaseController
         return response()->json($result, 200);
     }
 
-    //when a user chooses to buy boost from wallet
-    public function buyBoostsFromWallet(Request $request, $boostId)
-    {
-        $boost = Boost::find($boostId);
-
-        if ($boost == null) {
-            return $this->sendError([], 'Wrong boost selected');
-        }
-
-        $wallet = $this->user->wallet;
-        $walletType = 'non_withdrawable';
-
-        if ($request->wallet_type == 'bonus_balance') {
-            if ($wallet->bonus < ($boost->currency_value)) {
-                return $this->sendError([], 'You do not have enough money in your bonus wallet.');
-            }
-            $walletType = 'bonus';
-        } else {
-            if ($wallet->non_withdrawable < ($boost->currency_value)) {
-                return $this->sendError([], 'You do not have enough money in your deposit wallet.');
-            }
-        }
-
-        $this->walletRepository->debit(
-            $wallet,
-            $boost->currency_value,
-            ($boost->name . ' boost purchased'),
-            null,
-            $walletType,
-            WalletTransactionAction::BoostBought->value
-        );
-
-        $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
-
-        if ($userBoost == null) {
-            $this->user->boosts()->create([
-                'user_id' => $this->user->id,
-                'boost_id' => $boostId,
-                'boost_count' => $boost->pack_count,
-                'used_count' => 0
-            ]);
-        } else {
-            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
-        }
-
-        return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
-    }
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');

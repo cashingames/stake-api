@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\BuyBoostController;
 use App\Http\Controllers\GetBonusOddsController;
 use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
 use App\Http\Controllers\PlayGame\EndSinglePlayerPracticeGameController;
@@ -71,7 +72,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('wallet/me/transactions', [WalletController::class, 'transactions']);
         Route::get('wallet/me/transaction/verify/{reference}', [WalletController::class, "verifyTransaction"]);
         Route::get('wallet/banks', [WalletController::class, 'getBanks'])->middleware(['cacheResponse:604800']);
-        Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
+        Route::post('wallet/buy-boosts/{boostId}', BuyBoostController::class);
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);
         Route::post('single-player/practice/end', EndSinglePlayerPracticeGameController::class);
         Route::post('game/end/single-player', [GameController::class, 'endSingleGame']);
