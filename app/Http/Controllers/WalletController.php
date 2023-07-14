@@ -327,18 +327,6 @@ class WalletController extends BaseController
 
         return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
     }
-
-    private function validateWalletBalance($walletType, $boost, $wallet)
-    {
-        if ($walletType == 'bonus_balance') {
-            if ($wallet->bonus < ($boost->currency_value)) {
-                return $this->sendError([], 'You do not have enough money in your bonus wallet.');
-            }
-        }
-        if ($wallet->non_withdrawable < ($boost->currency_value)) {
-            return $this->sendError([], 'You do not have enough money in your deposit wallet.');
-        }
-    }
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
