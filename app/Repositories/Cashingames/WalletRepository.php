@@ -4,6 +4,7 @@ namespace App\Repositories\Cashingames;
 
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Models\Boost;
 use App\Models\Staking;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
@@ -165,7 +166,7 @@ class WalletRepository
         if ($balanceAccount == "bonus") {
             $wallet->bonus -= $amount;
             $wallet->save();
-          
+
             $balanceAmount = $wallet->bonus;
             $balanceType = WalletBalanceType::BonusBalance->value;
         }
@@ -184,7 +185,7 @@ class WalletRepository
             'balance' => $balanceAmount,
             'description' => $description,
             'reference' => $reference ?? Str::random(10),
-            'balance_type' => $balanceType ,
+            'balance_type' => $balanceType,
             'transaction_action' => $action
         ]);
     }
@@ -212,7 +213,6 @@ class WalletRepository
         });
     }
 
-
     public function hasFundedBefore($user)
     {
         return WalletTransaction::where('wallet_id', $user->wallet->id)
@@ -220,4 +220,36 @@ class WalletRepository
             ->exists();
     }
 
+    public function buyBoostFromWallet($request, $user)
+    {
+        $boost = Boost::find($request->boostId);
+
+        $walletType = 'non_withdrawable';
+
+        if ($request->wallet_type == 'bonus_balance') {
+            $walletType = 'bonus';
+        }
+
+        $this->debit(
+            $user->wallet,
+            $boost->currency_value,
+            ($boost->name . ' boost purchased'),
+            null,
+            $walletType,
+            WalletTransactionAction::BoostBought->value
+        );
+
+        $userBoost = $user->boosts()->where('boost_id', $request->boostId)->first();
+
+        if ($userBoost == null) {
+            $user->boosts()->create([
+                'user_id' => $user->id,
+                'boost_id' => $request->boostId,
+                'boost_count' => $boost->pack_count,
+                'used_count' => 0
+            ]);
+        } else {
+            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
+        }
+    }
 }

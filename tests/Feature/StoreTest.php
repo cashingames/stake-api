@@ -49,9 +49,8 @@ class StoreTest extends TestCase
     public function test_a_boost_must_first_exist_to_be_bought()
     {
         $response = $this->post(self::BUY_BOOST_WALLET_URL . '/50');
-        $response->assertJsonFragment(['message' => 'Wrong boost selected']);
 
-        $response->assertStatus(400);
+        $response->assertSessionHasErrors(['boost_id']);
     }
 
     public function test_boosts_can_be_bought_from_fundable_wallet_balance()
@@ -125,16 +124,12 @@ class StoreTest extends TestCase
     public function test_boost_cannot_be_bought_if_deposit_balance_is_less_than_boost_currency_value()
     {
         $response = $this->post(self::BUY_BOOST_WALLET_URL . '/' . Boost::inRandomOrder()->first()->id);
-        $response->assertJsonFragment(['message' => 'You do not have enough money in your deposit wallet.']);
-
-        $response->assertStatus(400);
+        $response->assertSessionHasErrors(['wallet_type']);
     }
 
     public function test_boost_cannot_be_bought_if_bonus_balance_is_less_than_boost_currency_value()
     {
         $response = $this->post(self::BUY_BOOST_WALLET_URL . '/' . Boost::inRandomOrder()->first()->id,['wallet_type'=>'bonus_balance']);
-        $response->assertJsonFragment(['message' => 'You do not have enough money in your bonus wallet.']);
-
-        $response->assertStatus(400);
+        $response->assertSessionHasErrors(['wallet_type']);
     }
 }
