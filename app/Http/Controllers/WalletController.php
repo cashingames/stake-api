@@ -24,11 +24,6 @@ use App\Services\FeatureFlag;
 
 class WalletController extends BaseController
 {
-    public function __construct(
-        private WalletRepository $walletRepository,
-    ) {
-        parent::__construct();
-    }
     public function me()
     {
         $data = [
@@ -280,8 +275,54 @@ class WalletController extends BaseController
         return response()->json($result, 200);
     }
 
+    //when a user chooses to buy boost from wallet
+    public function buyBoostsFromWallet($boostId)
+    {
+        $boost = Boost::find($boostId);
+
+        if ($boost == null) {
+            return $this->sendError([], 'Wrong boost selected');
+        }
+
+        $wallet = $this->user->wallet;
+        if ($wallet->non_withdrawable < ($boost->currency_value)) {
+            return $this->sendError([], 'You do not have enough money in your wallet.');
+        }
+
+        $wallet->non_withdrawable -= $boost->currency_value;
+        $wallet->save();
+
+
+        WalletTransaction::create([
+            'wallet_id' => $wallet->id,
+            'transaction_type' => 'DEBIT',
+            'amount' => $boost->currency_value,
+            'balance' => $wallet->non_withdrawable,
+            'description' => $boost->name . ' boost purchased',
+            'reference' => Str::random(10),
+            'balance_type' => WalletBalanceType::CreditsBalance->value,
+            'transaction_action' => WalletTransactionAction::BoostBought->value
+        ]);
+
+        $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
+
+        if ($userBoost == null) {
+            $this->user->boosts()->create([
+                'user_id' => $this->user->id,
+                'boost_id' => $boostId,
+                'boost_count' => $boost->pack_count,
+                'used_count' => 0
+            ]);
+        } else {
+            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
+        }
+
+        return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
+    }
+
     private function _failedPaymentVerification()
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
+
 }
