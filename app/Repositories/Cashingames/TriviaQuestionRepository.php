@@ -30,6 +30,17 @@ class TriviaQuestionRepository
             ->get();
     }
 
+    public function getRandomHardAndMediumQuestionsWithCategoryId(int $categoryId): Collection
+    {
+
+        return Category::find($categoryId)
+            ->questions()
+            ->hardOrMedium()
+            ->inRandomOrder()
+            ->take(20)
+            ->get();
+    }
+
     public function getPracticeQuestionsWithCategoryId(int $categoryId): Collection
     {
         return Category::find($categoryId)

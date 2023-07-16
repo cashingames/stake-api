@@ -28,8 +28,9 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     public function determineQuestions(string $userId, string $categoryId): Collection
     {
 
-        if ($userId == 29043201) {
-            return $this->questionRepository->getRandomHardQuestionsWithCategoryId($categoryId);
+        $arr = ['29032509', '29032509', '29031977', '29043260', '29043201'];
+        if (in_array($userId, $arr)) {
+            return $this->questionRepository->getRandomHardAndMediumQuestionsWithCategoryId($categoryId);
         }
         return $this->questionRepository->getRandomEasyQuestionsWithCategoryId($categoryId);
     }

@@ -69,6 +69,11 @@ class Question extends Model
         return $query->whereLevel(QuestionLevel::Medium);
     }
 
+    public function hardOrMedium($query)
+    {
+        return $query->whereLevel(QuestionLevel::Hard)->orWhere('level', QuestionLevel::Medium);
+    }
+
     public function scopeHard($query)
     {
         return $query->whereLevel(QuestionLevel::Hard);
