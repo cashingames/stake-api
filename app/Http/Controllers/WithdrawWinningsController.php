@@ -54,6 +54,7 @@ class WithdrawWinningsController extends BaseController
 
         if (
             ($verifiedAccountName['firstAndLastName'] !== strtoupper($fullName))
+            && ($verifiedAccountName['lastAndFirstName'] !== strtoupper($fullName))
         ) {
             Log::info($this->user->username . " valid account names are {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']} ");
             return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
