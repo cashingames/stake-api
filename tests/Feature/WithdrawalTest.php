@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Models\WalletTransaction;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 use App\Models\User;
 use Mockery\MockInterface;
@@ -90,7 +94,7 @@ class WithdrawalTest extends TestCase
 
         ]);
         $response->assertJson([
-            'message' => 'Account name does not match your registration name. Please contact support.',
+            'message' => 'Account name does not match your registration name. Please contact support to assist.',
         ]);
     }
 
@@ -244,5 +248,37 @@ class WithdrawalTest extends TestCase
         ]);
 
         $response->assertStatus(500);
+    }
+
+    public function test_that_a_user_is_forced_to_verify_if_max_withdrawal_limit_is_exceeded()
+    {
+
+        Config::set('trivia.max_withdrawal_amount', 10000);
+
+        $this->user->wallet->withdrawable = 20000;
+        $this->user->wallet->save();
+
+        $result = WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 15000,
+            'balance' => $this->user->wallet->withdrawable,
+            'description' => 'Wallet Top-up',
+            'reference' => Str::random(10),
+            'created_at' => now()->subHours(3),
+            'balance_type' => WalletBalanceType::WinningsBalance->value,
+            'description_action' => WalletTransactionAction::WinningsWithdrawn->value
+        ]);
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'account_name' => 'Test User',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+        ]);
+
+        $response->assertJsonFragment([
+            'message' => 'Please contact support to verify your identity to proceed with this withdrawal'
+        ]);
     }
 }

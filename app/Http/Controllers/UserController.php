@@ -62,8 +62,8 @@ class UserController extends BaseController
 
     
     private function shouldShowRegistrationBonusNotice($user)
-    {   
-        $hasFundedBefore = $user->transactions()
+    {
+        $hasFundedBefore = $user->wallet->transactions()
         ->where('transaction_action', WalletTransactionAction::WalletFunded->value)
         ->exists();
         

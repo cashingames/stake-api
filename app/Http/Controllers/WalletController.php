@@ -34,17 +34,17 @@ class WalletController extends BaseController
 
     public function transactions()
     {
-        $mainTransactions = $this->user->transactions()->mainTransactions()
+        $mainTransactions = $this->user->wallet->transactions()->mainTransactions()
             ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
-        $bonusTransactions = $this->user->transactions()->bonusTransactions()
+        $bonusTransactions = $this->user->wallet->transactions()->bonusTransactions()
             ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
 
-        $winningsTransactions = $this->user->transactions()->winningsTransactions()
+        $winningsTransactions = $this->user->wallet->transactions()->winningsTransactions()
             ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);

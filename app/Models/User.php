@@ -51,7 +51,6 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_admin' => 'boolean',
     ];
 
     protected $appends = [
@@ -77,11 +76,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function getIsAdminAttribute()
-    {
-        return $this->username == 'oyekunmi' || $this->username == 'zee';
-    }
-
     public function profile()
     {
         return $this->hasOne(Profile::class);
@@ -92,19 +86,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Wallet::class);
     }
 
-    public function transactions()
-    {
-        return $this->hasManyThrough(WalletTransaction::class, Wallet::class);
-    }
-
     public function boosts()
     {
         return $this->hasMany(UserBoost::class);
-    }
-
-    public function challengeRequests()
-    {
-        return $this->hasMany(ChallengeRequest::class);
     }
 
     public function getFullPhoneNumberAttribute()
@@ -112,29 +96,15 @@ class User extends Authenticatable implements JWTSubject
         return $this->country_code . $this->phone_number;
     }
 
-    public function categories()
-    {
-        return $this->belongsToMany(User::class, 'game_sessions')->withPivot('points_gained', 'user_id');
-    }
 
     public function gameSessions()
     {
         return $this->hasMany(GameSession::class);
     }
 
-    public function gameSessionQuestions()
-    {
-        return $this->hasManyThrough(GameSessionQuestion::class, GameSession::class);
-    }
-
     public function bonuses()
     {
         return $this->hasManyThrough(Bonus::class, UserBonus::class);
-    }
- 
-    public function userBonuses()
-    {
-        return $this->hasMany(UserBonus::class);
     }
 
 
@@ -147,15 +117,6 @@ class User extends Authenticatable implements JWTSubject
             ->get()
             ->avg('correct_count');
 
-    }
-
-    public function userTransactions()
-    {
-        return $this->transactions()
-            ->select('transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
-            ->orderBy('transactionDate', 'desc')
-            ->limit(10)
-            ->get();
     }
 
     /**

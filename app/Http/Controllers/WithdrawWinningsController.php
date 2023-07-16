@@ -28,6 +28,17 @@ class WithdrawWinningsController extends BaseController
             'account_name' => ['required', 'string']
         ]);
 
+        $totalWithdrawals = $this->user
+            ->wallet
+            ->transactions()
+            ->sum('amount');
+
+        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount')) {
+            return $this->sendError(
+                false,
+                'Please contact support to verify your identity to proceed with this withdrawal'
+            );
+        }
 
         $debitAmount = $request->amount;
 
@@ -56,11 +67,21 @@ class WithdrawWinningsController extends BaseController
             ($verifiedAccountName['firstAndLastName'] !== strtoupper($fullName))
             && ($verifiedAccountName['lastAndFirstName'] !== strtoupper($fullName))
         ) {
-            Log::info($this->user->username . " valid account names are {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']} ");
-            return $this->sendError(false, 'Account name does not match your registration name. Please contact support.');
+            Log::info(
+                $this->user->username .
+                " valid account names from bank are
+                {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']}
+                but {$fullName} was provided"
+            );
+            return $this->sendError(
+                null,
+                'Account name does not match your registration name. Please contact support to assist.'
+            );
         }
 
-        $recipientCode = $withdrawalService->createTransferRecipient($bankCode, $verifyAccount->data->account_name, $request->account_number);
+        $recipientCode = $withdrawalService->createTransferRecipient(
+            $bankCode, $verifyAccount->data->account_name, $request->account_number
+        );
 
         if (is_null($recipientCode)) {
             return $this->sendError(false, 'Recipient code could not be generated');
@@ -71,10 +92,20 @@ class WithdrawWinningsController extends BaseController
         try {
             $transferInitiated = $withdrawalService->initiateTransfer($recipientCode, ($debitAmount * 100));
         } catch (\Throwable $th) {
-            return $this->sendError(false, "We are unable to complete your withdrawal request at this time, please try in a short while or contact support");
+            return $this->sendError(
+                false,
+                "We are unable to complete your withdrawal request at this time, " .
+                "please try in a short while or contact support"
+            );
         }
 
-        $walletRepository->debit($this->user->wallet,  $debitAmount, 'Successful Withdrawal', null, "withdrawable", WalletTransactionAction::WinningsWithdrawn->value);
+        $walletRepository->debit(
+            $this->user->wallet,
+            $debitAmount,
+            'Successful Withdrawal',
+            null,
+            "withdrawable", WalletTransactionAction::WinningsWithdrawn->value
+        );
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status === 'pending') {
