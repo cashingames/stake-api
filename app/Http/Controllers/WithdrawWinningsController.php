@@ -34,7 +34,10 @@ class WithdrawWinningsController extends BaseController
             ->sum('amount');
 
         if ($totalWithdrawals >= config('trivia.max_withdrawal_amount')) {
-            Log::info($this->user->username . " has reached max withdrawal amount");
+            Log::info($this->user->username . " has reached max withdrawal amount", [
+                'totalWithdrawals' => $totalWithdrawals,
+                'maxWithdrawalAmount' => config('trivia.max_withdrawal_amount')
+            ]);
             return $this->sendError(
                 false,
                 'Please contact support to verify your identity to proceed with this withdrawal'
