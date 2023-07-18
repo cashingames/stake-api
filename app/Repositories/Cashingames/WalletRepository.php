@@ -165,7 +165,7 @@ class WalletRepository
         if ($balanceAccount == "bonus") {
             $wallet->bonus -= $amount;
             $wallet->save();
-          
+
             $balanceAmount = $wallet->bonus;
             $balanceType = WalletBalanceType::BonusBalance->value;
         }
@@ -184,7 +184,7 @@ class WalletRepository
             'balance' => $balanceAmount,
             'description' => $description,
             'reference' => $reference ?? Str::random(10),
-            'balance_type' => $balanceType ,
+            'balance_type' => $balanceType,
             'transaction_action' => $action
         ]);
     }
@@ -220,4 +220,12 @@ class WalletRepository
             ->exists();
     }
 
+    public function getWalletTransactions($wallet, $walletType)
+    {
+        return $wallet->transactions()
+            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->where('balance_type', $walletType)
+            ->orderBy('wallet_transactions.created_at', 'desc')
+            ->paginate(10);
+    }
 }
