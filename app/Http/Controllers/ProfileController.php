@@ -119,7 +119,7 @@ class ProfileController extends BaseController
             'new_password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        if ($data['password'] === $data['new_password']) {
+        if ($data['password'] == $data['new_password']) {
             return $this->sendError("The new password must be different from the old password.", "The new password must be different from the old password.");
         }
 

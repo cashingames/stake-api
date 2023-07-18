@@ -112,10 +112,10 @@ class WithdrawWinningsController extends BaseController
         );
         Log::info('withdrawal transaction created ' . $this->user->username);
 
-        if ($transferInitiated->status === 'pending') {
+        if ($transferInitiated->status == 'pending') {
             return $this->sendResponse(true, "Transfer processing, wait for your bank account to reflect");
         }
-        if ($transferInitiated->status === "success") {
+        if ($transferInitiated->status == "success") {
             return $this->sendResponse(true, "Your transfer is being successfully processed to your bank account");
         }
     }

@@ -30,7 +30,7 @@ class MatchRequestAction
             'challengeRequest' => $challengeRequest,
         ]);
 
-        if ($challengeRequest->status !== 'MATCHING') {
+        if ($challengeRequest->status != 'MATCHING') {
             return null;
         }
 

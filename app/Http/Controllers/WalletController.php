@@ -94,7 +94,7 @@ class WalletController extends BaseController
 
             case 'charge.success':
                 $email = $event->obj->data->customer->email;
-                if ('success' === $status) {
+                if ('success' == $status) {
                     Log::info("successfull charge");
                     $isValidTransaction = $this->verifyPaystackTransaction($reference);
 
@@ -111,7 +111,7 @@ class WalletController extends BaseController
             case 'transfer.reversed' || 'transfer.failed':
                 Log::info("transfer failed or reversed");
                 $email = $event->obj->data->recipient->email;
-                if ('reversed' === $status || 'failed' === $status) {
+                if ('reversed' == $status || 'failed' == $status) {
                     $isValidTransaction = $this->verifyPaystackTransaction($event->obj->data->reference);
                     if ($isValidTransaction) {
                         $this->reverseWithdrawalTransaction($reference, $amount, $email);

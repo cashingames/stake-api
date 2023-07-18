@@ -86,7 +86,7 @@ class GameController extends BaseController
 
                 $uSubs = $gameInfo->where('game_type_id', $type->id)->where('category_id', $category->id)->unique('subcategory_id');
                 $_subcategories = $categories->filter(function ($x) use ($uSubs) {
-                    return $uSubs->firstWhere('subcategory_id', $x->id) !== null;
+                    return $uSubs->firstWhere('subcategory_id', $x->id) != null;
                 });
 
                 $toReturnSubcategories = [];

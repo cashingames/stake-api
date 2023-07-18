@@ -83,7 +83,7 @@ class BonusRepository
             //remove bonus from users' wallet
             $activeRegistrationBonuses
                 ->reject(function (UserBonus $bonus) {
-                    return $bonus->amount_remaining_after_staking === 0;
+                    return $bonus->amount_remaining_after_staking == 0;
                 })
                 ->each(function ($userBonus) {
                     $userBonus->user->wallet->update([

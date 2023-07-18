@@ -7,7 +7,7 @@ trait AvatarUtils
 {
     private function getAvatarUrl($avatar)
     {
-        if ($avatar !== null) {
+        if ($avatar != null) {
             return config('app.url') . '/' . $avatar;
         }
         return $avatar;

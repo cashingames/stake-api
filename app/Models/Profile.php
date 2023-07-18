@@ -32,14 +32,14 @@ class Profile extends Model
 
     public function getReferrerProfile()
     {
-        if ($this->referrer === null || trim($this->referrer) === '') {
+        if ($this->referrer == null || trim($this->referrer) == '') {
             return null;
         }
 
         $profile = null;
         if ($profileRefferrer = Profile::where('referral_code', $this->referrer)->first()) {
             $profile = $profileRefferrer;
-        } else if ($user = User::where('username', $this->referrer)->first()) {
+        } elseif ($user = User::where('username', $this->referrer)->first()) {
             $profile = $user->profile;
         }
 
