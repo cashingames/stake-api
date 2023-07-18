@@ -23,6 +23,7 @@ use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\GetBonusOddsController;
+use App\Http\Controllers\GetUserTransactionsController;
 use App\Http\Controllers\PlayGame\EndPracticeChallengeGameController;
 use App\Http\Controllers\PlayGame\EndSinglePlayerPracticeGameController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
@@ -84,5 +85,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('challenges/submit', EndChallengeGameController::class);
         Route::post('challenges/practice/create', StartPracticeChallengeRequestController::class);
         Route::post('challenges/practice/submit', EndPracticeChallengeGameController::class);
+        Route::get('wallet/transactions/{wallet_type}', GetUserTransactionsController::class);
     }
 );
