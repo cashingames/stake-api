@@ -252,8 +252,9 @@ class GameController extends BaseController
 
     private function handleBonusStaking($staking, $points)
     {
+        $stakingOdd = 1;
         foreach (config('bonusOdds') as $bonusOdd) {
-            if ($bonusOdd['score'] = $points) {
+            if ($bonusOdd['score'] == $points) {
                 $stakingOdd = $bonusOdd['odd'];
             }
         }
