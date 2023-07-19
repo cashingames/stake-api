@@ -30,10 +30,10 @@ class BonusRepository
         UserBonus::where('user_id', $user->id)
             ->where('bonus_id', $bonus->id)
             ->where('is_on', false)->update([
-                    'is_on' => true,
-                    'amount_credited' => $amount,
-                    'amount_remaining_after_staking' => $amount
-                ]);
+                'is_on' => true,
+                'amount_credited' => $amount,
+                'amount_remaining_after_staking' => $amount
+            ]);
     }
 
     public function deactivateBonus(Bonus $bonus, User $user)
@@ -162,4 +162,33 @@ class BonusRepository
         ]);
     }
 
+    public function deductFromUserBonuses($amount)
+    {
+        $userBonuses = UserBonus::where('user_id', auth()->user()->id)
+            ->where('is_on', true)
+            ->where('amount_remaining_after_staking', '>', 0)
+            ->orderBy('amount_remaining_after_staking')
+            ->get();
+
+        $amountRemainingAfterDeduction = $amount;
+
+        foreach ($userBonuses as $userBonus) {
+
+            if ($amountRemainingAfterDeduction == 0) {
+                return;
+            }
+            if (($userBonus->amount_remaining_after_staking - $amountRemainingAfterDeduction) < 0) {
+                $userBonus->amount_remaining_after_staking = 0;
+                $userBonus->save();
+
+                $amountRemainingAfterDeduction -= $userBonus->amount_remaining_after_staking;
+            }
+            elseif (($userBonus->amount_remaining_after_staking - $amountRemainingAfterDeduction) >= 0) {
+                $userBonus->amount_remaining_after_staking -= $amountRemainingAfterDeduction;
+                $userBonus->save();
+
+                $amountRemainingAfterDeduction = $userBonus->amount_remaining_after_staking - $amountRemainingAfterDeduction;
+            }
+        }
+    }
 }

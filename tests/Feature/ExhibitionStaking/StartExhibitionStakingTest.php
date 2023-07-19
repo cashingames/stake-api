@@ -152,4 +152,74 @@ class StartExhibitionStakingTest extends TestCase
             'message' => 'Insufficient bonus amount will be left after this stake. Please stake 1000',
         ]);
     }
+
+    public function test_that_multiple_user_bonuses_can_be_deducted_from_during_staking_deduction()
+    {
+        $regBonus = Bonus::where('name', BonusType::RegistrationBonus->value)->first();
+        $cashbackBonus = Bonus::where('name', BonusType::StakingLossCashback->value)->first();
+
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' => $regBonus ->id,
+            'is_on' => true,
+            'amount_credited' => 150,
+            'amount_remaining_after_staking' => 150,
+            'total_amount_won' => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+        UserBonus::create([
+            'user_id' => $this->user->id,
+            'bonus_id' => $cashbackBonus->id,
+            'is_on' => true,
+            'amount_credited' => 50,
+            'amount_remaining_after_staking' => 50,
+            'total_amount_won' => 0,
+            'amount_remaining_after_withdrawal' => 0
+        ]);
+
+        $questions = Question::factory()
+            ->count(50)
+            ->create();
+
+        $data = [];
+
+        foreach ($questions as $question) {
+            $data[] = [
+                'question_id' => $question->id,
+                'category_id' => $this->category->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        DB::table('categories_questions')->insert($data);
+
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 200
+        ]);
+
+        $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "staking_amount" => 200,
+            'wallet_type' => "bonus_balance"
+        ]);
+
+        $this->assertDatabaseHas('user_bonuses', [
+            'user_id' => $this->user->id,
+            'bonus_id' => $regBonus->id,
+            'amount_remaining_after_staking' => 0
+        ]);
+        $this->assertDatabaseHas('user_bonuses', [
+            'user_id' => $this->user->id,
+            'bonus_id' => $cashbackBonus->id,
+            'amount_remaining_after_staking' => 0
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $this->user->id,
+            'bonus' => 0,
+            'non_withdrawable' => 2000,
+        ]);
+
+    }
 }
