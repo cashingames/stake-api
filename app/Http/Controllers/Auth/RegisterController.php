@@ -157,7 +157,7 @@ class RegisterController extends BaseController
         $boosts = Cache::remember('boosts', 60 * 60 * 24, function () {
             return Boost::all();
         });
-        
+
         DB::transaction(function () use ($user, $boosts) {
 
             $user->boosts()->create([
@@ -173,10 +173,7 @@ class RegisterController extends BaseController
                 'boost_count' => 3,
                 'used_count' => 0
             ]);
-
         });
-
-
     }
 
     /**
@@ -259,20 +256,15 @@ class RegisterController extends BaseController
             return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
         }
 
-        if (Cache::has($user->username . "_last_otp_time")) {
-            //otp was still recently sent to this user, so no need resending
-            return $this->sendResponse([], "You can not send OTP at this time, please try later");
-        } else {
-            try {
-                $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-                return $this->sendResponse([
-                    'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
-                ], "OTP has been resent to phone number");
-            } catch (\Throwable $th) {
-                //throw $th;
-                Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
-            }
+        try {
+            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+            return $this->sendResponse([
+                'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
+            ], "OTP has been resent to phone number");
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
+            return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
         }
     }
 }
