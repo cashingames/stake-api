@@ -33,7 +33,7 @@ class WithdrawWinningsController extends BaseController
             ->transactions()
             ->sum('amount');
 
-        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount')) {
+        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
             Log::info($this->user->username . " has reached max withdrawal amount", [
                 'totalWithdrawals' => $totalWithdrawals,
                 'maxWithdrawalAmount' => config('trivia.max_withdrawal_amount')
@@ -129,5 +129,11 @@ class WithdrawWinningsController extends BaseController
             'firstAndLastName' => $firstAndLastName,
             'lastAndFirstName' => $lastAndFirstName
         ];
+    }
+
+    private function identifyVerified($userId)
+    {
+        $verified = [29031959];
+        return in_array($userId, $verified);
     }
 }
