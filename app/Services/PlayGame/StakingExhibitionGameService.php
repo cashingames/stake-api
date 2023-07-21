@@ -39,7 +39,7 @@ class StakingExhibitionGameService
             ->determineQuestions($this->user->id, $this->validatedRequest->category);
 
         if ($questions->count() < 10) {
-            Log::info(
+            Log::error(
                 'User has less than 10 questions',
                 [
                     'user' => $this->user->username,

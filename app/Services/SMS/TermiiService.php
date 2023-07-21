@@ -2,12 +2,10 @@
 
 namespace App\Services\SMS;
 
-use App\Jobs\ExpireGeneratedOtp;
 use App\Models\AuthToken;
-use App\Models\User;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Cache;
 use App\Services\SMS\SMSProviderInterface;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @codeCoverageIgnore
@@ -81,12 +79,11 @@ class TermiiService implements SMSProviderInterface
             'sms' => "{$user->username}, your Cashingames secure OTP is {$otp_token}. Do not share with anyone"
         ];
         try {
-            $this->send($smsData);
-            Cache::put($user->username . "_last_otp_time", now()->toTimeString(), $seconds = 60 * config('auth.verification.minutes_before_otp_expiry'));
+            return $this->send($smsData);
         } catch (\Throwable $th) {
-
-            throw $th;
-            // return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+            Log::error("Unable to deliver OTP via SMS Reason: " . $th->getMessage());
         }
+
+        return null;
     }
 }

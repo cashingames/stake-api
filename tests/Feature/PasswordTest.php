@@ -77,7 +77,7 @@ class PasswordTest extends TestCase
         $this->user->update(['phone_number' => 90958886969]);
 
         $this->mock(SMSProviderInterface::class, function (MockInterface $mock) {
-            $mock->shouldReceive('deliverOTP')->once();
+            $mock->shouldReceive('deliverOTP')->once()->andReturn(true);
         });
 
         $response = $this->withHeaders(['x-brand-id' => 2])->postjson(self::RESET_EMAIL_URL, [

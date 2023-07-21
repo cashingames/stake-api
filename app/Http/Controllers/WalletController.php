@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Models\WalletTransaction;
 use App\Models\User;
 use App\Models\Boost;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
+use Yabacon\Paystack;
+use App\Enums\FeatureFlags;
+use App\Services\FeatureFlag;
+use App\Enums\WalletBalanceType;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Yabacon\Paystack\Event as PaystackEvent;
-use Yabacon\Paystack;
-use Yabacon\Paystack\Exception\ApiException as PaystackException;
-use App\Enums\FeatureFlags;
-use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use Yabacon\Paystack\Event as PaystackEvent;
 use App\Repositories\Cashingames\WalletRepository;
-use App\Services\FeatureFlag;
+use Yabacon\Paystack\Exception\ApiException as PaystackException;
+use App\Http\ResponseHelpers\WalletTransactionsResponse;
+use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
+
 
 class WalletController extends BaseController
 {

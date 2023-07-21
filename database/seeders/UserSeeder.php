@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use Carbon\Carbon;
-use App\Models\GameSession;
 class UserSeeder extends Seeder
 {
     /**

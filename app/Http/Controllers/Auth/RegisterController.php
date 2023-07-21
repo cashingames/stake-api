@@ -188,20 +188,10 @@ class RegisterController extends BaseController
         $user
     ) {
 
-        try {
-            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-        } catch (\Throwable $th) {
-            Log::error(
-                "Registration: Unable to deliver OTP via SMS Reason: ",
-                [
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phone_number' => $user->phone_number,
-                    'error' => $th->getMessage()
-                ]
-            );
+        $result = $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        if ($result == null) {
             return $this->sendResponse(
-                "Something went wrong. Please contact admin" . $th->getMessage(),
+                "Something went wrong. Please contact admin",
                 "Unable to deliver OTP via SMS"
             );
         }
@@ -256,15 +246,13 @@ class RegisterController extends BaseController
             return $this->sendResponse("Phone number already verified", "Your phone number has already been verified");
         }
 
-        try {
-            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-            return $this->sendResponse([
-                'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
-            ], "OTP has been resent to phone number");
-        } catch (\Throwable $th) {
-            //throw $th;
-            Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-            return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+        $result = $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        if ($result == null) {
+            return $this->sendResponse("Something went wrong. Please contact support", "Unable to deliver OTP via SMS");
         }
+        return $this->sendResponse([
+            'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
+        ], "OTP has been resent to phone number");
+
     }
 }

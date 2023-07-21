@@ -89,23 +89,10 @@ class LoginController extends BaseController
             return null;
         }
 
-        try {
-            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-            Log::info(
-                "Login: OTP sent successfully: "
-            );
-        } catch (\Throwable $th) {
-            Log::error(
-                "Login: Unable to deliver OTP via SMS Reason: ",
-                [
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phone_number' => $user->phone_number,
-                    'error' => $th->getMessage()
-                ]
-            );
+        $result = $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        if ($result == null) {
             return $this->sendResponse(
-                "Something went wrong. Please contact admin" . $th->getMessage(),
+                "Something went wrong. Please contact support",
                 "Unable to deliver OTP via SMS"
             );
         }

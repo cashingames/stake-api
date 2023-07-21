@@ -6,7 +6,6 @@ use App\Enums\AuthTokenType;
 use App\Http\Controllers\BaseController;
 use App\Models\AuthToken;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +14,7 @@ class ForgotPasswordController extends BaseController
 {
 
     //@TODO Test reset password
-    public function sendEmail(
+    public function sendVerificationToken(
         Request $request,
         SMSProviderInterface $smsService
     ) {
@@ -24,21 +23,18 @@ class ForgotPasswordController extends BaseController
             'phone_number' => ['required', 'numeric'],
         ]);
         $user = User::where('phone_number', $data['phone_number'])->first();
-
-        if (!is_null($user)) {
-            try {
-                $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-                return $this->sendResponse(true, 'OTP Sent');
-            } catch (\Throwable $th) {
-                Log::info("Forgot Password: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-                return $this->sendError("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
-            }
+        if ($user == null) {
+            return $this->sendError("Phone number does not exist", "Phone number does not exist");
         }
 
-        return $this->sendError("Phone number does not exist", "Phone number does not exist");
+        $result = $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        if ($result == null) {
+            return $this->sendError("Unable to deliver OTP via SMS", "Unable to deliver OTP via SMS");
+        }
+
+        return $this->sendResponse(true, 'OTP Sent');
+
     }
-
-
 
     public function verifyToken(Request $request)
     {
@@ -76,15 +72,14 @@ class ForgotPasswordController extends BaseController
             return $this->sendResponse("Phone number does not exist", "Phone number does not exist");
         }
 
-        try {
-            $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
-            return $this->sendResponse([
-                'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
-            ], "OTP has been resent to phone number");
-        } catch (\Throwable $th) {
-            //throw $th;
-            Log::info("Registration: Unable to deliver OTP via SMS Reason: " . $th->getMessage());
-            return $this->sendResponse("Unable to deliver OTP via SMS", "Reason: " . $th->getMessage());
+        $result = $smsService->deliverOTP($user, AuthTokenType::PhoneVerification->value);
+        if ($result == null) {
+            return $this->sendError("Unable to deliver OTP via SMS", "Unable to deliver OTP via SMS");
         }
+
+        return $this->sendResponse([
+            'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
+        ], "OTP has been resent to phone number");
+
     }
 }
