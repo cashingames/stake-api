@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\WalletTransactionAction;
+use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
@@ -73,10 +74,14 @@ class WithdrawWinningsController extends BaseController
         ) {
             Log::error(
                 $this->user->username .
-                " valid account names from bank are
+                    "'s possible valid account names are
                 {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']}
                 but {$fullName} was provided"
             );
+            SendAdminErrorEmailUpdate::dispatch('Failed Withdrawal Attempt', $this->user->username .
+                "'s possible valid account names are
+            {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']}
+            but {$fullName} was provided");
             return $this->sendError(
                 null,
                 'Account name does not match your registration name. Please contact support to assist.'
@@ -84,7 +89,9 @@ class WithdrawWinningsController extends BaseController
         }
 
         $recipientCode = $withdrawalService->createTransferRecipient(
-            $bankCode, $verifyAccount->data->account_name, $request->account_number
+            $bankCode,
+            $verifyAccount->data->account_name,
+            $request->account_number
         );
 
         if (is_null($recipientCode)) {
@@ -99,7 +106,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(
                 false,
                 "We are unable to complete your withdrawal request at this time, " .
-                "please try in a short while or contact support"
+                    "please try in a short while or contact support"
             );
         }
 
@@ -108,7 +115,8 @@ class WithdrawWinningsController extends BaseController
             $debitAmount,
             'Successful Withdrawal',
             null,
-            "withdrawable", WalletTransactionAction::WinningsWithdrawn->value
+            "withdrawable",
+            WalletTransactionAction::WinningsWithdrawn->value
         );
         Log::info('withdrawal transaction created ' . $this->user->username);
 

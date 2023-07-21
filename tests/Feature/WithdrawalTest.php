@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\Payments\PaystackService;
 use Database\Seeders\BonusSeeder;
+use Illuminate\Support\Facades\Queue;
 use Exception;
 
 class WithdrawalTest extends TestCase
@@ -83,6 +85,7 @@ class WithdrawalTest extends TestCase
                 'reference' => 'randomref'
             ]);
         });
+        Queue::fake();
         $this->user->wallet->withdrawable = 1000;
         $this->user->wallet->save();
 
@@ -93,6 +96,9 @@ class WithdrawalTest extends TestCase
             'bank_name' => 'Test Bank'
 
         ]);
+
+        Queue::assertPushed(SendAdminErrorEmailUpdate::class);
+
         $response->assertJson([
             'message' => 'Account name does not match your registration name. Please contact support to assist.',
         ]);
