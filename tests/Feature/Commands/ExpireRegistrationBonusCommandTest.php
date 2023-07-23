@@ -39,7 +39,7 @@ class ExpireRegistrationBonusCommandTest extends TestCase
         ]);
 
         $bonus = UserBonus::first();
-        $bonus->created_at = now()->subDays(10);
+        $bonus->created_at = now()->subDays(30);
         $bonus->save();
 
         $this->artisan('bonus:registration:expire')->assertExitCode(0);
