@@ -4,9 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\WalletTransaction;
-use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GetWalletTransactionsTest extends TestCase

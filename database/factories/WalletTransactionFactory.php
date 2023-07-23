@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\Model;
 use App\Models\WalletTransaction;
 use App\Models\Wallet;
@@ -27,12 +30,12 @@ class WalletTransactionFactory extends Factory
         return [
             //
             'wallet_id' => Wallet::factory(),
-            "transaction_type" => $this->faker->randomElement(['CREDIT', 'DEBIT']),
-            "balance_type" => $this->faker->randomElement(["CREDIT_BALANCE", "BONUS_BALANCE", "WINNINGS_BALANCE"]),
+            "transaction_type" => $this->faker->randomElement(WalletTransactionType::cases()),
+            "transaction_action" => $this->faker->randomElement(WalletTransactionAction::cases()),
+            "balance_type" => $this->faker->randomElement(WalletBalanceType::cases()),
             "reference" => Str::random(10),
-            "amount" => $this->faker->randomElement([150.00, 800.00, 450.00, 2000.00, 2500.00]),
-            "description" => $this->faker->randomElement(['Wallet Top-up', 'Successful Withdrawal', 'Failed Withdrawal Reversed']),
-
+            "amount" => $this->faker->randomFloat(2, 0, 100000),
+            "description" => $this->faker->sentence,
         ];
     }
 }

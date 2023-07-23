@@ -138,6 +138,7 @@ class User extends Authenticatable implements JWTSubject
                 'boosts.id',
                 'boosts.pack_count',
                 'boosts.currency_value',
+                DB::raw("boosts.currency_value * boosts.pack_count as price"),
                 'boosts.icon',
                 'boosts.description',
                 'name',

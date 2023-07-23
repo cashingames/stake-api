@@ -6,6 +6,7 @@ use App\Enums\BonusType;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use App\Models\Bonus;
+use App\Models\Boost;
 use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,6 +17,7 @@ use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\WalletTransaction;
 use Database\Seeders\BonusSeeder;
+use Database\Seeders\BoostSeeder;
 use PHPUnit\Framework\Constraint\IsFalse;
 
 class ProfileTest extends TestCase
@@ -38,13 +40,20 @@ class ProfileTest extends TestCase
         parent::setUp();
 
         $this->seed(UserSeeder::class);
+        $this->seed(BoostSeeder::class);
+
         $this->user = User::first();
+
+        $this->user->boosts()->attach(Boost::first()->id, [
+            'boost_count' => 0,
+            'used_count' => 0,
+        ]);
 
         $this->actingAs($this->user);
     }
 
     public function test_relevant_user_profile_can_be_retrieved_with_data()
-    {   
+    {
         $this->seed(BonusSeeder::class);
         $response = $this->withHeaders([
             'x-brand-id' => 1,

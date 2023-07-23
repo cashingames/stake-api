@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\ClientPlatform;
 use App\Notifications\CustomNotificationChannels\FcmNotificationChannel;
 use App\Services\Firebase\FirestoreService;
 use App\Services\SMS\TermiiService;
@@ -39,10 +38,6 @@ class AppServiceProvider extends ServiceProvider
             SMSProviderInterface::class,
             fn() => new TermiiService(config('services.termii.api_key'))
         );
-        $this->app->scoped(
-            ClientPlatform::class,
-            fn() => ClientPlatform::detect($this->app->request->header('x-brand-id')));
-
         $this->app->bind(
             FirestoreService::class,
             fn() => new FirestoreService()

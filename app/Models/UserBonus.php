@@ -31,6 +31,6 @@ class UserBonus extends Model
 
     public function scopeTobeExpired($query)
     {
-        return $query->where('created_at', '<=', now()->subDays(7));
+        return $query->where('created_at', '<=', now()->subDays(30));
     }
 }

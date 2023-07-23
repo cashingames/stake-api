@@ -65,7 +65,7 @@ class BonusRepository
     public function getActiveUserRegistrationBonusesToExpire(): Collection
     {
         return UserBonus::where('is_on', true)
-            ->where('created_at', '<=', now()->subDays(7))
+            ->where('created_at', '<=', now()->subDays(30))
             ->whereHas('bonus', function ($query) {
                 $query->where('name', BonusType::RegistrationBonus->value);
             })

@@ -2,7 +2,6 @@
 
 namespace App\Http\ResponseHelpers;
 
-use App\Enums\ClientPlatform;
 use stdClass;
 
 class CommonDataResponse
