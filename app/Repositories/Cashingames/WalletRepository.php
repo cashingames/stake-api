@@ -4,15 +4,36 @@ namespace App\Repositories\Cashingames;
 
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\Staking;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class WalletRepository
 {
+
+    public function getWalletByUserId(int $userId): mixed
+    {
+        return Wallet::where('user_id', $userId)->firstOrFail();
+    }
+    public function getWalletBalance($user, $walletType)
+    {
+        $wallet = $user->wallet;
+        switch ($walletType) {
+            case WalletBalanceType::CreditsBalance:
+                return $wallet->non_withdrawable;
+            case WalletBalanceType::BonusBalance:
+                return $wallet->bonus;
+            case WalletBalanceType::WinningsBalance:
+                return $wallet->withdrawable;
+            default:
+                throw new \App\Exceptions\UnknownFeatureException("Invalid wallet balance type");
+        }
+    }
 
     /**
      * To calculate the percentage profit, you need to calculate the difference between the amount received
@@ -100,119 +121,6 @@ class WalletRepository
         return $this->getPlatformProfitPercentageOnStaking(now()->startOfDay(), now()->endOfDay());
     }
 
-    public function credit(Wallet $wallet, float $amount, string $description, string $reference = null): void
-    {
-        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
-
-            $newBalance = $wallet->withdrawable + $amount;
-
-            $wallet->update([
-                'withdrawable' => $newBalance
-            ]);
-
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $amount,
-                'balance' => $newBalance,
-                'description' => $description,
-                'reference' => $reference ?? Str::random(10),
-                'balance_type' => WalletBalanceType::WinningsBalance->value,
-                'transaction_action' => WalletTransactionAction::WinningsCredited->value
-            ]);
-        });
-    }
-
-    public function creditFundingAccount(
-        Wallet $wallet,
-        float $amount,
-        string $description,
-        string $reference = null
-    ): void {
-        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
-
-            $newBalance = $wallet->non_withdrawable + $amount;
-
-            $wallet->update([
-                'non_withdrawable' => $newBalance
-            ]);
-
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $amount,
-                'balance' => $newBalance,
-                'description' => $description,
-                'reference' => $reference ?? Str::random(10),
-                'balance_type' => WalletBalanceType::CreditsBalance->value,
-                'transaction_action' => WalletTransactionAction::WalletFunded->value
-            ]);
-        });
-    }
-
-    public function debit(Wallet $wallet, float $amount, string $description, string $reference = null, string $balanceAccount, string $action): void
-    {
-        $balanceAmount = 0;
-        $balanceType = '';
-
-        if ($balanceAccount == "non_withdrawable") {
-            $wallet->non_withdrawable -= $amount;
-            $wallet->save();
-
-            $balanceAmount = $wallet->non_withdrawable;
-            $balanceType = WalletBalanceType::CreditsBalance->value;
-        }
-        if ($balanceAccount == "bonus") {
-            $wallet->bonus -= $amount;
-            $wallet->save();
-
-            $balanceAmount = $wallet->bonus;
-            $balanceType = WalletBalanceType::BonusBalance->value;
-        }
-        if ($balanceAccount == "withdrawable") {
-            $wallet->withdrawable -= $amount;
-            $wallet->save();
-
-            $balanceAmount = $wallet->withdrawable;
-            $balanceType = WalletBalanceType::WinningsBalance->value;
-        }
-
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $amount,
-            'balance' => $balanceAmount,
-            'description' => $description,
-            'reference' => $reference ?? Str::random(10),
-            'balance_type' => $balanceType,
-            'transaction_action' => $action
-        ]);
-    }
-
-    public function creditBonusAccount(Wallet $wallet, float $amount, string $description, string $reference = null): void
-    {
-        DB::transaction(function () use ($wallet, $amount, $description, $reference) {
-
-            $newBalance = $wallet->bonus + $amount;
-
-            $wallet->update([
-                'bonus' => $newBalance
-            ]);
-
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $amount,
-                'balance' => $newBalance,
-                'description' => $description,
-                'reference' => $reference ?? Str::random(10),
-                'balance_type' => WalletBalanceType::BonusBalance->value,
-                'transaction_action' => WalletTransactionAction::BonusCredited->value
-            ]);
-        });
-    }
-
-
     public function hasFundedBefore($user)
     {
         return WalletTransaction::where('wallet_id', $user->wallet->id)
@@ -223,9 +131,231 @@ class WalletRepository
     public function getWalletTransactions($wallet, $walletType)
     {
         return $wallet->transactions()
-            ->select('wallet_transactions.id as id', 'transaction_type as type', 'amount', 'description', 'wallet_transactions.created_at as transactionDate')
+            ->select(
+                'wallet_transactions.id as id',
+                'transaction_type as type',
+                'amount',
+                'description',
+                'wallet_transactions.created_at as transactionDate'
+            )
             ->where('balance_type', $walletType)
             ->orderBy('wallet_transactions.created_at', 'desc')
             ->paginate(10);
     }
+
+    public function addTransaction(WalletTransactionDto $dto): mixed
+    {
+        $result = null;
+        switch ($dto->transactionType) {
+            case WalletTransactionType::Credit:
+                $result = $this->credit($dto);
+                break;
+            case WalletTransactionType::Debit:
+                $result = $this->debit($dto);
+                break;
+            default:
+                throw new \App\Exceptions\UnknownFeatureException("Invalid wallet transaction type");
+        }
+
+        return $result;
+    }
+
+    private function debit(WalletTransactionDto $dto): mixed
+    {
+        $result = null;
+        switch ($dto->balanceType) {
+            case WalletBalanceType::CreditsBalance:
+                $result = $this->removeDeposit($dto);
+                break;
+            case WalletBalanceType::BonusBalance:
+                $result = $this->removeBonus($dto);
+                break;
+            case WalletBalanceType::WinningsBalance:
+                $result = $this->removeWinnings($dto);
+                break;
+            default:
+                throw new \App\Exceptions\UnknownFeatureException("Invalid wallet balance type");
+        }
+
+        return $result;
+    }
+
+    private function credit(WalletTransactionDto $dto): mixed
+    {
+        $result = null;
+        switch ($dto->balanceType) {
+            case WalletBalanceType::CreditsBalance:
+                $result = $this->addDeposit($dto);
+                break;
+            case WalletBalanceType::BonusBalance:
+                $result = $this->addBonus($dto);
+                break;
+            case WalletBalanceType::WinningsBalance:
+                $result = $this->addWinnings($dto);
+                break;
+            default:
+                throw new \App\Exceptions\UnknownFeatureException("Invalid wallet balance type");
+        }
+
+        return $result;
+    }
+
+
+    private function addDeposit(
+        WalletTransactionDto $dto
+    ): mixed {
+
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $balance = $wallet->non_withdrawable += $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $balance,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::CreditsBalance->value,
+                'transaction_type' => WalletTransactionType::Credit->value,
+            ]);
+        });
+
+        return $transaction;
+    }
+
+    private function removeDeposit(WalletTransactionDto $dto): mixed
+    {
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $wallet->non_withdrawable -= $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $wallet->non_withdrawable,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::CreditsBalance->value,
+                'transaction_type' => WalletTransactionType::Debit->value,
+            ]);
+
+        });
+
+        return $transaction;
+    }
+
+    private function addWinnings(WalletTransactionDto $dto): mixed
+    {
+
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $balance = $wallet->withdrawable += $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $balance,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_type' => WalletTransactionType::Credit->value,
+            ]);
+        });
+
+        return $transaction;
+    }
+
+    private function removeWinnings(WalletTransactionDto $dto): mixed
+    {
+
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $balance = $wallet->withdrawable -= $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $balance,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::CreditsBalance->value,
+                'transaction_type' => WalletTransactionType::Debit->value,
+            ]);
+
+        });
+
+        return $transaction;
+    }
+
+
+    private function addBonus(
+        WalletTransactionDto $dto
+    ): mixed {
+
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $balance = $wallet->bonus += $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $balance,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_type' => WalletTransactionType::Credit->value,
+            ]);
+        });
+
+        return $transaction;
+    }
+
+
+    private function removeBonus(WalletTransactionDto $dto): mixed
+    {
+
+        $transaction = null;
+        DB::transaction(function () use ($dto, &$transaction) {
+
+            $wallet = $this->getWalletByUserId($dto->userId);
+            $balance = $wallet->bonus -= $dto->amount;
+            $wallet->save();
+
+            $transaction = WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'amount' => $dto->amount,
+                'balance' => $balance,
+                'description' => $dto->description,
+                'transaction_action' => $dto->action,
+                'reference' => $dto->reference,
+                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'transaction_type' => WalletTransactionType::Debit->value,
+            ]);
+
+        });
+
+        return $transaction;
+    }
+
+
 }

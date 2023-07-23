@@ -6,7 +6,6 @@ use Mockery;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Profile;
 use App\Models\Category;
 use Mockery\MockInterface;
 use App\Jobs\MatchChallengeRequest;

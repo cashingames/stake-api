@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Facades\Cache;
 use App\Enums\AuthTokenType;
+use App\Repositories\Cashingames\BoostRepository;
 
 class RegisterController extends BaseController
 {
@@ -40,7 +41,9 @@ class RegisterController extends BaseController
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(
+        private readonly BoostRepository $boostRepository
+    )
     {
         $this->middleware('auth:api', ['except' => ['register', 'verifyUsername', 'resendOTP']]);
     }
@@ -159,20 +162,13 @@ class RegisterController extends BaseController
         });
 
         DB::transaction(function () use ($user, $boosts) {
+            $this
+                ->boostRepository
+                ->addUserBoost($boosts->firstWhere('name', 'Time Freeze')->id, $user->id);
 
-            $user->boosts()->create([
-                'user_id' => $user->id,
-                'boost_id' => $boosts->firstWhere('name', 'Time Freeze')->id,
-                'boost_count' => 3,
-                'used_count' => 0
-            ]);
-
-            $user->boosts()->create([
-                'user_id' => $user->id,
-                'boost_id' => $boosts->firstWhere('name', 'Skip')->id,
-                'boost_count' => 3,
-                'used_count' => 0
-            ]);
+            $this
+                ->boostRepository
+                ->addUserBoost($boosts->firstWhere('name', 'Skip')->id, $user->id);
         });
     }
 

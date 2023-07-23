@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use App\Services\Payments\PaystackService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,10 +15,16 @@ use Illuminate\Support\Facades\Log;
 
 class WithdrawWinningsController extends BaseController
 {
+
+    public function __construct(
+        private readonly WalletRepository $walletRepository,
+        private readonly PaystackService $withdrawalService,
+    ) {
+        parent::__construct();
+        $this->middleware('auth:api');
+    }
     public function __invoke(
         Request $request,
-        PaystackService $withdrawalService,
-        WalletRepository $walletRepository,
     ) {
         $request->validate([
             'account_number' => ['required', 'numeric'],
@@ -47,8 +56,8 @@ class WithdrawWinningsController extends BaseController
 
         $debitAmount = $request->amount;
 
-        $banks = Cache::rememberForever('banks', function () use ($withdrawalService) {
-            return $withdrawalService->getBanks();
+        $banks = Cache::rememberForever('banks', function () {
+            return $this->withdrawalService->getBanks();
         });
         $bankCode = '';
         foreach ($banks->data as $bank) {
@@ -58,7 +67,7 @@ class WithdrawWinningsController extends BaseController
             }
         }
 
-        $verifyAccount = $withdrawalService->verifyAccount($bankCode, $request->account_number);
+        $verifyAccount = $this->withdrawalService->verifyAccount($bankCode, $request->account_number);
 
         if (!$verifyAccount->status) {
             return $this->sendError(false, 'Account is not valid');
@@ -88,7 +97,7 @@ class WithdrawWinningsController extends BaseController
             );
         }
 
-        $recipientCode = $withdrawalService->createTransferRecipient(
+        $recipientCode = $this->withdrawalService->createTransferRecipient(
             $bankCode,
             $verifyAccount->data->account_name,
             $request->account_number
@@ -101,7 +110,7 @@ class WithdrawWinningsController extends BaseController
         Log::info($this->user->username . " requested withdrawal of {$debitAmount}");
 
         try {
-            $transferInitiated = $withdrawalService->initiateTransfer($recipientCode, ($debitAmount * 100));
+            $transferInitiated = $this->withdrawalService->initiateTransfer($recipientCode, ($debitAmount * 100));
         } catch (\Throwable $th) {
             return $this->sendError(
                 false,
@@ -110,14 +119,17 @@ class WithdrawWinningsController extends BaseController
             );
         }
 
-        $walletRepository->debit(
-            $this->user->wallet,
-            $debitAmount,
-            'Successful Withdrawal',
-            null,
-            "withdrawable",
-            WalletTransactionAction::WinningsWithdrawn->value
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $this->user->id,
+                $debitAmount,
+                'Successful Withdrawal',
+                WalletBalanceType::WinningsBalance,
+                WalletTransactionType::Debit,
+                WalletTransactionAction::WinningsWithdrawn
+            )
         );
+        
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status == 'pending') {

@@ -79,7 +79,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Refractor StartSinglePlayerRequest Validation to use repo pattern
 - Remove GameModes from DB and Interface
 - Move registration bonus code out of debit wallet action
-
+- Based on winnings decide description. So add more granular Actions
+- Test WalletController
+- Delete userBonus
 //user_bonuss
 - change amount_credited to amount
 - change amount_remaining_after_stake to balance
@@ -90,3 +92,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - move profile::change password to password controller::change password
 - reverse relationship between user and profile
 - cleanup debit wallet action and credit wallet action
+- Cleanup boost
+    - Drop point value
+    - Default used_count to 0
+    - Include total column to remove computed column in model
+    - Update code to reflect these changes
+    

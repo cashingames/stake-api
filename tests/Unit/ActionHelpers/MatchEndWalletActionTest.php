@@ -3,10 +3,10 @@
 namespace Tests\Unit\ActionHelpers;
 
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
-use App\Actions\Wallet\CreditWalletAction;
 use App\Models\ChallengeRequest;
 use App\Models\Wallet;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -56,7 +56,7 @@ class MatchEndWalletActionTest extends TestCase
 
         $sut = new MatchEndWalletAction(
             $mockedTriviaChallengeStakingRepository,
-            $this->mockCreditWalletAction(),
+            $this->mockWalletRepository(),
         );
 
         $result = $sut->execute($challengeRequest->id);
@@ -94,11 +94,10 @@ class MatchEndWalletActionTest extends TestCase
             ->with($challengeRequest->id)
             ->willReturn($matchedRequest);
 
-        $mockedCreditWalletAction = $this->mockCreditWalletAction();
+        $mockedCreditWalletAction = $this->mockWalletRepository();
         $mockedCreditWalletAction
             ->expects($this->exactly(2))
-            ->method('executeRefund')
-            ->with($this->anything(), $challengeRequest->amount, $this->anything());
+            ->method('addTransaction');
 
         $sut = new MatchEndWalletAction(
             $mockedTriviaChallengeStakingRepository,
@@ -140,11 +139,10 @@ class MatchEndWalletActionTest extends TestCase
             ->with($challengeRequest->id)
             ->willReturn($matchedRequest);
 
-        $mockedCreditWalletAction = $this->mockCreditWalletAction();
+        $mockedCreditWalletAction = $this->mockWalletRepository();
         $mockedCreditWalletAction
             ->expects($this->once())
-            ->method('execute')
-            ->with($this->anything(), $challengeRequest->amount * 2, $this->anything());
+            ->method('addTransaction');
 
         $sut = new MatchEndWalletAction(
             $mockedTriviaChallengeStakingRepository,
@@ -163,9 +161,9 @@ class MatchEndWalletActionTest extends TestCase
         return $this->createMock(TriviaChallengeStakingRepository::class);
     }
 
-    private function mockCreditWalletAction()
+    private function mockWalletRepository()
     {
-        return $this->createMock(CreditWalletAction::class);
+        return $this->createMock(WalletRepository::class);
     }
 
 

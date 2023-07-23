@@ -9,7 +9,6 @@ use App\Enums\BonusType;
 use App\Models\Question;
 use App\Models\Category;
 use App\Models\UserBonus;
-use App\Models\GameSession;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\BonusSeeder;
 use Illuminate\Support\Facades\DB;

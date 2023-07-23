@@ -81,7 +81,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('wallet/buy-boosts/{boostId}', [WalletController::class, 'buyBoostsFromWallet']);
 
         Route::controller(BoostsController::class)->group(function () {
-            Route::post('boosts/{id}/buy', 'buy');
+            Route::post('boosts/{id}/buy', 'buy')->whereNumber('id');
         });
 
         Route::post('game/start/single-player', StartSinglePlayerGameController::class);

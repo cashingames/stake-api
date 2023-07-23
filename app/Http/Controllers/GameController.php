@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Category;
 use App\Models\GameType;
-use App\Models\UserBoost;
 use App\Models\ExhibitionStaking;
 use App\Models\GameSessionQuestion;
 use App\Models\Question;
 use App\Models\StakingOdd;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -221,31 +223,41 @@ class GameController extends BaseController
         }
 
         if ($amountWon > 0) {
-            $description = 'Single game Winnings credited';
-            $this->walletRepository->credit($this->user->wallet, $amountWon, $description, null);
+            $this->walletRepository->addTransaction(
+                new WalletTransactionDto(
+                    $this->user->id,
+                    $amountWon,
+                    'Single game Winnings credited',
+                    WalletBalanceType::WinningsBalance,
+                    WalletTransactionType::Credit,
+                    WalletTransactionAction::WinningsCredited
+                )
+            );
+
             $staking->update(['amount_won' => $amountWon]);
         }
 
 
-        DB::transaction(function () use ($request, $game) {
-            foreach ($request->consumedBoosts as $row) {
-                $userBoost = UserBoost::where('user_id', $this->user->id)
-                    ->where('boost_id', $row['boost']['id'])
-                    ->first();
+        //@TODO: Refractor boost usage
+        // DB::transaction(function () use ($request, $game) {
+        //     foreach ($request->consumedBoosts as $row) {
+        //         $userBoost = UserBoost::where('user_id', $this->user->id)
+        //             ->where('boost_id', $row['boost']['id'])
+        //             ->first();
 
-                $userBoost->update([
-                    'used_count' => $userBoost->used_count + 1,
-                    'boost_count' => $userBoost->boost_count - 1
-                ]);
+        //         $userBoost->update([
+        //             'used_count' => $userBoost->used_count + 1,
+        //             'boost_count' => $userBoost->boost_count - 1
+        //         ]);
 
-                DB::table('exhibition_boosts')->insert([
-                    'game_session_id' => $game->id,
-                    'boost_id' => $row['boost']['id'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-            }
-        });
+        //         DB::table('exhibition_boosts')->insert([
+        //             'game_session_id' => $game->id,
+        //             'boost_id' => $row['boost']['id'],
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now()
+        //         ]);
+        //     }
+        // });
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }

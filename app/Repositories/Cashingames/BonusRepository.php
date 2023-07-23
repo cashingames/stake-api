@@ -19,10 +19,7 @@ class BonusRepository
 {
     public function giveBonus(Bonus $bonus, User $user)
     {
-        UserBonus::create([
-            'user_id' => $user->id,
-            'bonus_id' => $bonus->id
-        ]);
+        $user->bonuses()->attach($bonus->id);
     }
 
     public function activateBonus(Bonus $bonus, User $user, float $amount)

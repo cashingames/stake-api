@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Boost;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
@@ -88,7 +89,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function boosts()
     {
-        return $this->hasMany(UserBoost::class);
+        return $this->belongsToMany(Boost::class, 'user_boosts')
+            ->withPivot('boost_count', 'used_count')
+            ->withTimestamps();
     }
 
     public function getFullPhoneNumberAttribute()
@@ -104,7 +107,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function bonuses()
     {
-        return $this->hasManyThrough(Bonus::class, UserBonus::class);
+        return $this->belongsToMany(Bonus::class, 'user_bonuses')
+            ->withPivot('amount_credited', 'amount_remaining_after_staking', 'total_amount_won', 'is_on')
+            ->withTimestamps();
     }
 
 
@@ -131,7 +136,6 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('boosts.id', '=', 'user_boosts.boost_id');
             })->select(
                 'boosts.id',
-                'boosts.point_value',
                 'boosts.pack_count',
                 'boosts.currency_value',
                 'boosts.icon',

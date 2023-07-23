@@ -2,17 +2,21 @@
 
 namespace App\Actions\TriviaChallenge;
 
-use App\Actions\Wallet\CreditWalletAction;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Jobs\SendChallengeRefundNotification;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Repositories\Cashingames\WalletRepository;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use Illuminate\Support\Facades\Log;
 
 class MatchEndWalletAction
 {
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
-        private readonly CreditWalletAction $creditWalletAction,
+        private readonly WalletRepository $walletRepository,
     ) {
     }
 
@@ -41,17 +45,30 @@ class MatchEndWalletAction
 
     private function refundMatchedOpponents(ChallengeRequest $request, ChallengeRequest $matchedRequest): void
     {
-        $this->creditWalletAction->executeRefund(
-            $request->user->wallet,
-            $request->amount,
-            'Challenge game stake refund'
+        $description = 'Challenge game stake refund';
+
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $request->user_id,
+                $request->amount,
+                $description,
+                WalletBalanceType::CreditsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::FundsReversed
+            )
         );
+
         SendChallengeRefundNotification::dispatch( $request , $request->user);
-        
-        $this->creditWalletAction->executeRefund(
-            $matchedRequest->user->wallet,
-            $matchedRequest->amount,
-            'Challenge game stake refund'
+
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $matchedRequest->user_id,
+                $matchedRequest->amount,
+                $description,
+                WalletBalanceType::CreditsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::FundsReversed
+            )
         );
 
         SendChallengeRefundNotification::dispatch( $matchedRequest, $matchedRequest->user);
@@ -61,11 +78,18 @@ class MatchEndWalletAction
     private function creditWinner(ChallengeRequest $winner): void
     {
         $amountWon = $winner->amount * 2;
-        $this->creditWalletAction->execute(
-            $winner->user->wallet,
-            $amountWon,
-            'Challenge game Winnings credited'
+
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $winner->user_id,
+                $amountWon,
+                'Challenge game Winnings credited',
+                WalletBalanceType::WinningsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::WinningsCredited,
+            )
         );
+
         ChallengeRequest::where('challenge_request_id', $winner->challenge_request_id)
             ->update([
                 'amount_won' => $amountWon

@@ -4,15 +4,16 @@ namespace App\Services\PlayGame;
 
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
 use App\Actions\TriviaChallenge\PracticeMatchEndWalletAction;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionType;
 use App\Models\ChallengeRequest;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
 use App\Services\Firebase\FirestoreService;
-use App\Actions\Wallet\DebitWalletAction;
-use App\Enums\GameRequestMode;
 use App\Enums\WalletTransactionAction;
-use App\Models\UserBoost;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Lottery;
 
@@ -20,7 +21,7 @@ class StakingChallengeGameService
 {
 
     public function __construct(
-        private readonly DebitWalletAction $debitWalletAction,
+        private readonly WalletRepository $walletRepository,
         private readonly MatchEndWalletAction $matchEndWalletAction,
         private readonly FirestoreService $firestoreService,
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
@@ -31,13 +32,17 @@ class StakingChallengeGameService
     {
         $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
-            $this->debitWalletAction->execute(
-                $user->wallet,
-                $data['amount'],
-                'Challenge game stake debited',
-                "non_withdrawable",
-                WalletTransactionAction::StakingPlaced->value
+            $this->walletRepository->addTransaction(
+                new WalletTransactionDto(
+                    $user->id,
+                    $data['amount'],
+                    'Challenge game stake debited',
+                    WalletBalanceType::CreditsBalance,
+                    WalletTransactionType::Credit,
+                    WalletTransactionAction::StakingPlaced
+                )
             );
+            
             $response = $this
                 ->triviaChallengeStakingRepository
                 ->createForMatching($user, $data['amount'], $data['category']);
@@ -113,7 +118,7 @@ class StakingChallengeGameService
         $this->matchEndWalletAction->execute($requestId);
         $this->updateEndMatchFirestore($request, $matchedRequest);
 
-        if (!is_null($consumedBoosts)) {
+        if (!is_null($consumedBoosts) || !empty($consumedBoosts)) {
             $this->handleConsumedBoosts($consumedBoosts, $request);
         }
         return $request;
@@ -139,7 +144,7 @@ class StakingChallengeGameService
             ->updateCompletedRequest($requestId, $score);
 
         [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
-        $this->practiceMatchEndWalletAction->execute($requestId, GameRequestMode::CHALLENGE_PRACTICE);
+        $this->practiceMatchEndWalletAction->execute($requestId);
         $this->updateEndMatchFirestore($request, $matchedRequest);
 
         return $request;
@@ -214,24 +219,25 @@ class StakingChallengeGameService
 
     private function handleConsumedBoosts($consumedBoosts, $request)
     {
-        DB::transaction(function () use ($consumedBoosts, $request) {
-            foreach ($consumedBoosts as $row) {
-                $userBoost = UserBoost::
-                    where('user_id', $request->user_id)
-                    ->where('boost_id', $row['boost']['id'])->first();
+        //@TODO fix this
+        // DB::transaction(function () use ($consumedBoosts, $request) {
+        //     foreach ($consumedBoosts as $row) {
+        //         $userBoost = UserBoost::
+        //             where('user_id', $request->user_id)
+        //             ->where('boost_id', $row['boost']['id'])->first();
 
-                $userBoost->update([
-                    'used_count' => $userBoost->used_count + 1,
-                    'boost_count' => $userBoost->boost_count - 1
-                ]);
+        //         $userBoost->update([
+        //             'used_count' => $userBoost->used_count + 1,
+        //             'boost_count' => $userBoost->boost_count - 1
+        //         ]);
 
-                DB::table('challenge_boosts')->insert([
-                    'challenge_request_id' => $request->challenge_request_id,
-                    'boost_id' => $row['boost']['id'],
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
-            }
-        });
+        //         DB::table('challenge_boosts')->insert([
+        //             'challenge_request_id' => $request->challenge_request_id,
+        //             'boost_id' => $row['boost']['id'],
+        //             'created_at' => now(),
+        //             'updated_at' => now()
+        //         ]);
+        //     }
+        // });
     }
 }

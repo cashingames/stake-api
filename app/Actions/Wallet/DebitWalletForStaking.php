@@ -4,8 +4,10 @@ namespace App\Actions\Wallet;
 
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\Wallet;
 use \App\Repositories\Cashingames\WalletRepository;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 
 class DebitWalletForStaking
@@ -17,36 +19,27 @@ class DebitWalletForStaking
     }
     public function execute(Wallet $wallet, float $amount, WalletBalanceType $walletType): float
     {
-        $balanceToDeduct = "";
-        $action = WalletTransactionAction::StakingPlaced->value;
-
-        if ($walletType == WalletBalanceType::BonusBalance && $wallet->bonus >= $amount) {
-            $hasRegistrationBonus = $this->registrationBonusService->hasActiveRegistrationBonus($wallet->user);
-            if ($hasRegistrationBonus) {
-                $registrationBonus = $this->registrationBonusService->activeRegistrationBonus($wallet->user);
-                $this->handleRegistrationBonusDeduction($registrationBonus, $amount);
-            }
-            $balanceToDeduct = "bonus";
-            $description = "Bonus Staking of " . $amount;
-
-            $this->walletRepository->debit($wallet, $amount, $description, null, $balanceToDeduct, $action);
-            return $wallet->bonus;
+        if (
+            $walletType == WalletBalanceType::BonusBalance &&
+            null != $bonus = $this->registrationBonusService->activeRegistrationBonus($wallet->user)
+        ) {
+            $bonus->amount_remaining_after_staking -= $amount;
+            $bonus->save();
         }
 
-        if ($wallet->non_withdrawable < $amount) {
-            $amount = $wallet->non_withdrawable;
-        }
 
-        $balanceToDeduct = "non_withdrawable";
-        $description = 'Single game stake debited';
+        $result = $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $wallet->user_id,
+                $amount,
+                'Single game stake debited',
+                $walletType,
+                WalletTransactionType::Debit,
+                WalletTransactionAction::StakingPlaced,
+            )
+        );
 
-        $this->walletRepository->debit($wallet, $amount, $description, null, $balanceToDeduct, $action);
-        return $wallet->non_withdrawable;
+        return $result->balance;
     }
 
-    private function handleRegistrationBonusDeduction($registrationBonus, $amount)
-    {
-        $registrationBonus->amount_remaining_after_staking -= $amount;
-        $registrationBonus->save();
-    }
 }

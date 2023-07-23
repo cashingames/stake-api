@@ -1,21 +1,19 @@
 <?php
 
 namespace App\Actions\TriviaChallenge;
-
-use App\Actions\Wallet\CreditWalletAction;
-use App\Enums\GameRequestMode;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
+use App\Repositories\Cashingames\WalletRepository;
 
 class PracticeMatchEndWalletAction
 {
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
-        private readonly CreditWalletAction $creditWalletAction,
+        private readonly WalletRepository $walletRepository,
     ) {
     }
 
-    public function execute(string $requestId, GameRequestMode $mode): ChallengeRequest|null
+    public function execute(string $requestId): ChallengeRequest|null
     {
 
         $winner = $this->getChallengeWinner(

@@ -9,27 +9,22 @@ use GameModeSeeder;
 use GameTypeSeeder;
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Boost;
 use App\Models\Bonus;
 use App\Models\Option;
 use App\Models\Staking;
 use App\Enums\BonusType;
 use App\Models\Category;
 use App\Models\Question;
-use App\Models\UserBoost;
 use App\Models\UserBonus;
 use App\Models\StakingOdd;
 use App\Enums\FeatureFlags;
 use App\Models\GameSession;
 use App\Services\FeatureFlag;
-use Illuminate\Support\Carbon;
 use App\Models\ExhibitionStaking;
 use Database\Seeders\BonusSeeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Database\Seeders\StakingOddSeeder;
 use Database\Seeders\StakingOddsRulesSeeder;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GameTest extends TestCase

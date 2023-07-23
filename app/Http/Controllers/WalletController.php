@@ -2,29 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Boosts\BuyBoostAction;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\WalletTransaction;
 use App\Models\User;
 use App\Models\Boost;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use Yabacon\Paystack;
-use App\Enums\FeatureFlags;
-use App\Services\FeatureFlag;
 use App\Enums\WalletBalanceType;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use App\Enums\WalletTransactionAction;
 use Yabacon\Paystack\Event as PaystackEvent;
 use App\Repositories\Cashingames\WalletRepository;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
 use App\Http\ResponseHelpers\WalletTransactionsResponse;
+use App\Repositories\Cashingames\BoostRepository;
 use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 
 
 class WalletController extends BaseController
 {
+
+    public function __construct(
+        private readonly BoostRepository $boostRepository,
+        private readonly WalletRepository $walletRepository,
+        private readonly BuyBoostAction $buyBoostAction,
+    ) {
+        parent::__construct();
+    }
     public function me()
     {
         $data = [
@@ -194,33 +203,40 @@ class WalletController extends BaseController
         }
 
         $user = User::where('email', $email)->first();
-        $walletRepository = new WalletRepository;
 
-        if (FeatureFlag::isEnabled(FeatureFlags::REGISTRATION_BONUS)) {
-            $hasFundedBefore = $walletRepository->hasFundedBefore($user);
+        $hasFundedBefore = $this->walletRepository->hasFundedBefore($user);
 
-            if (!$hasFundedBefore) {
-                $registrationBonusService = new RegistrationBonusService;
-                $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
-                $shouldRecieveBonus = $registrationBonusService->activateBonus($user, $bonusAmount);
-                if ($shouldRecieveBonus) {
-                    if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
-                        $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
-                    }
-                    $walletRepository->creditBonusAccount(
-                        $user->wallet,
-                        $bonusAmount,
-                        'Bonus Top-up',
-                        null,
-                    );
+        if (!$hasFundedBefore) {
+            $registrationBonusService = new RegistrationBonusService;
+            $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
+            $shouldRecieveBonus = $registrationBonusService->activateBonus($user, $bonusAmount);
+            if ($shouldRecieveBonus) {
+                if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
+                    $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
                 }
+
+                $this->walletRepository->addTransaction(
+                    new WalletTransactionDto(
+                        $user->id,
+                        $bonusAmount,
+                        '100% welcome bonus',
+                        WalletBalanceType::BonusBalance,
+                        WalletTransactionType::Credit,
+                        WalletTransactionAction::BonusCredited
+                    )
+                );
             }
         }
-        $walletRepository->creditFundingAccount(
-            $user->wallet,
-            ($amount / 100),
-            'Wallet Top-up',
-            null,
+
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $user->id,
+                ($amount / 100),
+                'Wallet Top-up',
+                WalletBalanceType::CreditsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::WalletFunded
+            )
         );
 
         Log::info('payment successful from paystack');
@@ -237,13 +253,15 @@ class WalletController extends BaseController
             return response("", 200);
         }
 
-        $walletRepository = new WalletRepository;
-
-        $walletRepository->credit(
-            $user->wallet,
-            ($amount / 100),
-            'Failed Withdrawal Reversed',
-            null,
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $user->id,
+                ($amount / 100),
+                'Failed Withdrawal Reversed',
+                WalletBalanceType::WinningsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::FundsReversed
+            )
         );
 
         Log::info('withdrawal reversed for transaction reference ' . $reference);
@@ -286,37 +304,11 @@ class WalletController extends BaseController
         }
 
         $wallet = $this->user->wallet;
-        if ($wallet->non_withdrawable < ($boost->currency_value)) {
+        if ($wallet->non_withdrawable < ($boost->price)) {
             return $this->sendError([], 'You do not have enough money in your wallet.');
         }
 
-        $wallet->non_withdrawable -= $boost->currency_value;
-        $wallet->save();
-
-
-        WalletTransaction::create([
-            'wallet_id' => $wallet->id,
-            'transaction_type' => 'DEBIT',
-            'amount' => $boost->currency_value,
-            'balance' => $wallet->non_withdrawable,
-            'description' => $boost->name . ' boost purchased',
-            'reference' => Str::random(10),
-            'balance_type' => WalletBalanceType::CreditsBalance->value,
-            'transaction_action' => WalletTransactionAction::BoostBought->value
-        ]);
-
-        $userBoost = $this->user->boosts()->where('boost_id', $boostId)->first();
-
-        if ($userBoost == null) {
-            $this->user->boosts()->create([
-                'user_id' => $this->user->id,
-                'boost_id' => $boostId,
-                'boost_count' => $boost->pack_count,
-                'used_count' => 0
-            ]);
-        } else {
-            $userBoost->update(['boost_count' => $userBoost->boost_count + $boost->pack_count]);
-        }
+        $this->buyBoostAction->execute($boostId, WalletBalanceType::CreditsBalance);
 
         return $this->sendResponse($wallet->non_withdrawable, 'Boost Bought');
     }

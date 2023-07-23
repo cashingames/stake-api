@@ -143,7 +143,7 @@ class WithdrawalTest extends TestCase
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => "DEBIT",
             'description' => 'Successful Withdrawal',
-            'balance' => $this->user->wallet->withdrawable
+            'balance' => 4500
         ]);
     }
 
