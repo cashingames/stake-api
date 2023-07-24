@@ -205,6 +205,7 @@ class StakingChallengeGameService
         /**
          * When Odds should win
          * Current odds: 2/5 to help us recoop the lost amount
+         * Minimum score for bot is 2
          */
         Lottery::odds(2, 5)
             ->winner(function () use ($opponentScore, &$botScore) {

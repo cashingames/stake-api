@@ -73,7 +73,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Account is not valid');
         }
 
-        $fullName = $this->user->profile->first_name . ' ' . $this->user->profile->last_name;
+        $fullName = strtoupper($this->user->profile->first_name . ' ' . $this->user->profile->last_name);
 
         $verifiedAccountName = $this->getValidAccountName($verifyAccount->data->account_name);
 

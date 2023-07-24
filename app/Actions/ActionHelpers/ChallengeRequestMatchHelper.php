@@ -22,10 +22,16 @@ class ChallengeRequestMatchHelper
     public function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
 
-        $questions = $challengeRequest->user_id == 29043201 ?
-            $this->triviaQuestionRepository->getRandomHardQuestionsWithCategoryId($challengeRequest->category_id) :
-            $this->triviaQuestionRepository->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
-
+        $arr = [29032509, 29032509, 29031977, 29043260, 29043201, 29031959, 29043239];
+        if (in_array($challengeRequest->user_id, $arr)) {
+            $questions = $this
+                ->triviaQuestionRepository
+                ->getRandomHardAndMediumQuestionsWithCategoryId($challengeRequest->category_id);
+        } else {
+            $questions = $this
+                ->triviaQuestionRepository
+                ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
+        }
 
         $this->triviaChallengeStakingRepository->logQuestions(
             $questions->toArray(),

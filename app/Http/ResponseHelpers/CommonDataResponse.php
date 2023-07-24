@@ -17,6 +17,7 @@ class CommonDataResponse
             $d->description = $boostItem->description;
             $d->pack_count = $boostItem->pack_count;
             $d->currency_value = $boostItem->price;
+            $d->price = $boostItem->price;
             $d->count = is_null($boostItem->count) ? 0 : $boostItem->count;
             $d->icon = str_ireplace("icons", "icons", $boostItem->icon);
 
