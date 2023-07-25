@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
-        $schedule->command(ExpireBonusCommand::class)->daily();
+        // $schedule->command(ExpireBonusCommand::class)->daily();
         // $schedule->command(GiveLossCashbackCommand::class, [
         //     'duration' => CashbackAccrualDuration::DAILY->value
         // ])->daily();
