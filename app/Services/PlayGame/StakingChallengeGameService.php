@@ -42,7 +42,7 @@ class StakingChallengeGameService
                     WalletTransactionAction::StakingPlaced
                 )
             );
-            
+
             $response = $this
                 ->triviaChallengeStakingRepository
                 ->createForMatching($user, $data['amount'], $data['category']);
@@ -209,10 +209,21 @@ class StakingChallengeGameService
          */
         Lottery::odds(2, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
-                $botScore = ($opponentScore == 10 || $opponentScore == 9) ? 10 : rand($opponentScore, 10);
+
+                if ($opponentScore > 8) {
+                    $botScore = 10;
+                } else {
+                    $botScore = rand($opponentScore + 1, 10);
+                }
             })
             ->loser(function () use ($opponentScore, &$botScore) {
-                $botScore = rand(0, $opponentScore);
+
+                if ($opponentScore < 3) {
+                    $botScore = rand(1, 5); //we don't want both to ever score 0
+                } else {
+                    $botScore = rand(1, $opponentScore);
+                }
+
             })
             ->choose();
         return $botScore;
