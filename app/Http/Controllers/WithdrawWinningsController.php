@@ -73,28 +73,9 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(false, 'Account is not valid');
         }
 
-        $fullName = strtoupper($this->user->profile->first_name . ' ' . $this->user->profile->last_name);
-
-        $verifiedAccountName = $this->getValidAccountName($verifyAccount->data->account_name);
-
-        if (
-            ($verifiedAccountName['firstAndLastName'] != $fullName)
-            && ($verifiedAccountName['lastAndFirstName'] != $fullName)
-        ) {
-            Log::error(
-                $this->user->username .
-                    "'s possible valid account names are
-                {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']}
-                but {$fullName} was provided"
-            );
-            SendAdminErrorEmailUpdate::dispatch('Failed Withdrawal Attempt', $this->user->username .
-                "'s possible valid account names are
-            {$verifiedAccountName['firstAndLastName']} and {$verifiedAccountName['lastAndFirstName']}
-            but {$fullName} was provided");
-            return $this->sendError(
-                null,
-                'Account name does not match your registration name. Please contact support to assist.'
-            );
+        $validateAccountName = $this->validateAccountName($verifyAccount->data->account_name);
+        if (!is_null($validateAccountName)) {
+            return $validateAccountName;
         }
 
         $recipientCode = $this->withdrawalService->createTransferRecipient(
@@ -140,15 +121,33 @@ class WithdrawWinningsController extends BaseController
         }
     }
 
-    private function getValidAccountName($accountName)
+    private function validateAccountName($bankAccountName)
     {
-        $accountNameParts = explode(" ", $accountName);
-        $firstAndLastName = $accountNameParts[0] . " " . $accountNameParts[count($accountNameParts) - 1];
-        $lastAndFirstName = $accountNameParts[count($accountNameParts) - 1] . " " . $accountNameParts[0];
-        return [
-            'firstAndLastName' => strtoupper($firstAndLastName),
-            'lastAndFirstName' => strtoupper($lastAndFirstName)
+        $suppliedNameArr = [
+            strtoupper(trim($this->user->profile->first_name)),
+            strtoupper(trim($this->user->profile->last_name))
         ];
+
+        $cleanedBankName = strtoupper(str_replace(',', '', trim($bankAccountName)));
+        $bankAccountNamesArr = explode(' ', $cleanedBankName);
+
+        foreach ($suppliedNameArr as $name) {
+            if (!in_array($name, $bankAccountNamesArr)) {
+                $msg = $this->user->username .
+                    "'s account name from bank is
+                    {$cleanedBankName} but {$suppliedNameArr[0]} {$suppliedNameArr[1]}   was provided";
+                Log::error($msg);
+                SendAdminErrorEmailUpdate::dispatch(
+                    'Failed Withdrawal Attempt',
+                    $msg
+                );
+                return $this->sendError(
+                    null,
+                    'Account name does not match your registration name. Please contact support to assist.'
+                );
+            }
+        }
+        return null;
     }
 
     private function identifyVerified($userId)
