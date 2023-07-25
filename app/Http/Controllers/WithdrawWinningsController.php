@@ -38,20 +38,9 @@ class WithdrawWinningsController extends BaseController
             'account_name' => ['required', 'string']
         ]);
 
-        $totalWithdrawals = $this->user
-            ->wallet
-            ->transactions()
-            ->sum('amount');
-
-        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
-            Log::error($this->user->username . " has reached max withdrawal amount", [
-                'totalWithdrawals' => $totalWithdrawals,
-                'maxWithdrawalAmount' => config('trivia.max_withdrawal_amount')
-            ]);
-            return $this->sendError(
-                false,
-                'Please contact support to verify your identity to proceed with this withdrawal'
-            );
+        $kycResult = $this->checkKYC();
+        if (!is_null($kycResult)) {
+            return $kycResult;
         }
 
         $debitAmount = $request->amount;
@@ -148,6 +137,30 @@ class WithdrawWinningsController extends BaseController
             }
         }
         return null;
+    }
+
+    private function checkKYC()
+    {
+        $totalWithdrawals = $this->user
+            ->wallet
+            ->transactions()
+            ->sum('amount');
+
+        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
+            $msg = $this->user->username .
+                " has reached max withdrawal amount of " .
+                config('trivia.max_withdrawal_amount') . " but has not been verified" .
+                " total withdrawals so far : {$totalWithdrawals}";
+            SendAdminErrorEmailUpdate::dispatch(
+                'Failed Withdrawal Attempt',
+                $msg
+            );
+            Log::error($msg);
+            return $this->sendError(
+                false,
+                'Please contact support to verify your identity to proceed with this withdrawal'
+            );
+        }
     }
 
     private function identifyVerified($userId)
