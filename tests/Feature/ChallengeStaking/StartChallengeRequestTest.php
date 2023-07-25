@@ -24,7 +24,7 @@ class StartChallengeRequestTest extends TestCase
     {
         parent::setUp();
 
-        $this->createBothUser();
+        $this->createBotUser();
 
         $this->withHeader('x-request-env', 'development');
         $this->instance(
@@ -53,6 +53,11 @@ class StartChallengeRequestTest extends TestCase
             'user_id' => $user->id,
             'username' => $user->username,
             'status' => 'MATCHING',
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $user->id,
+            'non_withdrawable' => 500,
         ]);
     }
 
@@ -162,7 +167,7 @@ class StartChallengeRequestTest extends TestCase
         return $user;
     }
 
-    private function createBothUser(): void
+    private function createBotUser(): void
     {
         $user = User::factory()
             ->hasProfile(1)
