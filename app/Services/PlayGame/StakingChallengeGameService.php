@@ -38,7 +38,7 @@ class StakingChallengeGameService
                     $data['amount'],
                     'Challenge game stake debited',
                     WalletBalanceType::CreditsBalance,
-                    WalletTransactionType::Credit,
+                    WalletTransactionType::Debit,
                     WalletTransactionAction::StakingPlaced
                 )
             );
