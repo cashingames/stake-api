@@ -61,8 +61,8 @@ Route::middleware('api')->prefix('v3')->group(
 
 Route::middleware(['auth:api'])->prefix('v3')->group(
     function () {
-        Route::get('user/profile', [UserController::class, 'profile'])->middleware(['last_active']);
-        Route::get('game/common', [GameController::class, 'getCommonData'])->middleware(['cacheResponse:86400']);
+        Route::get('user/profile', [UserController::class, 'profile']);
+        Route::get('game/common', [GameController::class, 'getCommonData'])->middleware(['cacheResponse:300']);
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::get('odds/standard', GetStakingOddsController::class);
         Route::get('odds/bonus', GetBonusOddsController::class);

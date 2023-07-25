@@ -30,7 +30,6 @@ class StakingChallengeGameService
     }
     public function create(User $user, array $data): ChallengeRequest|null
     {
-        $response = null;
         DB::transaction(function () use ($user, $data, &$response) {
             $this->walletRepository->addTransaction(
                 new WalletTransactionDto(
@@ -47,10 +46,6 @@ class StakingChallengeGameService
                 ->triviaChallengeStakingRepository
                 ->createForMatching($user, $data['amount'], $data['category']);
         });
-
-        if (!$response) {
-            return null;
-        }
 
         $this->firestoreService->createDocument(
             'trivia-challenge-requests',
@@ -71,10 +66,6 @@ class StakingChallengeGameService
         $response = $this
             ->triviaChallengeStakingRepository
             ->createPracticeRequestForMatching($user, $data['amount'], $data['category']);
-
-        if (!$response) {
-            return null;
-        }
 
         $this->firestoreService->createDocument(
             'trivia-challenge-requests',
