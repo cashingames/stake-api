@@ -220,25 +220,22 @@ class StakingChallengeGameService
 
     private function handleConsumedBoosts($consumedBoosts, $request)
     {
-        //@TODO fix this
-        // DB::transaction(function () use ($consumedBoosts, $request) {
-        //     foreach ($consumedBoosts as $row) {
-        //         $userBoost = UserBoost::
-        //             where('user_id', $request->user_id)
-        //             ->where('boost_id', $row['boost']['id'])->first();
+        DB::transaction(function () use ($consumedBoosts, $request) {
+            foreach ($consumedBoosts as $row) {
+                DB::update(
+                    'UPDATE user_boosts
+                    SET used_count = used_count + 1, boost_count = boost_count - 1
+                    WHERE user_id = ? AND boost_id = ?',
+                    [$request->user_id, $row['boost']['id']]
+                );
 
-        //         $userBoost->update([
-        //             'used_count' => $userBoost->used_count + 1,
-        //             'boost_count' => $userBoost->boost_count - 1
-        //         ]);
-
-        //         DB::table('challenge_boosts')->insert([
-        //             'challenge_request_id' => $request->challenge_request_id,
-        //             'boost_id' => $row['boost']['id'],
-        //             'created_at' => now(),
-        //             'updated_at' => now()
-        //         ]);
-        //     }
-        // });
+                DB::table('challenge_boosts')->insert([
+                    'challenge_request_id' => $request->challenge_request_id,
+                    'boost_id' => $row['boost']['id'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        });
     }
 }

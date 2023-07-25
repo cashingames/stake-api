@@ -238,26 +238,23 @@ class GameController extends BaseController
         }
 
 
-        //@TODO: Refractor boost usage
-        // DB::transaction(function () use ($request, $game) {
-        //     foreach ($request->consumedBoosts as $row) {
-        //         $userBoost = UserBoost::where('user_id', $this->user->id)
-        //             ->where('boost_id', $row['boost']['id'])
-        //             ->first();
+        DB::transaction(function () use ($request, $game) {
+            foreach ($request->consumedBoosts as $row) {
+                DB::update(
+                    'UPDATE user_boosts
+                    SET used_count = used_count + 1, boost_count = boost_count - 1
+                    WHERE user_id = ? AND boost_id = ?',
+                    [$this->user->id, $row['boost']['id']]
+                );
 
-        //         $userBoost->update([
-        //             'used_count' => $userBoost->used_count + 1,
-        //             'boost_count' => $userBoost->boost_count - 1
-        //         ]);
-
-        //         DB::table('exhibition_boosts')->insert([
-        //             'game_session_id' => $game->id,
-        //             'boost_id' => $row['boost']['id'],
-        //             'created_at' => Carbon::now(),
-        //             'updated_at' => Carbon::now()
-        //         ]);
-        //     }
-        // });
+                DB::table('exhibition_boosts')->insert([
+                    'game_session_id' => $game->id,
+                    'boost_id' => $row['boost']['id'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+        });
 
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }

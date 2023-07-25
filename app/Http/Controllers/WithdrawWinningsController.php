@@ -78,8 +78,8 @@ class WithdrawWinningsController extends BaseController
         $verifiedAccountName = $this->getValidAccountName($verifyAccount->data->account_name);
 
         if (
-            ($verifiedAccountName['firstAndLastName'] != strtoupper($fullName))
-            && ($verifiedAccountName['lastAndFirstName'] != strtoupper($fullName))
+            ($verifiedAccountName['firstAndLastName'] != $fullName)
+            && ($verifiedAccountName['lastAndFirstName'] != $fullName)
         ) {
             Log::error(
                 $this->user->username .
@@ -146,8 +146,8 @@ class WithdrawWinningsController extends BaseController
         $firstAndLastName = $accountNameParts[0] . " " . $accountNameParts[count($accountNameParts) - 1];
         $lastAndFirstName = $accountNameParts[count($accountNameParts) - 1] . " " . $accountNameParts[0];
         return [
-            'firstAndLastName' => $firstAndLastName,
-            'lastAndFirstName' => $lastAndFirstName
+            'firstAndLastName' => strtoupper($firstAndLastName),
+            'lastAndFirstName' => strtoupper($lastAndFirstName)
         ];
     }
 
