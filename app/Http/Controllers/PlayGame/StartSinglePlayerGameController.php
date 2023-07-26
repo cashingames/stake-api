@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Requests\StartSinglePlayerRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
+use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Services\PlayGame\StakingExhibitionGameService;
 use Illuminate\Http\Request;
 
@@ -18,8 +19,7 @@ class StartSinglePlayerGameController extends Controller
         Request $request,
         StartSinglePlayerRequest $reqeuestModel,
         StakingExhibitionGameService $stakeService
-    )
-    {
+    ) {
         $validated = $reqeuestModel->validated();
         $validatedRequest = (object) $validated;
 
@@ -32,6 +32,10 @@ class StartSinglePlayerGameController extends Controller
 
         //@TODO: Handle business error states in the services
         if (count($startResponse->questions) < 10) {
+            SendAdminErrorEmailUpdate::dispatch(
+                'Failed Single Game Start Attempt',
+                $request->user()->username."'s single game could not start. reason: Category not available for now"
+            );
             Log::info('SSTART_SINGLE_PLAYER_CANNOT_START', [
                 'user' => $request->user()->username,
             ]);
@@ -55,5 +59,4 @@ class StartSinglePlayerGameController extends Controller
             'game' => $gameInfo
         ];
     }
-
 }
