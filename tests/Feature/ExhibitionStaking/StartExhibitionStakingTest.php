@@ -12,6 +12,8 @@ use App\Models\Staking;
 use App\Models\UserBonus;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\BonusSeeder;
+use App\Jobs\SendAdminErrorEmailUpdate;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\DB;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\GameModeSeeder;
@@ -303,6 +305,24 @@ class StartExhibitionStakingTest extends TestCase
         $this->assertDatabaseCount('exhibition_stakings', 1);
     }
 
+   public function test_that_email_is_sent_when_questions_are_not_enough(){
+        
+        Queue::fake();
 
+        $this->user->wallet->update([
+            'non_withdrawable' => 2000,
+            'bonus' => 500
+        ]);
 
+        $response = $this->postjson(self::START_EXHIBITION_GAME_URL, [
+            "category" => $this->category->id,
+            "mode" => 1,
+            "type" => 2,
+            "staking_amount" => 200,
+            'wallet_type' => "bonus_balance"
+        ]);
+
+        Queue::assertPushed( SendAdminErrorEmailUpdate::class);
+    
+    }
 }
