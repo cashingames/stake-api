@@ -7,6 +7,7 @@ use App\Enums\WalletTransactionAction;
 use App\Enums\WalletTransactionType;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
+use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Models\GameMode;
 use App\Models\Boost;
 use App\Models\Category;
@@ -41,7 +42,7 @@ class GameController extends BaseController
         $result = new stdClass;
         $result->gameModes = Cache::rememberForever(
             'gameModes',
-            fn() =>
+            fn () =>
             GameMode::select(
                 'id',
                 'name',
@@ -54,12 +55,12 @@ class GameController extends BaseController
         );
         $result->boosts = Cache::rememberForever(
             'gameBoosts',
-            fn() => Boost::where('name', '!=', 'Bomb')
+            fn () => Boost::where('name', '!=', 'Bomb')
                 ->get()
         );
-        $gameTypes = Cache::rememberForever('gameTypes', fn() => GameType::has('questions')->inRandomOrder()->get());
+        $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn() => Category::all());
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
 
         $gameInfo = DB::select("
             SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
@@ -142,8 +143,7 @@ class GameController extends BaseController
         $result->totalWithdrawalAmountLimit = config('trivia.total_withdrawal_limit');
         $result->totalWithdrawalDays = config('trivia.total_withdrawal_days_limit');
         $result->hoursBeforeWithdrawal = config('trivia.hours_before_withdrawal');
-        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");
-        ;
+        $result->minimumBoostScore = config("trivia.minimum_game_boost_score");;
 
         return $this->sendResponse((new CommonDataResponse())->transform($result), "Common data");
     }
@@ -155,12 +155,22 @@ class GameController extends BaseController
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->sharedLock()->first();
         if ($game == null) {
-            Log::info($this->user->username . " tries to end game with invalid token " . $request->token);
+            $msg = $this->user->username . " tries to end game with invalid token " . $request->token;
+            Log::info($msg);
+            SendAdminErrorEmailUpdate::dispatch(
+                'Invalid Game Session Token',
+                $msg
+            );
             return $this->sendError('Game Session does not exist', 'Game Session does not exist');
         }
 
         if ($game->state == "COMPLETED") {
-            Log::info($this->user->username . " trying to end game a second time with " . $request->token);
+            $msg = $this->user->username . " trying to end game a second time with " . $request->token;
+            Log::info($msg);
+            SendAdminErrorEmailUpdate::dispatch(
+                'End Game Second Attempt',
+                $msg
+            );
             return $this->sendResponse($game, 'Game Ended');
         }
 
@@ -175,8 +185,13 @@ class GameController extends BaseController
         $chosenOptions = [];
 
         if (count($request->chosenOptions) > $questionsCount) {
-            Log::error($this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token");
-
+            $msg = $this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token";
+            Log::error($msg);
+            
+            SendAdminErrorEmailUpdate::dispatch(
+                'Expected Answers Count Exceeded',
+                $msg
+            );
             //@TODO: we choose to pick first X options to avoid errors
             //refractor this to unique question id and pick 1 option for each
             $chosenOptions = array_slice($request->chosenOptions, 0, $questionsCount);
@@ -278,7 +293,6 @@ class GameController extends BaseController
         }
 
         return $amountWon;
-
     }
 
     private function handleNormalStaking($staking, $points)
@@ -290,6 +304,5 @@ class GameController extends BaseController
             ->update(['odds_applied' => $totalOdds]);
 
         return $staking->amount_staked * $totalOdds;
-
     }
 }
