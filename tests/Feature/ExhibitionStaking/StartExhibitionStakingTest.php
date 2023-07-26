@@ -172,9 +172,6 @@ class StartExhibitionStakingTest extends TestCase
         ]);
 
         Queue::assertPushed( SendAdminErrorEmailUpdate::class);
-        
-        // $response->assertJson([
-        //     'message' => 'Insufficient bonus balance. Please contact support for help.',
-        // ]);
+    
     }
 }
