@@ -47,7 +47,8 @@ class ResetPasswordTest extends TestCase
 
     public function test_that_existing_user_can_reset_password()
     {   
-
+        $this->user->update(['phone_number' => "1234556778"]);
+        
         $response = $this->postjson(self::URL, [
             "phone" => $this->user->phone_number,
             "password" => "passwordNew1234",
