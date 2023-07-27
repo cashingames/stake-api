@@ -65,7 +65,7 @@ class ResetPasswordTest extends TestCase
     {   
 
         $response = $this->postjson(self::URL, [
-            "phone" => '09098888887',
+            "phone" => '8888888999',
             "password" => "passwordNew1234",
             "password_confirmation" => "passwordNew1234",
             "code" =>  '12345'
