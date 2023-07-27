@@ -10,7 +10,6 @@ use App\Models\Category;
 use Mockery\MockInterface;
 use App\Jobs\MatchChallengeRequest;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Config;
 use App\Services\Firebase\FirestoreService;
 use App\Jobs\MatchWithHumanChallengeRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,6 +30,10 @@ class StartChallengeRequestTest extends TestCase
             FirestoreClient::class,
             Mockery::mock(FirestoreClient::class)
         );
+
+        config(['trivia.minimum_challenge_staking_amount' => 100]);
+        config(['trivia.maximum_challenge_staking_amount' => 1000]);
+
         Queue::fake();
     }
 
@@ -67,7 +70,6 @@ class StartChallengeRequestTest extends TestCase
             FirestoreService::class,
             Mockery::mock(FirestoreService::class)
         );
-        Config::set('trivia.minimum_challenge_staking_amount', 100);
         $user = User::factory()
             ->hasProfile(1)
             ->create();
@@ -88,7 +90,7 @@ class StartChallengeRequestTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJson([
-            "message" => "Amount should not be less than 100",
+            "message" => "The amount must be at least 100."
         ]);
     }
 
@@ -98,7 +100,6 @@ class StartChallengeRequestTest extends TestCase
             FirestoreService::class,
             Mockery::mock(FirestoreService::class)
         );
-        Config::set('trivia.maximum_challenge_staking_amount', 1000);
         $user = User::factory()
             ->hasProfile(1)
             ->create();
@@ -119,7 +120,7 @@ class StartChallengeRequestTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJson([
-            "message" => "Amount should not be more than 1000",
+            "message" => "The amount must not be greater than 1000.",
         ]);
     }
 
@@ -151,13 +152,11 @@ class StartChallengeRequestTest extends TestCase
     {
         $user = User::factory()
             ->hasProfile(1)
+            ->hasWallet(1, [
+                'non_withdrawable' => 1000
+            ])
             ->create();
 
-        Wallet::factory()
-            ->for($user)
-            ->create([
-                'non_withdrawable' => 1000
-            ]);
         $this->actingAs($user)
             ->post(self::URL, [
                 'category' => $category->id,
@@ -169,14 +168,11 @@ class StartChallengeRequestTest extends TestCase
 
     private function createBotUser(): void
     {
-        $user = User::factory()
+        User::factory()
             ->hasProfile(1)
-            ->create();
-
-        Wallet::factory()
-            ->for($user)
-            ->create([
+            ->hasWallet(1, [
                 'non_withdrawable' => 1000
-            ]);
+            ])
+            ->create();
     }
 }

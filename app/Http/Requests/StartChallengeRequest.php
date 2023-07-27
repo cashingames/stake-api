@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\WalletBalanceType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -30,40 +31,66 @@ class StartChallengeRequest extends FormRequest
     {
         return [
             'category' => ['required', 'numeric'],
-            'amount' => ['required', 'numeric'],
+            'amount' => [
+                'required',
+                'numeric',
+                "max:" . config('trivia.maximum_challenge_staking_amount'),
+                "min:" . config('trivia.minimum_challenge_staking_amount')
+            ],
+            'wallet_type' => ['nullable', 'string']
         ];
     }
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
-            if ($this->input('amount') > auth()->user()->wallet->non_withdrawable) {
-                $validator->errors()->add('amount', 'Insufficient Balance');
-            }
-            if ($this->input('amount') > config('trivia.maximum_challenge_staking_amount')) {
-                $validator->errors()->add(
-                    'amount',
-                    'Amount should not be more than ' . config('trivia.maximum_challenge_staking_amount')
-                );
-            }
-            if ($this->input('amount') < config('trivia.minimum_challenge_staking_amount')) {
-                $validator->errors()->add(
-                    'amount',
-                    'Amount should not be less than ' . config('trivia.minimum_challenge_staking_amount')
-                );
-            }
+            $this->validateStakingAmount($validator);
         });
     }
 
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
+    private function validateStakingAmount($validator)
     {
-        return [
-            'amount.min' => 'Insufficient Balance',
-        ];
+
+        $stakingAmount = $this->input('amount');
+        $user = auth()->user();
+
+        if (strtoupper($this->input('wallet_type')) == WalletBalanceType::BonusBalance->value) {
+            $this->validateBonusAccount($validator, $user, $stakingAmount);
+        } else {
+            $this->validateDepositAccount($validator, $user, $stakingAmount);
+        }
+    }
+
+    private function validateDepositAccount($validator, $user, $stakingAmount)
+    {
+        app()->instance(WalletBalanceType::class, WalletBalanceType::CreditsBalance);
+
+        if ($user->wallet->non_withdrawable < $stakingAmount) {
+            $validator->errors()->add(
+                'staking_amount',
+                'You do not have sufficient deposit balance. Please deposit more funds.'
+            );
+        }
+    }
+
+    private function validateBonusAccount($validator, $user, $stakingAmount)
+    {
+        app()->instance(WalletBalanceType::class, WalletBalanceType::BonusBalance);
+        if ($user->wallet->bonus < $stakingAmount) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Insufficient bonus balance. Please contact support for help.'
+            );
+            return;
+        }
+
+        $leftOverAmount = ($user->wallet->bonus - $stakingAmount);
+        if ($leftOverAmount < config('trivia.minimum_challenge_staking_amount') && $leftOverAmount != 0) {
+            $validator->errors()->add(
+                'staking_amount',
+                'Insufficient bonus amount will be left after this stake. Please stake ' . $user->wallet->bonus
+            );
+        }
+
     }
 }

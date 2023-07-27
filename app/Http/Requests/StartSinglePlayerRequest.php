@@ -79,7 +79,7 @@ class StartSinglePlayerRequest extends FormRequest
         $stakingAmount = $this->input('staking_amount');
         $user = auth()->user();
 
-        if ($this->input('wallet_type') == 'bonus_balance') {
+        if (strtoupper($this->input('wallet_type')) == WalletBalanceType::BonusBalance->value) {
             $this->validateBonusAccount($validator, $user, $stakingAmount);
         } else {
             $this->validateDepositAccount($validator, $user, $stakingAmount);
@@ -116,7 +116,6 @@ class StartSinglePlayerRequest extends FormRequest
                 'staking_amount',
                 'Insufficient bonus amount will be left after this stake. Please stake ' . $user->wallet->bonus
             );
-            return;
         }
 
     }
