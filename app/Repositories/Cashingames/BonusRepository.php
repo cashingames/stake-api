@@ -62,42 +62,6 @@ class BonusRepository
         $userBonus->save();
     }
 
-    public function getActiveUserRegistrationBonusesToExpire(): Collection
-    {
-        return UserBonus::where('is_on', true)
-            ->where('created_at', '<=', now()->subDays(30))
-            ->whereHas('bonus', function ($query) {
-                $query->where('name', BonusType::RegistrationBonus->value);
-            })
-            ->with('user.wallet')
-            ->get();
-    }
-
-    public function expireBonuses(Collection $activeRegistrationBonuses)
-    {
-        DB::transaction(function () use ($activeRegistrationBonuses) {
-
-            //remove bonus from users' wallet
-            $activeRegistrationBonuses
-                ->reject(function (UserBonus $bonus) {
-                    return $bonus->amount_remaining_after_staking == 0;
-                })
-                ->each(function ($userBonus) {
-                    $userBonus->user->wallet->update([
-                        'bonus' => $userBonus->user->wallet->bonus - $userBonus->amount_remaining_after_staking
-                    ]);
-                });
-
-            if ($activeRegistrationBonuses->isEmpty()) {
-                return;
-            }
-
-            $activeRegistrationBonuses->toQuery()->update([
-                'is_on' => false
-            ]);
-        });
-    }
-
     public function getUsersLossBetween(Carbon $startDate, Carbon $endDate)
     {
         $usersWithLosses = DB::select("
