@@ -35,7 +35,6 @@ class WithdrawWinningsController extends BaseController
                 'max:' . $this->user->wallet->withdrawable,
                 'min:' . config('trivia.min_withdrawal_amount')
             ],
-            'account_name' => ['required', 'string']
         ]);
 
         $kycResult = $this->checkKYC();
@@ -85,7 +84,7 @@ class WithdrawWinningsController extends BaseController
             return $this->sendError(
                 false,
                 "We are unable to complete your withdrawal request at this time, " .
-                    "please try in a short while or contact support"
+                "please try in a short while or contact support"
             );
         }
 
@@ -99,7 +98,7 @@ class WithdrawWinningsController extends BaseController
                 WalletTransactionAction::WinningsWithdrawn
             )
         );
-        
+
         Log::info('withdrawal transaction created ' . $this->user->username);
 
         if ($transferInitiated->status == 'pending') {
@@ -112,31 +111,32 @@ class WithdrawWinningsController extends BaseController
 
     private function validateAccountName($bankAccountName)
     {
-        $suppliedNameArr = [
-            strtoupper(trim($this->user->profile->first_name)),
-            strtoupper(trim($this->user->profile->last_name))
-        ];
+        $suppliedNameArr = explode(' ', $this->cleanName($this->user->profile->full_name));
+        $bankAccountNamesArr = explode(' ', $this->cleanName($bankAccountName));
 
-        $cleanedBankName = strtoupper(str_replace(',', '', trim($bankAccountName)));
-        $bankAccountNamesArr = explode(' ', $cleanedBankName);
-
+        $countOfFoundName = 0;
         foreach ($suppliedNameArr as $name) {
-            if (!in_array($name, $bankAccountNamesArr)) {
-                $msg = $this->user->username .
-                    "'s account name from bank is
-                    {$cleanedBankName} but {$suppliedNameArr[0]} {$suppliedNameArr[1]}   was provided";
-                Log::error($msg);
-                SendAdminErrorEmailUpdate::dispatch(
-                    'Failed Withdrawal Attempt',
-                    $msg
-                );
-                return $this->sendError(
-                    null,
-                    'Account name does not match your registration name. Please contact support to assist.'
-                );
+            if (in_array($name, $bankAccountNamesArr)) {
+                $countOfFoundName++;
             }
         }
-        return null;
+
+        if ($countOfFoundName >= 2) {
+            return null;
+        }
+
+        $msg = $this->user->username .
+            "'s account name from bank is
+                    {$bankAccountName} but {$this->user->profile->full_name}   was provided";
+        Log::error($msg);
+        SendAdminErrorEmailUpdate::dispatch(
+            'Failed Withdrawal Attempt',
+            $msg
+        );
+        return $this->sendError(
+            null,
+            'Account name does not match your registration name. Please contact support to assist.'
+        );
     }
 
     private function checkKYC()
@@ -144,6 +144,7 @@ class WithdrawWinningsController extends BaseController
         $totalWithdrawals = $this->user
             ->wallet
             ->transactions()
+            ->where('transaction_action', WalletTransactionAction::WinningsWithdrawn)
             ->sum('amount');
 
         if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
@@ -167,5 +168,11 @@ class WithdrawWinningsController extends BaseController
     {
         $verified = [29031959, 29043239];
         return in_array($userId, $verified);
+    }
+
+    private function cleanName($name)
+    {
+        $specialChars = array('-', ',');
+        return strtoupper(str_replace($specialChars, ' ', trim($name)));
     }
 }

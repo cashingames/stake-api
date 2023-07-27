@@ -60,23 +60,29 @@ class WithdrawalTest extends TestCase
 
         $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 150,
             'bank_name' => 'Test Bank'
         ])->assertSessionHasErrors(['amount' => 'The amount must be at least 500.']);
     }
 
-    public function test_that_a_user_cannot_withdraw_if_name_is_not_equal_to_account_name()
+    /**
+     * @dataProvider wrongAccountNamesDataProvider
+     */
+    public function test_that_a_user_cannot_withdraw_if_name_is_not_equal_to_account_name(
+        $nameFromBank,
+        $suppliedFirstName,
+        $suppliedLastName
+    )
     {
         $banksMock = $this->banksMock;
-        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock, $nameFromBank) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => 'TEST ACCOUNT'
+                    'account_name' => $nameFromBank
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -86,15 +92,18 @@ class WithdrawalTest extends TestCase
             ]);
         });
         Queue::fake();
-        $this->user->wallet->withdrawable = 1000;
-        $this->user->wallet->save();
+        $this->user->profile->update([
+            'first_name' => $suppliedFirstName,
+            'last_name' => $suppliedLastName,
+        ]);
+        $this->user->wallet->update([
+            'withdrawable' => 1000
+        ]);
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
-
         ]);
 
         Queue::assertPushed(SendAdminErrorEmailUpdate::class);
@@ -104,17 +113,24 @@ class WithdrawalTest extends TestCase
         ]);
     }
 
-    public function test_that_user_can_withdraw_successfully()
+    /**
+     * @dataProvider correctAccountNamesDataProvider
+     */
+    public function test_that_user_can_withdraw_successfully(
+        $nameFromBank,
+        $suppliedFirstName,
+        $suppliedLastName
+    )
     {
         $banksMock = $this->banksMock;
-        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock, $nameFromBank) {
             $mock->shouldReceive('getBanks')->once()->andReturn(
                 $banksMock
             );
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
+                    'account_name' => $nameFromBank
                 ]
             ]);
 
@@ -124,15 +140,20 @@ class WithdrawalTest extends TestCase
                 'reference' => 'randomref'
             ]);
         });
-        $this->user->wallet->withdrawable = 5000;
-        $this->user->wallet->save();
+
+        $this->user->profile->update([
+            'first_name' => $suppliedFirstName,
+            'last_name' => $suppliedLastName,
+        ]);
+
+        $this->user->wallet->update([
+            'withdrawable' => 5000
+        ]);
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
-
         ]);
 
         $response->assertJson([
@@ -157,7 +178,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
+                    'account_name' => strtoupper($this->user->profile->full_name)
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -171,7 +192,6 @@ class WithdrawalTest extends TestCase
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
 
@@ -199,7 +219,6 @@ class WithdrawalTest extends TestCase
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
 
@@ -219,7 +238,7 @@ class WithdrawalTest extends TestCase
             $mock->shouldReceive('verifyAccount')->andReturn((object)[
                 'status' => true,
                 'data' => (object)[
-                    'account_name' => strtoupper($this->user->profile->first_name) . " " . strtoupper($this->user->profile->last_name)
+                    'account_name' => strtoupper($this->user->profile->full_name)
                 ]
             ]);
             $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
@@ -231,14 +250,14 @@ class WithdrawalTest extends TestCase
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
 
         ]);
 
         $response->assertJson([
-            'message' => 'We are unable to complete your withdrawal request at this time, please try in a short while or contact support'
+            'message' => 'We are unable to complete your withdrawal request at' .
+            ' this time, please try in a short while or contact support'
         ]);
     }
 
@@ -247,7 +266,6 @@ class WithdrawalTest extends TestCase
         $this->user->delete();
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
 
@@ -264,7 +282,7 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->withdrawable = 20000;
         $this->user->wallet->save();
 
-        $result = WalletTransaction::create([
+        WalletTransaction::create([
             'wallet_id' => $this->user->wallet->id,
             'transaction_type' => 'CREDIT',
             'amount' => 15000,
@@ -273,12 +291,11 @@ class WithdrawalTest extends TestCase
             'reference' => Str::random(10),
             'created_at' => now()->subHours(3),
             'balance_type' => WalletBalanceType::WinningsBalance->value,
-            'description_action' => WalletTransactionAction::WinningsWithdrawn->value
+            'transaction_action' => WalletTransactionAction::WinningsWithdrawn->value
         ]);
 
         $response = $this->post(self::WITHDRAWAL_URL, [
             'account_number' => '124567890',
-            'account_name' => 'Test User',
             'amount' => 500,
             'bank_name' => 'Test Bank'
         ]);
@@ -286,5 +303,26 @@ class WithdrawalTest extends TestCase
         $response->assertJsonFragment([
             'message' => 'Please contact support to verify your identity to proceed with this withdrawal'
         ]);
+    }
+
+
+    public function wrongAccountNamesDataProvider()
+    {
+        // name from bank, supplied first name, supplied last name
+        return [
+            ['Oyesola Ogundele', 'Oyesola', 'Akinkunmi'],
+            ['JUWA BABAFEMI', 'BENJAMIN JUWA', 'Enitan'],
+            ['MUHAMMED-BASHEER AISHAT', 'Aisha', 'Muhammed']
+        ];
+    }
+
+    public function correctAccountNamesDataProvider()
+    {
+        // name from bank, supplied first name, supplied last name
+        return [
+            ['OLUWATOYOSI MARVELLOUS ERAIYETAN', 'OLUWATOYOSI MARVELOUS', 'ERAIYETAN'],
+            ['JUWA BABAFEMI', 'JUWA', 'BABAFEMI'],
+            ['MUHAMMED-BASHEER AISHAT', 'Aishat', 'Muhammed']
+        ];
     }
 }
