@@ -140,7 +140,7 @@ class WalletRepository
             )
             ->where('balance_type', $walletType)
             ->orderBy('wallet_transactions.created_at', 'desc')
-            ->paginate(10);
+            ->paginate(100);
     }
 
     public function addTransaction(WalletTransactionDto $dto): mixed

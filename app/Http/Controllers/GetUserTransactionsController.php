@@ -15,7 +15,6 @@ class GetUserTransactionsController extends Controller
     {
         $transactions = $transactionAction->execute(auth()->user()->wallet, $request->wallet_type);
 
-        // dd($transactions);
         return (new WalletTransactionsResponse())->transform($transactions)->original;
         
     }
