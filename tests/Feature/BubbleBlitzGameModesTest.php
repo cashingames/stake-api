@@ -19,6 +19,7 @@ class BubbleBlitzGameModesTest extends TestCase
     {
         parent::setUp();
         $this->seed(UserSeeder::class);
+        $this->seed(GameSeeder::class);
         $this->user = User::first();
         $this->actingAs($this->user);
     }

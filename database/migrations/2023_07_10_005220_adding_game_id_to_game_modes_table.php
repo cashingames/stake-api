@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('game_modes', function (Blueprint $table) {
-            $table->foreignId('game_id');
+            $table->foreignId('game_id')->default(0);
         });
     }
 

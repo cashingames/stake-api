@@ -9,10 +9,10 @@ use Illuminate\Http\Request;
 
 class BubbleBlitzGameModesController extends BaseController
 {
-    public function __invoke(Game $games)
+    public function __invoke()
     {
-        // $gameModes = GameMode::where('game_id', 2)->get();
-        $gameModes = $games->gameModes()->where('name', 'Bubble Blitz')->get();
+        $game = Game::where('name', 'Bubble Blitz')->first()->id;
+        $gameModes = GameMode::where('game_id', $game)->get();
         $data = [];
         $response = new BubbleBlitzGameModesResponse();
         foreach($gameModes as $gameMode){

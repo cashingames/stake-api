@@ -14,6 +14,6 @@ class GameMode extends Model
     }
 
     public function games(){
-        return $this->belongsTo(Game::class);
+        return $this->belongsTo(Game::class, 'game_id');
     }
 }
