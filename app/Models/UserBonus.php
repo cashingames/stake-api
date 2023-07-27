@@ -28,9 +28,4 @@ class UserBonus extends Model
     {
         return $this->belongsTo(Bonus::class);
     }
-
-    public function scopeTobeExpired($query)
-    {
-        return $query->where('created_at', '<=', now()->subDays(30));
-    }
 }
