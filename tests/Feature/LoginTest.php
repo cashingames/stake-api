@@ -7,7 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use UserSeeder;
 use App\Models\User;
-
+use App\Jobs\SendAdminErrorEmailUpdate;
+use Illuminate\Support\Facades\Queue;
 class LoginTest extends TestCase
 {
     use RefreshDatabase;
@@ -28,7 +29,6 @@ class LoginTest extends TestCase
         $this->seed(UserSeeder::class);
         $this->user = User::first();
         config(['services.termii.api_key' => 'termii_api_key']);
-
     }
 
     public function login_fields_cannot_be_empty()
@@ -121,8 +121,7 @@ class LoginTest extends TestCase
 
     public function test_that_ip_address_is_updated_on_login()
     {
-
-        $response = $this->postjson(self::AUTH_URL, [
+        $this->postjson(self::AUTH_URL, [
             "email" => $this->user->email,
             "password" => "password",
         ]);
@@ -130,5 +129,22 @@ class LoginTest extends TestCase
         $this->assertDatabaseHas('users', [
             'meta_data->login_ip_address' => request()->ip(),
         ]);
+    }
+
+    public function test_that_email_is_sent_when_user_has_no_phone_number()
+    {
+
+        Queue::fake();
+
+        $this->user->update([
+            'phone_number' => null
+        ]);
+
+        $this->postjson(self::AUTH_URL, [
+            "email" => $this->user->email,
+            "password" => "password",
+        ]);
+
+        Queue::assertPushed(SendAdminErrorEmailUpdate::class);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\AuthTokenType;
 use App\Models\User;
 use App\Http\Controllers\BaseController;
+use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Services\SMS\SMSProviderInterface;
 use Illuminate\Support\Facades\Log;
 
@@ -84,6 +85,12 @@ class LoginController extends BaseController
         SMSProviderInterface $smsService,
         $user
     ) {
+        if ($user->phone_number == null || $user->phone_number == " " ) {
+            SendAdminErrorEmailUpdate::dispatch(
+                'Attempt to Login with empty phone number record',
+                $user->username." does not have a phone number in our records"
+            );
+        }
 
         if ($user->phone_verified_at != null) {
             return null;
