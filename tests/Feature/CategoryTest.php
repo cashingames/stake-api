@@ -23,22 +23,28 @@ class CategoryTest extends TestCase
         $this->category = Category::first();
     }
 
-    // public function test_category_icon_can_be_uploaded()
-    // {
-    //     Storage::fake('icons');
+    public function test_category_icon_must_be_a_file_to_be_uploaded()
+    {
+        
+        $response = $this->post('/api/v3/category/icon/save', [
+            'categoryName' => $this->category->name,
+            'icon' => "file",
+        ]);
 
-    //     $file = UploadedFile::fake()->image('category_icon.png');
+        $response->assertStatus(302);
 
-    //     $response = $this->post('/api/v3/category/icon/save', [
-    //         'categoryName' => $this->category->name,
-    //         'icon' => $file,
-    //     ]);
+    }
 
-    //     $response->assertStatus(200);
+    public function test_category_name_must_be_a_strings_to_be_uploaded()
+    {
+        
+        $response = $this->post('/api/v3/category/icon/save', [
+            'categoryName' => 122333,
+            'icon' => "file",
+        ]);
 
-    //     // Delete the uploaded image
-    //     Storage::disk('icons')->delete($file->hashName());
+        $response->assertStatus(302);
 
-    // }
+    }
 
 }
