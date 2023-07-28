@@ -30,7 +30,8 @@ class GameController extends BaseController
 {
 
     public function __construct(
-        private WalletRepository $walletRepository) {
+        private WalletRepository $walletRepository
+    ) {
         parent::__construct();
     }
 
@@ -152,7 +153,7 @@ class GameController extends BaseController
 
         $game = $this->user->gameSessions()->where('session_token', $request->token)->sharedLock()->first();
         if ($game == null) {
-            $msg = $this->user->username . " tries to end game with invalid token " . $request->token;
+            $msg = $this->user->username . " tries to end game with invalid token : " . $request->token;
             Log::info($msg);
             SendAdminErrorEmailUpdate::dispatch(
                 'Invalid Game Session Token',
@@ -162,7 +163,8 @@ class GameController extends BaseController
         }
 
         if ($game->state == "COMPLETED") {
-            $msg = $this->user->username . " trying to end game a second time with " . $request->token;
+            $msg = 'Player ' . $this->user->username . " with staking amount of " . $request->staking_amount . " and GameId: " . $game->id .
+                " is trying to submit twice.";
             Log::info($msg);
             SendAdminErrorEmailUpdate::dispatch(
                 'End Game Second Attempt',
@@ -184,7 +186,7 @@ class GameController extends BaseController
         if (count($request->chosenOptions) > $questionsCount) {
             $msg = $this->user->username . " sent " . count($request->chosenOptions) . " answers as against $questionsCount for gamesession $request->token";
             Log::error($msg);
-            
+
             SendAdminErrorEmailUpdate::dispatch(
                 'Expected Answers Count Exceeded',
                 $msg
