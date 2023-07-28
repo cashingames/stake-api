@@ -20,7 +20,7 @@ class WalletRepository
     {
         return Wallet::where('user_id', $userId)->firstOrFail();
     }
-    public function getWalletBalance($user, $walletType)
+    public function getWalletBalance($user, WalletBalanceType $walletType)
     {
         $wallet = $user->wallet;
         switch ($walletType) {
@@ -56,12 +56,12 @@ class WalletRepository
      */
     public function getUserProfitPercentageOnStaking(int $userId, Carbon $startDate, Carbon $endDate): int|float
     {
-        $todayStakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+        $stakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
             ->where('user_id', $userId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->first();
-        $amountStaked = $todayStakes?->amount_staked ?? 0;
-        $amountWon = $todayStakes?->amount_won ?? 0;
+        $amountStaked = $stakes?->amount_staked ?? 0;
+        $amountWon = $stakes?->amount_won ?? 0;
 
         if ($amountStaked == 0) {
             return 0;

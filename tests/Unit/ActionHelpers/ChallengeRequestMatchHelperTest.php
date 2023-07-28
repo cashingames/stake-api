@@ -5,6 +5,7 @@ namespace Tests\Unit\ActionHelpers;
 use App\Models\Profile;
 use App\Models\Question;
 use App\Services\Firebase\FirestoreService;
+use App\Services\StakeQuestionsHardeningService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
@@ -26,23 +27,23 @@ class ChallengeRequestMatchHelperTest extends TestCase
             ['question' => 'question 3'],
         ]);
 
-        $triviaQuestionRepo = $this->mockTriviaQuestionRepository();
-        $triviaQuestionRepo
-            ->expects($this->once())
-            ->method('getRandomEasyQuestionsWithCategoryId')
-            ->with($challengeRequest->category_id)
-            ->willReturn($questions);
-
         $triviaChallengeStakingRepo = $this->mockTriviaChallengeStakingRepository();
         $triviaChallengeStakingRepo
             ->expects($this->once())
             ->method('logQuestions')
             ->with($questions->toArray(), $challengeRequest, $matchedRequest);
 
+        $stakeQuestionsHardeningService = $this->mockStakeQuestionsHardeningService();
+        $stakeQuestionsHardeningService
+            ->expects($this->once())
+            ->method('determineQuestions')
+            ->with($challengeRequest->user_id, $challengeRequest->category_id)
+            ->willReturn($questions);
 
         $sut = new ChallengeRequestMatchHelper(
             $triviaChallengeStakingRepo,
-            $triviaQuestionRepo,
+            $this->mockTriviaQuestionRepository(),
+            $stakeQuestionsHardeningService,
             $this->mockFirestoreService(),
         );
 
@@ -92,6 +93,7 @@ class ChallengeRequestMatchHelperTest extends TestCase
         $sut = new ChallengeRequestMatchHelper(
             $this->mockTriviaChallengeStakingRepository(),
             $this->mockTriviaQuestionRepository(),
+            $this->mockStakeQuestionsHardeningService(),
             $firestoreService,
         );
 
@@ -111,6 +113,11 @@ class ChallengeRequestMatchHelperTest extends TestCase
     private function mockFirestoreService()
     {
         return $this->createMock(FirestoreService::class);
+    }
+
+    private function mockStakeQuestionsHardeningService()
+    {
+        return $this->createMock(StakeQuestionsHardeningService::class);
     }
 
 }

@@ -27,15 +27,6 @@ class OddsService
         return $this->getDynamicOdds();
     }
 
-    private function getStandardOdds(): Collection
-    {
-        return Cache::remember(
-            'staking-odds',
-            60 * 60,
-            fn() => StakingOdd::active()->orderBy('score', 'DESC')->get()
-        );
-    }
-
     public function getDynamicOdds(): Collection
     {
         $odds = $this->getStandardOdds();
@@ -46,6 +37,15 @@ class OddsService
             $odd->odd = round(($odd->odd * $oddsMultiplier['oddsMultiplier']), 2);
             return $odd;
         });
+    }
+
+    private function getStandardOdds(): Collection
+    {
+        return Cache::remember(
+            'staking-odds',
+            60 * 60,
+            fn() => StakingOdd::active()->orderBy('score', 'DESC')->get()
+        );
     }
 
     public function computeDynamicOdds(): array

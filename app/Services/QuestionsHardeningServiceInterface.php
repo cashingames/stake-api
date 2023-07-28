@@ -13,7 +13,7 @@ interface QuestionsHardeningServiceInterface
 {
    /**
     * @param array $attributes
-    * @return Question
+    * @return Collection
     */
    public function determineQuestions(int $userId, int $categoryId): Collection;
 }

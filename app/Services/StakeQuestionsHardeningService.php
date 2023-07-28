@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Repositories\Cashingames\TriviaQuestionRepository;
+use App\Repositories\Cashingames\WalletRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Determining Question Hardening odds of a user
@@ -15,7 +17,8 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
 {
 
     public function __construct(
-        private readonly TriviaQuestionRepository $questionRepository
+        private readonly TriviaQuestionRepository $questionRepository,
+        private readonly WalletRepository $walletRepository
     )
     {
     }
@@ -28,12 +31,22 @@ class StakeQuestionsHardeningService implements QuestionsHardeningServiceInterfa
     public function determineQuestions(int $userId, int $categoryId): Collection
     {
 
-        $arr = [29032509, 29032509, 29031977, 29043260, 29043201, 29031959, 29043239, 29043149];
-        if (in_array($userId, $arr)) {
-            return $this->questionRepository->getRandomHardAndMediumQuestionsWithCategoryId($categoryId);
+        $percentWonThisYear = $this->walletRepository
+            ->getUserProfitPercentageOnStakingThisYear($userId);
+
+        if ($percentWonThisYear > 30) {
+
+            Log::info(
+                'Serving getHardQuestions because percentage won this year is greater than 30%',
+                [
+                    'user' => auth()->user()->username,
+                    'percentWonThisYear' => $percentWonThisYear . '%',
+                ]
+            );
+            return $this->questionRepository
+                ->getRandomHardAndMediumQuestionsWithCategoryId($categoryId);
         }
         return $this->questionRepository->getRandomEasyQuestionsWithCategoryId($categoryId);
     }
-   
 
 }

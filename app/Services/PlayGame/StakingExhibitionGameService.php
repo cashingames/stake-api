@@ -26,7 +26,8 @@ class StakingExhibitionGameService
     public function __construct(
         private StakeQuestionsHardeningService $stakeQuestionsHardeningService,
         private readonly DebitWalletForStaking $walletDebitAction,
-        private readonly WalletBalanceType $walletBalanceType
+        private readonly WalletBalanceType $walletBalanceType,
+        private readonly OddsService $oddsService
     ) {
         $this->user = auth()->user();
     }
@@ -95,9 +96,7 @@ class StakingExhibitionGameService
         /**
          * @TODO Rename to dynamic staking odds
          */
-
-        $oddMultiplierComputer = app(OddsService::class);
-        $oddMultiplier = $oddMultiplierComputer->computeDynamicOdds($this->user);
+        $oddMultiplier = $this->oddsService->computeDynamicOdds();
         $odd = $oddMultiplier['oddsMultiplier'];
 
         /**

@@ -2,6 +2,7 @@
 
 namespace App\Actions\ActionHelpers;
 
+use App\Services\StakeQuestionsHardeningService;
 use Illuminate\Support\Collection;
 use App\Models\ChallengeRequest;
 use App\Services\Firebase\FirestoreService;
@@ -15,23 +16,15 @@ class ChallengeRequestMatchHelper
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
+        private readonly StakeQuestionsHardeningService $stakeQuestionsHardeningService,
         private readonly FirestoreService $firestoreService,
     ) {
     }
 
     public function processQuestions(ChallengeRequest $challengeRequest, ChallengeRequest $matchedRequest): Collection
     {
-
-        $arr = [29032509, 29032509, 29031977, 29043260, 29043201, 29031959, 29043239];
-        if (in_array($challengeRequest->user_id, $arr)) {
-            $questions = $this
-                ->triviaQuestionRepository
-                ->getRandomHardAndMediumQuestionsWithCategoryId($challengeRequest->category_id);
-        } else {
-            $questions = $this
-                ->triviaQuestionRepository
-                ->getRandomEasyQuestionsWithCategoryId($challengeRequest->category_id);
-        }
+        $questions = $this->stakeQuestionsHardeningService
+            ->determineQuestions($challengeRequest->user_id, $challengeRequest->category_id);
 
         $this->triviaChallengeStakingRepository->logQuestions(
             $questions->toArray(),

@@ -20,7 +20,7 @@ class GetStakingOddsController extends BaseController
     {
         $message = 'staking odds fetched';
 
-        $result = $oddsService->getOdds($this->user);
+        $result = $oddsService->getOdds();
 
         Log::info(
             'GET_ODDS_COMPUTED',
