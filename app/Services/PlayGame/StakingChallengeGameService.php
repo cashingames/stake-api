@@ -36,7 +36,7 @@ class StakingChallengeGameService
                     $user->id,
                     $data['amount'],
                     'Challenge game stake debited',
-                    WalletBalanceType::CreditsBalance,
+                    WalletBalanceType::from($data['wallet_type'] ?? WalletBalanceType::CreditsBalance->value),
                     WalletTransactionType::Debit,
                     WalletTransactionAction::StakingPlaced
                 )

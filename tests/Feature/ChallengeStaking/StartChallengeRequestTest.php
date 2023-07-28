@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ChallengeStaking;
 
+use App\Enums\WalletBalanceType;
 use Mockery;
 use Tests\TestCase;
 use App\Models\User;
@@ -37,7 +38,10 @@ class StartChallengeRequestTest extends TestCase
         Queue::fake();
     }
 
-    public function test_challenge_request_returns_sucess(): void
+    /**
+     * @dataProvider walletTypeDataProvider
+     */
+    public function test_challenge_request_returns_sucess(string $walletType): void
     {
         $this->instance(
             FirestoreService::class,
@@ -48,7 +52,7 @@ class StartChallengeRequestTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $user = $this->prepareMatchRequest($category, 500);
+        $user = $this->prepareMatchRequest($category, $walletType, 500);
 
         $this->assertDatabaseHas('challenge_requests', [
             'category_id' => $category->id,
@@ -60,7 +64,8 @@ class StartChallengeRequestTest extends TestCase
 
         $this->assertDatabaseHas('wallets', [
             'user_id' => $user->id,
-            'non_withdrawable' => 500,
+            'non_withdrawable' => $walletType === WalletBalanceType::CreditsBalance->value ? 500 : 1000,
+            'bonus' => $walletType === WalletBalanceType::BonusBalance->value ? 500 : 1000,
         ]);
     }
 
@@ -135,7 +140,7 @@ class StartChallengeRequestTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $user = $this->prepareMatchRequest($category, 500);
+        $user = $this->prepareMatchRequest($category, WalletBalanceType::CreditsBalance->value, 500);
 
         $this->assertDatabaseHas('challenge_requests', [
             'category_id' => $category->id,
@@ -148,19 +153,21 @@ class StartChallengeRequestTest extends TestCase
         Queue::assertPushed(MatchWithHumanChallengeRequest::class);
         Queue::assertPushed(MatchChallengeRequest::class);
     }
-    private function prepareMatchRequest($category, $amount): User
+    private function prepareMatchRequest($category, string $walletType, $amount): User
     {
         $user = User::factory()
             ->hasProfile(1)
             ->hasWallet(1, [
-                'non_withdrawable' => 1000
+                'non_withdrawable' => 1000,
+                'bonus' => 1000,
             ])
             ->create();
 
         $this->actingAs($user)
             ->post(self::URL, [
                 'category' => $category->id,
-                'amount' => $amount
+                'amount' => $amount,
+                'wallet_type' => $walletType,
             ]);
 
         return $user;
@@ -174,5 +181,13 @@ class StartChallengeRequestTest extends TestCase
                 'non_withdrawable' => 1000
             ])
             ->create();
+    }
+
+    public function walletTypeDataProvider()
+    {
+        return [
+            [WalletBalanceType::CreditsBalance->value],
+            [WalletBalanceType::BonusBalance->value],
+        ];
     }
 }
