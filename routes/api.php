@@ -14,9 +14,7 @@ use App\Http\Controllers\FrontEndLogsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\GetStakingOddsController;
-use App\Http\Controllers\GetSingleContestController;
 use App\Http\Controllers\WithdrawWinningsController;
-use App\Http\Controllers\GetContestDetailsController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
@@ -90,8 +88,6 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('single-player/practice/start', StartSinglePlayerPracticeGameController::class);
         Route::post('account/delete', [UserController::class, 'deleteAccount']);
         Route::delete('account/delete', [UserController::class, 'deleteAccount']);
-        Route::get('contests', GetContestDetailsController::class);
-        Route::get('contest/{id}', GetSingleContestController::class)->middleware(['cacheResponse:300']);
         Route::post('challenges/create', StartChallengeRequestController::class);
         Route::post('challenges/submit', EndChallengeGameController::class);
         Route::post('challenges/practice/create', StartPracticeChallengeRequestController::class);
