@@ -105,14 +105,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(GameSession::class);
     }
 
-    public function bonuses()
-    {
-        return $this->belongsToMany(Bonus::class, 'user_bonuses')
-            ->withPivot('amount_credited', 'amount_remaining_after_staking', 'total_amount_won', 'is_on')
-            ->withTimestamps();
-    }
-
-
     public function getAverageOfRecentGames()
     {
         return $this->gameSessions()

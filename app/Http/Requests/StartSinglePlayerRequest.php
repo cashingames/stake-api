@@ -5,14 +5,12 @@ namespace App\Http\Requests;
 use App\Enums\WalletBalanceType;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\Cashingames\WalletRepository;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 
 class StartSinglePlayerRequest extends FormRequest
 {
 
     public function __construct(
         private WalletRepository $walletRepository,
-        private RegistrationBonusService $registrationBonusService
     ) {
     }
     /**

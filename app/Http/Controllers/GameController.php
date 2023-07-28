@@ -18,7 +18,6 @@ use App\Models\Question;
 use App\Models\StakingOdd;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Repositories\Cashingames\WalletTransactionDto;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -31,9 +30,7 @@ class GameController extends BaseController
 {
 
     public function __construct(
-        private WalletRepository $walletRepository,
-        private RegistrationBonusService $registrationBonusService
-    ) {
+        private WalletRepository $walletRepository) {
         parent::__construct();
     }
 
@@ -287,10 +284,6 @@ class GameController extends BaseController
             ->update(['odds_applied' => $stakingOdd]);
 
         $amountWon = $staking->amount_staked * $stakingOdd;
-
-        if ($amountWon > 0) {
-            $this->registrationBonusService->updateAmountWon($this->user, $amountWon);
-        }
 
         return $amountWon;
     }

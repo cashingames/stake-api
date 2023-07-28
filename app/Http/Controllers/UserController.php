@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\WalletTransactionAction;
 use App\Models\User;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Support\Carbon;
 use App\Http\ResponseHelpers\CommonDataResponse;
 use stdClass;
@@ -70,11 +69,7 @@ class UserController extends BaseController
         if ($hasFundedBefore) {
             return false;
         }
-        $registrationBonusService = new RegistrationBonusService;
-
-        if(!$hasFundedBefore &&  !is_null($registrationBonusService->inactiveRegistrationBonus($user) )){
-            return true;
-        }
-        return false;
+        
+        return true;
     }
 }

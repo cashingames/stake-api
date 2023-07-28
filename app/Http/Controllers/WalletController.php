@@ -21,8 +21,6 @@ use App\Repositories\Cashingames\WalletRepository;
 use Yabacon\Paystack\Exception\ApiException as PaystackException;
 use App\Http\ResponseHelpers\WalletTransactionsResponse;
 use App\Repositories\Cashingames\BoostRepository;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
-
 
 class WalletController extends BaseController
 {
@@ -203,29 +201,22 @@ class WalletController extends BaseController
         }
 
         $user = User::where('email', $email)->first();
-
         $hasFundedBefore = $this->walletRepository->hasFundedBefore($user);
-
         if (!$hasFundedBefore) {
-            $registrationBonusService = new RegistrationBonusService;
             $bonusAmount = ($amount / 100) * (config('trivia.bonus.signup.registration_bonus_percentage') / 100);
-            $shouldRecieveBonus = $registrationBonusService->activateBonus($user, $bonusAmount);
-            if ($shouldRecieveBonus) {
-                if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
-                    $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
-                }
-
-                $this->walletRepository->addTransaction(
-                    new WalletTransactionDto(
-                        $user->id,
-                        $bonusAmount,
-                        '100% welcome bonus',
-                        WalletBalanceType::BonusBalance,
-                        WalletTransactionType::Credit,
-                        WalletTransactionAction::BonusCredited
-                    )
-                );
+            if ($bonusAmount > config('trivia.bonus.signup.registration_bonus_limit')) {
+                $bonusAmount = config('trivia.bonus.signup.registration_bonus_limit');
             }
+            $this->walletRepository->addTransaction(
+                new WalletTransactionDto(
+                    $user->id,
+                    $bonusAmount,
+                    '100% welcome bonus',
+                    WalletBalanceType::BonusBalance,
+                    WalletTransactionType::Credit,
+                    WalletTransactionAction::BonusCredited
+                )
+            );
         }
 
         $this->walletRepository->addTransaction(
@@ -317,5 +308,4 @@ class WalletController extends BaseController
     {
         return $this->sendResponse(false, 'Payment could not be verified. Please wait for your balance to reflect.');
     }
-
 }

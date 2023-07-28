@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Boost;
-use App\Services\Bonuses\RegistrationBonus\RegistrationBonusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -43,8 +42,7 @@ class RegisterController extends BaseController
      */
     public function __construct(
         private readonly BoostRepository $boostRepository
-    )
-    {
+    ) {
         $this->middleware('auth:api', ['except' => ['register', 'verifyUsername', 'resendOTP']]);
     }
 
@@ -140,14 +138,6 @@ class RegisterController extends BaseController
         //create the wallet
         $user->wallet()
             ->create();
-
-        //give user sign up bonus
-        if (isset($data['bonus_checked']) && $data['bonus_checked']) {
-
-            $registrationBonusService = new RegistrationBonusService;
-
-            $registrationBonusService->giveBonus($user);
-        }
 
         $this->giveFreeBoosts($user);
 
@@ -249,6 +239,5 @@ class RegisterController extends BaseController
         return $this->sendResponse([
             'next_resend_minutes' => config('auth.verification.minutes_before_otp_expiry')
         ], "OTP has been resent to phone number");
-
     }
 }
