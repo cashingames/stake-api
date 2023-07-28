@@ -19,7 +19,6 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\PlayGame\EndChallengeGameController;
-use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\BoostsController;
 use App\Http\Controllers\GetBonusOddsController;
 use App\Http\Controllers\GetUserTransactionsController;
@@ -40,7 +39,6 @@ Route::post(
 ); //@Frontend to switch to this
 Route::post('auth/token/verify', [ForgotPasswordController::class, 'verifyToken']);
 Route::post('auth/password/reset', [ResetPasswordController::class, 'reset']);
-Route::post('auth/user/authenticate', AuthenticateVerifiedUserController::class);
 Route::post('auth/register/verify-token', VerifyOTPController::class);
 Route::post('auth/register/token/resend', [RegisterController::class, 'resendOTP']);
 Route::post('auth/password/token/resend', [ForgotPasswordController::class, 'resendOTP']);
