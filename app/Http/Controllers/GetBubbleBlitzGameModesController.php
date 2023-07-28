@@ -7,7 +7,7 @@ use App\Models\Game;
 use App\Models\GameMode;
 use Illuminate\Http\Request;
 
-class BubbleBlitzGameModesController extends BaseController
+class GetBubbleBlitzGameModesController extends BaseController
 {
     public function __invoke()
     {
