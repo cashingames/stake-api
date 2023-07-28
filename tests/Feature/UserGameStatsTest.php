@@ -6,6 +6,8 @@ use App\Mail\UserGameStatsEmail;
 use App\Models\GameSession;
 use App\Models\User;
 use App\Services\UserGameStatsService;
+use Database\Seeders\GameModeSeeder;
+use Database\Seeders\GameSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
@@ -21,6 +23,7 @@ class UserGameStatsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(GameModeSeeder::class);
         User::factory()
             ->count(10)
             ->create(['created_at' => now('Africa/Lagos')->yesterday()]);
@@ -37,6 +40,7 @@ class UserGameStatsTest extends TestCase
         $dailyReports = $this->userStatsService->getBiWeeklyUserGameStats($this->user);
         $this->assertCount(6, $dailyReports);
     }
+
     public function test_that_send_user_game_stats_command_runs()
     {
         Mail::fake();
@@ -46,5 +50,4 @@ class UserGameStatsTest extends TestCase
 
         Mail::assertSent(UserGameStatsEmail::class);
     }
-
 }

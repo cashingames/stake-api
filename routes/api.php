@@ -20,6 +20,7 @@ use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
 use App\Http\Controllers\ClaimUserRewardController;
 use App\Http\Controllers\FeatureFlagController;
+use App\Http\Controllers\GetBubbleBlitzGameModesController;
 use App\Http\Controllers\MissUserRewardController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\GetGameController;
@@ -66,6 +67,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('user-reward/miss', MissUserRewardController::class);
         Route::post('ads-reward/award', AdsRewardController::class);
         Route::get('games', GetGameController::class);
+        Route::get('bubble-blitz/modes', GetBubbleBlitzGameModesController::class);
     }
 );
 

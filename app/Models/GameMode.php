@@ -12,4 +12,8 @@ class GameMode extends Model
     public function gameSessions(){
         return $this->hasMany(GameSession::class);
     }
+
+    public function games(){
+        return $this->belongsTo(Game::class, 'game_id');
+    }
 }

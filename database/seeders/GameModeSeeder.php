@@ -19,31 +19,37 @@ class GameModeSeeder extends Seeder
         DB::table('game_modes')->insert(
             [
                 'name' => "EXHIBITION",
+                'game_id' => 1,
                 'display_name' => "Exhibition",
                 'description' => "Play Single",
-                'icon' => 'icons/exhibition_icon.png',
-                'background_color' => '#E2F5EA'
             ]
         );
 
         DB::table('game_modes')->insert(
             [
                 'name' => "CHALLENGE",
+                'game_id' => 1,
                 'display_name' => "Challenge",
                 'description' => "Challenge a friend to a duel",
-                'icon' => 'icons/challenge_icon.png',
-                'background_color' => '#FAEEFF'
             ]
         );
 
-        // DB::table('game_modes')->insert(
-        //     [
-        //         'name' => "TOURNAMENT",
-        //         'display_name' => "Tournament",
-        //         'description' => "Participate in a tournament",
-        //         'icon' => 'icons/tournament_icon.png',
-        //         'background_color' => '#FCF4DB'
-        //     ]
-        // );
+        DB::table('game_modes')->insert(
+            [
+                'name' => "NORMAL_MODE",
+                'game_id' => 2,
+                'display_name' => "Normal Mode",
+                'description' => "Play different levels",
+            ]
+        );
+
+        DB::table('game_modes')->insert(
+            [
+                'name' => "PRACTICE",
+                'game_id' => 2,
+                'display_name' => "Practice Mode",
+                'description' => "Practice your shooting skills",
+            ]
+        );
     }
 }
