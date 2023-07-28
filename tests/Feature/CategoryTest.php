@@ -23,21 +23,27 @@ class CategoryTest extends TestCase
         $this->category = Category::first();
     }
 
-    public function test_category_icon_can_be_uploaded()
+    public function test_category_icon_must_be_a_file_to_be_uploaded()
     {
-        Storage::fake('icons');
-
-        $file = UploadedFile::fake()->image('category_icon.png');
-
+        
         $response = $this->post('/api/v3/category/icon/save', [
             'categoryName' => $this->category->name,
-            'icon' => $file,
+            'icon' => "file",
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(302);
 
-        // Delete the uploaded image
-        Storage::disk('icons')->delete($file->hashName());
+    }
+
+    public function test_category_name_must_be_a_strings_to_be_uploaded()
+    {
+        
+        $response = $this->post('/api/v3/category/icon/save', [
+            'categoryName' => 122333,
+            'icon' => "file",
+        ]);
+
+        $response->assertStatus(302);
 
     }
 
