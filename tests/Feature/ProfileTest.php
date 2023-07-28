@@ -2,10 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Enums\BonusType;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
-use App\Models\Bonus;
 use App\Models\Boost;
 use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,11 +12,9 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use UserSeeder;
 use App\Models\User;
-use App\Models\UserBonus;
 use App\Models\WalletTransaction;
 use Database\Seeders\BonusSeeder;
 use Database\Seeders\BoostSeeder;
-use PHPUnit\Framework\Constraint\IsFalse;
 
 class ProfileTest extends TestCase
 {
@@ -254,36 +250,15 @@ class ProfileTest extends TestCase
         ]);
     }
 
-    public function test_reg_bonus_popup_toggle_returns_true_if_user_has_not_funded_before_and_has_reg_bonus()
+    public function test_reg_bonus_popup_toggle_returns_true_if_user_has_not_funded_before()
     {
         $this->seed(BonusSeeder::class);
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => false,
-            'amount_credited' => 0,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won'  => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
+    
         $response = $this->get(self::PROFILE_DATA_URL);
 
         $response->assertJson([
             'data' => [
                 'showRegistrationBonusNotice' => true,
-            ]
-        ]);
-    }
-
-    public function test_reg_bonus_popup_toggle_returns_false_if_user_has_not_funded_before_and_does_not_have_reg_bonus()
-    {
-        $this->seed(BonusSeeder::class);
-      
-        $response = $this->get(self::PROFILE_DATA_URL);
-
-        $response->assertJson([
-            'data' => [
-                'showRegistrationBonusNotice' => false,
             ]
         ]);
     }

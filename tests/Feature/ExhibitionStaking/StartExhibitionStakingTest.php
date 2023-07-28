@@ -4,12 +4,9 @@ namespace Tests\Feature\ExhibitionStaking;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Bonus;
-use App\Enums\BonusType;
 use App\Models\Question;
 use App\Models\Category;
 use App\Models\Staking;
-use App\Models\UserBonus;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\BonusSeeder;
 use App\Jobs\SendAdminErrorEmailUpdate;
@@ -47,17 +44,6 @@ class StartExhibitionStakingTest extends TestCase
 
     public function test_that_game_can_be_started_with_registration_bonus()
     {
-        config(['features.registration_bonus.enabled' => true]);
-
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' => Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won' => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
 
         $questions = Question::factory()
             ->count(50)
@@ -88,11 +74,6 @@ class StartExhibitionStakingTest extends TestCase
             'wallet_type' => "bonus_balance"
         ]);
 
-        $this->assertDatabaseHas('user_bonuses', [
-            'user_id' => $this->user->id,
-            'amount_remaining_after_staking' => 300
-        ]);
-
         $this->assertDatabaseHas('wallets', [
             'user_id' => $this->user->id,
             'bonus' => 300,
@@ -105,16 +86,6 @@ class StartExhibitionStakingTest extends TestCase
     {
         config(['features.registration_bonus.enabled' => true]);
         config(['trivia.minimum_exhibition_staking_amount' => 400]);
-
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' => Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 1500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won' => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
 
         $this->user->wallet->update([
             'non_withdrawable' => 2000,

@@ -263,57 +263,6 @@ class RegisterTest extends TestCase
         ]);
     }
 
-    public function test_that_user_bonus_record_is_created_when_user_chooses_to_have_bonus()
-    {
-        config(['features.registration_bonus.enabled' => true]);
-        $this->seed(BonusSeeder::class);
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => "Doe",
-            'username' => 'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'bonus_checked' => true
-
-        ]);
-
-        $user = User::where('email', 'email@email.com')->first();
-
-        $this->assertDatabaseHas('user_bonuses', [
-            'user_id' => $user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-        ]);
-    }
-
-    public function test_that_user_bonus_record_is_not_created_when_user_does_not_choose_to_have_bonus()
-    {
-        config(['features.registration_bonus.enabled' => true]);
-        $this->seed(BonusSeeder::class);
-
-        $this->withHeaders(['x-brand-id' => 2])->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => "Doe",
-            'username' => 'janeJoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-
-        ]);
-
-        $user = User::where('email', 'email@email.com')->first();
-
-        $this->assertDatabaseMissing('user_bonuses', [
-            'user_id' => $user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-        ]);
-    }
-
     public function test_that_meta_details_can_be_created_for_user()
     {
 

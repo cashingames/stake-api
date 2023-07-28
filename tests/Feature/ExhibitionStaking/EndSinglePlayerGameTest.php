@@ -15,7 +15,6 @@ use App\Models\ExhibitionStaking;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\StakingOdd;
-use App\Models\UserBonus;
 use UserSeeder;
 use BoostSeeder;
 use CategorySeeder;
@@ -144,15 +143,6 @@ class EndSinglePlayerGameTest extends TestCase
         ]]);
 
         $staking = Staking::factory()->create(['user_id' => $this->user->id, 'fund_source' => 'BONUS_BALANCE']);
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 1500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won'  => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
 
         ExhibitionStaking::factory()
             ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
@@ -204,17 +194,8 @@ class EndSinglePlayerGameTest extends TestCase
 
         ]]);
 
-        $staking = Staking::factory()->create(['user_id' => $this->user->id, 'fund_source' => 'BONUS_BALANCE']);
-        UserBonus::create([
-            'user_id' => $this->user->id,
-            'bonus_id' =>  Bonus::where('name', BonusType::RegistrationBonus->value)->first()->id,
-            'is_on' => true,
-            'amount_credited' => 1500,
-            'amount_remaining_after_staking' => 500,
-            'total_amount_won'  => 0,
-            'amount_remaining_after_withdrawal' => 0
-        ]);
-
+        Staking::factory()->create(['user_id' => $this->user->id, 'fund_source' => 'BONUS_BALANCE']);
+     
         ExhibitionStaking::factory()
             ->create(['game_session_id' => GameSession::first()->id, 'staking_id' => Staking::first()->id]);
 

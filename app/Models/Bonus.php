@@ -11,10 +11,4 @@ class Bonus extends Model
 
     protected $fillable = ['name', 'trigger', 'duration_count','duration_measurement'];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'user_bonuses')
-            ->withPivot('is_on', 'amount_credited', 'amount_remaining_after_staking', 'total_amount_won')
-            ->withTimestamps();
-    }
 }
