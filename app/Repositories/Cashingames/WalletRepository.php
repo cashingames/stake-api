@@ -269,7 +269,7 @@ class WalletRepository
                 'description' => $dto->description,
                 'transaction_action' => $dto->action,
                 'reference' => $dto->reference,
-                'balance_type' => WalletBalanceType::BonusBalance->value,
+                'balance_type' => WalletBalanceType::WinningsBalance->value,
                 'transaction_type' => WalletTransactionType::Credit->value,
             ]);
         });
@@ -294,7 +294,7 @@ class WalletRepository
                 'description' => $dto->description,
                 'transaction_action' => $dto->action,
                 'reference' => $dto->reference,
-                'balance_type' => WalletBalanceType::CreditsBalance->value,
+                'balance_type' => WalletBalanceType::WinningsBalance->value,
                 'transaction_type' => WalletTransactionType::Debit->value,
             ]);
 

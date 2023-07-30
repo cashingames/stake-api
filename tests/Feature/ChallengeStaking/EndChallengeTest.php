@@ -172,6 +172,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'fund_source' => $walletType1,
         ]);
 
         ChallengeRequest::factory()->for($secondUser)->create([
@@ -180,7 +181,8 @@ class EndChallengeTest extends TestCase
             'status' => 'MATCHED',
             'category_id' => $category->id,
             'amount' => 500,
-            'started_at' => now()
+            'started_at' => now(),
+            'fund_source' => $walletType2,
         ]);
 
         //seed logged questions
@@ -195,7 +197,7 @@ class EndChallengeTest extends TestCase
         ]);
 
         $this
-            ->actingAs(User::first())
+            ->actingAs($firstUser)
             ->postJson(
                 self::URL,
                 [
@@ -220,7 +222,7 @@ class EndChallengeTest extends TestCase
         ]);
 
         $this
-            ->actingAs(User::find(2))
+            ->actingAs($secondUser)
             ->postJson(
                 self::URL,
                 [
@@ -239,22 +241,18 @@ class EndChallengeTest extends TestCase
             'status' => 'COMPLETED',
         ]);
 
-        //refund if both users got the same score
         $this->assertDatabaseHas('wallets', [
             'user_id' => $firstUser->id,
-            'withdrawable' => 500 * 2,
-        ]);
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $secondUser->id,
-            'withdrawable' => 0,
             'non_withdrawable' => 0,
+            'withdrawable' => 1000,
+            'bonus' => 0,
         ]);
 
         $this->assertDatabaseHas('wallets', [
             'user_id' => $secondUser->id,
             'non_withdrawable' => 0,
-            'bonus' => 0,
             'withdrawable' => 0,
+            'bonus' => 0,
         ]);
     }
 
