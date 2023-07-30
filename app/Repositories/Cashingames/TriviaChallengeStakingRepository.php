@@ -17,7 +17,7 @@ class TriviaChallengeStakingRepository
         return ChallengeRequest::where('challenge_request_id', $requestId)->first();
     }
 
-    public function createForMatching(User $user, float $amount, int $categoryId): ChallengeRequest
+    public function createForMatching(User $user, float $amount, int $categoryId, string $fundSource): ChallengeRequest
     {
         /**
          * NOTE: Adding more randomness to to test if it will fix the unstable
@@ -34,6 +34,8 @@ class TriviaChallengeStakingRepository
             'amount' => $amount,
             'category_id' => $categoryId,
             'status' => 'MATCHING',
+            'request_mode' => GameRequestMode::CHALLENGE->value,
+            'fund_source' => $fundSource
         ]);
     }
 

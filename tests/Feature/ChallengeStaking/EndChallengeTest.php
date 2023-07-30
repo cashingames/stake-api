@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ChallengeStaking;
 
+use App\Enums\WalletBalanceType;
 use Mockery;
 use Tests\TestCase;
 use App\Models\User;
@@ -37,7 +38,10 @@ class EndChallengeTest extends TestCase
         User::factory()->has(Wallet::factory())->count(5)->create();
     }
 
-    public function test_challenge_draw_flow(): void
+    /**
+     * @dataProvider walletTypeDataProvider
+     */
+    public function test_challenge_draw_flow(string $walletType1, string $walletType2): void
     {
         $this->instance(
             FirestoreService::class,
@@ -59,6 +63,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'fund_source' => $walletType1,
         ]);
 
         ChallengeRequest::factory()->for($secondUser)->create([
@@ -67,7 +72,8 @@ class EndChallengeTest extends TestCase
             'status' => 'MATCHED',
             'category_id' => $category->id,
             'amount' => 500,
-            'started_at' => now()
+            'started_at' => now(),
+            'fund_source' => $walletType2,
         ]);
 
         $this
@@ -128,18 +134,23 @@ class EndChallengeTest extends TestCase
         //refund if both users got the same score
         $this->assertDatabaseHas('wallets', [
             'user_id' => $firstUser->id,
-            'non_withdrawable' => 500,
+            'non_withdrawable' => $walletType1 == WalletBalanceType::CreditsBalance->value ? 500 : 0,
+            'bonus' => $walletType1 == WalletBalanceType::BonusBalance->value ? 500 : 0,
         ]);
         $this->assertDatabaseHas('wallets', [
             'user_id' => $secondUser->id,
-            'non_withdrawable' => 500,
+            'non_withdrawable' => $walletType2 == WalletBalanceType::CreditsBalance->value ? 500 : 0,
+            'bonus' => $walletType2 == WalletBalanceType::BonusBalance->value ? 500 : 0,
         ]);
 
         //assert that refund push notification was queued
         Queue::assertPushed(SendChallengeRefundNotification::class, 2);
     }
 
-    public function test_challenge_win_flow(): void
+    /**
+     * @dataProvider walletTypeDataProvider
+     */
+    public function test_challenge_win_flow(string $walletType1, string $walletType2)
     {
         $this->instance(
             FirestoreService::class,
@@ -238,6 +249,13 @@ class EndChallengeTest extends TestCase
             'withdrawable' => 0,
             'non_withdrawable' => 0,
         ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $secondUser->id,
+            'non_withdrawable' => 0,
+            'bonus' => 0,
+            'withdrawable' => 0,
+        ]);
     }
 
     private function seedQuestions(Category $category): array
@@ -263,5 +281,11 @@ class EndChallengeTest extends TestCase
         return $data;
     }
 
-
+    public function walletTypeDataProvider()
+    {
+        return [
+            [WalletBalanceType::CreditsBalance->value, WalletBalanceType::CreditsBalance->value],
+            [WalletBalanceType::BonusBalance->value, WalletBalanceType::BonusBalance->value],
+        ];
+    }
 }

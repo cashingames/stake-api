@@ -52,7 +52,7 @@ class MatchEndWalletAction
                 $request->user_id,
                 $request->amount,
                 $description,
-                WalletBalanceType::CreditsBalance,
+                WalletBalanceType::from($request->fund_source ?? WalletBalanceType::CreditsBalance->value),
                 WalletTransactionType::Credit,
                 WalletTransactionAction::FundsReversed
             )
@@ -65,7 +65,7 @@ class MatchEndWalletAction
                 $matchedRequest->user_id,
                 $matchedRequest->amount,
                 $description,
-                WalletBalanceType::CreditsBalance,
+                WalletBalanceType::from($matchedRequest->fund_source ?? WalletBalanceType::CreditsBalance->value),
                 WalletTransactionType::Credit,
                 WalletTransactionAction::FundsReversed
             )

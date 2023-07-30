@@ -94,6 +94,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - refractor getWalletTransaction test
 - Delete contest related code
 - Re-implement boost and boost history logging and deduction
+- Made fund source not nullable in challenge request
 - Cleanup boost
     - Drop point value
     - Default used_count to 0

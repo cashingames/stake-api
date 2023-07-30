@@ -31,12 +31,13 @@ class StakingChallengeGameService
     public function create(User $user, array $data): ChallengeRequest|null
     {
         DB::transaction(function () use ($user, $data, &$response) {
+            $fundSource = WalletBalanceType::from($data['wallet_type'] ?? WalletBalanceType::CreditsBalance->value);
             $this->walletRepository->addTransaction(
                 new WalletTransactionDto(
                     $user->id,
                     $data['amount'],
                     'Challenge game stake debited',
-                    WalletBalanceType::from($data['wallet_type'] ?? WalletBalanceType::CreditsBalance->value),
+                    $fundSource,
                     WalletTransactionType::Debit,
                     WalletTransactionAction::StakingPlaced
                 )
@@ -44,7 +45,7 @@ class StakingChallengeGameService
 
             $response = $this
                 ->triviaChallengeStakingRepository
-                ->createForMatching($user, $data['amount'], $data['category']);
+                ->createForMatching($user, $data['amount'], $data['category'], $fundSource->value);
         });
 
         $this->firestoreService->createDocument(
