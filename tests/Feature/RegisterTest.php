@@ -162,29 +162,6 @@ class RegisterTest extends TestCase
             'message' => 'The phone number has been taken, contact support',
         ]);
     }
-    public function test_brand_id_can_be_inserted()
-    {
-
-        $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'phone_number' => ' ',
-            'email' => 'email@email.com',
-            'country_code' => '',
-            'brand_id' => 1
-        ]);
-    }
-
 
     public function test_new_user_gets_configurable_bonus()
     {

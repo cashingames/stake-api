@@ -63,34 +63,6 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-
-            'first_name' => [
-                'string', 'max:255',
-            ],
-            'last_name' => [
-                'string', 'max:255',
-            ],
-            'username' => [
-                'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-            ],
-            'country_code' => [
-                'string', 'max:4', 'required'
-            ],
-            'phone_number' => [
-                'numeric', 'required',
-                new UniquePhoneNumberRule,
-            ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username'],
-            'user_type' => ['nullable', 'string']
-        ]);
-    }
-
     /**
      * Create a new user instance after a valid registration.
      *
@@ -112,7 +84,6 @@ class RegisterController extends BaseController
                 'is_on_line' => true,
                 'user_type' => $this->getUserType(),
                 'country_code' => '' ,
-                'brand_id' => request()->header('x-brand-id', 1),
             ]);
             // dd($user);
         //create the profile
@@ -163,20 +134,6 @@ class RegisterController extends BaseController
 
     protected function GiveSingUpBonus($user)
     {
-        $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
-        DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable_balance += $bonusAmount;
-
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable_balance,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-            ]);
-            $user->wallet->save();
-        });
 
         $user->boosts()->create([
             'user_id' => $user->id,
@@ -196,26 +153,6 @@ class RegisterController extends BaseController
             'boost_count' => 3,
             'used_count' => 0
         ]);
-    }
-
-    /**
-     * The user has been registered.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param mixed $user
-     * @return mixed
-     */
-    protected function registered(
-        $user
-    ) {
-
-        $result = [
-            'username' => $user->username,
-            'email' => $user->email,
-            'phone_number' => $user->phone_number,
-            'next_resend_minutes' => 2
-        ];
-        return $this->sendResponse($result, 'Account created successfully');
     }
 
     public function register(
@@ -238,7 +175,7 @@ class RegisterController extends BaseController
             ],
             'phone_number' => [
                 'numeric',
-                new UniquePhoneNumberRule,
+                'nullable'
             ],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
