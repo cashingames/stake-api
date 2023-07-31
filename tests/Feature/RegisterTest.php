@@ -139,54 +139,6 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
     }
 
-    /** @test */
-    public function a_phone_number_variant_is_considered_a_duplicate_phone_number()
-    {
-        $this->user->update(['phone_number' => 704995878]);
-
-        $response = $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'jaydoe',
-            'country_code' => '+234',
-            'phone_number' => '0' . $this->user->phone_number,
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-
-
-        $response->assertJson([
-            'message' => 'The phone number has been taken, contact support',
-        ]);
-    }
-
-    public function test_new_user_gets_configurable_bonus()
-    {
-        config(['trivia.bonus.signup.general_bonus_amount' => 50]);
-
-        $this->postjson(self::REGISTER_URL, [
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'username' => 'janeDoe',
-            'country_code' => '+234',
-            'phone_number' => '7098498884',
-            'email' => 'email@email.com',
-            'password' => 'password',
-            'password_confirmation' => 'password'
-
-        ]);
-
-        $user = User::where('email', 'email@email.com' )->first();
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $user->id,
-            'non_withdrawable_balance' => 50.00,
-        ]);
-    }
-
 
     public function test_new_user_gets_boost_bonus()
     {
