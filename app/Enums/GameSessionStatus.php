@@ -8,6 +8,7 @@ enum GameSessionStatus: string
     case CLOSED = 'CLOSED';
     case PENDING = 'PENDING';
     case DECLINED = 'DECLINED';
-    case EXPIRED = 'EXPIRED';
     case COMPLETED = 'COMPLETED';
+    case MATCHING = 'MATCHING';
+    case MATCHED = 'MATCHED';
 }
