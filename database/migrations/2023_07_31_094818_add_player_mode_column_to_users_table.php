@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('player_mode')->default('permanent');
+            $table->string('user_type')->default('PERMANENT');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('player_mode');
+            $table->dropColumn('user_type');
         });
     }
 };

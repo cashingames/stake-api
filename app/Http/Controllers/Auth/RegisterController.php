@@ -25,6 +25,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Enums\UserType;
 
 class RegisterController extends BaseController
 {
@@ -85,7 +86,8 @@ class RegisterController extends BaseController
             ],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
+            'user_type' => ['nullable', 'string']
         ]);
     }
 
@@ -97,21 +99,22 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
+        $request = request();
       //create the user
-
         $user =
             User::create([
-                'username' => $data['username'],
+                'username' => (is_null($request->user_type)) ? $data['username'] : $this->generateGuestUsername(),
                 'phone_number' =>  ' ',
-                'email' => $data['email'],
+                'email' =>  (is_null($request->user_type)) ? $data['email'] : $this->generateGuestEmail(),
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
                 'email_verified_at' => now() ,
                 'is_on_line' => true,
+                'user_type' => $this->getUserType(),
                 'country_code' => '' ,
                 'brand_id' => request()->header('x-brand-id', 1),
             ]);
-
+            // dd($user);
         //create the profile
         $user
             ->profile()
@@ -237,9 +240,10 @@ class RegisterController extends BaseController
                 'numeric',
                 new UniquePhoneNumberRule,
             ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
+            'user_type' => ['nullable', 'string']
         ]);
 
         $user = $this->create($request->all());
@@ -254,5 +258,39 @@ class RegisterController extends BaseController
         ];
         return $this->sendResponse($result, 'Account created successfully');
     }
+
+    protected function getUserType()
+    {
+        $request = request();
+        $guestUser = $request->user_type;
+          $userType = UserType::PERMANENT_PLAYER;
+          if( $guestUser === 'guest'){
+              $userType = UserType::GUEST_PLAYER;
+          }
+          return $userType;
+    }
+
+    protected function generateGuestUsername()
+    {
+        $guestUserName = 'guest_';
+        $randNumber = random_int(100, 10000);
+        $automatedGuestUserName = $guestUserName . $randNumber;
+        
+        return $automatedGuestUserName;
+    }
   
+    protected function generateGuestEmail() 
+    {
+        $length = 10;
+        $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        $email = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $email .= $chars[rand(0, strlen($chars) - 1)];
+        }
+        
+        $email .= '@gameark.com';   
+        return $email;
+    }
+    
 }
