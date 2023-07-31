@@ -18,6 +18,7 @@ class UserController extends BaseController
         $this->user->load(['profile', 'wallet']);
         $result = new stdClass;
         $result->username = $this->user->username;
+        $result->playerMode = $this->user->player_mode;
         $result->email = $this->user->email;
         $result->lastName = $this->user->profile->last_name;
         $result->firstName = $this->user->profile->first_name;

@@ -47,6 +47,7 @@ class ProfileTest extends TestCase
             'data' => [
                 'username' => $this->user->username,
                 'email' => $this->user->email,
+                'playerMode' => $this->user->player_mode,
                 'lastName' => $this->user->profile->last_name,
                 'firstName' => $this->user->profile->first_name,
                 'points' => $this->user->points(),
