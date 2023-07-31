@@ -3,6 +3,7 @@
 namespace Tests\Feature\ExhibitionStaking;
 
 use App\Enums\GameRequestMode;
+use App\Enums\GameSessionStatus;
 use App\Models\Category;
 use App\Models\ChallengeRequest;
 use App\Models\Question;
@@ -57,7 +58,7 @@ class EndSinglePlayerPracticeTest extends TestCase
             'username' => $this->user->username,
             'amount' => 200,
             'category_id' => 102,
-            'status' => 'ONGOING',
+            'status' => GameSessionStatus::ONGOING->value,
             'session_token' => $sessionToken,
             'request_mode' => GameRequestMode::SINGLE_PRACTICE->value
         ]);

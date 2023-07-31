@@ -34,7 +34,7 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-            'status' => 'MATCHING',
+            'status' => GameSessionStatus::MATCHING->value,
             'request_mode' => GameRequestMode::CHALLENGE->value,
             'fund_source' => $fundSource
         ]);
@@ -49,7 +49,7 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-            'status' => 'MATCHING',
+            'status' => GameSessionStatus::MATCHING->value,
             'request_mode' => GameRequestMode::CHALLENGE_PRACTICE->value
         ]);
     }
