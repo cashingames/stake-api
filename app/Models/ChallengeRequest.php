@@ -11,7 +11,7 @@ class ChallengeRequest extends Model
 
     protected $fillable = [
         'challenge_request_id',
-        'user_id', 'username',
+        'user_id', 'username','status',
         'amount', 'category_id', 'request_mode'
     ];
 

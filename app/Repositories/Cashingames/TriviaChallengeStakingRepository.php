@@ -3,6 +3,7 @@
 namespace App\Repositories\Cashingames;
 
 use App\Enums\GameRequestMode;
+use App\Enums\GameSessionStatus;
 use App\Models\ChallengeRequest;
 use App\Models\Option;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,7 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-            'status' => 'MATCHING',
+            'status' => GameSessionStatus::MATCHING->value,
             'request_mode' => GameRequestMode::CHALLENGE->value,
             'fund_source' => $fundSource
         ]);
@@ -48,7 +49,7 @@ class TriviaChallengeStakingRepository
             'username' => $user->username,
             'amount' => $amount,
             'category_id' => $categoryId,
-            'status' => 'MATCHING',
+            'status' => GameSessionStatus::MATCHING->value,
             'request_mode' => GameRequestMode::CHALLENGE_PRACTICE->value
         ]);
     }
@@ -60,7 +61,8 @@ class TriviaChallengeStakingRepository
             ->where('challenge_request_id', '!=', $challengeRequest->challenge_request_id)
             ->where('amount', $challengeRequest->amount)
             ->where('user_id', '!=', $challengeRequest->user_id)
-            ->where('status', 'MATCHING')
+            ->where('status', GameSessionStatus::MATCHING->value)
+            ->where('request_mode', GameRequestMode::CHALLENGE->value)
             ->first();
     }
 

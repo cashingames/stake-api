@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PlayGame;
 
 use App\Enums\GameRequestMode;
+use App\Enums\GameSessionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
 use App\Models\ChallengeRequest;
@@ -39,7 +40,7 @@ class StartSinglePlayerPracticeGameController extends Controller
             'username' => $user->username,
             'amount' => $data['amount'],
             'category_id' => $data['category'],
-            'status' => 'ONGOING',
+            'status' => GameSessionStatus::ONGOING->value,
             'session_token' => $sessionToken,
             'request_mode' => GameRequestMode::SINGLE_PRACTICE->value
         ]);
