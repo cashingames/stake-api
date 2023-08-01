@@ -2,7 +2,6 @@
 
 namespace App\Services\Payments;
 
-use App\Models\WalletTransaction;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +11,6 @@ class PaystackService
 {
     private $paystackKey;
     private $client;
-    private $user;
 
     public function __construct()
     {
@@ -24,8 +22,6 @@ class PaystackService
                 'Accept' => 'application/json'
             ]
         ]);
-
-        $this->user = auth()->user();
     }
 
     public function verifyAccount($bankCode, $accountNumber)
