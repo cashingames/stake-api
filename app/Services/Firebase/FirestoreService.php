@@ -35,12 +35,16 @@ class FirestoreService
         $this->firestore->document($collection . '/' . $document)->delete();
     }
 
-    public function resolveClient(?string $env = null): void
+    private function resolveClient(?string $env = null): void
     {
         $credentials = $this->getGoogleCredentialFileName($env);
 
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
+        if (app()->environment('testing')) {
+            putenv('GOOGLE_APPLICATION_CREDENTIALS='.base_path('tests/FirebaseTestConfig/'.$credentials) );
+        } else {
+            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
+        }
+
         $this->firestore = app()->make(FirestoreClient::class);
     }
-
 }
