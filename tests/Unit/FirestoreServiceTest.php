@@ -18,6 +18,7 @@ class FirestoreServiceTest extends TestCase
         parent::setUp();
         $this->mock(FirestoreService::class, function (MockInterface $mock) {
             $mock->shouldReceive('document');
+            $mock->shouldReceive('resolveClient')->andReturnNull();
         
         });
         $this->_service = new FirestoreService();

@@ -35,7 +35,7 @@ class FirestoreService
         $this->firestore->document($collection . '/' . $document)->delete();
     }
 
-    private function resolveClient(?string $env = null): void
+    public function resolveClient(?string $env = null): void
     {
         $credentials = $this->getGoogleCredentialFileName($env);
 
