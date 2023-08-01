@@ -25,6 +25,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Enums\UserType;
 
 class RegisterController extends BaseController
 {
@@ -62,33 +63,6 @@ class RegisterController extends BaseController
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-
-            'first_name' => [
-                'string', 'max:255',
-            ],
-            'last_name' => [
-                'string', 'max:255',
-            ],
-            'username' => [
-                'required', 'string', 'string', 'alpha_num', 'max:255', 'unique:users',
-            ],
-            'country_code' => [
-                'string', 'max:4', 'required'
-            ],
-            'phone_number' => [
-                'numeric', 'required',
-                new UniquePhoneNumberRule,
-            ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
-        ]);
-    }
-
     /**
      * Create a new user instance after a valid registration.
      *
@@ -97,21 +71,20 @@ class RegisterController extends BaseController
      */
     protected function create(array $data)
     {
+        $request = request();
       //create the user
-
         $user =
             User::create([
-                'username' => $data['username'],
-                'phone_number' =>  ' ',
-                'email' => $data['email'],
+                'username' => (is_null($request->user_type)) ? $data['username'] : $this->generateGuestUsername(),
+                'email' =>  (is_null($request->user_type)) ? $data['email'] : $this->generateGuestEmail(),
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
                 'email_verified_at' => now() ,
                 'is_on_line' => true,
+                'user_type' => $this->getUserType(),
                 'country_code' => '' ,
-                'brand_id' => request()->header('x-brand-id', 1),
             ]);
-
+            // dd($user);
         //create the profile
         $user
             ->profile()
@@ -155,25 +128,12 @@ class RegisterController extends BaseController
             }
         }
     }
+    
         return $user;
     }
 
     protected function GiveSingUpBonus($user)
     {
-        $bonusAmount = config('trivia.bonus.signup.general_bonus_amount');
-        DB::transaction(function () use ($user, $bonusAmount) {
-            $user->wallet->non_withdrawable_balance += $bonusAmount;
-
-            WalletTransaction::create([
-                'wallet_id' => $user->wallet->id,
-                'transaction_type' => 'CREDIT',
-                'amount' => $bonusAmount,
-                'balance' => $user->wallet->non_withdrawable_balance,
-                'description' => 'Sign Up Bonus',
-                'reference' => Str::random(10),
-            ]);
-            $user->wallet->save();
-        });
 
         $user->boosts()->create([
             'user_id' => $user->id,
@@ -195,26 +155,6 @@ class RegisterController extends BaseController
         ]);
     }
 
-    /**
-     * The user has been registered.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param mixed $user
-     * @return mixed
-     */
-    protected function registered(
-        $user
-    ) {
-
-        $result = [
-            'username' => $user->username,
-            'email' => $user->email,
-            'phone_number' => $user->phone_number,
-            'next_resend_minutes' => 2
-        ];
-        return $this->sendResponse($result, 'Account created successfully');
-    }
-
     public function register(
         Request $request,
        
@@ -233,20 +173,23 @@ class RegisterController extends BaseController
             'country_code' => [
                 'string', 'max:4'
             ],
-            'phone_number' => [
-                'numeric',
-                new UniquePhoneNumberRule,
-            ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'referrer' => ['nullable', 'string', 'exists:users,username']
+            'referrer' => ['nullable', 'string', 'exists:users,username'],
+            'user_type' => ['nullable', 'string']
         ]);
 
         $user = $this->create($request->all());
 
         $token = auth()->login($user);
 
-        Mail::to($request->email)->send(new WelcomeEmail());
+        $userType = $user->user_type;
+        $userCurrentType = UserType::PERMANENT_PLAYER;
+        
+        if($userType == $userCurrentType){
+            Mail::to($request->email)->send(new WelcomeEmail());
+        }
+
         $result = [
             'username' => $user->username,
             'email' => $user->email,
@@ -254,5 +197,31 @@ class RegisterController extends BaseController
         ];
         return $this->sendResponse($result, 'Account created successfully');
     }
+
+    protected function getUserType()
+    {
+        $request = request();
+        $guestUser = $request->user_type;
+          $userType = UserType::PERMANENT_PLAYER;
+          if( $guestUser === 'guest'){
+              $userType = UserType::GUEST_PLAYER;
+          }
+          return $userType;
+    }
+
+    protected function generateGuestUsername()
+    {
+        $guestUserName = 'guest';
+        $randNumber = random_int(100, 10000);
+        $automatedGuestUserName = $guestUserName . $randNumber;
+        
+        return $automatedGuestUserName;
+    }
   
+    protected function generateGuestEmail() 
+    {     
+        $email = 'guest_' . uniqid(random_int(100, 10000), true) . '@gameark.com';   
+        return $email;
+    }
+    
 }
