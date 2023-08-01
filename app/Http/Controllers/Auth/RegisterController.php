@@ -76,7 +76,6 @@ class RegisterController extends BaseController
         $user =
             User::create([
                 'username' => (is_null($request->user_type)) ? $data['username'] : $this->generateGuestUsername(),
-                'phone_number' =>  ' ',
                 'email' =>  (is_null($request->user_type)) ? $data['email'] : $this->generateGuestEmail(),
                 'password' => bcrypt($data['password']),
                 'otp_token' => null,
@@ -129,6 +128,7 @@ class RegisterController extends BaseController
             }
         }
     }
+    
         return $user;
     }
 
@@ -173,10 +173,6 @@ class RegisterController extends BaseController
             'country_code' => [
                 'string', 'max:4'
             ],
-            'phone_number' => [
-                'numeric',
-                'nullable'
-            ],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'referrer' => ['nullable', 'string', 'exists:users,username'],
@@ -187,7 +183,13 @@ class RegisterController extends BaseController
 
         $token = auth()->login($user);
 
-        Mail::to($request->email)->send(new WelcomeEmail());
+        $userType = $user->user_type;
+        $userCurrentType = UserType::PERMANENT_PLAYER;
+        
+        if($userType == $userCurrentType){
+            Mail::to($request->email)->send(new WelcomeEmail());
+        }
+
         $result = [
             'username' => $user->username,
             'email' => $user->email,
@@ -209,7 +211,7 @@ class RegisterController extends BaseController
 
     protected function generateGuestUsername()
     {
-        $guestUserName = 'guest_';
+        $guestUserName = 'guest';
         $randNumber = random_int(100, 10000);
         $automatedGuestUserName = $guestUserName . $randNumber;
         
@@ -217,16 +219,8 @@ class RegisterController extends BaseController
     }
   
     protected function generateGuestEmail() 
-    {
-        $length = 10;
-        $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        $email = '';
-        
-        for ($i = 0; $i < $length; $i++) {
-            $email .= $chars[rand(0, strlen($chars) - 1)];
-        }
-        
-        $email .= '@gameark.com';   
+    {     
+        $email = 'guest_' . uniqid(random_int(100, 10000), true) . '@gameark.com';   
         return $email;
     }
     
