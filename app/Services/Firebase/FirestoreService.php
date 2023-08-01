@@ -40,7 +40,7 @@ class FirestoreService
         $credentials = $this->getGoogleCredentialFileName($env);
 
         if (app()->environment('testing')) {
-            putenv('GOOGLE_APPLICATION_CREDENTIALS='.storage_path($credentials) );
+            putenv('GOOGLE_APPLICATION_CREDENTIALS='.base_path('tests/FirebaseTestConfig/'.$credentials) );
         } else {
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . storage_path('app/firebase/' . $credentials));
         }
