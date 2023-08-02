@@ -24,7 +24,7 @@ use App\Http\Controllers\GetBubbleBlitzGameModesController;
 use App\Http\Controllers\MissUserRewardController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\GetGameController;
-
+use App\Http\Controllers\UpdateGuestPlayerProfileController;
 
 Route::post('auth/register', [RegisterController::class, 'register']);
 Route::post('auth/login', [LoginController::class, 'login']);
@@ -54,6 +54,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('fcm/subscriptions', RegisterPushDeviceTokenController::class);
         Route::post('profile/me/edit-personal', [ProfileController::class, 'editPersonalInformation']);
         Route::post('profile/me/picture', [ProfileController::class, 'addProfilePic']);
+        Route::post('profile/me/update-guest_player', UpdateGuestPlayerProfileController::class);
         Route::post('profile/me/password/change', [ProfileController::class, 'changePassword']);
         Route::post('referrer/update', [ProfileController::class, 'updateReferrer']);
         Route::post('purchased/item', [WalletController::class, 'itemPurchased']);
