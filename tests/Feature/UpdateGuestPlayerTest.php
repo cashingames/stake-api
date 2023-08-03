@@ -40,7 +40,7 @@ class UpdateGuestPlayerTest extends TestCase
 
     public function test_that_guest_user_profile_gets_updated()
     {
-        $response = $this->post('/api/v3/profile/me/update-guest_player', [
+        $response = $this->post('/api/v3/guest/profile/update', [
             'username' => 'JayDee',
             'email' => 'johndoe@email.com',
             'password' => '12345678',
