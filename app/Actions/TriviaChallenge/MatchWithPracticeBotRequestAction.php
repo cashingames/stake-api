@@ -10,7 +10,7 @@ use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
-class MatchWithBotRequestAction
+class MatchWithPracticeBotRequestAction
 {
 
     public function __construct(
@@ -19,18 +19,18 @@ class MatchWithBotRequestAction
         private readonly StakingChallengeGameService $triviaChallengeService,
         private readonly ChallengeRequestMatchHelper $challengeRequestMatchHelper,
     ) {
-      
+
     }
 
     public function execute(ChallengeRequest $challengeRequest): ChallengeRequest|null
     {
-        Log::info('MatchWithBotRequestAction Executing', [
+        Log::info('MatchWithPracticeBotRequestAction Executing', [
             'google_env' => 'in MatchWithHumanRequestAction ' . env('GOOGLE_APPLICATION_CREDENTIALS'),
             'challengeRequest' => $challengeRequest,
         ]);
 
         $matchedRequest = $this->matchWithBot($challengeRequest);
-       
+
         $this->triviaChallengeStakingRepository->updateAsMatched($challengeRequest, $matchedRequest);
 
         $questions = $this->challengeRequestMatchHelper->processPracticeQuestions($challengeRequest, $matchedRequest);

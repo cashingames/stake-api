@@ -9,7 +9,7 @@ class CategoryController extends BaseController
 {
 
     public function saveCategoryIcon(Request $request)
-    {   
+    {
         $request->validate([
             'categoryName' => 'required|string|max:200',
             'icon'     =>  'required|image|mimes:jpeg,png,jpg,gif,base64|max:1024'//1mb max

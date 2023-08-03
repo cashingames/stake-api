@@ -4,18 +4,15 @@ namespace Tests\Feature\ChallengeStaking;
 
 use App\Enums\GameRequestMode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Mockery;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Profile;
 use App\Models\Category;
 use Mockery\MockInterface;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Config;
 use App\Services\Firebase\FirestoreService;
-use App\Jobs\MatchWithBotChallengeRequest;
+use App\Jobs\MatchWithPracticeBotChallengeRequest;
 
 
 class StartPracticeChallengeRequestTest extends TestCase
@@ -79,7 +76,7 @@ class StartPracticeChallengeRequestTest extends TestCase
             'status' => 'MATCHING',
         ]);
 
-        Queue::assertPushed(MatchWithBotChallengeRequest::class);
+        Queue::assertPushed(MatchWithPracticeBotChallengeRequest::class);
     }
 
     public function test_challenge_request_with_practice_mode_does_not_deduct_from_wallet_balance(): void

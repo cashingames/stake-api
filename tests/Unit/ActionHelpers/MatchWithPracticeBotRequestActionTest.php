@@ -2,17 +2,16 @@
 
 namespace Tests\Unit\ActionHelpers;
 
-use App\Actions\TriviaChallenge\MatchWithBotRequestAction;
-use App\Services\Firebase\FirestoreService;
+use App\Actions\TriviaChallenge\MatchWithPracticeBotRequestAction;
 use Tests\TestCase;
 use App\Models\ChallengeRequest;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\PlayGame\StakingChallengeGameService;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\User;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
-class MatchWithBotRequestActionTest extends TestCase
+
+class MatchWithPracticeBotRequestActionTest extends TestCase
 {
     public function test_that_challenge_request_is_always_matched_with_bot()
     {
@@ -35,7 +34,7 @@ class MatchWithBotRequestActionTest extends TestCase
             ->with($this->isInstanceOf(User::class), $this->anything())
             ->willReturn($matchedRequest);
 
-        $sut = new MatchWithBotRequestAction(
+        $sut = new MatchWithPracticeBotRequestAction(
             $this->mockTriviaChallengeStakingRepository(),
             $this->mockTriviaQuestionRepository(),
             $mockedStakingChallengeGameService,

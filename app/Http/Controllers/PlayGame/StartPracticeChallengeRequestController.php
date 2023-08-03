@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
 use Illuminate\Support\Facades\Log;
-use App\Jobs\MatchWithBotChallengeRequest;
+use App\Jobs\MatchWithPracticeBotChallengeRequest;
 use App\Services\PlayGame\StakingChallengeGameService;
 
 // @TODO change to single player logic to avoid firebase
@@ -31,7 +31,7 @@ class StartPracticeChallengeRequestController extends Controller
 
         $result = $triviaChallengeService->createPracticeRequest($request->user(), $data);
 
-        MatchWithBotChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
+        MatchWithPracticeBotChallengeRequest::dispatchSync($result, $request->header('x-request-env'));
        
         return ResponseHelper::success($this->transformResponse($result));
     }

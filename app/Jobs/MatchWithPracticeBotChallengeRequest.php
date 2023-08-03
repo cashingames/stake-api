@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ChallengeRequest;
-use App\Actions\TriviaChallenge\MatchWithBotRequestAction;
+use App\Actions\TriviaChallenge\MatchWithPracticeBotRequestAction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,7 +12,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Traits\Utils\ResolveGoogleCredentials;
 
-class MatchWithBotChallengeRequest implements ShouldQueue
+/**
+ * 
+ * This is currently only used by Practice flow
+ */
+class MatchWithPracticeBotChallengeRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ResolveGoogleCredentials;
 
@@ -32,7 +36,7 @@ class MatchWithBotChallengeRequest implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(MatchWithBotRequestAction $action): void
+    public function handle(MatchWithPracticeBotRequestAction $action): void
     {
 
         Log::info('MatchWithBotChallengeRequest Executing', [

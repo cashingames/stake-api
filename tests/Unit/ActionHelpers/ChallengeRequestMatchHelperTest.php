@@ -100,6 +100,43 @@ class ChallengeRequestMatchHelperTest extends TestCase
         $sut->updateFirestore($challengeRequest, $matchedRequest, $questions);
     }
 
+
+    public function test_that_practice_questions_are_processed()
+    {
+        $challengeRequest = ChallengeRequest::factory()->make();
+        $matchedRequest = ChallengeRequest::factory()->make();
+        $questions = collect([
+            ['question' => 'question 1'],
+            ['question' => 'question 2'],
+            ['question' => 'question 3'],
+        ]);
+
+        $triviaQuestionRepository = $this->mockTriviaQuestionRepository();
+        $triviaQuestionRepository
+            ->expects($this->once())
+            ->method('getPracticeQuestionsWithCategoryId')
+            ->with($challengeRequest->category_id)
+            ->willReturn($questions);
+
+        $triviaChallengeStakingRepo = $this->mockTriviaChallengeStakingRepository();
+        $triviaChallengeStakingRepo
+            ->expects($this->once())
+            ->method('logQuestions')
+            ->with($questions->toArray(), $challengeRequest, $matchedRequest);
+
+        $sut = new ChallengeRequestMatchHelper(
+            $triviaChallengeStakingRepo,
+            $triviaQuestionRepository,
+            $this->mockStakeQuestionsHardeningService(),
+            $this->mockFirestoreService(),
+        );
+
+        $result = $sut->processPracticeQuestions($challengeRequest, $matchedRequest);
+
+        $this->assertEquals($questions, $result);
+    }
+
+
     private function mockTriviaChallengeStakingRepository()
     {
         return $this->createMock(TriviaChallengeStakingRepository::class);
