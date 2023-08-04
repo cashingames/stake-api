@@ -224,7 +224,7 @@ class StakingChallengeGameService
                 if ($opponentScore < 3) {
                     $botScore = rand(3, 5); //we don't want both to ever score 0
                 } else {
-                    $botScore = rand(3, $opponentScore + 1);
+                    $botScore = rand(3, $opponentScore < 10 ? $opponentScore : 10);
                 }
             })
             ->choose();
