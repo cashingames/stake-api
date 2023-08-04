@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
-class UpdateGuestPlayerProfileController extends Controller
+class UpdateGuestPlayerProfileController extends BaseController
 {
     public function __invoke(Request $request)
     {
@@ -25,19 +25,13 @@ class UpdateGuestPlayerProfileController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'new_password' => ['required', 'string', 'min:8', 'confirmed'],
         ]); 
-        $user->username = $data['username'];
-        $user->email = $data['email'];
-        $user->user_type = UserType::PERMANENT_PLAYER;
-        $user->save();
-
         if ($data['password'] === $data['new_password']) {
             return $this->sendError("The new password must be different from the old password.", "The new password must be different from the old password.");
         }
-
-        if (Hash::check($data['password'], $user->password)) {
-            $user->update(['password' => bcrypt($data['new_password'])]);
-            return $this->sendResponse("Password Changed!.", "Password Changed!.");
-        }
-
+        $user->username = $data['username'];
+        $user->email = $data['email'];
+        $user->password = bcrypt($data['new_password']);
+        $user->user_type = UserType::PERMANENT_PLAYER->value;
+        $user->save();
     }
 }
