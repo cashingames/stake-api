@@ -91,7 +91,7 @@ class StakingChallengeGameService
         //fix double submission bug from frontend
         $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
         if ($request->status == 'COMPLETED') {
-            Log::info('CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
+            Log::error('CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
             return $request;
         }
 
@@ -135,7 +135,7 @@ class StakingChallengeGameService
             ->triviaChallengeStakingRepository
             ->updateCompletedRequest($requestId, $score);
 
-        [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
+        [$matchedRequest, $request] = $this->handlePracticeBotSubmission($matchedRequest, $score);
         $this->practiceMatchEndWalletAction->execute($requestId);
         $this->updateEndMatchFirestore($request, $matchedRequest);
 
@@ -190,16 +190,28 @@ class StakingChallengeGameService
             ->updateCompletedRequest($botRequest->challenge_request_id, $botScore);
     }
 
+    private function handlePracticeBotSubmission(ChallengeRequest $botRequest, float $opponentScore): array
+    {
+        $botScore = 1;
+        Lottery::odds(1, 5)
+            ->winner(function () use ($opponentScore, &$botScore) {
+                $botScore = rand($opponentScore, 10);
+            })
+            ->loser(function () use ($opponentScore, &$botScore) {
+                $botScore = rand(1, $opponentScore < 10 ? $opponentScore : 10);
+            })
+            ->choose();
+
+        return $this
+            ->triviaChallengeStakingRepository
+            ->updateCompletedRequest($botRequest->challenge_request_id, $botScore);
+    }
+
     private function generateBotScore(float $opponentScore): float
     {
+        //@NOTE: Make bot win more until we handle jedidiah's winning case
         $botScore = 10;
-
-        /**
-         * When Odds should win
-         * Current odds: 2/5 to help us recoop the lost amount
-         * Minimum score for bot is 2
-         */
-        Lottery::odds(2, 5)
+        Lottery::odds(3, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
 
                 if ($opponentScore > 8) {
@@ -209,13 +221,11 @@ class StakingChallengeGameService
                 }
             })
             ->loser(function () use ($opponentScore, &$botScore) {
-
                 if ($opponentScore < 3) {
-                    $botScore = rand(1, 5); //we don't want both to ever score 0
+                    $botScore = rand(3, 5); //we don't want both to ever score 0
                 } else {
-                    $botScore = rand(1, $opponentScore);
+                    $botScore = rand(3, $opponentScore + 1);
                 }
-
             })
             ->choose();
         return $botScore;
