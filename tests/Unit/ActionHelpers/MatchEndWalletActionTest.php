@@ -21,8 +21,6 @@ class MatchEndWalletActionTest extends TestCase
             ['MATCHING', 'MATCHING'],
             ['MATCHED', 'MATCHING'],
             ['MATCHED', 'MATCHED'],
-            // ['MATCHED', 'COMPLETED'],
-            // ['COMPLETED', 'MATCHED'],
         ];
     }
 
