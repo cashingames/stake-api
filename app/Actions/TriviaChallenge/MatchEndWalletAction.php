@@ -27,12 +27,12 @@ class MatchEndWalletAction
         $winner = $this->getChallengeWinner(
             $request = $this->triviaChallengeStakingRepository->getRequestById($requestId),
             $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId),
-            $setDefaultWinnerAction = new SetDefaultChallengeWinner( $request,  $matchedRequest)
+            new SetDefaultChallengeWinner( $request,  $matchedRequest)
         );
 
         $isComplete = $this->isCompleted($request, $matchedRequest );
         Log::info('isComplete: ' . $isComplete);
-        if (!$isComplete) {
+        if (!$isComplete && !$this->hasOpponentNotCompleted($request, $matchedRequest )) {
             return null;
         }
 
@@ -130,7 +130,7 @@ class MatchEndWalletAction
         ChallengeRequest $request,
         ChallengeRequest $matchedRequest
     ): bool {
-        return $matchedRequest->status == 'MATCHED' && $request->status == 'COMPLETED' ||
-            $matchedRequest->status == 'COMPLETED' && $request->status == 'MATCHED';
+        return ($matchedRequest->status == 'MATCHED' && $request->status == 'COMPLETED') ||
+            ($matchedRequest->status == 'COMPLETED' && $request->status == 'MATCHED');
     }
 }

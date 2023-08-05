@@ -69,14 +69,18 @@ class MatchEndWalletActionTest extends TestCase
     ) {
 
         $challengeRequest = ChallengeRequest::factory()->create([
+            'user_id' => 1,
             'status' => 'COMPLETED',
+            'session_token' => 'tyruh4878475',
             'ended_at' => now()->subMinute()
         ]);
-
         $matchedRequest = ChallengeRequest::factory()->create([
+            'user_id' => 2,
             'status' => "MATCHED",
+            'session_token' => $challengeRequest->session_token,
             'ended_at' => null
         ]);
+
 
         $mockedTriviaChallengeStakingRepository = $this->mockTriviaChallengeStakingRepository();
         $mockedTriviaChallengeStakingRepository
@@ -96,8 +100,6 @@ class MatchEndWalletActionTest extends TestCase
         );
 
         $result = $sut->execute($challengeRequest->id);
-
-        dd($result);
 
         $this->assertEquals($challengeRequest->id,  $result->id);
     }

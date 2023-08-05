@@ -21,10 +21,7 @@ class SetDefaultChallengeWinner
             && is_null($this->matchedRequest->ended_at)
         ) {
             return $this->request;
-        }else{
-            self::execute($challengeRequest);
         }
-       
+        self::execute($challengeRequest);
     }
-
 }
