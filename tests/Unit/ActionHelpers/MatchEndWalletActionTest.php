@@ -21,17 +21,17 @@ class MatchEndWalletActionTest extends TestCase
             ['MATCHING', 'MATCHING'],
             ['MATCHED', 'MATCHING'],
             ['MATCHED', 'MATCHED'],
-            ['MATCHED', 'COMPLETED'],
-            ['COMPLETED', 'MATCHED'],
+            // ['MATCHED', 'COMPLETED'],
+            // ['COMPLETED', 'MATCHED'],
         ];
     }
 
     /**
      * @dataProvider cannotBeEndedDataProvider
      */
-    public function test_that_match_cannot_be_ended_when_both_match_is_not_completed
-    (
-        string $challengeStatus, string $matchedChallengeStatus
+    public function test_that_match_cannot_be_ended_when_both_match_is_not_completed(
+        string $challengeStatus,
+        string $matchedChallengeStatus
     ) {
 
         $challengeRequest = ChallengeRequest::factory()->create([
@@ -62,6 +62,44 @@ class MatchEndWalletActionTest extends TestCase
         $result = $sut->execute($challengeRequest->id);
 
         $this->assertNull($result);
+    }
+
+    public function test_that_a_winner_is_auto_selected_if_one_opponent_fails_to_end(
+       
+    ) {
+
+        $challengeRequest = ChallengeRequest::factory()->create([
+            'status' => 'COMPLETED',
+            'ended_at' => now()->subMinute()
+        ]);
+
+        $matchedRequest = ChallengeRequest::factory()->create([
+            'status' => "MATCHED",
+            'ended_at' => null
+        ]);
+
+        $mockedTriviaChallengeStakingRepository = $this->mockTriviaChallengeStakingRepository();
+        $mockedTriviaChallengeStakingRepository
+            ->expects($this->once())
+            ->method('getRequestById')
+            ->with($challengeRequest->id)
+            ->willReturn($challengeRequest);
+        $mockedTriviaChallengeStakingRepository
+            ->expects($this->once())
+            ->method('getMatchedRequestById')
+            ->with($challengeRequest->id)
+            ->willReturn($matchedRequest);
+
+        $sut = new MatchEndWalletAction(
+            $mockedTriviaChallengeStakingRepository,
+            $this->mockWalletRepository(),
+        );
+
+        $result = $sut->execute($challengeRequest->id);
+
+        dd($result);
+
+        $this->assertEquals($challengeRequest->id,  $result->id);
     }
 
     public function test_that_we_initiate_refund_and_sent_notification_when_both_have_same_score()
@@ -108,7 +146,6 @@ class MatchEndWalletActionTest extends TestCase
 
         $this->assertNull($result);
         Notification::assertCount(2);
-
     }
 
     public function test_that_winner_is_credited_when_game_ends()
@@ -152,8 +189,6 @@ class MatchEndWalletActionTest extends TestCase
         $result = $sut->execute($challengeRequest->id);
 
         $this->assertSame($challengeRequest->id, $result->id);
-
-
     }
 
     private function mockTriviaChallengeStakingRepository()
@@ -165,6 +200,4 @@ class MatchEndWalletActionTest extends TestCase
     {
         return $this->createMock(WalletRepository::class);
     }
-
-
 }

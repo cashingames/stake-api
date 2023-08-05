@@ -10,6 +10,7 @@ use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Repositories\Cashingames\WalletTransactionDto;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class MatchEndWalletAction
@@ -25,10 +26,11 @@ class MatchEndWalletAction
         //@note: $winner comes before isComplete because the request and matchRequest objects are need in isComplete
         $winner = $this->getChallengeWinner(
             $request = $this->triviaChallengeStakingRepository->getRequestById($requestId),
-            $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
+            $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId),
+            $setDefaultWinnerAction = new SetDefaultChallengeWinner( $request,  $matchedRequest)
         );
 
-        $isComplete = $this->isCompleted($request, $matchedRequest);
+        $isComplete = $this->isCompleted($request, $matchedRequest );
         Log::info('isComplete: ' . $isComplete);
         if (!$isComplete) {
             return null;
@@ -58,7 +60,7 @@ class MatchEndWalletAction
             )
         );
 
-        SendChallengeRefundNotification::dispatch( $request , $request->user);
+        SendChallengeRefundNotification::dispatch($request, $request->user);
 
         $this->walletRepository->addTransaction(
             new WalletTransactionDto(
@@ -71,8 +73,7 @@ class MatchEndWalletAction
             )
         );
 
-        SendChallengeRefundNotification::dispatch( $matchedRequest, $matchedRequest->user);
-        
+        SendChallengeRefundNotification::dispatch($matchedRequest, $matchedRequest->user);
     }
 
     private function creditWinner(ChallengeRequest $winner): void
@@ -98,10 +99,16 @@ class MatchEndWalletAction
 
     private function getChallengeWinner(
         ChallengeRequest $request,
-        ChallengeRequest $matchedRequest
+        ChallengeRequest $matchedRequest,
+        SetDefaultChallengeWinner $setDefaultWinnerAction
+
     ): ChallengeRequest|null {
 
         if (!$this->isCompleted($request, $matchedRequest)) {
+            if ($this->hasOpponentNotCompleted($request, $matchedRequest)) {
+                $winner = $setDefaultWinnerAction->execute($request);
+                return $winner;
+            }
             return null;
         }
 
@@ -119,5 +126,11 @@ class MatchEndWalletAction
         return $matchedRequest->status == 'COMPLETED' && $request->status == 'COMPLETED';
     }
 
-
+    private function hasOpponentNotCompleted(
+        ChallengeRequest $request,
+        ChallengeRequest $matchedRequest
+    ): bool {
+        return $matchedRequest->status == 'MATCHED' && $request->status == 'COMPLETED' ||
+            $matchedRequest->status == 'COMPLETED' && $request->status == 'MATCHED';
+    }
 }
