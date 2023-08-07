@@ -20,15 +20,15 @@ class VerifyChallengeWinner implements ShouldQueue
     public function __construct(
         private readonly ChallengeRequest $request,
         private readonly ChallengeRequest $matchedRequest,
-        private readonly VerifyChallengeWinnerAction $verifyChallengeWinnerAction,
+
     ) {
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(VerifyChallengeWinnerAction $verifyChallengeWinnerAction): void
     {
-        $this->verifyChallengeWinnerAction->execute($this->request, $this->matchedRequest);
+        $verifyChallengeWinnerAction->execute($this->request, $this->matchedRequest);
     }
 }

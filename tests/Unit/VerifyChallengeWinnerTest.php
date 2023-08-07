@@ -44,11 +44,10 @@ class VerifyChallengeWinnerTest extends TestCase
 
         $verifyWinnerJob = new VerifyChallengeWinner(
             $challengeRequest,
-            $matchedRequest,
-            $verifyWinnerAction
+            $matchedRequest
         );
 
-        $verifyWinnerJob->handle();
+        $verifyWinnerJob->handle( $verifyWinnerAction);
 
         $this->assertEquals($challengeRequest->amount_won,  $challengeRequest->amount * 2);
     }
