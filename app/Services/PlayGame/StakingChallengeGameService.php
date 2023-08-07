@@ -211,7 +211,7 @@ class StakingChallengeGameService
     {
         //@NOTE: Make bot win more until we handle jedidiah's winning case
         $botScore = 10;
-        Lottery::odds(3, 5)
+        Lottery::odds(2, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
 
                 if ($opponentScore > 8) {
