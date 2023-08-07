@@ -54,20 +54,32 @@ class WalletRepository
      * @param mixed $user
      * @return float
      */
-    public function getUserProfitPercentageOnStaking(int $userId, Carbon $startDate, Carbon $endDate): int|float
+    public function getUserProfitPercentageOnStaking(int $walletId, Carbon $startDate, Carbon $endDate): int|float
     {
-        $stakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
-            ->where('user_id', $userId)
+        $userTransactions = WalletTransaction::selectRaw('sum(amount) as amount, transaction_action as action')
+            ->where('wallet_id', $walletId)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->first();
-        $amountStaked = $stakes?->amount_staked ?? 0;
-        $amountWon = $stakes?->amount_won ?? 0;
+            ->groupBy('transaction_action')
+            ->get();
+
+        $amountStaked = $userTransactions
+            ->where('action', WalletTransactionAction::StakingPlaced->value)
+            ->first()?->amount ?? 0;
+        $amountWon = $userTransactions
+            ->where('action', WalletTransactionAction::WinningsCredited->value)
+            ->first()?->amount ?? 0;
+        $amountRefunded = $userTransactions
+            ->where('action', WalletTransactionAction::FundsReversed->value)
+            ->first()?->amount ?? 0;
+
+        $totalAmountWon = $amountWon + $amountRefunded;
+
 
         if ($amountStaked == 0) {
             return 0;
         }
 
-        return (($amountWon - $amountStaked) / $amountStaked) * 100;
+        return (($totalAmountWon - $amountStaked) / $amountStaked) * 100;
     }
 
 
@@ -79,12 +91,22 @@ class WalletRepository
      */
     public function getPlatformProfitPercentageOnStaking(Carbon $startDate, Carbon $endDate): int|float
     {
-        $todayStakes = Staking::selectRaw('sum(amount_staked) as amount_staked, sum(amount_won) as amount_won')
+        $userTransactions = WalletTransaction::selectRaw('sum(amount) as amount, transaction_action as action')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->first();
-        $amountStaked = $todayStakes?->amount_staked ?? 0;
-        $amountWon = $todayStakes?->amount_won ?? 0;
+            ->groupBy('transaction_action')
+            ->get();
 
+        $amountStaked = $userTransactions
+            ->where('action', WalletTransactionAction::StakingPlaced->value)
+            ->first()?->amount ?? 0;
+        $amountWon = $userTransactions
+            ->where('action', WalletTransactionAction::WinningsCredited->value)
+            ->first()?->amount ?? 0;
+        $amountRefunded = $userTransactions
+            ->where('action', WalletTransactionAction::FundsReversed->value)
+            ->first()?->amount ?? 0;
+
+        $totalAmountWon = $amountWon + $amountRefunded;
 
         /**
          * If no stakes were made today, then the platform is neutral
@@ -95,7 +117,7 @@ class WalletRepository
             return 0;
         }
 
-        return (($amountWon - $amountStaked) / $amountStaked) * -100;
+        return (($totalAmountWon - $amountStaked) / $amountStaked) * -100;
     }
 
 
@@ -105,14 +127,16 @@ class WalletRepository
      */
 
     // get user profit on staking today
-    public function getUserProfitPercentageOnStakingToday(int $userId): int|float
-    {
-        return $this->getUserProfitPercentageOnStaking($userId, now()->startOfDay(), now()->endOfDay());
-    }
+    // public function getUserProfitPercentageOnStakingToday(int $userId): int|float
+    // {
+    //     $wallet = Wallet::where('user_id', $userId)->firstOrFail();
+    //     return $this->getUserProfitPercentageOnStaking($wallet->id, now()->startOfDay(), now()->endOfDay());
+    // }
 
     public function getUserProfitPercentageOnStakingThisYear(int $userId): int|float
     {
-        return $this->getUserProfitPercentageOnStaking($userId, now()->startOfYear(), now());
+        $wallet = Wallet::where('user_id', $userId)->firstOrFail();
+        return $this->getUserProfitPercentageOnStaking($wallet->id, now()->startOfYear(), now());
     }
 
     //get platform profit on staking today

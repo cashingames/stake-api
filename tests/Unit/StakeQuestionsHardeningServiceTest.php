@@ -50,7 +50,7 @@ class StakeQuestionsHardeningServiceTest extends TestCase
     }
 
     public function test_that_hard_and_medium_questions_can_be_fetched_based_on_user_profit()
-    {   
+    {
         $mockedTriviaQuestionRepository = $this->mockTriviaQuestionRepository();
         $mockedTriviaQuestionRepository
             ->expects($this->once())

@@ -104,7 +104,7 @@ class StakingChallengeGameService
             ->updateCompletedRequest($requestId, $score);
 
         if ($this->isBot($matchedRequest)) {
-            [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
+            [$matchedRequest, $request] = $this->handleBotSubmission($request, $matchedRequest, $score);
         }
 
         $this->matchEndWalletAction->execute($requestId);
@@ -182,9 +182,10 @@ class StakingChallengeGameService
         return $matchRequest->user_id == 1;
     }
 
-    private function handleBotSubmission(ChallengeRequest $botRequest, float $opponentScore): array
-    {
-        $botScore = $this->generateBotScore($opponentScore);
+    private function handleBotSubmission(
+        ChallengeRequest $request, ChallengeRequest $botRequest, float $opponentScore
+    ): array {
+        $botScore = $this->generateBotScore($request->user_id, $opponentScore);
         return $this
             ->triviaChallengeStakingRepository
             ->updateCompletedRequest($botRequest->challenge_request_id, $botScore);
@@ -207,11 +208,18 @@ class StakingChallengeGameService
             ->updateCompletedRequest($botRequest->challenge_request_id, $botScore);
     }
 
-    private function generateBotScore(float $opponentScore): float
+    private function generateBotScore(int $userId, float $opponentScore): float
     {
-        //@NOTE: Make bot win more until we handle jedidiah's winning case
+        $botWinOdd = 2;
+        $wonPercent = $this->walletRepository
+            ->getUserProfitPercentageOnStakingThisYear($userId);
+
+        if ($wonPercent > 30) {
+            $botWinOdd = 4;
+        }
+
         $botScore = 10;
-        Lottery::odds(2, 5)
+        Lottery::odds($botWinOdd, 5)
             ->winner(function () use ($opponentScore, &$botScore) {
 
                 if ($opponentScore > 8) {
@@ -228,6 +236,14 @@ class StakingChallengeGameService
                 }
             })
             ->choose();
+
+        Log::info('CHALLENGE_SCORE_LOG', [
+            'odd' => $botWinOdd,
+            'opponentScore' => $opponentScore,
+            'wonPercent' => $wonPercent,
+            'bScore' => $botScore
+        ]);
+
         return $botScore;
     }
 
