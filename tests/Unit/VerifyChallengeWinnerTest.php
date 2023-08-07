@@ -5,12 +5,14 @@ namespace Tests\Unit;
 use App\Jobs\VerifyChallengeWinner;
 use App\Models\ChallengeRequest;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 
 class VerifyChallengeWinnerTest extends TestCase
-{
+{   
+    use RefreshDatabase;
     public function test_that_user_is_selected_as_winner_if_opponent_does_not_submit()
     {
         User::factory()
