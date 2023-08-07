@@ -37,10 +37,7 @@ class VerifyChallengeWinnerTest extends TestCase
             'ended_at' => null
         ]);
 
-        $walletRepository = new WalletRepository;
-        $triviaChallengeRepository = new TriviaChallengeStakingRepository;
-
-        $verifyWinnerAction= new VerifyChallengeWinnerAction( $triviaChallengeRepository , $walletRepository);
+        $verifyWinnerAction= app()->make(VerifyChallengeWinnerAction::class);
 
         $verifyWinnerJob = new VerifyChallengeWinner(
             $challengeRequest,
