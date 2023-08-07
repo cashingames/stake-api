@@ -11,4 +11,5 @@ enum GameSessionStatus: string
     case COMPLETED = 'COMPLETED';
     case MATCHING = 'MATCHING';
     case MATCHED = 'MATCHED';
+    case SYSTEM_COMPLETED = 'SYSTEM_COMPLETED';
 }
