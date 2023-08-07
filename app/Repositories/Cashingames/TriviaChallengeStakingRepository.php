@@ -150,7 +150,7 @@ class TriviaChallengeStakingRepository
     }
 
     public function updateSystemCompletedRequest(string $requestId): void
-    {
+    {    
         ChallengeRequest::where('challenge_request_id', $requestId)
             ->update([
                 'status' => GameSessionStatus::SYSTEM_COMPLETED->value,

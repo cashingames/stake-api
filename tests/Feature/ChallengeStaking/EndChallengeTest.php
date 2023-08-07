@@ -1,8 +1,8 @@
 <?php
 
 namespace Tests\Feature\ChallengeStaking;
-
 use App\Enums\WalletBalanceType;
+
 use Mockery;
 use Tests\TestCase;
 use App\Models\User;
@@ -63,6 +63,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'ended_at' => now()->addMinute(),
             'fund_source' => $walletType1,
         ]);
 
@@ -73,6 +74,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'ended_at' => now()->addMinute(),
             'fund_source' => $walletType2,
         ]);
 
@@ -172,6 +174,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'ended_at' => now()->addMinute(),
             'fund_source' => $walletType1,
         ]);
 
@@ -182,6 +185,7 @@ class EndChallengeTest extends TestCase
             'category_id' => $category->id,
             'amount' => 500,
             'started_at' => now(),
+            'ended_at' => now()->addMinute(),
             'fund_source' => $walletType2,
         ]);
 

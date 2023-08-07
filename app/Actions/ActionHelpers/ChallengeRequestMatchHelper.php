@@ -85,6 +85,41 @@ class ChallengeRequestMatchHelper
         );
     }
 
+    public function updateEndMatchFirestore(ChallengeRequest $request, ChallengeRequest $matchedRequest)
+    {
+        $request->refresh();
+        $matchedRequest->refresh();
+
+
+        $this->firestoreService->updateDocument(
+            'trivia-challenge-requests',
+            $request->challenge_request_id,
+            [
+                'score' => $request->score,
+                'status' => $request->status,
+                'amount_won' => $request->amount_won,
+                'opponent' => [
+                    'score' => $matchedRequest->score,
+                    'status' => $matchedRequest->status,
+                ]
+            ]
+        );
+
+        $this->firestoreService->updateDocument(
+            'trivia-challenge-requests',
+            $matchedRequest->challenge_request_id,
+            [
+                'score' => $matchedRequest->score,
+                'status' => $matchedRequest->status,
+                'amount_won' => $matchedRequest->amount_won,
+                'opponent' => [
+                    'score' => $request->score,
+                    'status' => $request->status,
+                ]
+            ]
+        );
+    }
+
     private function parseQuestions(Collection $questions): array
     {
         return $questions->map(fn ($question) => [
