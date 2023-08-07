@@ -23,8 +23,7 @@ class StandardExhibitionQuestionsHardeningService implements QuestionsHardeningS
         $value = Category::find($categoryId)
             ->questions()
             ->where(function ($query) {
-                $query->where('level', 'easy')
-                    ->orWhere('level', 'medium');
+                $query->where('level', 'easy');
             })
             ->inRandomOrder()
             ->take(20)
