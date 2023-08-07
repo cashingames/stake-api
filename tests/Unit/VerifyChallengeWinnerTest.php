@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Actions\TriviaChallenge\VerifyChallengeWinnerAction;
 use App\Jobs\VerifyChallengeWinner;
 use App\Models\ChallengeRequest;
 use App\Models\User;
@@ -39,11 +40,12 @@ class VerifyChallengeWinnerTest extends TestCase
         $walletRepository = new WalletRepository;
         $triviaChallengeRepository = new TriviaChallengeStakingRepository;
 
+        $verifyWinnerAction= new VerifyChallengeWinnerAction( $triviaChallengeRepository , $walletRepository);
+
         $verifyWinnerJob = new VerifyChallengeWinner(
             $challengeRequest,
             $matchedRequest,
-            $walletRepository,
-            $triviaChallengeRepository
+            $verifyWinnerAction
         );
 
         $verifyWinnerJob->handle();
