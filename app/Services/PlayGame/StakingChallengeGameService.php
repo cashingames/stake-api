@@ -2,8 +2,10 @@
 
 namespace App\Services\PlayGame;
 
+use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
 use App\Actions\TriviaChallenge\PracticeMatchEndWalletAction;
+use App\Enums\GameSessionStatus;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionType;
 use App\Models\ChallengeRequest;
@@ -25,7 +27,8 @@ class StakingChallengeGameService
         private readonly MatchEndWalletAction $matchEndWalletAction,
         private readonly FirestoreService $firestoreService,
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
-        private readonly PracticeMatchEndWalletAction $practiceMatchEndWalletAction
+        private readonly PracticeMatchEndWalletAction $practiceMatchEndWalletAction,
+        private readonly ChallengeRequestMatchHelper $challengeHelper
     ) {
     }
     public function create(User $user, array $data): ChallengeRequest|null
@@ -90,7 +93,7 @@ class StakingChallengeGameService
 
         //fix double submission bug from frontend
         $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
-        if ($request->status == 'COMPLETED') {
+        if ($request->status == GameSessionStatus::COMPLETED->value) {
             Log::error('CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
             return $request;
         }
@@ -108,7 +111,7 @@ class StakingChallengeGameService
         }
 
         $this->matchEndWalletAction->execute($requestId);
-        $this->updateEndMatchFirestore($request, $matchedRequest);
+        $this->challengeHelper->updateEndMatchFirestore($request, $matchedRequest);
 
         if (!is_null($consumedBoosts) || !empty($consumedBoosts)) {
             $this->handleConsumedBoosts($consumedBoosts, $request);
@@ -137,45 +140,11 @@ class StakingChallengeGameService
 
         [$matchedRequest, $request] = $this->handlePracticeBotSubmission($matchedRequest, $score);
         $this->practiceMatchEndWalletAction->execute($requestId);
-        $this->updateEndMatchFirestore($request, $matchedRequest);
+        $this->challengeHelper->updateEndMatchFirestore($request, $matchedRequest);
 
         return $request;
     }
 
-    private function updateEndMatchFirestore(ChallengeRequest $request, ChallengeRequest $matchedRequest)
-    {
-        $request->refresh();
-        $matchedRequest->refresh();
-
-
-        $this->firestoreService->updateDocument(
-            'trivia-challenge-requests',
-            $request->challenge_request_id,
-            [
-                'score' => $request->score,
-                'status' => $request->status,
-                'amount_won' => $request->amount_won,
-                'opponent' => [
-                    'score' => $matchedRequest->score,
-                    'status' => $matchedRequest->status,
-                ]
-            ]
-        );
-
-        $this->firestoreService->updateDocument(
-            'trivia-challenge-requests',
-            $matchedRequest->challenge_request_id,
-            [
-                'score' => $matchedRequest->score,
-                'status' => $matchedRequest->status,
-                'amount_won' => $matchedRequest->amount_won,
-                'opponent' => [
-                    'score' => $request->score,
-                    'status' => $request->status,
-                ]
-            ]
-        );
-    }
 
     private function isBot(ChallengeRequest $matchRequest)
     {

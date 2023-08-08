@@ -2,10 +2,12 @@
 
 namespace App\Actions\TriviaChallenge;
 
+use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use App\Enums\WalletTransactionType;
 use App\Jobs\SendChallengeRefundNotification;
+use App\Jobs\VerifyChallengeWinner;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\WalletRepository;
@@ -17,6 +19,7 @@ class MatchEndWalletAction
     public function __construct(
         private readonly TriviaChallengeStakingRepository $triviaChallengeStakingRepository,
         private readonly WalletRepository $walletRepository,
+        private readonly ChallengeRequestMatchHelper $challengeHelper
     ) {
     }
 
@@ -28,16 +31,19 @@ class MatchEndWalletAction
             $matchedRequest = $this->triviaChallengeStakingRepository->getMatchedRequestById($requestId)
         );
 
-        $isComplete = $this->isCompleted($request, $matchedRequest);
+        $isComplete = $this->challengeHelper->isBothCompleted($request, $matchedRequest);
+       
         Log::info('isComplete: ' . $isComplete);
         if (!$isComplete) {
+            //indicate we are waiting for opponent
+            VerifyChallengeWinner::dispatch($request, $matchedRequest)->delay(now()->addMinute());
             return null;
         }
 
         if ($winner == null) {
             $this->refundMatchedOpponents($request, $matchedRequest);
         } else {
-            $this->creditWinner($winner);
+            $this->challengeHelper->creditWinner($request);
         }
 
         return $winner;
@@ -75,33 +81,12 @@ class MatchEndWalletAction
         
     }
 
-    private function creditWinner(ChallengeRequest $winner): void
-    {
-        $amountWon = $winner->amount * 2;
-
-        $this->walletRepository->addTransaction(
-            new WalletTransactionDto(
-                $winner->user_id,
-                $amountWon,
-                'Challenge game Winnings credited',
-                WalletBalanceType::WinningsBalance,
-                WalletTransactionType::Credit,
-                WalletTransactionAction::WinningsCredited,
-            )
-        );
-
-        ChallengeRequest::where('challenge_request_id', $winner->challenge_request_id)
-            ->update([
-                'amount_won' => $amountWon
-            ]);
-    }
-
     private function getChallengeWinner(
         ChallengeRequest $request,
         ChallengeRequest $matchedRequest
     ): ChallengeRequest|null {
 
-        if (!$this->isCompleted($request, $matchedRequest)) {
+        if (!$this->challengeHelper->isBothCompleted($request, $matchedRequest)) {
             return null;
         }
 
@@ -111,13 +96,4 @@ class MatchEndWalletAction
 
         return $request->score > $matchedRequest->score ? $request : $matchedRequest;
     }
-
-    private function isCompleted(
-        ChallengeRequest $request,
-        ChallengeRequest $matchedRequest
-    ): bool {
-        return $matchedRequest->status == 'COMPLETED' && $request->status == 'COMPLETED';
-    }
-
-
 }

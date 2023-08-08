@@ -2,18 +2,33 @@
 
 namespace Tests\Unit\ActionHelpers;
 
+use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
 use App\Models\ChallengeRequest;
 use App\Models\Wallet;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\WalletRepository;
+use App\Services\Firebase\FirestoreService;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class MatchEndWalletActionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(UserSeeder::class);
+        $this->mock(FirestoreService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('updateDocument');
+        });
+    }
+
 
     public function cannotBeEndedDataProvider()
     {
@@ -29,16 +44,18 @@ class MatchEndWalletActionTest extends TestCase
     /**
      * @dataProvider cannotBeEndedDataProvider
      */
-    public function test_that_match_cannot_be_ended_when_both_match_is_not_completed
-    (
-        string $challengeStatus, string $matchedChallengeStatus
+    public function test_that_match_cannot_be_ended_when_both_match_is_not_completed(
+        string $challengeStatus,
+        string $matchedChallengeStatus
     ) {
 
         $challengeRequest = ChallengeRequest::factory()->create([
+            'user_id' => 1,
             'status' => $challengeStatus,
         ]);
 
         $matchedRequest = ChallengeRequest::factory()->create([
+            'user_id' => 2,
             'status' => $matchedChallengeStatus,
         ]);
 
@@ -57,6 +74,7 @@ class MatchEndWalletActionTest extends TestCase
         $sut = new MatchEndWalletAction(
             $mockedTriviaChallengeStakingRepository,
             $this->mockWalletRepository(),
+            $this->mockChallengeRequestMatchHelper(),
         );
 
         $result = $sut->execute($challengeRequest->id);
@@ -71,44 +89,31 @@ class MatchEndWalletActionTest extends TestCase
         $wallet = Wallet::factory()->create();
         $challengeRequest = ChallengeRequest::factory()->for($wallet->user)->create([
             'status' => 'COMPLETED',
+            'session_token' => '1234',
             'score' => 10,
             'amount' => 1000,
+            'ended_at' => now()
         ]);
 
         $wallet2 = Wallet::factory()->create();
         $matchedRequest = ChallengeRequest::factory()->for($wallet2->user)->create([
             'status' => 'COMPLETED',
+            'session_token' => '1234',
             'score' => 10,
             'amount' => 1000,
+            'ended_at' => now()
         ]);
 
-        $mockedTriviaChallengeStakingRepository = $this->mockTriviaChallengeStakingRepository();
-        $mockedTriviaChallengeStakingRepository
-            ->expects($this->once())
-            ->method('getRequestById')
-            ->with($challengeRequest->id)
-            ->willReturn($challengeRequest);
-        $mockedTriviaChallengeStakingRepository
-            ->expects($this->once())
-            ->method('getMatchedRequestById')
-            ->with($challengeRequest->id)
-            ->willReturn($matchedRequest);
-
-        $mockedCreditWalletAction = $this->mockWalletRepository();
-        $mockedCreditWalletAction
-            ->expects($this->exactly(2))
-            ->method('addTransaction');
-
         $sut = new MatchEndWalletAction(
-            $mockedTriviaChallengeStakingRepository,
-            $mockedCreditWalletAction,
+            app()->make(TriviaChallengeStakingRepository::class),
+            app()->make(WalletRepository::class),
+            app()->make(ChallengeRequestMatchHelper::class),
         );
 
-        $result = $sut->execute($challengeRequest->id);
+        $result = $sut->execute($challengeRequest->challenge_request_id);
 
         $this->assertNull($result);
         Notification::assertCount(2);
-
     }
 
     public function test_that_winner_is_credited_when_game_ends()
@@ -116,44 +121,29 @@ class MatchEndWalletActionTest extends TestCase
         $wallet = Wallet::factory()->create();
         $challengeRequest = ChallengeRequest::factory()->for($wallet->user)->create([
             'status' => 'COMPLETED',
+            'challenge_request_id' => '123',
+            'session_token' => '1234',
             'score' => 10,
-            'amount' => 1000,
+            'amount' => 1000
         ]);
 
         $wallet2 = Wallet::factory()->create();
         $matchedRequest = ChallengeRequest::factory()->for($wallet2->user)->create([
             'status' => 'COMPLETED',
+            'challenge_request_id' => '456',
+            'session_token' => '1234',
             'score' => 2,
-            'amount' => 1000,
+            'amount' => 1000
         ]);
 
-        $mockedTriviaChallengeStakingRepository = $this->mockTriviaChallengeStakingRepository();
-        $mockedTriviaChallengeStakingRepository
-            ->expects($this->once())
-            ->method('getRequestById')
-            ->with($challengeRequest->id)
-            ->willReturn($challengeRequest);
-        $mockedTriviaChallengeStakingRepository
-            ->expects($this->once())
-            ->method('getMatchedRequestById')
-            ->with($challengeRequest->id)
-            ->willReturn($matchedRequest);
-
-        $mockedCreditWalletAction = $this->mockWalletRepository();
-        $mockedCreditWalletAction
-            ->expects($this->once())
-            ->method('addTransaction');
-
         $sut = new MatchEndWalletAction(
-            $mockedTriviaChallengeStakingRepository,
-            $mockedCreditWalletAction,
+            app()->make(TriviaChallengeStakingRepository::class),
+            app()->make(WalletRepository::class),
+            app()->make(ChallengeRequestMatchHelper::class),
         );
-
-        $result = $sut->execute($challengeRequest->id);
+        $result = $sut->execute($challengeRequest->challenge_request_id);
 
         $this->assertSame($challengeRequest->id, $result->id);
-
-
     }
 
     private function mockTriviaChallengeStakingRepository()
@@ -166,5 +156,8 @@ class MatchEndWalletActionTest extends TestCase
         return $this->createMock(WalletRepository::class);
     }
 
-
+    private function mockChallengeRequestMatchHelper()
+    {
+        return $this->createMock(ChallengeRequestMatchHelper::class);
+    }
 }

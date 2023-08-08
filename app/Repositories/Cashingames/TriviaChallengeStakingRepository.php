@@ -140,7 +140,7 @@ class TriviaChallengeStakingRepository
         $opponent = $this->getMatchedRequestById($requestId);
         ChallengeRequest::where('challenge_request_id', $requestId)
             ->update([
-                'status' => 'COMPLETED',
+                'status' => GameSessionStatus::COMPLETED->value,
                 'score' => $score,
                 'ended_at' => now(),
             ]);
@@ -148,6 +148,16 @@ class TriviaChallengeStakingRepository
 
         return [$this->getRequestById($requestId), $opponent];
     }
+
+    public function updateSystemCompletedRequest(string $requestId): void
+    {    
+        ChallengeRequest::where('challenge_request_id', $requestId)
+            ->update([
+                'status' => GameSessionStatus::SYSTEM_COMPLETED->value,
+                'ended_at' => now(),
+            ]);
+    }
+
 
 
     private function prepareQuestionForLog(array $question, ChallengeRequest $challengeRequest): array
