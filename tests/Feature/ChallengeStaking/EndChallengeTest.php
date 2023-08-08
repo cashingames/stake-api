@@ -157,7 +157,7 @@ class EndChallengeTest extends TestCase
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('updateDocument')->times(4);
+                $mock->shouldReceive('updateDocument')->times(6);
             })
         );
 
@@ -222,7 +222,21 @@ class EndChallengeTest extends TestCase
         ]);
         $this->assertDatabaseHas('challenge_requests', [
             'challenge_request_id' => '2',
-            'status' => 'MATCHED',
+            'status' => 'SYSTEM_COMPLETED',
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $firstUser->id,
+            'non_withdrawable' => 0,
+            'withdrawable' => 1000,
+            'bonus' => 0,
+        ]);
+
+        $this->assertDatabaseHas('wallets', [
+            'user_id' => $secondUser->id,
+            'non_withdrawable' => 0,
+            'withdrawable' =>  0,
+            'bonus' => 0,
         ]);
 
         $this
@@ -243,20 +257,6 @@ class EndChallengeTest extends TestCase
         $this->assertDatabaseHas('challenge_requests', [
             'challenge_request_id' => '2',
             'status' => 'COMPLETED',
-        ]);
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $firstUser->id,
-            'non_withdrawable' => 0,
-            'withdrawable' => 1000,
-            'bonus' => 0,
-        ]);
-
-        $this->assertDatabaseHas('wallets', [
-            'user_id' => $secondUser->id,
-            'non_withdrawable' => 0,
-            'withdrawable' => 0,
-            'bonus' => 0,
         ]);
     }
 

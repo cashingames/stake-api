@@ -32,6 +32,7 @@ class MatchEndWalletAction
         );
 
         $isComplete = $this->challengeHelper->isBothCompleted($request, $matchedRequest);
+       
         Log::info('isComplete: ' . $isComplete);
         if (!$isComplete) {
             //indicate we are waiting for opponent

@@ -166,7 +166,7 @@ class ChallengeRequestMatchHelper
     }
 
     public function isBothCompleted(ChallengeRequest $request, ChallengeRequest $matchedRequest): bool
-    {
+    {   
         return $this->isCompleted($request) && $this->isCompleted($matchedRequest);
     }
 

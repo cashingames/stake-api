@@ -7,6 +7,7 @@ use App\Actions\TriviaChallenge\VerifyChallengeWinnerAction;
 use App\Jobs\VerifyChallengeWinner;
 use App\Models\ChallengeRequest;
 use App\Models\User;
+use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Mockery;
@@ -21,6 +22,8 @@ class VerifyChallengeWinnerTest extends TestCase
             ChallengeRequestMatchHelper::class,
             Mockery::mock(ChallengeRequestMatchHelper::class, function (MockInterface $mock) {
                 $mock->shouldReceive('updateEndMatchFirestore')->once();
+                $mock->shouldReceive('isCompleted')->once()->andReturn(false);
+                $mock->shouldReceive('creditWinner')->once();
             })
         );
 
@@ -32,6 +35,7 @@ class VerifyChallengeWinnerTest extends TestCase
 
         $challengeRequest = ChallengeRequest::factory()->create([
             'user_id' => 1,
+            'challenge_request_id' => '1',
             'session_token' => '123',
             'status' => 'COMPLETED',
             'amount' => 200,
@@ -40,6 +44,7 @@ class VerifyChallengeWinnerTest extends TestCase
         ]);
         $matchedRequest = ChallengeRequest::factory()->create([
             'user_id' => 2,
+            'challenge_request_id' => '2',
             'session_token' => '123',
             'status' => "MATCHED",
             'amount' => 200,
@@ -48,7 +53,7 @@ class VerifyChallengeWinnerTest extends TestCase
         ]);
 
         $verifyWinnerAction = app()->make(VerifyChallengeWinnerAction::class);
-
+        
         $verifyWinnerJob = new VerifyChallengeWinner(
             $challengeRequest,
             $matchedRequest
@@ -57,15 +62,8 @@ class VerifyChallengeWinnerTest extends TestCase
         $verifyWinnerJob->handle($verifyWinnerAction);
 
         $this->assertDatabaseHas('challenge_requests', [
-            'user_id' => '1',
-            'status' => 'COMPLETED',
-        ]);
-        $this->assertDatabaseHas('challenge_requests', [
-            'user_id' => '2',
+            'challenge_request_id' => '2',
             'status' => 'SYSTEM_COMPLETED',
         ]);
-
-
-        $this->assertEquals($challengeRequest->amount_won,  $challengeRequest->amount * 2);
     }
 }

@@ -12,6 +12,7 @@ use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Repositories\Cashingames\TriviaQuestionRepository;
+use App\Repositories\Cashingames\WalletRepository;
 
 class ChallengeRequestMatchHelperTest extends TestCase
 {
@@ -45,6 +46,7 @@ class ChallengeRequestMatchHelperTest extends TestCase
             $this->mockTriviaQuestionRepository(),
             $stakeQuestionsHardeningService,
             $this->mockFirestoreService(),
+            $this->mockWalletRepository(),
         );
 
         $result = $sut->processQuestions($challengeRequest, $matchedRequest);
@@ -95,6 +97,7 @@ class ChallengeRequestMatchHelperTest extends TestCase
             $this->mockTriviaQuestionRepository(),
             $this->mockStakeQuestionsHardeningService(),
             $firestoreService,
+            $this->mockWalletRepository(),
         );
 
         $sut->updateFirestore($challengeRequest, $matchedRequest, $questions);
@@ -129,6 +132,7 @@ class ChallengeRequestMatchHelperTest extends TestCase
             $triviaQuestionRepository,
             $this->mockStakeQuestionsHardeningService(),
             $this->mockFirestoreService(),
+            $this->mockWalletRepository()
         );
 
         $result = $sut->processPracticeQuestions($challengeRequest, $matchedRequest);
@@ -140,6 +144,11 @@ class ChallengeRequestMatchHelperTest extends TestCase
     private function mockTriviaChallengeStakingRepository()
     {
         return $this->createMock(TriviaChallengeStakingRepository::class);
+    }
+
+    private function mockWalletRepository()
+    {
+        return $this->createMock(WalletRepository::class);
     }
 
     private function mockTriviaQuestionRepository()
