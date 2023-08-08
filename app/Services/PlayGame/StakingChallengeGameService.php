@@ -5,9 +5,9 @@ namespace App\Services\PlayGame;
 use App\Actions\ActionHelpers\ChallengeRequestMatchHelper;
 use App\Actions\TriviaChallenge\MatchEndWalletAction;
 use App\Actions\TriviaChallenge\PracticeMatchEndWalletAction;
+use App\Enums\GameSessionStatus;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionType;
-use App\Jobs\VerifyChallengeWinner;
 use App\Models\ChallengeRequest;
 use App\Repositories\Cashingames\WalletTransactionDto;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +93,7 @@ class StakingChallengeGameService
 
         //fix double submission bug from frontend
         $request = $this->triviaChallengeStakingRepository->getRequestById($requestId);
-        if ($request->status == 'COMPLETED') {
+        if ($request->status == GameSessionStatus::COMPLETED->value) {
             Log::error('CHALLENGE_SUBMIT_ERROR', ['status' => 'SECOND_SUBMISSIONS', 'request' => $request]);
             return $request;
         }
@@ -109,16 +109,12 @@ class StakingChallengeGameService
         if ($this->isBot($matchedRequest)) {
             [$matchedRequest, $request] = $this->handleBotSubmission($matchedRequest, $score);
         }
-        
+
+        $this->matchEndWalletAction->execute($requestId);
+        $this->challengeHelper->updateEndMatchFirestore($request, $matchedRequest);
+
         if (!is_null($consumedBoosts) || !empty($consumedBoosts)) {
             $this->handleConsumedBoosts($consumedBoosts, $request);
-        }
-
-        if (!$this->isBot($matchedRequest) && is_null($matchedRequest->ended_at)) {
-            VerifyChallengeWinner::dispatch($request, $matchedRequest)->delay(now()->addMinute());
-        } else {
-            $this->matchEndWalletAction->execute($requestId);
-            $this->challengeHelper->updateEndMatchFirestore($request, $matchedRequest);
         }
         return $request;
     }

@@ -2,6 +2,12 @@
 
 namespace App\Actions\ActionHelpers;
 
+use App\Enums\GameSessionStatus;
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
+use App\Repositories\Cashingames\WalletRepository;
+use App\Repositories\Cashingames\WalletTransactionDto;
 use App\Services\StakeQuestionsHardeningService;
 use Illuminate\Support\Collection;
 use App\Models\ChallengeRequest;
@@ -18,6 +24,7 @@ class ChallengeRequestMatchHelper
         private readonly TriviaQuestionRepository $triviaQuestionRepository,
         private readonly StakeQuestionsHardeningService $stakeQuestionsHardeningService,
         private readonly FirestoreService $firestoreService,
+        private readonly WalletRepository $walletRepository,
     ) {
     }
 
@@ -90,17 +97,16 @@ class ChallengeRequestMatchHelper
         $request->refresh();
         $matchedRequest->refresh();
 
-
         $this->firestoreService->updateDocument(
             'trivia-challenge-requests',
             $request->challenge_request_id,
             [
                 'score' => $request->score,
-                'status' => $request->status,
+                'status' => $this->cleanFirebaseStatus($request->status),
                 'amount_won' => $request->amount_won,
                 'opponent' => [
                     'score' => $matchedRequest->score,
-                    'status' => $matchedRequest->status,
+                    'status' => $this->cleanFirebaseStatus($matchedRequest->status),
                 ]
             ]
         );
@@ -110,14 +116,23 @@ class ChallengeRequestMatchHelper
             $matchedRequest->challenge_request_id,
             [
                 'score' => $matchedRequest->score,
-                'status' => $matchedRequest->status,
+                'status' => $this->cleanFirebaseStatus($matchedRequest->status),
                 'amount_won' => $matchedRequest->amount_won,
                 'opponent' => [
                     'score' => $request->score,
-                    'status' => $request->status,
+                    'status' => $this->cleanFirebaseStatus($request->status),
                 ]
             ]
         );
+    }
+
+    private function cleanFirebaseStatus(string $status): string
+    {
+        if ($status == GameSessionStatus::SYSTEM_COMPLETED->value) {
+            return GameSessionStatus::COMPLETED->value;
+        }
+
+        return $status;
     }
 
     private function parseQuestions(Collection $questions): array
@@ -142,5 +157,37 @@ class ChallengeRequestMatchHelper
             'status' => $challengeRequest->status,
             'is_bot' => $challengeRequest->user->id == 1,
         ];
+    }
+
+    public function isCompleted(ChallengeRequest $request): bool
+    {
+        return $request->status == GameSessionStatus::COMPLETED->value ||
+            $request->status == GameSessionStatus::SYSTEM_COMPLETED->value;
+    }
+
+    public function isBothCompleted(ChallengeRequest $request, ChallengeRequest $matchedRequest): bool
+    {
+        return $this->isCompleted($request) && $this->isCompleted($matchedRequest);
+    }
+
+    public function creditWinner(ChallengeRequest $winner): void
+    {
+        $amountWon = $winner->amount * 2;
+
+        $this->walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $winner->user_id,
+                $amountWon,
+                'Challenge game Winnings credited',
+                WalletBalanceType::WinningsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::WinningsCredited,
+            )
+        );
+
+        ChallengeRequest::where('challenge_request_id', $winner->challenge_request_id)
+            ->update([
+                    'amount_won' => $amountWon
+                ]);
     }
 }
