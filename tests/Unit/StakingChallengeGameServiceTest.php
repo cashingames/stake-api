@@ -100,26 +100,24 @@ class StakingChallengeGameServiceTest extends TestCase
         ]);
 
         $this->mockedTriviaChallengeStakingRepository
-        ->expects($this->once())
-        ->method('getRequestById')
-        ->with($this->challengeRequest->challenge_request_id)
-        ->willReturn($this->challengeRequest);
+            ->expects($this->once())
+            ->method('getRequestById')
+            ->with($this->challengeRequest->challenge_request_id)
+            ->willReturn($this->challengeRequest);
 
         $this->mockedTriviaChallengeStakingRepository
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('updateCompletedRequest')
-            ->with($this->matchedRequest->challenge_request_id, $this->matchedRequest->score)
-            ->willReturn([$this->challengeRequest, $this->matchedRequest]);
+            ->with($this->challengeRequest->challenge_request_id, $this->challengeRequest->score)
+            ->willReturnOnConsecutiveCalls([$this->matchedRequest, $this->challengeRequest]);
 
         $this->mockedChallengeRequestMatchHelper
             ->expects($this->once())
             ->method('updateEndMatchFirestore')
-            ->with($this->challengeRequest, $this->matchedRequest);
+            ->with($this->matchedRequest, $this->challengeRequest);
 
-            
-           
         $result = $this->service->submit($this->data);
-        $this->assertEquals($result, $this->challengeRequest);
+        $this->assertEquals($result, $this->matchedRequest);
     }
 
     private function mockTriviaChallengeStakingRepository()
