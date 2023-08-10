@@ -126,7 +126,7 @@ class MatchEndWalletActionTest extends TestCase
             'score' => 10,
             'amount' => 1000
         ]);
-
+       
         $wallet2 = Wallet::factory()->create();
         $matchedRequest = ChallengeRequest::factory()->for($wallet2->user)->create([
             'status' => 'COMPLETED',
@@ -144,6 +144,38 @@ class MatchEndWalletActionTest extends TestCase
         $result = $sut->execute($challengeRequest->challenge_request_id);
 
         $this->assertSame($challengeRequest->id, $result->id);
+        $this->assertNotSame($matchedRequest->id, $result->id);
+    }
+
+    public function test_that_loser_is_not_credited_when_game_ends()
+    {
+        $wallet = Wallet::factory()->create();
+        $challengeRequest = ChallengeRequest::factory()->for($wallet->user)->create([
+            'status' => 'COMPLETED',
+            'challenge_request_id' => '123',
+            'session_token' => '1234',
+            'score' => 2,
+            'amount' => 1000
+        ]);
+       
+        $wallet2 = Wallet::factory()->create();
+        $matchedRequest = ChallengeRequest::factory()->for($wallet2->user)->create([
+            'status' => 'COMPLETED',
+            'challenge_request_id' => '456',
+            'session_token' => '1234',
+            'score' => 5,
+            'amount' => 1000
+        ]);
+
+        $sut = new MatchEndWalletAction(
+            app()->make(TriviaChallengeStakingRepository::class),
+            app()->make(WalletRepository::class),
+            app()->make(ChallengeRequestMatchHelper::class),
+        );
+        $result = $sut->execute($challengeRequest->challenge_request_id);
+
+        $this->assertSame($matchedRequest->id, $result->id);
+        $this->assertNotSame($challengeRequest->id, $result->id);
     }
 
     private function mockTriviaChallengeStakingRepository()
