@@ -43,7 +43,7 @@ class MatchEndWalletAction
         if ($winner == null) {
             $this->refundMatchedOpponents($request, $matchedRequest);
         } else {
-            $this->challengeHelper->creditWinner($request);
+            $this->challengeHelper->creditWinner($winner);
         }
 
         return $winner;
