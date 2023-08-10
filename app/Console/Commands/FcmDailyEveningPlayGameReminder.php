@@ -2,15 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
-use App\Models\UserPlan;
-use App\Models\User;
-use App\Models\Plan;
-use App\Models\FcmPushSubscription;
-use Illuminate\Support\Facades\DB;
 use App\Actions\SendPushNotification;
 use App\Enums\ClientPlatform;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class FcmDailyEveningPlayGameReminder extends Command
 {
@@ -49,8 +44,12 @@ class FcmDailyEveningPlayGameReminder extends Command
     public function GetDailyReminderUserToken()
     {
         $allTokens = [];
+        $twoWeeksAgo = now()->subDays(14);
 
-        $devices = DB::select('SELECT DISTINCT device_token from fcm_push_subscriptions where valid = ?', [1]);
+        $devices = DB::select('SELECT DISTINCT device_token
+        FROM fcm_push_subscriptions AS fcm
+        JOIN users ON fcm.user_id = users.id
+        WHERE fcm.valid = ? AND users.last_activity_time >= ?', [1, $twoWeeksAgo]);
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
