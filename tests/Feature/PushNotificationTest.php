@@ -2,14 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Support\Str;
 use Database\Seeders\UserSeeder;
-use Illuminate\Foundation\Testing\WithFaker;
-use App\Services\Firebase\CloudMessagingService;
-use GuzzleHttp\Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PushNotificationTest extends TestCase
 {
@@ -26,18 +23,31 @@ class PushNotificationTest extends TestCase
 
         $this->actingAs($this->user);
     }
-    
-    public function test_can_register_device_token(){
+
+    public function test_can_register_device_token()
+    {
         $device_token = Str::uuid();
         $response = $this->postjson('/api/v3/fcm/subscriptions', [
-            'device_token' => $device_token
+            'device_token' => $device_token,
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('fcm_push_subscriptions', [
             'device_token' => $device_token,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
+    }
+
+    public function test_that_user_daily_afternoon_notification_command_runs()
+    {
+        $this->artisan('fcm:daily-afternoon-reminder')
+            ->assertExitCode(0);
+    }
+
+    public function test_that_user_daily_evening_notification_command_runs()
+    {
+        $this->artisan('fcm:daily-evening-reminder')
+            ->assertExitCode(0);
     }
 
     // public function test_push_notification_gets_sent(){
@@ -52,7 +62,7 @@ class PushNotificationTest extends TestCase
     //         'title' => 'App notification',
     //         'body' => 'body content'
     //     ])->send();
-        
+
     //     $spy->shouldHaveReceived('request');
     // }
 }
