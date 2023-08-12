@@ -51,6 +51,7 @@ class FcmDailyEveningPlayGameReminder extends Command
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
+
         return $allTokens;
     }
 
