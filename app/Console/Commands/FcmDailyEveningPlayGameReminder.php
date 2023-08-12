@@ -2,15 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
-use App\Models\UserPlan;
-use App\Models\User;
-use App\Models\Plan;
-use App\Models\FcmPushSubscription;
-use Illuminate\Support\Facades\DB;
+use App\Actions\GetActiveUsersDeviceTokensAction;
 use App\Actions\SendPushNotification;
 use App\Enums\ClientPlatform;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class FcmDailyEveningPlayGameReminder extends Command
 {
@@ -33,10 +29,10 @@ class FcmDailyEveningPlayGameReminder extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(GetActiveUsersDeviceTokensAction $getActiveUsersDeviceTokensAction)
     {
         $pushNotification = new SendPushNotification(ClientPlatform::GameArkMobile);
-        $pushTokens = $this->GetDailyReminderUserToken();
+        $pushTokens = $this->GetDailyReminderUserToken($getActiveUsersDeviceTokensAction);
 
         // send
         $pushNotification->sendDailyReminderNotification(
@@ -46,11 +42,12 @@ class FcmDailyEveningPlayGameReminder extends Command
             "How did your day go? Log in to GameArk to unwind.  Keep your brain sharp and have some fun in the process!🧠🌟");
     }
 
-    public function GetDailyReminderUserToken()
+    public function GetDailyReminderUserToken(GetActiveUsersDeviceTokensAction $getActiveUsersDeviceTokensAction)
     {
         $allTokens = [];
+        $twoWeeksAgo = now()->subDays(14);
 
-        $devices = DB::select('SELECT DISTINCT device_token from fcm_push_subscriptions where valid = ?', [1]);
+        $devices = $getActiveUsersDeviceTokensAction->execute($twoWeeksAgo);
         foreach ($devices as $device) {
             $allTokens[] = $device->device_token;
         }
