@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('cashdrops', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->bigInteger('pool_limit');
+            $table->bigInteger('lower_pool_limit');
+            $table->bigInteger('upper_pool_limit');
             $table->decimal('percentage_stake', $precision = 9, $scale = 2)->comment('the percentage taken into the pool');
+            $table->string('icon');
             $table->timestamps();
         });
     }
