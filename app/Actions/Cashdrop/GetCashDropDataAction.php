@@ -12,7 +12,7 @@ class GetCashDropDataAction
     }
 
     public function execute(
-    ): mixed {
+    ): array {
 
         return $this->cashdropRepository->getCashdropData();
     }
