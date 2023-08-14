@@ -94,13 +94,6 @@ class User extends Authenticatable implements JWTSubject
             ->withTimestamps();
     }
 
-    public function cashdropsRounds()
-    {
-        return $this->belongsToMany(CashdropRound::class, 'cashdrop_user')
-            ->withPivot('winner', 'amount')
-            ->withTimestamps();
-    }
-
     public function getFullPhoneNumberAttribute()
     {
         return $this->country_code . $this->phone_number;
