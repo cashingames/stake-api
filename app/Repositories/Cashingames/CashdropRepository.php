@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Cashingames;
 
-use App\Models\Cashdrop;
 use Illuminate\Support\Facades\DB;
 
 class CashdropRepository
