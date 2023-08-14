@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('cashdrop_round_id');
             $table->boolean('winner');
-            $table->foreignId('cashdrop_id');
             $table->decimal('amount', 10,2);
             $table->timestamps();
         });
