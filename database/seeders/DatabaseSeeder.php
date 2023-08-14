@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
             StakingOddSeeder::class,
             ChallengeRequestSeeder::class,
             BonusSeeder::class,
-            PromotionSeeder::class
+            PromotionSeeder::class,
+            CashDropSeeder::class
         ]);
     }
 }
