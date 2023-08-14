@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cashdrop_id');
             $table->bigInteger('pooled_amount');
-            $table->dateTime('dropped_at');
+            $table->dateTime('dropped_at')->nullable();
             $table->decimal('percentage_stake', $precision = 9, $scale = 2)->comment('cashdrop precentage stake * stake amount');
             $table->timestamps();
         });
