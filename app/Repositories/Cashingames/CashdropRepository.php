@@ -7,17 +7,17 @@ use Illuminate\Support\Facades\DB;
 class CashdropRepository
 {
 
-    public function getCashdropData(): array
+    public function getCashdrops(): array
     {
         return [
 
-            'cashdropRounds' =>  $this->getCashdropRounds(),
+            'cashdropRounds' =>  $this->getRunningCashdrops(),
             'cashdropWinners' =>  $this->getCashdropWinners()
 
         ];
     }
 
-    public function getCashdropRounds(): array
+    public function getRunningCashdrops(): array
     {
         return DB::select(
             'SELECT cashdrops.name as cashdropName, cashdrops.id 

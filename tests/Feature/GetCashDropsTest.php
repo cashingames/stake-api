@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class GetCashDropDataTest extends TestCase
+class GetCashDropsTest extends TestCase
 {
     use RefreshDatabase;
     public $user;
@@ -47,7 +47,7 @@ class GetCashDropDataTest extends TestCase
             ]
         );
 
-        $response = $this->get('/api/v3/cashdrop/data');
+        $response = $this->get('/api/v3/cashdrops');
 
         $response->assertJsonCount(2, '*');
     }

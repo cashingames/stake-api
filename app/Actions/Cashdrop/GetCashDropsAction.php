@@ -4,7 +4,7 @@ namespace App\Actions\Cashdrop;
 
 use App\Repositories\Cashingames\CashdropRepository;
 
-class GetCashDropDataAction
+class GetCashDropsAction
 {
     public function __construct(
         private readonly CashdropRepository $cashdropRepository,
@@ -14,6 +14,6 @@ class GetCashDropDataAction
     public function execute(
     ): array {
 
-        return $this->cashdropRepository->getCashdropData();
+        return $this->cashdropRepository->getCashdrops();
     }
 }
