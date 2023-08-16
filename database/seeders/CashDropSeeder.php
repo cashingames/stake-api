@@ -21,7 +21,8 @@ class CashDropSeeder extends Seeder
                 'percentage_stake' => 0.05,
                 'created_at' => now(),
                 'updated_at' => now(),
-                'icon' => 'icons/gold_cashdrop_icon.png'
+                'icon' => 'icons/gold_cashdrop_icon.png',
+                'background_colour' => '#F3E9C7'
             ]
         );
         DB::table('cashdrops')->insert(
@@ -32,7 +33,8 @@ class CashDropSeeder extends Seeder
                 'percentage_stake' => 0.03,
                 'created_at' => now(),
                 'updated_at' => now(),
-                'icon' => 'icons/silver_cashdrop_icon.png'
+                'icon' => 'icons/silver_cashdrop_icon.png',
+                'background_colour' => '#EAEAEA'
             ]
         );
         DB::table('cashdrops')->insert(
@@ -43,7 +45,8 @@ class CashDropSeeder extends Seeder
                 'percentage_stake' => 0.02,
                 'created_at' => now(),
                 'updated_at' => now(),
-                'icon' => 'icons/bronze_cashdrop_icon.png'
+                'icon' => 'icons/bronze_cashdrop_icon.png',
+                'background_colour' => '#EECCAB'
             ]
         );
 
