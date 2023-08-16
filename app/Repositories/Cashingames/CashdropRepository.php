@@ -21,7 +21,7 @@ class CashdropRepository
     {
         return DB::select(
             'SELECT cashdrops.name as cashdropName, cashdrops.id 
-            as cashdropId, cashdrop_rounds.pooled_amount 
+            as cashdropId, cashdrops.icon as cashdropIcon, cashdrop_rounds.pooled_amount 
             as pooledAmount, cashdrops.background_colour as backgroundColor from cashdrops 
             left join cashdrop_rounds on cashdrops.id = cashdrop_rounds.cashdrop_id 
             where cashdrop_rounds.dropped_at is null
