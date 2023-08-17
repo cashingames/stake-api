@@ -40,7 +40,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_reset_email_can_be_sent()
     {
-        $response = $this->withHeaders(['x-brand-id' => 10])->postjson(self::RESET_EMAIL_URL, [
+        $response = $this->postjson(self::RESET_EMAIL_URL, [
             "email" => $this->user->email,
         ]);
 
