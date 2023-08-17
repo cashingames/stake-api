@@ -40,7 +40,7 @@ class ForgotPasswordController extends BaseController
      
         $user = User::where('email', $data['email'])->first();
         if (!$user) {
-            return $this->sendResponse(true, 'Email sent');
+            return $this->sendError('email does not exist', 'email does not exist');
         }
 
         $token = mt_rand(10000, 99999);
