@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StartChallengeRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Jobs\FillUpCashdropPools;
+use App\Jobs\FillCashdropPools;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\MatchChallengeRequest;
 use App\Jobs\MatchWithHumanChallengeRequest;
@@ -35,7 +35,7 @@ class StartChallengeRequestController extends Controller
         if (!$matchedRequest) {
             MatchChallengeRequest::dispatch($result, $request->header('x-request-env'));
         }
-        FillUpCashdropPools::dispatch($request->amount, $request->user());
+        FillCashdropPools::dispatch($request->amount, $request->user());
         return ResponseHelper::success($this->transformResponse($result));
     }
 

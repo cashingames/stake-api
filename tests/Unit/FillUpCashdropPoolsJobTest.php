@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Cashdrop\FillCashdropRoundsAction;
 use App\Jobs\FillUpCashdropPools;
 use App\Models\Cashdrop;
 use App\Models\CashdropRound;
@@ -10,7 +11,6 @@ use App\Repositories\Cashingames\CashdropRepository;
 use Database\Seeders\CashDropSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 class FillUpCashdropPoolsJobTest extends TestCase
@@ -43,9 +43,9 @@ class FillUpCashdropPoolsJobTest extends TestCase
     public function test_fill_up_cashdrop_pool(): void
     {
         $job = new FillUpCashdropPools(200, $this->user);
-        $cashdropRepository = new CashdropRepository();
+        $cashdropAction = new FillCashdropRoundsAction(new CashdropRepository);
 
-        $job->handle($cashdropRepository);
+        $job->handle($cashdropAction);
 
         $this->assertDatabaseHas('cashdrop_users', [
             'user_id' => $this->user->id,

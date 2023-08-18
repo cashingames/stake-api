@@ -4,7 +4,7 @@ namespace App\Http\Controllers\PlayGame;
 
 use App\Http\Requests\StartSinglePlayerRequest;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Jobs\FillUpCashdropPools;
+use App\Jobs\FillCashdropPools;
 use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Services\PlayGame\StakingExhibitionGameService;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class StartSinglePlayerGameController extends Controller
             ]);
             return ResponseHelper::error('Category not available for now, try again later', 400);
         }
-        FillUpCashdropPools::dispatch($request->staking_amount, $request->user());
+        FillCashdropPools::dispatch($request->staking_amount, $request->user());
         $result = $this->prepare($startResponse->gameSession, $startResponse->questions);
         return ResponseHelper::success($result);
     }

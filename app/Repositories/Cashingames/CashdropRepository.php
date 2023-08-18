@@ -3,9 +3,7 @@
 namespace App\Repositories\Cashingames;
 
 use App\Models\CashdropRound;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Mailer\Event\FailedMessageEvent;
 
 class CashdropRepository
 {
@@ -44,26 +42,16 @@ class CashdropRepository
         );
     }
 
-    public function fillUpCashdropPools(User $user, float $amount): void
-    {
-        CashdropRound::whereNull('dropped_at')->get()->map(function ($round) use ($user, $amount) {
-            DB::transaction(function () use ($round, $user, $amount) {
-                $round->pooled_amount += $amount * $round->percentage_stake;
-                $round->save();
-
-                $dataToUpdateOrInsert = [
-                    'amount' => DB::raw('amount + ' . $amount * $round->percentage_stake),
-                    'winner' => false
-                ];
-                
-                $conditions = [
-                    'cashdrop_round_id' => $round->id,
-                    'user_id' => $user->id 
-                ];
-                
-                DB::table('cashdrop_users')->updateOrInsert($conditions, $dataToUpdateOrInsert);
-             
-            });
-        });
+    public function getActiveCashdrops(){
+       return CashdropRound::whereNull('dropped_at')->get();
     }
+
+    public function updateCashdropRound($roundId, $data){
+        CashdropRound::where('id', $roundId)->update($data);
+    }
+
+    public function updateCashdropUser($conditions, $data){
+        DB::table('cashdrop_users')->updateOrInsert($conditions, $data);
+    }
+   
 }
