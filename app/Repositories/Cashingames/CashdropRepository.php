@@ -59,10 +59,23 @@ class CashdropRepository
     }
 
     public function updateUserCashdropRound(
-        array $cashdropRoundData,
-        array $cashdropUsersconditions,
-        array $cashdropUsersData
+        int $userId,
+        float $amount,
+        object $round
     ) {
+        $cashdropRoundData = [
+            'cashdrop_round_id' => $round->id,
+            'pooled_amount' => $round->pooled_amount + $amount * $round->percentage_stake,
+        ];
+        $cashdropUsersconditions = [
+            'cashdrop_round_id' => $round->id,
+            'user_id' => $userId
+        ];
+        $cashdropUsersData = [
+            'amount' => DB::raw('amount + ' . $amount * $round->percentage_stake),
+            'winner' => false
+        ];
+
         $this->updateCashdropRound($cashdropRoundData);
         $this->updateCashdropUser($cashdropUsersconditions, $cashdropUsersData);
     }

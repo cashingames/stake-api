@@ -17,24 +17,11 @@ class FillCashdropRoundsAction
     {
 
         DB::transaction(function () use ($user, $amount) {
-            $this->cashdropRepository->getActiveCashdrops()->map(function ($round) use ($user, $amount) {
-                $cashdropRoundData = [
-                    'cashdrop_round_id' => $round->id,
-                    'pooled_amount' => $round->pooled_amount + $amount * $round->percentage_stake,
-                ];
-                $cashdropUsersconditions = [
-                    'cashdrop_round_id' => $round->id,
-                    'user_id' => $user->id
-                ];
-                $cashdropUsersData = [
-                    'amount' => DB::raw('amount + ' . $amount * $round->percentage_stake),
-                    'winner' => false
-                ];
-
+            $this->cashdropRepository->getActiveCashdrops()->map(function ($round) use ($user, $amount) { 
                 $this->cashdropRepository->updateUserCashdropRound(
-                    $cashdropRoundData,
-                    $cashdropUsersconditions,
-                    $cashdropUsersData
+                    $user->id,
+                    $amount,
+                    $round
                 );
             });
         });
