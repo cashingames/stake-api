@@ -7,6 +7,7 @@ use App\Enums\WalletTransactionAction;
 use App\Enums\WalletTransactionType;
 use App\Http\ResponseHelpers\GameSessionResponse;
 use App\Http\ResponseHelpers\CommonDataResponse;
+use App\Jobs\FillCashdropPools;
 use App\Jobs\SendAdminErrorEmailUpdate;
 use App\Models\GameMode;
 use App\Models\Boost;
@@ -269,7 +270,7 @@ class GameController extends BaseController
                 ]);
             }
         });
-
+        FillCashdropPools::dispatch($staking->amount_staked, $this->user);
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
 

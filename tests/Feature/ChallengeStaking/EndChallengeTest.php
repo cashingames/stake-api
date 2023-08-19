@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\ChallengeStaking;
 use App\Enums\WalletBalanceType;
-
+use App\Jobs\FillCashdropPools;
 use Mockery;
 use Tests\TestCase;
 use App\Models\User;
@@ -147,6 +147,8 @@ class EndChallengeTest extends TestCase
 
         //assert that refund push notification was queued
         Queue::assertPushed(SendChallengeRefundNotification::class, 2);
+         //assert that cash drop filling job was queued
+        Queue::assertPushed(FillCashdropPools::class);
     }
 
     /**

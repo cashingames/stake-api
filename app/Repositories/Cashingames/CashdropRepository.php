@@ -42,16 +42,28 @@ class CashdropRepository
         );
     }
 
-    public function getActiveCashdrops(){
-       return CashdropRound::whereNull('dropped_at')->get();
+    public function getActiveCashdrops()
+    {
+        return CashdropRound::whereNull('dropped_at')->get();
     }
 
-    public function updateCashdropRound($roundId, $data){
-        CashdropRound::where('id', $roundId)->update($data);
+    public function updateCashdropRound($data)
+    {
+        CashdropRound::where('id', $data['cashdrop_round_id'])
+            ->update(['pooled_amount' => $data['pooled_amount']]);
     }
 
-    public function updateCashdropUser($conditions, $data){
+    public function updateCashdropUser($conditions, $data)
+    {
         DB::table('cashdrop_users')->updateOrInsert($conditions, $data);
     }
-   
+
+    public function updateUserCashdropRound(
+        array $cashdropRoundData,
+        array $cashdropUsersconditions,
+        array $cashdropUsersData
+    ) {
+        $this->updateCashdropRound($cashdropRoundData);
+        $this->updateCashdropUser($cashdropUsersconditions, $cashdropUsersData);
+    }
 }
