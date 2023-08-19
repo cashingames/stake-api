@@ -34,14 +34,13 @@ class StartSinglePlayerGameController extends Controller
         if (count($startResponse->questions) < 10) {
             SendAdminErrorEmailUpdate::dispatch(
                 'Failed Single Game Start Attempt',
-                $request->user()->username."'s single game could not start. reason: Category not available for now"
+                $request->user()->username . "'s single game could not start. reason: Category not available for now"
             );
             Log::info('SSTART_SINGLE_PLAYER_CANNOT_START', [
                 'user' => $request->user()->username,
             ]);
             return ResponseHelper::error('Category not available for now, try again later', 400);
         }
-
         $result = $this->prepare($startResponse->gameSession, $startResponse->questions);
         return ResponseHelper::success($result);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Cashingames;
 
+use App\Models\CashdropRound;
 use Illuminate\Support\Facades\DB;
 
 class CashdropRepository
@@ -39,5 +40,43 @@ class CashdropRepository
             LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
             WHERE cashdrop_users.winner is true'
         );
+    }
+
+    public function getActiveCashdrops()
+    {
+        return CashdropRound::whereNull('dropped_at')->get();
+    }
+
+    public function updateCashdropRound($data)
+    {
+        CashdropRound::where('id', $data['cashdrop_round_id'])
+            ->update(['pooled_amount' => $data['pooled_amount']]);
+    }
+
+    public function updateCashdropUser($conditions, $data)
+    {
+        DB::table('cashdrop_users')->updateOrInsert($conditions, $data);
+    }
+
+    public function updateUserCashdropRound(
+        int $userId,
+        float $amount,
+        object $round
+    ) {
+        $cashdropRoundData = [
+            'cashdrop_round_id' => $round->id,
+            'pooled_amount' => $round->pooled_amount + $amount * $round->percentage_stake,
+        ];
+        $cashdropUsersconditions = [
+            'cashdrop_round_id' => $round->id,
+            'user_id' => $userId
+        ];
+        $cashdropUsersData = [
+            'amount' => DB::raw('amount + ' . $amount * $round->percentage_stake),
+            'winner' => false
+        ];
+
+        $this->updateCashdropRound($cashdropRoundData);
+        $this->updateCashdropUser($cashdropUsersconditions, $cashdropUsersData);
     }
 }

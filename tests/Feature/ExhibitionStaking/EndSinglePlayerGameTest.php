@@ -3,6 +3,7 @@
 namespace Tests\Feature\ExhibitionStaking;
 
 use App\Enums\BonusType;
+use App\Jobs\FillCashdropRounds;
 use App\Models\Bonus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -55,7 +56,8 @@ class EndSinglePlayerGameTest extends TestCase
     }
 
     public function test_exhibition_game_can_be_ended_without_boosts_and_options()
-    {
+    {   
+        Queue::fake();
         Staking::factory()->count(5)->create(['user_id' => $this->user->id]);
 
         GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id]);
@@ -72,6 +74,8 @@ class EndSinglePlayerGameTest extends TestCase
         $response->assertJson([
             'message' => 'Game Ended',
         ]);
+          //assert that cash drop filling job was queued
+          Queue::assertPushed(FillCashdropRounds::class);
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()
