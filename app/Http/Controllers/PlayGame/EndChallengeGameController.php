@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\ResponseHelpers\ResponseHelper;
-use App\Jobs\FillCashdropPools;
+use App\Jobs\FillCashdropRounds;
 use App\Repositories\Cashingames\TriviaChallengeStakingRepository;
 use App\Services\PlayGame\StakingChallengeGameService;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +33,7 @@ class EndChallengeGameController extends Controller
         }
        
         $challengeRequest = $triviaChallengeStakingRepository->getRequestById($data['challenge_request_id']);
-        FillCashdropPools::dispatch($challengeRequest->amount, $request->user());
+        FillCashdropRounds::dispatch($challengeRequest->amount, $request->user());
 
         return ResponseHelper::success((object) ['score' => $result->score]);
     }

@@ -3,7 +3,7 @@
 namespace Tests\Feature\ExhibitionStaking;
 
 use App\Enums\BonusType;
-use App\Jobs\FillCashdropPools;
+use App\Jobs\FillCashdropRounds;
 use App\Models\Bonus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -75,7 +75,7 @@ class EndSinglePlayerGameTest extends TestCase
             'message' => 'Game Ended',
         ]);
           //assert that cash drop filling job was queued
-          Queue::assertPushed(FillCashdropPools::class);
+          Queue::assertPushed(FillCashdropRounds::class);
     }
 
     public function test_exhibition_staking_creates_a_winning_transaction_when_game_ends()

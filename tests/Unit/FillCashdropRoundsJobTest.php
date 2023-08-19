@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Actions\Cashdrop\FillCashdropRoundsAction;
-use App\Jobs\FillCashdropPools;
+use App\Jobs\FillCashdropRounds;
 use App\Models\Cashdrop;
 use App\Models\CashdropRound;
 use App\Models\User;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class FillCashdropPoolsJobTest extends TestCase
+class FillCashdropRoundsJobTest extends TestCase
 {
     use RefreshDatabase;
     public $user, $cashdrop, $cashdropRound ;
@@ -42,7 +42,7 @@ class FillCashdropPoolsJobTest extends TestCase
     }
     public function test_fill_up_cashdrop_pool(): void
     {
-        $job = new FillCashdropPools(200, $this->user);
+        $job = new FillCashdropRounds(200, $this->user);
         $cashdropAction = new FillCashdropRoundsAction(new CashdropRepository);
 
         $job->handle($cashdropAction);
