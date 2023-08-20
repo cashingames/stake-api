@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\DB;
 class CashdropRepository
 {
 
-    public function createCashdropRound(Cashdrop $cashdrop):CashdropRound
+    public function createCashdropRound(Cashdrop $cashdrop): CashdropRound
     {
-       return CashdropRound::create([
+        return CashdropRound::create([
             'cashdrop_id' => $cashdrop->id,
             'pooled_amount' => 0.0,
             'percentage_stake' => $cashdrop->percentage_stake,
@@ -101,7 +101,7 @@ class CashdropRepository
         $randomUserCashdrop = DB::table('cashdrop_users')
             ->where('cashdrop_round_id', $cashdropRound->id)
             ->inRandomOrder()->first();
-        
+
         $winner = User::find($randomUserCashdrop->user_id);
         $walletRepository->addTransaction(
             new WalletTransactionDto(
@@ -113,7 +113,22 @@ class CashdropRepository
                 WalletTransactionAction::WinningsCredited,
             )
         );
-        $randomUserCashdrop->update(['winner' => true]);
-        return $randomUserCashdrop->cashdrop;
+        DB::update(
+            'UPDATE cashdrop_users SET winner = ?
+             WHERE id = ? ',
+            [
+                true,
+                $randomUserCashdrop->id,
+            ]
+        );
+        DB::update(
+            'UPDATE cashdrop_rounds SET dropped_at = ?
+             WHERE id = ? ',
+            [
+                now(),
+                $cashdropRound->id,
+            ]
+        );
+        return $cashdropRound->cashdrop;
     }
 }

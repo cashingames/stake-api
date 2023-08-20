@@ -2,12 +2,16 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
+use App\Actions\Cashdrop\DropCashdropAction;
 use App\Actions\Cashdrop\FillCashdropRoundsAction;
 use App\Jobs\FillCashdropRounds;
 use App\Models\Cashdrop;
 use App\Models\CashdropRound;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Repositories\Cashingames\CashdropRepository;
+use App\Repositories\Cashingames\WalletRepository;
 use Database\Seeders\CashDropSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +20,11 @@ use Tests\TestCase;
 class FillCashdropRoundsJobTest extends TestCase
 {
     use RefreshDatabase;
-    public $user, $cashdrop, $cashdropRound ;
+    public $user, $cashdrop, $cashdropRound;
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->has(Wallet::factory()->count(1))->create();
         $this->seed(CashDropSeeder::class);
         $this->cashdrop = Cashdrop::first();
         $this->cashdropRound = CashdropRound::create([
@@ -43,7 +47,11 @@ class FillCashdropRoundsJobTest extends TestCase
     public function test_fill_up_cashdrop_pool(): void
     {
         $job = new FillCashdropRounds(200, $this->user);
-        $cashdropAction = new FillCashdropRoundsAction(new CashdropRepository);
+        $cashdropRepository = new CashdropRepository;
+        $cashdropAction = new FillCashdropRoundsAction(
+            $cashdropRepository,
+            $this->mockdropCashdropAction()
+        );
 
         $job->handle($cashdropAction);
 
@@ -57,5 +65,39 @@ class FillCashdropRoundsJobTest extends TestCase
             'cashdrop_id' => $this->cashdrop->id,
             'pooled_amount' => ($this->cashdrop->percentage_stake * 200) + 100,
         ]);
+    }
+
+    public function test_drop_cashdrop_action_is_triggered(): void
+    {
+        $this->cashdropRound->update(['pooled_amount' => $this->cashdrop->lower_pool_limit]);
+
+        $job = new FillCashdropRounds(200, $this->user);
+        $cashdropRepository = new CashdropRepository;
+        $walletRepository = new WalletRepository;
+        $createCashdropAction = $this->mockCreateNewCashdropRoundAction();
+        $dropAction = new DropCashdropAction(
+            $cashdropRepository,
+            $walletRepository,
+            $createCashdropAction
+        );
+
+        $cashdropAction = new FillCashdropRoundsAction(
+            $cashdropRepository,
+            $dropAction ,
+        );
+
+        $job->handle($cashdropAction);
+
+        $this->assertDatabaseHas('wallets', [
+            'withdrawable' => $this->cashdropRound->pooled_amount
+        ]);
+    }
+    private function mockdropCashdropAction()
+    {
+        return $this->createMock(DropCashdropAction::class);
+    }
+    private function mockCreateNewCashdropRoundAction()
+    {
+        return $this->createMock(CreateNewCashdropRoundAction::class);
     }
 }
