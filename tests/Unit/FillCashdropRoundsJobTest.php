@@ -11,12 +11,16 @@ use App\Repositories\Cashingames\CashdropRepository;
 use Database\Seeders\CashDropSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use App\Services\Firebase\FirestoreService;
+use Google\Cloud\Firestore\V1\Client\FirestoreClient;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class FillCashdropRoundsJobTest extends TestCase
 {
     use RefreshDatabase;
-    public $user, $cashdrop, $cashdropRound ;
+    public $user, $cashdrop, $cashdropRound;
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,11 +43,20 @@ class FillCashdropRoundsJobTest extends TestCase
             'created_at' => now(),
             'updated_at' => now()
         ]);
+        config(['trivia.cashdrops_firestore_document_id' => "randomId12345"]);
     }
     public function test_fill_up_cashdrop_pool(): void
     {
+        $mockedFirestoreService = $this->mockFirestoreService();
+        $mockedFirestoreService
+            ->expects($this->once())
+            ->method('updateDocument');
+
         $job = new FillCashdropRounds(200, $this->user);
-        $cashdropAction = new FillCashdropRoundsAction(new CashdropRepository);
+        $cashdropAction = new FillCashdropRoundsAction(
+            new CashdropRepository,
+            $mockedFirestoreService
+        );
 
         $job->handle($cashdropAction);
 
@@ -57,5 +70,10 @@ class FillCashdropRoundsJobTest extends TestCase
             'cashdrop_id' => $this->cashdrop->id,
             'pooled_amount' => ($this->cashdrop->percentage_stake * 200) + 100,
         ]);
+    }
+
+    private function mockFirestoreService()
+    {
+        return $this->createMock(FirestoreService::class);
     }
 }

@@ -33,5 +33,6 @@ return [
     'minimum_challenge_staking_amount' => env('MINIMUM_CHALLENGE_STAKING_AMOUNT', 100),
     'maximum_challenge_staking_amount' => env('MAXIMUM_CHALLENGE_STAKING_AMOUNT', 1000000),
     'email_verification_limit_threshold' => env('EMAIL_VERIFICATION_LIMIT_THRESHOLD', 1000),
-    'minimum_withdrawal_perfect_score_threshold' => env('MINIMUM_WITHDRAWAL_PERFECT_SCORE_THRESHOLD', 5)
+    'minimum_withdrawal_perfect_score_threshold' => env('MINIMUM_WITHDRAWAL_PERFECT_SCORE_THRESHOLD', 5),
+    'cashdrops_firestore_document_id' => env('CASHDROPS_FIRESTORE_DOCUMENT_ID')
 ];
