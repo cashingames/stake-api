@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
 use App\Models\Cashdrop;
 use App\Repositories\Cashingames\CashdropRepository;
@@ -28,7 +29,9 @@ class CreateNewCashdropActionTest extends TestCase
         config(['trivia.cashdrops_firestore_document_id' => "randomId12345"]);
         $action= new CreateNewCashdropRoundAction(
             new CashdropRepository, 
-            $this->mockFirestoreService());
+            $this->mockFirestoreService(),
+            $this->mockFirestoreHelper()
+        );
 
     
         $action->execute($this->cashdrop);
@@ -42,5 +45,9 @@ class CreateNewCashdropActionTest extends TestCase
     private function mockFirestoreService()
     {
         return $this->createMock(FirestoreService::class);
+    }
+    private function mockFirestoreHelper()
+    {
+        return $this->createMock(CashdropFirestoreHelper::class);
     }
 }
