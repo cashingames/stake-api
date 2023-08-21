@@ -16,9 +16,9 @@ class CreateNewCashdropRoundAction
     ) {
     }
 
-    public function execute(Cashdrop $cashdrop): void
+    public function execute(Cashdrop $cashdrop, $env): void
     {
         $this->cashdropRepository->createCashdropRound($cashdrop);
-        $this->cashdropFirestoreHelper->updateCashdropFirestore();
+        $this->cashdropFirestoreHelper->updateCashdropFirestore($env);
     }
 }

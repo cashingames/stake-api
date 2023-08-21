@@ -58,7 +58,7 @@ class FillCashdropRoundsJobTest extends TestCase
             ->expects($this->once())
             ->method('updateCashdropFirestore');
 
-        $job = new FillCashdropRounds(200, $this->user);
+        $job = new FillCashdropRounds(200, $this->user,'testing');
         $cashdropRepository = new CashdropRepository;
         $cashdropAction = new FillCashdropRoundsAction(
             $cashdropRepository,
@@ -86,7 +86,7 @@ class FillCashdropRoundsJobTest extends TestCase
     {
         $this->cashdropRound->update(['pooled_amount' => $this->cashdrop->lower_pool_limit]);
 
-        $job = new FillCashdropRounds(200, $this->user);
+        $job = new FillCashdropRounds(200, $this->user,'testing');
         $cashdropRepository = new CashdropRepository;
         $walletRepository = new WalletRepository;
         $createCashdropAction = $this->mockCreateNewCashdropRoundAction();

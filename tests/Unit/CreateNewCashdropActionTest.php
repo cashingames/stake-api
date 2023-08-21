@@ -33,7 +33,7 @@ class CreateNewCashdropActionTest extends TestCase
         );
 
     
-        $action->execute($this->cashdrop);
+        $action->execute($this->cashdrop,'testing');
 
         $this->assertDatabaseHas('cashdrop_rounds', [
             'cashdrop_id' => $this->cashdrop->id,

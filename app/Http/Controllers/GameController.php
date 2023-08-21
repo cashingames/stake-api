@@ -270,7 +270,7 @@ class GameController extends BaseController
                 ]);
             }
         });
-        FillCashdropRounds::dispatch($staking->amount_staked, $this->user);
+        FillCashdropRounds::dispatch($staking->amount_staked, $this->user, $request->header('x-request-env'));
         return $this->sendResponse((new GameSessionResponse())->transform($game), "Game Ended");
     }
 

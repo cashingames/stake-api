@@ -16,23 +16,23 @@ class FillCashdropRoundsAction
     ) {
     }
 
-    public function execute(User $user, float $amount)
+    public function execute(User $user, float $amount, $env)
     {
         $activeCashdrops = $this->cashdropRepository->getActiveCashdrops();
-        DB::transaction(function () use ($user, $amount, $activeCashdrops) {
-            $activeCashdrops->map(function ($round) use ($user, $amount) {
+        DB::transaction(function () use ($user, $amount, $activeCashdrops, $env) {
+            $activeCashdrops->map(function ($round) use ($user, $amount, $env) {
                 $this->cashdropRepository->updateUserCashdropRound(
                     $user->id,
                     $amount,
                     $round
                 );
                 if ($round->pooled_amount >= $round->cashdrop->lower_pool_limit) {
-                    $this->dropCashdropAction->execute($round);
+                    $this->dropCashdropAction->execute($round, $env);
                 }
             });
         });
 
-        $this->cashdropFirestoreHelper->updateCashdropFirestore();
+        $this->cashdropFirestoreHelper->updateCashdropFirestore($env);
     }
 
   

@@ -16,10 +16,10 @@ class DropCashdropAction
     ) {
     }
 
-    public function execute(CashdropRound $cashdropRound): void {
+    public function execute(CashdropRound $cashdropRound, $env): void {
 
         $cashdrop = $this->cashdropRepository->creditWinner($this->walletRepository, $cashdropRound);
-        $this->createNewCashdropRoundAction->execute($cashdrop);
+        $this->createNewCashdropRoundAction->execute($cashdrop, $env);
        
     }
 }

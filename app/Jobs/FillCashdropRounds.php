@@ -9,10 +9,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Traits\Utils\ResolveGoogleCredentials;
 
 class FillCashdropRounds implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ResolveGoogleCredentials;
 
     /**
      * Create a new job instance.
@@ -20,6 +21,7 @@ class FillCashdropRounds implements ShouldQueue
     public function __construct(
         private readonly float $amount,
         private readonly User $user,
+        private $env
     ) {
         //
     }
@@ -29,6 +31,6 @@ class FillCashdropRounds implements ShouldQueue
      */
     public function handle(FillCashdropRoundsAction $fillCashdropRoundsAction): void
     {
-        $fillCashdropRoundsAction->execute($this->user, $this->amount);
+        $fillCashdropRoundsAction->execute($this->user, $this->amount, $this->env);
     }
 }

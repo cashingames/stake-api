@@ -33,7 +33,7 @@ class EndChallengeGameController extends Controller
         }
        
         $challengeRequest = $triviaChallengeStakingRepository->getRequestById($data['challenge_request_id']);
-        FillCashdropRounds::dispatch($challengeRequest->amount, $request->user());
+        FillCashdropRounds::dispatch($challengeRequest->amount, $request->user(), $request->header('x-request-env'));
 
         return ResponseHelper::success((object) ['score' => $result->score]);
     }

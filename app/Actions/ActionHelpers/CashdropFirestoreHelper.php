@@ -15,7 +15,7 @@ class CashdropFirestoreHelper
     ) {
     }
    
-    public function updateCashdropFirestore()
+    public function updateCashdropFirestore($env)
     {
         $cashdropUpdateArray = [];
         foreach ($this->cashdropRepository->getActiveCashdrops() as $cashdropsRound) {
@@ -29,7 +29,8 @@ class CashdropFirestoreHelper
         $this->firestoreService->updateDocument(
             'cashdrops-updates',
             FirebaseDocumentIds::CASHDROP,
-            $cashdropUpdateArray
+            $cashdropUpdateArray,
+            $env
         );
     }
 
