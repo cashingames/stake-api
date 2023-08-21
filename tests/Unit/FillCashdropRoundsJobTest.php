@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
 use App\Actions\Cashdrop\DropCashdropAction;
 use App\Actions\Cashdrop\FillCashdropRoundsAction;
@@ -25,6 +26,7 @@ class FillCashdropRoundsJobTest extends TestCase
 {
     use RefreshDatabase;
     public $user, $cashdrop, $cashdropRound;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,21 +49,22 @@ class FillCashdropRoundsJobTest extends TestCase
             'created_at' => now(),
             'updated_at' => now()
         ]);
-        config(['trivia.cashdrops_firestore_document_id' => "randomId12345"]);
     }
+
     public function test_fill_up_cashdrop_pool(): void
     {
-        $mockedFirestoreService = $this->mockFirestoreService();
-        $mockedFirestoreService
+        $mockedFirestoreHelper = $this->mockFirestoreHelper();
+        $mockedFirestoreHelper
             ->expects($this->once())
-            ->method('updateDocument');
+            ->method('updateCashdropFirestore');
 
         $job = new FillCashdropRounds(200, $this->user);
         $cashdropRepository = new CashdropRepository;
         $cashdropAction = new FillCashdropRoundsAction(
             $cashdropRepository,
-            $mockedFirestoreService
-            $this->mockdropCashdropAction()
+            $this->mockdropCashdropAction(),
+            $mockedFirestoreHelper,
+           
           );
 
 
@@ -96,6 +99,7 @@ class FillCashdropRoundsJobTest extends TestCase
         $cashdropAction = new FillCashdropRoundsAction(
             $cashdropRepository,
             $dropAction ,
+            $this->mockFirestoreHelper()
         );
 
         $job->handle($cashdropAction);
@@ -111,8 +115,9 @@ class FillCashdropRoundsJobTest extends TestCase
     private function mockCreateNewCashdropRoundAction()
     {
         return $this->createMock(CreateNewCashdropRoundAction::class);
-    private function mockFirestoreService()
+    }
+    private function mockFirestoreHelper()
     {
-        return $this->createMock(FirestoreService::class);
+        return $this->createMock(CashdropFirestoreHelper::class);
     }
 }

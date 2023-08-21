@@ -159,7 +159,7 @@ class EndChallengeTest extends TestCase
         $this->instance(
             FirestoreService::class,
             Mockery::mock(FirestoreService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('updateDocument')->times(6);
+                $mock->shouldReceive('updateDocument')->times(8);
             })
         );
 

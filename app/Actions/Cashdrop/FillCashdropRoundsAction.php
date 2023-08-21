@@ -2,9 +2,9 @@
 
 namespace App\Actions\Cashdrop;
 
+use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Models\User;
 use App\Repositories\Cashingames\CashdropRepository;
-use App\Services\Firebase\FirestoreService;
 use Illuminate\Support\Facades\DB;
 
 class FillCashdropRoundsAction
@@ -12,7 +12,7 @@ class FillCashdropRoundsAction
     public function __construct(
         private readonly CashdropRepository $cashdropRepository,
         private readonly DropCashdropAction $dropCashdropAction,
-        private readonly FirestoreService $firestoreService,
+        private readonly CashdropFirestoreHelper $cashdropFirestoreHelper
     ) {
     }
 
@@ -32,24 +32,8 @@ class FillCashdropRoundsAction
             });
         });
 
-        $this->updateCashdropFirestore($activeCashdrops->refresh());
+        $this->cashdropFirestoreHelper->updateCashdropFirestore();
     }
 
-    private function updateCashdropFirestore($activeCashdrops)
-    {
-        $cashdropUpdateArray = [];
-        foreach ($activeCashdrops as $cashdropsRound) {
-            $cashdropUpdateArray[] = [
-                $cashdropsRound->cashdrop->name => [
-                    'cashdrop_id' =>  $cashdropsRound->cashdrop_id,
-                    'cashdrop_amount' => $cashdropsRound->pooled_amount
-                ]
-            ];
-        }
-        $this->firestoreService->updateDocument(
-            'cashdrops-updates',
-            config('trivia.cashdrops_firestore_document_id'),
-            $cashdropUpdateArray
-        );
-    }
+  
 }
