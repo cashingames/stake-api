@@ -60,6 +60,11 @@ class CashdropRepository
         return CashdropRound::whereNull('dropped_at')->get();
     }
 
+    public function getUserCashdrops($roundId, $userId)
+    {
+        return  DB::table('cashdrop_users')->where('cashdrop_round_id', $roundId)
+            ->where('user_id', $userId)->first();
+    }
     public function updateCashdropRound($data)
     {
         CashdropRound::where('id', $data['cashdrop_round_id'])
@@ -84,8 +89,15 @@ class CashdropRepository
             'cashdrop_round_id' => $round->id,
             'user_id' => $userId
         ];
+        $newAmount = 0;
+        $existingCashdropUserRecord = $this->getUserCashdrops($round->id, $userId);
+
+        if (!is_null($existingCashdropUserRecord)) {
+            $newAmount = $existingCashdropUserRecord->amount + $amount * $round->percentage_stake;
+        }
+
         $cashdropUsersData = [
-            'amount' => DB::raw('amount + ' . $amount * $round->percentage_stake),
+            'amount' => $newAmount,
             'winner' => false
         ];
 

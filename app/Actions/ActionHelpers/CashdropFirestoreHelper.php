@@ -20,10 +20,10 @@ class CashdropFirestoreHelper
         $cashdropUpdateArray = [];
         foreach ($this->cashdropRepository->getActiveCashdrops() as $cashdropsRound) {
             $cashdropUpdateArray[] = [
-                $cashdropsRound->cashdrop->name => [
-                    'cashdrop_id' =>  $cashdropsRound->cashdrop_id,
-                    'cashdrop_amount' => $cashdropsRound->pooled_amount
-                ]
+            
+                'cashdrop_id' =>  $cashdropsRound->cashdrop_id,
+                'cashdrop_amount' => $cashdropsRound->pooled_amount
+                
             ];
         }
         $this->firestoreService->updateDocument(
