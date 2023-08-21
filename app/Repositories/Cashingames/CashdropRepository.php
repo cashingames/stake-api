@@ -2,12 +2,28 @@
 
 namespace App\Repositories\Cashingames;
 
+use App\Enums\WalletBalanceType;
+use App\Enums\WalletTransactionAction;
+use App\Enums\WalletTransactionType;
 use App\Models\CashdropRound;
+use App\Models\Cashdrop;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class CashdropRepository
 {
 
+    public function createCashdropRound(Cashdrop $cashdrop): CashdropRound
+    {
+        return CashdropRound::create([
+            'cashdrop_id' => $cashdrop->id,
+            'pooled_amount' => 0.0,
+            'percentage_stake' => $cashdrop->percentage_stake,
+            'dropped_at' => null,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
     public function getCashdrops(): array
     {
         return [
@@ -78,5 +94,41 @@ class CashdropRepository
 
         $this->updateCashdropRound($cashdropRoundData);
         $this->updateCashdropUser($cashdropUsersconditions, $cashdropUsersData);
+    }
+
+    public function creditWinner(WalletRepository $walletRepository, $cashdropRound)
+    {
+        $randomUserCashdrop = DB::table('cashdrop_users')
+            ->where('cashdrop_round_id', $cashdropRound->id)
+            ->inRandomOrder()->first();
+
+        $winner = User::find($randomUserCashdrop->user_id);
+        $walletRepository->addTransaction(
+            new WalletTransactionDto(
+                $winner->id,
+                $cashdropRound->pooled_amount,
+                'Cashdrop Lucky Winning',
+                WalletBalanceType::WinningsBalance,
+                WalletTransactionType::Credit,
+                WalletTransactionAction::WinningsCredited,
+            )
+        );
+        DB::update(
+            'UPDATE cashdrop_users SET winner = ?
+             WHERE id = ? ',
+            [
+                true,
+                $randomUserCashdrop->id,
+            ]
+        );
+        DB::update(
+            'UPDATE cashdrop_rounds SET dropped_at = ?
+             WHERE id = ? ',
+            [
+                now(),
+                $cashdropRound->id,
+            ]
+        );
+        return $cashdropRound->cashdrop;
     }
 }

@@ -11,8 +11,12 @@ class CashdropRound extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cashdrop_id','pooled_amount', 'dropped_at','percentage_stake',
+        'cashdrop_id', 'pooled_amount', 'dropped_at', 'percentage_stake',
         'created_at', 'updated_at'
     ];
 
+    public function cashdrop(): BelongsTo
+    {
+        return $this->belongsTo(Cashdrop::class);
+    }
 }
