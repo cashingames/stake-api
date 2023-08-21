@@ -17,11 +17,8 @@ class CashdropRepository
     {
         return CashdropRound::create([
             'cashdrop_id' => $cashdrop->id,
-            'pooled_amount' => 0.0,
             'percentage_stake' => $cashdrop->percentage_stake,
-            'dropped_at' => null,
-            'created_at' => now(),
-            'updated_at' => now()
+            'dropped_at' => null
         ]);
     }
     public function getCashdrops(): array

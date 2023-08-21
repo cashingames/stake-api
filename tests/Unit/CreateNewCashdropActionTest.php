@@ -26,7 +26,6 @@ class CreateNewCashdropActionTest extends TestCase
 
     public function test_new_cashdrop_rounds_can_be_created(): void
     {   
-        config(['trivia.cashdrops_firestore_document_id' => "randomId12345"]);
         $action= new CreateNewCashdropRoundAction(
             new CashdropRepository, 
             $this->mockFirestoreService(),
@@ -39,7 +38,7 @@ class CreateNewCashdropActionTest extends TestCase
         $this->assertDatabaseHas('cashdrop_rounds', [
             'cashdrop_id' => $this->cashdrop->id,
             'percentage_stake' => ($this->cashdrop->percentage_stake ),
-            'pooled_amount' => 0.0
+            'pooled_amount' => 0.0,
         ]);
     }
     private function mockFirestoreService()
