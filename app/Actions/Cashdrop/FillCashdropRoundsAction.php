@@ -26,26 +26,30 @@ class FillCashdropRoundsAction
                     $amount,
                     $round
                 );
-                if($round->pooled_amount >= $round->cashdrop->lower_pool_limit){
+                if ($round->pooled_amount >= $round->cashdrop->lower_pool_limit) {
                     $this->dropCashdropAction->execute($round);
                 }
             });
         });
 
-        $this->updateCashdropFirestore($activeCashdrops);
+        $this->updateCashdropFirestore($activeCashdrops->refresh());
     }
 
     private function updateCashdropFirestore($activeCashdrops)
     {
+        $cashdropUpdateArray = [];
         foreach ($activeCashdrops as $cashdropsRound) {
-            $this->firestoreService->updateDocument(
-                'cashdrops-updates',
-                config('trivia.cashdrops_firestore_document_id'),
-                [
-                    'cashdrop_id' => $cashdropsRound->cashdrop_id,
+            $cashdropUpdateArray[] = [
+                $cashdropsRound->cashdrop->name => [
+                    'cashdrop_id' =>  $cashdropsRound->cashdrop_id,
                     'cashdrop_amount' => $cashdropsRound->pooled_amount
                 ]
-            );
+            ];
         }
+        $this->firestoreService->updateDocument(
+            'cashdrops-updates',
+            config('trivia.cashdrops_firestore_document_id'),
+            $cashdropUpdateArray
+        );
     }
 }
