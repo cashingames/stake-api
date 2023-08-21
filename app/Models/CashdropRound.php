@@ -15,6 +15,7 @@ class CashdropRound extends Model
         'created_at', 'updated_at'
     ];
 
+    public $timestamps = true;
     public function cashdrop(): BelongsTo
     {
         return $this->belongsTo(Cashdrop::class);
