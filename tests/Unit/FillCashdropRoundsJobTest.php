@@ -7,6 +7,7 @@ use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
 use App\Actions\Cashdrop\DropCashdropAction;
 use App\Actions\Cashdrop\FillCashdropRoundsAction;
 use App\Jobs\FillCashdropRounds;
+use App\Jobs\SendCashdropDroppedNotification;
 use App\Models\Cashdrop;
 use App\Models\CashdropRound;
 use App\Models\User;
@@ -16,10 +17,7 @@ use App\Repositories\Cashingames\WalletRepository;
 use Database\Seeders\CashDropSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use App\Services\Firebase\FirestoreService;
-use Google\Cloud\Firestore\V1\Client\FirestoreClient;
-use Mockery;
-use Mockery\MockInterface;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class FillCashdropRoundsJobTest extends TestCase
@@ -83,7 +81,8 @@ class FillCashdropRoundsJobTest extends TestCase
     }
 
     public function test_drop_cashdrop_action_is_triggered(): void
-    {
+    {   
+        Queue::fake();
         $this->cashdropRound->update(['pooled_amount' => $this->cashdrop->lower_pool_limit]);
 
         $job = new FillCashdropRounds(200, $this->user,'testing');
@@ -104,6 +103,8 @@ class FillCashdropRoundsJobTest extends TestCase
 
         $job->handle($cashdropAction);
 
+        Queue::assertPushed(SendCashdropDroppedNotification::class);
+        
         $this->assertDatabaseHas('wallets', [
             'withdrawable' => $this->cashdropRound->pooled_amount
         ]);
