@@ -26,7 +26,8 @@ class CashdropRepository
         return [
 
             'cashdropRounds' =>  $this->getRunningCashdrops(),
-            'cashdropWinners' =>  $this->getCashdropWinners()
+            'cashdropWinners' =>  $this->getCashdropWinners(),
+            'nextToDrop' => $this->determineNextCashdropToDrop(),
 
         ];
     }
@@ -139,5 +140,10 @@ class CashdropRepository
             ]
         );
         return $cashdropRound->cashdrop;
+    }
+
+    private function determineNextCashdropToDrop()
+    {   
+       return $this->getActiveCashdrops()->random();
     }
 }
