@@ -49,6 +49,6 @@ class GetCashDropsTest extends TestCase
 
         $response = $this->get('/api/v3/cashdrops');
 
-        $response->assertJsonCount(2, '*');
+        $response->assertJsonCount(3, '*');
     }
 }
