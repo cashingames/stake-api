@@ -144,6 +144,6 @@ class CashdropRepository
 
     private function determineNextCashdropToDrop()
     {   
-       return $this->getActiveCashdrops()->random();
+       return $this->getActiveCashdrops()->random()->cashdrop_id;
     }
 }
