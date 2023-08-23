@@ -5,8 +5,10 @@ namespace Tests\Unit;
 use App\Jobs\SendCashdropDroppedNotification;
 use App\Models\Cashdrop;
 use App\Models\CashdropRound;
+use App\Models\GameSession;
 use App\Models\User;
 use Database\Seeders\CashDropSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,10 +19,13 @@ class SendCashdropDroppedNotificationJobTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create([
-            'phone_verified_at'  => now(),
-            'last_activity_time' => now()
-        ]);
+        $this->seed(UserSeeder::class);
+        $this->user = User::first();
+        GameSession::factory()
+            ->create([
+                'user_id' =>  $this->user->id,
+                'created_at' => now()
+            ]);
         $this->seed(CashDropSeeder::class);
         $this->cashdrop = Cashdrop::first();
         $this->cashdropRound = CashdropRound::create([

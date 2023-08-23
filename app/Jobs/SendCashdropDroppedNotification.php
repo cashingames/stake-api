@@ -32,8 +32,9 @@ class SendCashdropDroppedNotification implements ShouldQueue
      */
     public function handle(): void
     {
-       
-        User::where('last_activity_time', '>=', $this->cashdropRound->created_at)->chunk(200, function ($users) {
+        User::whereHas('gameSessions', function ($query){
+            $query->where('created_at','>=', $this->cashdropRound->created_at);
+        })->chunk(200, function ($users) {
             Log::info('sending cashdrop notifications to users ...', [$users] );
             foreach ($users as $user) {
                 $user->notify(new CashdropDroppedNotification(
