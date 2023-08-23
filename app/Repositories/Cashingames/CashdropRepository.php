@@ -10,6 +10,7 @@ use App\Models\CashdropRound;
 use App\Models\Cashdrop;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CashdropRepository
 {
@@ -143,10 +144,12 @@ class CashdropRepository
                 $cashdropRound->id,
             ]
         );
+        Log::info('cash dropped on: ' . $winner->username);
         SendCashdropDroppedNotification::dispatch(
             $winner->username,
             $cashdropRound
         );
+
 
         return $cashdropRound->cashdrop;
     }

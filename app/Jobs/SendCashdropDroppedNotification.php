@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendCashdropDroppedNotification implements ShouldQueue
 {
@@ -23,7 +24,7 @@ class SendCashdropDroppedNotification implements ShouldQueue
         private readonly string $username,
         private CashdropRound $cashdropRound
     ) {
-        //
+       
     }
 
     /**
@@ -31,7 +32,9 @@ class SendCashdropDroppedNotification implements ShouldQueue
      */
     public function handle(): void
     {
+       
         User::where('last_activity_time', '>=', $this->cashdropRound->created_at)->chunk(200, function ($users) {
+            Log::info('sending cashdrop notifications to users ...', [$users] );
             foreach ($users as $user) {
                 $user->notify(new CashdropDroppedNotification(
                     $this->username,
