@@ -54,7 +54,8 @@ class CashdropRepository
             LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
             LEFT JOIN cashdrop_rounds on cashdrop_users.cashdrop_round_id = cashdrop_rounds.id
             LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
-            WHERE cashdrop_users.winner is true
+            WHERE cashdrop_users.winner is true 
+            GROUP BY cashdrop_users.user_id
             ORDER BY cashdrop_rounds.created_at, cashdrop_users.updated_at ASC
             '
         );
