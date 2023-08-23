@@ -5,6 +5,7 @@ namespace App\Repositories\Cashingames;
 use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use App\Enums\WalletTransactionType;
+use App\Jobs\SendCashdropDroppedNotification;
 use App\Models\CashdropRound;
 use App\Models\Cashdrop;
 use App\Models\User;
@@ -138,6 +139,11 @@ class CashdropRepository
                 $cashdropRound->id,
             ]
         );
+        SendCashdropDroppedNotification::dispatch(
+            $winner->username,
+            $cashdropRound
+        );
+
         return $cashdropRound->cashdrop;
     }
 }

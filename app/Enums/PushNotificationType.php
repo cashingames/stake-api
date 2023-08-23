@@ -7,4 +7,5 @@ enum PushNotificationType: string
     case Challenge = "CHALLENGE";
     case Wallet = "WALLET";
     case ActivityUpdate = "ACTIVITY_UPDATE";
+    case Cashdrop = "CASHDROP";
 }

@@ -20,6 +20,5 @@ class DropCashdropAction
 
         $cashdrop = $this->cashdropRepository->creditWinner($this->walletRepository, $cashdropRound);
         $this->createNewCashdropRoundAction->execute($cashdrop, $env);
-       
     }
 }
