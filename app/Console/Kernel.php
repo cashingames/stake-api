@@ -7,6 +7,7 @@ use App\Jobs\ReactivateUserReward;
 use App\Services\FeatureFlag;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Traits\Utils\DateUtils;
 
 // use App\Console\Commands\TriviaStaking\Analytics\ComputeUsersLevelsCommand;
 
@@ -43,8 +44,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('bonus:refresh')->withoutOverlapping()->everyThreeHours();
         // fcm:contraint-reminder
         // $schedule->command('fcm:daily-morning-reminder')->withoutOverlapping()->dailyAt('08:00');
-        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('13:00');
-        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00');
+        $schedule->command('fcm:daily-afternoon-reminder')->withoutOverlapping()->dailyAt('14:00')->timezone('Africa/Lagos');
+        $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00')->timezone('Africa/Lagos');
         $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly();
         $schedule->command('user-reward:reactivate')->withoutOverlapping()->dailyAt('00:05');
         
