@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\CashdropRound;
 use App\Models\User;
 use App\Notifications\CashdropDroppedNotification;
 use Illuminate\Bus\Queueable;
@@ -20,8 +21,7 @@ class SendCashdropDroppedNotification implements ShouldQueue
      */
     public function __construct(
         private readonly string $username,
-        private readonly float $amount,
-        private readonly string $cashdropName
+        private CashdropRound $cashdropRound
     ) {
         //
     }
@@ -31,12 +31,12 @@ class SendCashdropDroppedNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        User::whereNotNull('phone_verified_at')->where('last_activity_time', '>=', now()->subMonths(2))->chunk(200, function ($users) {
+        User::where('last_activity_time', '>=', $this->cashdropRound->created_at)->chunk(200, function ($users) {
             foreach ($users as $user) {
                 $user->notify(new CashdropDroppedNotification(
                     $this->username,
-                    $this->amount,
-                    $this->cashdropName
+                    $this->cashdropRound->cashdrop->name,
+                    $this->cashdropRound->pooled_amount
                 ));
             }
         });

@@ -141,8 +141,7 @@ class CashdropRepository
         );
         SendCashdropDroppedNotification::dispatch(
             $winner->username,
-            $cashdropRound->pooled_amount,
-            $cashdropRound->cashdrop->name
+            $cashdropRound
         );
 
         return $cashdropRound->cashdrop;
