@@ -46,4 +46,9 @@ class Category extends Model
   {
     return $query->where('category_id', '!=', 0);
   }
+
+  public function categories()
+  {
+      return $this->hasManyThrough(User::class, UserCategory::class);
+  }
 }
