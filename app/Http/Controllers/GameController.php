@@ -283,12 +283,10 @@ class GameController extends BaseController
     private function showCategories()
     {
         $userCategories = $this->user->userCategories();
-        $categories = null;
         if(count($userCategories) <= 0){
-            $categories = Cache::rememberForever('categories', fn () => Category::all()); 
+            return Cache::rememberForever('categories', fn () => Category::all()); 
         } else {
-            $categories = $userCategories;
+            return $userCategories;
         }
-        return $categories;
     }
 }
