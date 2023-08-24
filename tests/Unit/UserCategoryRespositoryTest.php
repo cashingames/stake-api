@@ -38,10 +38,12 @@ class UserCategoryRespositoryTest extends TestCase
         ->method('addCategory')
         ->willReturn(true);
 
-        $categoryId = $this->category->id;
-        $userId = $this->user->id;
+        $data = [
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ];
         $addCategory = new AddCategoriesAction($userCategoryRespository);
-       $response = $addCategory->execute($userId, $categoryId);
+       $response = $addCategory->execute($data);
        $this->assertTrue($response);
     }
 
@@ -53,7 +55,6 @@ class UserCategoryRespositoryTest extends TestCase
         ->willReturn(true);
 
         $categoryId = $this->category->id;
-        $userId = $this->user->id;
         $removeCategory = new RemoveCategoriesAction($userCategoryRespository);
        $response = $removeCategory->execute($categoryId);
        $this->assertTrue($response);

@@ -10,8 +10,7 @@ class AddCategoriesAction
     ) {
     }
 
-    public function execute($userId, $categoryId) {
-        $addCategory = $this->userCategoryRespository->addCategory($userId, $categoryId);
-        return $addCategory;
+    public function execute($data) {
+        return $this->userCategoryRespository->addCategory($data);
     }
 }

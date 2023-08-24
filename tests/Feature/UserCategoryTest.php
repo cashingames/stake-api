@@ -16,7 +16,7 @@ class UserCategoryTest extends TestCase
 
     use RefreshDatabase, WithFaker;
 
-    protected $user;
+    protected $user;  protected $category;
 
     protected function setUp(): void
     {
@@ -25,6 +25,7 @@ class UserCategoryTest extends TestCase
         $this->seed(UserSeeder::class);
         $this->seed(CategorySeeder::class);
         $this->user = User::first();
+        $this->category = Category::first();
         $this->actingAs($this->user);
     }
     /**
@@ -32,46 +33,36 @@ class UserCategoryTest extends TestCase
      */
     public function test_that_user_can_add_category()
     {
-
-        $data = ["Football", "Music"];
-        $response = $this->post('/api/v3/trivia-quest/categories', [
+        $data = [$this->category->id];
+        $response = $this->post('/api/v3/trivia-quest/add-categories', [
             'data' => $data,
         ]);
-
-        foreach ($data as $item) {
-            $category = Category::where('name', $item)->first();
             $this->assertDatabaseHas('user_categories', [
                 'user_id' => $this->user->id,
-                'category_id' => $category->id,
+                'category_id' => $this->category->id,
             ]);
-        }
-
         $response->assertStatus(200);
     }
 
     public function test_that_user_can_remove_category()
     {
-        $data = ["Football", "Music"];
+        $data = [101, 501];
         foreach ($data as $item) {
-            $category = Category::where('name', $item)->first();
             UserCategory::create([
                 'user_id' => $this->user->id,
-                'category_id' => $category->id,
+                'category_id' => $item,
             ]);
         }
-        $response = $this->post('/api/v3/trivia-quest/remove-categories', [
-            'data' => ["Music"]
+        $this->post('/api/v3/trivia-quest/remove-categories', [
+            'data' => [501]
         ]);
 
-        $football = Category::where('name', 'Football')->first();
-       $music = Category::where('name', 'Music')->first();
-
         $this->assertDatabaseHas('user_categories', [
-            'category_id' => $football->id,
+            'category_id' => 101,
         ]);
 
         $this->assertDatabaseMissing('user_categories', [
-            'category_id' => $music->id,
+            'category_id' => 501,
         ]);
     }
 }

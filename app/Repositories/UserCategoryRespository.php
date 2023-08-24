@@ -7,13 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class UserCategoryRespository
 {
-    public function addCategory($userId, $categoryId)
+    public function addCategory($data)
     {
-        $userCategory = DB::table('user_categories')->insert([
-            'user_id' => $userId,
-            'category_id' => $categoryId,
-        ]); 
-        return $userCategory;  
+        DB::table('user_categories')->insert($data); 
     }
 
     public function removeCategory($id)
