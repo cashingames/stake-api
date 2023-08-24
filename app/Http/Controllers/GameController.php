@@ -20,7 +20,10 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Models\UserCategory;
 use stdClass;
+
+use function PHPUnit\Framework\isNull;
 
 class GameController extends BaseController
 {
@@ -49,8 +52,8 @@ class GameController extends BaseController
 
         $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        $categories = Cache::rememberForever('categories', fn () => Category::all());
-
+        // $categories = Cache::rememberForever('categories', fn () => Category::all());
+        $categories = $this->showCategories();
         $gameInfo = DB::select("
         SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
         c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
@@ -275,5 +278,15 @@ class GameController extends BaseController
             'value' => $coinsEarned
         ]);
         return $game;
+    }
+
+    private function showCategories()
+    {
+        $userCategories = $this->user->userCategories();
+        if(count($userCategories) <= 0){
+            return Cache::rememberForever('categories', fn () => Category::all()); 
+        } else {
+            return $userCategories;
+        }
     }
 }

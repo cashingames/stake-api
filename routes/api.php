@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AchievementBadeController;
+use App\Http\Controllers\AddUserCategoryController;
 use App\Http\Controllers\AdsRewardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\GetBubbleBlitzGameModesController;
 use App\Http\Controllers\MissUserRewardController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\GetGameController;
+use App\Http\Controllers\RemoveUserCategoryController;
 use App\Http\Controllers\UpdateGuestPlayerProfileController;
 
 Route::post('auth/register', [RegisterController::class, 'register']);
@@ -69,6 +71,8 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('ads-reward/award', AdsRewardController::class);
         Route::get('games', GetGameController::class);
         Route::get('bubble-blitz/modes', GetBubbleBlitzGameModesController::class);
+        Route::post('trivia-quest/add-categories', AddUserCategoryController::class);
+        Route::post('trivia-quest/remove-categories', RemoveUserCategoryController::class);
     }
 );
 

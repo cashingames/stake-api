@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use App\Traits\Utils\DateUtils;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\AchievementBadge;
+use App\Traits\Utils\DateUtils;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\HasApiTokens;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -33,7 +33,7 @@ class User extends Authenticatable implements JWTSubject
         'apple_user_id',
         'email_verified_at',
         'last_activity_time',
-        'user_type'
+        'user_type',
     ];
 
     /**
@@ -58,7 +58,7 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = [
         'achievement', 'rank', 'played_games_count',
-        'challenges_played', 'win_rate', 'full_phone_number'
+        'challenges_played', 'win_rate', 'full_phone_number',
     ];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -150,7 +150,7 @@ class User extends Authenticatable implements JWTSubject
             ->where(function ($query) {
                 $query->whereRaw('game_count * user_plans.plan_count > user_plans.used_count')
                     ->orWhere('expire_at', '>', now())
-                    ->orWhere('expire_at', NULL);
+                    ->orWhere('expire_at', null);
             });
     }
 
@@ -257,7 +257,6 @@ class User extends Authenticatable implements JWTSubject
             )->sum('value');
     }
 
-
     public function getAchievementAttribute()
     {
         $latestAchievement = DB::table('user_achievements')
@@ -270,7 +269,6 @@ class User extends Authenticatable implements JWTSubject
 
         return ($achievement->title);
     }
-
 
     public function getRankAttribute()
     {
@@ -319,7 +317,6 @@ class User extends Authenticatable implements JWTSubject
         return $lastTwoGamesAverage;
     }
 
-
     public function getWinRateAttribute()
     {
         $gameWins = GameSession::where('correct_count', '>=', 5)->count();
@@ -364,7 +361,7 @@ class User extends Authenticatable implements JWTSubject
         })->where('user_id', $this->id)->select('achievement_badges.id', 'title', 'milestone_type', 'milestone', 'milestone_count', 'count', 'is_claimed', 'is_rewarded', 'is_notified', 'description', 'reward_type', 'reward', 'medal as logoUrl', 'quality_image')->get();
 
         DB::table('user_achievement_badges')->where('user_id', $this->id)->where('is_claimed', 1)->update(array(
-            'is_notified' => 1
+            'is_notified' => 1,
         ));
         return $db;
     }
@@ -462,5 +459,15 @@ class User extends Authenticatable implements JWTSubject
     {
         $usedBoostCount = UserBoost::where('user_id', $this->id)->sum('used_count');
         return $usedBoostCount;
+    }
+
+    public function userCategories()
+    {
+        // return $this->hasManyThrough(Category::class, UserCategory::class);
+        return DB::table('user_categories')
+            ->where('user_id', $this->id)
+            ->join('categories', function ($join) {
+                $join->on('categories.id', '=', 'user_categories.category_id');
+            })->select('categories.id', 'categories.name', 'categories.icon', 'categories.category_id', 'categories.description', 'categories.background_color', 'categories.is_enabled')->get();
     }
 }
