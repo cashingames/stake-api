@@ -52,8 +52,8 @@ class GameController extends BaseController
 
         $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        // $categories = Cache::rememberForever('categories', fn () => Category::all());
-        $categories = $this->showCategories();
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
+        // $categories = $this->showCategories();
         $gameInfo = DB::select("
         SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
         c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
@@ -70,6 +70,7 @@ class GameController extends BaseController
 
         $gameInfo = collect($gameInfo);
         $toReturnTypes = [];
+        $userCategories = $this->user->userCategories();
         foreach ($gameTypes as $type) {
             $uniqueCategories = $gameInfo->where('game_type_id', $type->id)->unique('category_id');
             $categoryIds = $uniqueCategories->values()->pluck('category_id');
@@ -89,6 +90,7 @@ class GameController extends BaseController
                 });
 
                 $toReturnSubcategories = [];
+                
                 foreach ($_subcategories as $subcategory) {
                     $s = new stdClass;
                     $s->id = $subcategory->id;
@@ -116,9 +118,7 @@ class GameController extends BaseController
             $_type->description = $type->description;
             $_type->icon = $type->icon;
             $_type->bgColor = $type->background_color_2;
-
-            $_type->categories = $toReturnCategories;
-
+            $_type->categories = count($userCategories)  > 0 ? $userCategories : $toReturnCategories;
 
             $toReturnTypes[] = $_type;
         }
@@ -131,7 +131,7 @@ class GameController extends BaseController
         $result->minVersionCode = config('trivia.min_version_code_gameark');
         $result->minVersionForce = config('trivia.min_version_force_gameark');
         $result->boosts = Boost::all();
-
+        $result->hasOwnCategory = count($userCategories) > 0 ? true : false;
         $result->maximumExhibitionStakeAmount = config('trivia.maximum_exhibition_staking_amount');
         $result->minimumExhibitionStakeAmount = config('trivia.minimum_exhibition_staking_amount');
         $result->maximumChallengeStakeAmount = config('trivia.maximum_challenge_staking_amount');
@@ -278,15 +278,5 @@ class GameController extends BaseController
             'value' => $coinsEarned
         ]);
         return $game;
-    }
-
-    private function showCategories()
-    {
-        $userCategories = $this->user->userCategories();
-        if(count($userCategories) <= 0){
-            return Cache::rememberForever('categories', fn () => Category::all()); 
-        } else {
-            return $userCategories;
-        }
     }
 }
