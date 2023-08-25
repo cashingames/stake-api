@@ -166,7 +166,7 @@ class WithdrawWinningsController extends BaseController
 
     private function identifyVerified($userId)
     {
-        $verified = [29031959, 29043239, 29032509, 29039894, 29040540, 29043337];
+        $verified = [29031959, 29043239, 29032509, 29039894, 29040540, 29043337, 29042975];
         return in_array($userId, $verified);
     }
 
