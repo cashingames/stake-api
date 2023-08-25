@@ -56,6 +56,7 @@ class CashdropRepository
             LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
             WHERE cashdrop_users.winner is true 
             ORDER BY cashdrop_rounds.created_at, cashdrop_users.updated_at ASC
+            LIMIT 20
             '
         );
     }
