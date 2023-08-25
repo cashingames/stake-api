@@ -52,8 +52,8 @@ class GameController extends BaseController
 
         $gameTypes = Cache::rememberForever('gameTypes', fn () => GameType::has('questions')->inRandomOrder()->get());
 
-        // $categories = Cache::rememberForever('categories', fn () => Category::all());
-        $categories = $this->showCategories();
+        $categories = Cache::rememberForever('categories', fn () => Category::all());
+        // $categories = $this->showCategories();
         $gameInfo = DB::select("
         SELECT gt.name game_type_name, gt.id game_type_id, c.category_id category_id,
         c.id as subcategory_id, c.name subcategory_name, count(q.id) questons,
