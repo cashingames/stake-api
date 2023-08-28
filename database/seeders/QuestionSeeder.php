@@ -17,7 +17,7 @@ class QuestionSeeder extends Seeder
     {
             Question::factory()
                 ->hasOptions(4)
-                ->count(3)
+                ->count(150)
             ->create();
     }
 

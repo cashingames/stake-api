@@ -12,7 +12,7 @@ class GameSession extends Model
 
     protected $fillable = ['plan_id', 'trivia_id','game_mode_id','category_id','game_mode_id',
     'game_type_id','user_id','start_time','end_time','session_token','state','correct_count',
-    'wrong_count','total_count','points_gained','amount_won', 'coins_earned', 'created_at','updated_at'];
+    'wrong_count','total_count','points_gained','amount_won', 'coins_earned', 'user_level', 'created_at','updated_at'];
 
 
     public function mode()
