@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\RegisterPushDeviceTokenController;
 use App\Http\Controllers\Auth\AuthenticateVerifiedUserController;
+use App\Http\Controllers\ClaimHallmarkLevelRewardsController;
 use App\Http\Controllers\ClaimUserRewardController;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetBubbleBlitzGameModesController;
@@ -73,6 +74,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::get('bubble-blitz/modes', GetBubbleBlitzGameModesController::class);
         Route::post('trivia-quest/add-categories', AddUserCategoryController::class);
         Route::post('trivia-quest/remove-categories', RemoveUserCategoryController::class);
+        Route::post('levels-reward/claim', ClaimHallmarkLevelRewardsController::class);
     }
 );
 

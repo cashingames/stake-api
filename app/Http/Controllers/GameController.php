@@ -20,6 +20,7 @@ use App\Services\PlayGame\ReferralService;
 use Illuminate\Support\Facades\Event;
 use App\Events\AchievementBadgeEvent;
 use App\Enums\AchievementType;
+use App\Models\GameSession;
 use App\Models\UserCategory;
 use stdClass;
 
@@ -122,12 +123,18 @@ class GameController extends BaseController
 
             $toReturnTypes[] = $_type;
         }
-
+      
         $result->gameTypes = $toReturnTypes;
         $result->boosts = Boost::whereNull('deleted_at')
             ->where('name', '!=', 'Bomb')
             ->get();
-
+        $latestGameSession = GameSession::where('user_id', $this->user->id)->latest()->first();
+        if ($latestGameSession) {
+            $userLevel = $latestGameSession->user_level;
+        } else {
+            $userLevel = 1;
+        }
+        $result->userLevel = $userLevel;
         $result->minVersionCode = config('trivia.min_version_code_gameark');
         $result->minVersionForce = config('trivia.min_version_force_gameark');
         $result->boosts = Boost::all();
@@ -208,14 +215,18 @@ class GameController extends BaseController
 
         $game->wrong_count = $wrongs;
         $game->correct_count = $points;
+        $userLevel = null;
 
+        if($game->correct_count >= 5){
+            $userLevel = $game->user_level + 1;
+        }
+        $game->user_level = $userLevel;
+       
         $game = $this->processUserCoin($game);
         $game->points_gained = $points;
         $game->total_count = $points + $wrongs;
-
+       
         $game->save();
-
-
         if ($points > 0) {
             $this->creditPoints($this->user->id, $game->points_gained, "Points gained from game played");
         }

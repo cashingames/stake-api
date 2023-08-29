@@ -23,10 +23,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class GameTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
     /**
      * A basic feature test example.
      *
@@ -499,6 +500,7 @@ class GameTest extends TestCase
             "chosenOptions" => [],
             "consumedBoosts" => []
         ]);
+        // dd($game->state); 
 
         $coinsWon = $newUser->getUserCoins();    
         $this->assertDatabaseHas('user_coins', [
@@ -507,6 +509,23 @@ class GameTest extends TestCase
         ]);
     }
 
+    public function test_that_a_user_has_levels()
+    {   
+        GameSession::where('user_id', '!=', $this->user->id)->update(['user_id' => $this->user->id, 'state' => 'ONGOING']);
+        $game = $this->user->gameSessions()->first();
+       
+        $this->post(self::END_EXHIBITION_GAME_URL, [
+            "token" => $game->session_token,
+            "chosenOptions" => [],
+            "consumedBoosts" => []
+        ]);
+        $game->refresh();
+        
+        $this->assertDatabaseHas('game_sessions', [
+            'user_id' => $this->user->id,
+            'user_level' => 1
+        ]);
+    }
 
 
 }

@@ -17,11 +17,13 @@ class GameSessionResponse{
         $response->end_time = $gameSession->end_time;
         $response->session_token = $gameSession->session_token;
         $response->correct_count = $gameSession->correct_count;
+        $response->user_level = $gameSession->user_level;
         $response->coins_earned = $gameSession->coins_earned;
         $response->wrong_count = $gameSession->wrong_count;
         $response->total_count = $gameSession->total_count;
         $response->points_gained = $gameSession->points_gained;
         $response->state = $gameSession->state;
+     
     
         return $response;
     }
