@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('game_sessions', function (Blueprint $table) {
-            $table->integer('user_level')->default(1);
+            $table->integer('user_level')->default(1)->nullable();
         });
     }
 

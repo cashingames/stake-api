@@ -142,6 +142,45 @@ class RewardBenefitSeeder extends Seeder
                 'reward_count' => 5
             ]
         );
+
+        DB::table('reward_benefits')->insert(
+            [
+                'id' => 11,
+                'reward_id' => 2,
+                'reward_benefit_id' => 8,
+                'total_hours' =>  168,
+                'reward_type' => 'boost',
+                'reward_name' => 'Time Freeze',
+                'icon' => 'icons/time_freeze_icon.png',
+                'reward_count' => 1
+            ]
+        );
+
+        DB::table('reward_benefits')->insert(
+            [
+                'id' => 12,
+                'reward_id' => 2,
+                'reward_benefit_id' => 9,
+                'total_hours' =>  168,
+                'reward_type' => 'boost',
+                'reward_name' => 'Skip',
+                'icon' => 'icons/skip_icon.png',
+                'reward_count' => 1
+            ]
+        );
+
+        DB::table('reward_benefits')->insert(
+            [
+                'id' => 13,
+                'reward_id' => 2,
+                'reward_benefit_id' => 10,
+                'total_hours' =>  168,
+                'reward_type' => 'boost',
+                'reward_name' => 'Bomb',
+                'icon' => 'icons/bomb_icon.png',
+                'reward_count' => 1
+            ]
+        );
     }
     
 }

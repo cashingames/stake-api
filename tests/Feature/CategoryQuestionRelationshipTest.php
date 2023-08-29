@@ -49,7 +49,7 @@ class CategoryQuestionRelationshipTest extends TestCase
         
         $categoryQuestions = Category::find($this->category->id)->questions()->get();
     
-        assertCount(3, $categoryQuestions);
+        assertCount(5, $categoryQuestions);
     }
 
     public function test_that_a_question_can_belong_to_many_categories(){

@@ -21,5 +21,12 @@ class RewardSeeder extends Seeder
                 'life_span' => 168
             ]
         );
+        DB::table('rewards')->insert(
+            [
+                'id' => 2,
+                'name' => 'level_rewards',
+                'life_span' => 168
+            ]
+        );
     }
 }

@@ -128,11 +128,11 @@ class GameController extends BaseController
         $result->boosts = Boost::whereNull('deleted_at')
             ->where('name', '!=', 'Bomb')
             ->get();
-        $latestGameSession =GameSession::where('user_id', $this->user->id)->latest()->first();
+        $latestGameSession = GameSession::where('user_id', $this->user->id)->latest()->first();
         if ($latestGameSession) {
             $userLevel = $latestGameSession->user_level;
         } else {
-            $userLevel = null;
+            $userLevel = 1;
         }
         $result->userLevel = $userLevel;
         $result->minVersionCode = config('trivia.min_version_code_gameark');
