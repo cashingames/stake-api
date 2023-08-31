@@ -1,54 +1,90 @@
 [
     {
-        "question": "How can I contact customer care?",
-        "answer": "You can send us a message on whatsapp +234 (0) 802 511 6306 or send an email to hello@cashingames.com"
+        "question": "How can I sign up on Cashingames?",
+        "answer": "You can sign up by downloading and registering on the Cashingames app from Playstore, App store and by registering on stake.cashingames.com. A numeric OTP (One time Password) will be sent to your phone number for verification before signup."
     },
     {
         "question": "How can I win on Cashingames?",
         "answer": "There are multiple ways to win on Cashingames! Staking : You can stake cash before playing a game session and stand a chance to earn the winnings on the staking table depending on your score! Live Trivia : You can participate in our weekly live trivias and win amazing cash prizes if you emerge as one of the top 3! Leaderboard: Earn exciting cash prizes (6 figures!) monthly when you play daily and climb up the leaderboard."
     },
     {
-        "question": "Why should I refer my friends to play and is it a must?",
-        "answer": "Referring your friends to Cashingames helps them make money too and besides what are friends for?. It is not a must to refer your friends but you receive a bonus upon successful referral."
+        "question": "I am not getting the OTP on my phone. What should I do?",
+        "answer": "If you are unable to get the OTP, you can send us a WhatsApp message on +2348025116306 or an email from our contact us page and we’ll try to revert to you as soon as possible."
     },
     {
-        "question": "How much can I win? (Is there a limit to it?)",
-        "answer": "There are absolutely no limits! The higher your stake, the higher your chances of earning cool winnings."
+        "question": "I am under 18 years of age. Am I allowed to play cash games on Cashingames?",
+        "answer": "No, only players who are more than 18 years of age are allowed to play on Cashingames in line with local regulations."
     },
     {
-        "question": "Can I play all day?",
-        "answer": "Yes, you can. The world of trivia on Cashingames is open to you 24 hrs 7 days a week."
+        "question": "Do I receive any signup rewards after registering on the Cashingames app?",
+        "answer": "Yes, you will receive a 100% sign-up bonus on your first deposit, which can be used to play games on the app."
     },
     {
-        "question": "I don’t have a Cashingames account. Do I need one?",
-        "answer": "Yes, you need one so you can be eligible to play and also withdraw your winnings."
+        "question": "Can I withdraw the bonus?",
+        "answer": "Bonus can only be used in specific games, and is withdrawable only when you fulfill bonus rollover requirements."
     },
     {
-        "question": "How quickly am I paid when I win on Cashingames?",
-        "answer": "You receive your cash prizes after 24 hours of winning."
+        "question": "How can I deposit money on Cashingames to play games?",
+        "answer": "You can add money to your Cashingames account by clicking on the amount balance at the top right corner of your homepage, clicking on 'Deposit' and entering the amount you wish to add, click on 'fund wallet' and choose your payment method."
     },
     {
-        "question": "How can I send in my questions or suggestions?",
-        "answer": "You can send in your questions via our email to hello@cashingames.com"
+        "question": "Which payment methods can I use to deposit money on Cashingames?",
+        "answer": "We currently support five payment methods: bank transfer, USSD, credit/debit cards, Visa QR and directly from your bank."
     },
     {
-        "question": "What is the minimum amount I can withdraw from my winnings?",
-        "answer": "The minimum amount you can withdraw for now is ₦500.00"
+        "question": "I cannot find my preferred mode of payment. What should I do?",
+        "answer": "We have included many payment modes to deposit money to your Cashingames account. If your bank or preferred payment method is missing from the list, please let us know by sending us a message via the contact us page in the app."
     },
     {
-        "question": "Can I withdraw my signup bonus?",
-        "answer": "No, you cannot withdraw your sign up bonus because it is required to explore other features on Cashingames."
+        "question": "Money from my account has been debited but not credited into my Cashingames wallet. What should I do?",
+        "answer": "There may have been a technical issue from your bank. If we receive the money from your bank we will credit it to your Cashingames account within 48 hours. If we do not receive the money the same will be refunded to your bank account by your bank in 7-10 working days. If it is still not credited, please reach out to the Cashingames support with your transaction UTR number to check the status of the transaction"
     },
     {
-        "question": "How will I fund my wallet?",
-        "answer": "You can fund your wallet by clicking the “fund” tab in your wallet."
+        "question": "How can I withdraw money from my Cashingames wallet?",
+        "answer": "If you have winnings in your Cashingames wallet, you can withdraw it by going to your Wallet page and click on winnings, then ‘Withdraw’. The withdrawn amount will be credited into your bank account once you have linked your bank account on Cashingames to withdraw money"
     },
     {
-        "question": "Why should I link my Bank account to Cashingames?",
-        "answer": "This is important so you will be able to withdraw your cash prizes."
+        "question": "Which payment methods can I use to withdraw money on Cashingames?",
+        "answer": "We currently only support bank transfer for withdrawals, and will add more methods later on."
     },
     {
-        "question": "Can I delete my account?",
-        "answer": "Yes, you can."
+        "question": "What is the minimum and maximum amount I can withdraw from my Cashingames wallet?",
+        "answer": "The minimum limit for a withdrawal transaction is 100 NGN, and the maximum limit is 10,000 NGN."
+    },
+    {
+        "question": "What happens to my money if there is an error during withdrawal?",
+        "answer": "If withdrawal has not been sent, your Cashingames wallet balance will remain unchanged. For any additional support with your withdrawal, you can reach out to the Cashingame support team from the app."
+    },
+    {
+        "question": "What is a Challenge mode? How is it different from the single player mode?",
+        "answer": "Challenge and Single player modes are two different formats to play a game. A challenge is a one time gameplay against a real opponent. You can play a challenge by staking a minimum of 200 NGN, after which the system pairs you with an online player and you get the match result and winnings immediately after playing the game. A Challenge can only be played against one opponent. A Single player mode is a gameplay where you play alone and stake a minimum of 499 NGN on your knowledge with odds as high as x10. The more questions you answer correctly the more money you win."
+    },
+    {
+        "question": "How do I play a Challenge?",
+        "answer": "To play a challenge, from the game page, click on 'challenge a player' then 'play to earn', select a category and enter stake amount. Wait to be paired and proceed to playing."
+    },
+    {
+        "question": "Who will I get as an opponent?",
+        "answer": "You will be matched with another Cashingames user playing the same category as you and we eCashingamesoy algorithms to match players with your skill level; hence, increasing your chances to win."
+    },
+    {
+        "question": "What happens to my entry fee if I don't get matched with an opponent?",
+        "answer": "Your fee is not deducted from your Cashingames account till an opponent has been found"
+    },
+    {
+        "question": "What happens if I minimize the app while playing the game?",
+        "answer": "Your game will end. You might win or lose based on your last recorded score."
+    },
+    {
+        "question": "When do I get my winnings into my Cashingames account?",
+        "answer": "You will get the winnings in your Cashingames account as soon as the Challenge has ended."
+    },
+    {
+        "question":"Why can't I withdraw?",
+        "answer": "These can either be as a result of name mismatch; that is the name on your Cashingames account is different from the name on the account details provided on the app. Or, you because you haven't done your KYC registration which is mandatory before you can withdraw more than 10,000 NGN from Cashingames. To resolve this send a copy of any government approved identification card to us via WhatsApp (+2348025116306)."
+    },
+    {
+        "question": "How can I contact support?",
+        "answer": "If you are facing any issues with the Cashingames app, we're here to help you out. Your query might already be answered in our FAQ sections above. If not, you can also reach out to customer support from Cashingames support (hello@cashingames.com) or connect with Cashingames support team via WhatsApp chat (+2348025116306) and have your queries resolved."
     }
 ]
