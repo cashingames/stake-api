@@ -470,4 +470,9 @@ class User extends Authenticatable implements JWTSubject
                 $join->on('categories.id', '=', 'user_categories.category_id');
             })->select('categories.id', 'categories.name', 'categories.icon', 'categories.category_id', 'categories.description', 'categories.background_color', 'categories.is_enabled')->get();
     }
+
+    public function userDailyObjective()
+    {
+        return $this->hasMany(DailyObjective::class, 'user_daily_objectives')->withPivot('count', 'is_achieved');
+    }
 }
