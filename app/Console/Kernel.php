@@ -48,6 +48,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('fcm:daily-evening-reminder')->withoutOverlapping()->dailyAt('18:00')->timezone('Africa/Lagos');
         $schedule->command('fcm:inactive-user-reminder')->withoutOverlapping()->weekly();
         $schedule->command('user-reward:reactivate')->withoutOverlapping()->dailyAt('00:05');
+        $schedule->command('app:up-date-daily-objective')->withoutOverlapping()->dailyAt('00:05'); 
         
         $schedule->command('app:send-user-game-stats-email')->weekly()->mondays()
         ->when(function () {

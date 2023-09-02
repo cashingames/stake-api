@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
             QuestionSeeder::class,
             RewardSeeder::class,
             RewardBenefitSeeder::class,
-            GameSeeder::class
+            GameSeeder::class,
+            ObjectiveSeeder::class       
         ]);
     }
 }

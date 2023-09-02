@@ -23,6 +23,7 @@ use App\Http\Controllers\ClaimHallmarkLevelRewardsController;
 use App\Http\Controllers\ClaimUserRewardController;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\GetBubbleBlitzGameModesController;
+use App\Http\Controllers\GetDailyObjectiveController;
 use App\Http\Controllers\MissUserRewardController;
 use App\Http\Controllers\PlayGame\StartSinglePlayerGameController;
 use App\Http\Controllers\GetGameController;
@@ -75,6 +76,7 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('trivia-quest/add-categories', AddUserCategoryController::class);
         Route::post('trivia-quest/remove-categories', RemoveUserCategoryController::class);
         Route::post('levels-reward/claim', ClaimHallmarkLevelRewardsController::class);
+        Route::get('trivia-quest/daily-objectives', GetDailyObjectiveController::class);
     }
 );
 
