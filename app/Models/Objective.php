@@ -9,7 +9,7 @@ class Objective extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['description', 'icon', 'reward', 'reward_type'];
+    protected $fillable = ['description', 'name', 'icon', 'reward', 'reward_type'];
 
     public function dailyObjectives()
     {

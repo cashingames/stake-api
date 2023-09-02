@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('objectives', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->string('description');
             $table->string('icon');
             $table->string('reward');
+            $table->integer('milestone_count');
             $table->string('reward_type');
             $table->timestamps();
         });
