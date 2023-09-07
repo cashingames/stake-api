@@ -16,7 +16,7 @@ class UserCategoryTest extends TestCase
 
     use RefreshDatabase, WithFaker;
 
-    protected $user;  protected $category;
+    protected $user;protected $category;
 
     protected function setUp(): void
     {
@@ -37,10 +37,10 @@ class UserCategoryTest extends TestCase
         $response = $this->post('/api/v3/trivia-quest/add-categories', [
             'data' => $data,
         ]);
-            $this->assertDatabaseHas('user_categories', [
-                'user_id' => $this->user->id,
-                'category_id' => $this->category->id,
-            ]);
+        $this->assertDatabaseHas('user_categories', [
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id,
+        ]);
         $response->assertStatus(200);
     }
 
@@ -54,7 +54,7 @@ class UserCategoryTest extends TestCase
             ]);
         }
         $this->post('/api/v3/trivia-quest/remove-categories', [
-            'data' => [501]
+            'data' => [501],
         ]);
 
         $this->assertDatabaseHas('user_categories', [
@@ -64,5 +64,11 @@ class UserCategoryTest extends TestCase
         $this->assertDatabaseMissing('user_categories', [
             'category_id' => 501,
         ]);
+    }
+
+    public function test_that_user_category_endpoint_is_working()
+    {
+        $response = $this->get('/api/v3/trivia-quest/user-categories');
+        $response->assertStatus(200);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Actions\UserCategories\AddCategoriesAction;
+use App\Actions\UserCategories\GetUserCategoriesAction;
 use App\Actions\UserCategories\RemoveCategoriesAction;
 use App\Models\Category;
 use App\Models\User;
@@ -57,6 +58,19 @@ class UserCategoryRespositoryTest extends TestCase
         $categoryId = $this->category->id;
         $removeCategory = new RemoveCategoriesAction($userCategoryRespository);
        $response = $removeCategory->execute($categoryId);
+       $this->assertTrue($response);
+    }
+
+    public function test_that_user_categories_are_gotten()
+    {
+        $userCategoryRespository = $this->createMock(UserCategoryRespository::class);
+        $userCategoryRespository->expects($this->once())
+        ->method('getUserCategories')
+        ->willReturn(true);
+
+        $categoryId = $this->category->id;
+        $getCategory = new GetUserCategoriesAction($userCategoryRespository);
+       $response = $getCategory->execute($categoryId);
        $this->assertTrue($response);
     }
 }

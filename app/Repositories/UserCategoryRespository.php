@@ -16,4 +16,8 @@ class UserCategoryRespository
     {
         UserCategory::where('category_id', $id)->delete();
     }
+
+    public function getUserCategories($user){
+        return $user->userCategories();
+    }
 }
