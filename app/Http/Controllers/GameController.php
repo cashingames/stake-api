@@ -119,7 +119,7 @@ class GameController extends BaseController
             $_type->description = $type->description;
             $_type->icon = $type->icon;
             $_type->bgColor = $type->background_color_2;
-            $_type->categories = count($userCategories)  > 0 ? $userCategories : $toReturnCategories;
+            $_type->categories = $toReturnCategories;
 
             $toReturnTypes[] = $_type;
         }
