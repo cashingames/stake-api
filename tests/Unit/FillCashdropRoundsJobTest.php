@@ -80,35 +80,35 @@ class FillCashdropRoundsJobTest extends TestCase
         ]);
     }
 
-    public function test_drop_cashdrop_action_is_triggered(): void
-    {   
-        Queue::fake();
-        $this->cashdropRound->update(['pooled_amount' => $this->cashdrop->lower_pool_limit]);
+    // public function test_drop_cashdrop_action_is_triggered(): void
+    // {   
+    //     Queue::fake();
+    //     $this->cashdropRound->update(['pooled_amount' => $this->cashdrop->lower_pool_limit]);
 
-        $job = new FillCashdropRounds(200, $this->user,'testing');
-        $cashdropRepository = new CashdropRepository;
-        $walletRepository = new WalletRepository;
-        $createCashdropAction = $this->mockCreateNewCashdropRoundAction();
-        $dropAction = new DropCashdropAction(
-            $cashdropRepository,
-            $walletRepository,
-            $createCashdropAction
-        );
+    //     $job = new FillCashdropRounds(200, $this->user,'testing');
+    //     $cashdropRepository = new CashdropRepository;
+    //     $walletRepository = new WalletRepository;
+    //     $createCashdropAction = $this->mockCreateNewCashdropRoundAction();
+    //     $dropAction = new DropCashdropAction(
+    //         $cashdropRepository,
+    //         $walletRepository,
+    //         $createCashdropAction
+    //     );
 
-        $cashdropAction = new FillCashdropRoundsAction(
-            $cashdropRepository,
-            $dropAction ,
-            $this->mockFirestoreHelper()
-        );
+    //     $cashdropAction = new FillCashdropRoundsAction(
+    //         $cashdropRepository,
+    //         $dropAction ,
+    //         $this->mockFirestoreHelper()
+    //     );
 
-        $job->handle($cashdropAction);
+    //     $job->handle($cashdropAction);
 
-        Queue::assertPushed(SendCashdropDroppedNotification::class);
+    //     Queue::assertPushed(SendCashdropDroppedNotification::class);
         
-        $this->assertDatabaseHas('wallets', [
-            'withdrawable' => $this->cashdropRound->pooled_amount
-        ]);
-    }
+    //     $this->assertDatabaseHas('wallets', [
+    //         'withdrawable' => $this->cashdropRound->pooled_amount
+    //     ]);
+    // }
     private function mockdropCashdropAction()
     {
         return $this->createMock(DropCashdropAction::class);

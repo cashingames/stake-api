@@ -49,8 +49,9 @@ class CashdropRepository
     public function getCashdropWinners(): array
     {
         return DB::select(
-            'SELECT profiles.first_name, profiles.last_name, profiles.avatar, cashdrops.icon , cashdrops.name as cashdropsName,
+            'SELECT profiles.first_name, profiles.last_name, users.username, profiles.avatar, cashdrops.icon , cashdrops.name as cashdropsName,
             cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId, cashdrop_rounds.pooled_amount as pooledAmount FROM profiles 
+            LEFT JOIN users on users.id = profiles.user_id
             LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
             LEFT JOIN cashdrop_rounds on cashdrop_users.cashdrop_round_id = cashdrop_rounds.id
             LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
