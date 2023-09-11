@@ -42,7 +42,7 @@ class UpDateDailyObjective extends Command
             ->take(2)
             ->get();
 
-            UserDailyObjective::whereDate('created_at', '<', now())->delete();
+            UserDailyObjective::whereDate('created_at', '<', now()->startOfDay())->delete();
         $data = [];
 
         foreach ($objectives as $objective) {
