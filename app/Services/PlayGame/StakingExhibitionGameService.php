@@ -55,6 +55,14 @@ class StakingExhibitionGameService
             ];
         }
 
+        //temporarily blocking samson from playing general knowledge
+        if($this->validatedRequest->category == 507 && $this->user->id == 29039894 ){
+            return [
+                'gameSession' => null,
+                'questions' => []
+            ];
+        }
+
         DB::beginTransaction();
 
         $gameSession = $this->generateSession();
