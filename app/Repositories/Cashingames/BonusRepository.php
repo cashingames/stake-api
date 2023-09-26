@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+
+/**
+ * Interact with Firebase Cloud Messaging (FCM)
+ * @codeCoverageIgnore
+ */
 class BonusRepository
 {
     public function getUsersLossBetween(Carbon $startDate, Carbon $endDate)

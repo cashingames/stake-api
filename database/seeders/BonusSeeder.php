@@ -27,18 +27,5 @@ class BonusSeeder extends Seeder
             ],
             
         );
-
-        DB::table('bonuses')->insert(
-            [ 
-                'name' => BonusType::StakingLossCashback->value,
-                'trigger' => BonusTriggers::LossOnStaking->value,
-                'duration_count' => 3,
-                'duration_measurement' => BonusDurations::Days->value,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            
-        );
-
     }
 }

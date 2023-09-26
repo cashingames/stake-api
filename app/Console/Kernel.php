@@ -5,7 +5,9 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-//#[CodeCoverageIgnore]
+/**
+ * @codeCoverageIgnore
+ */
 class Kernel extends ConsoleKernel
 {
     /**
@@ -26,9 +28,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command("queue:work --tries=1 --stop-when-empty")->everyMinute();
-        // $schedule->command(GiveLossCashbackCommand::class, [
-        //     'duration' => CashbackAccrualDuration::DAILY->value
-        // ])->daily();
     }
 
     /**

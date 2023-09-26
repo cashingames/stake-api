@@ -26,9 +26,9 @@ class FillCashdropRoundsAction
                     $amount,
                     $round
                 );
-                // if ($round->pooled_amount >= $round->cashdrop->lower_pool_limit) {
-                //     $this->dropCashdropAction->execute($round, $env);
-                // }
+                if ($round->pooled_amount >= $round->cashdrop->lower_pool_limit) {
+                    $this->dropCashdropAction->execute($round, $env);
+                }
             });
         });
 
