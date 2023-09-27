@@ -2,11 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
 use App\Models\Cashdrop;
 use App\Repositories\Cashingames\CashdropRepository;
-use App\Services\Firebase\FirestoreService;
 use Database\Seeders\CashDropSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,9 +25,7 @@ class CreateNewCashdropActionTest extends TestCase
     public function test_new_cashdrop_rounds_can_be_created(): void
     {   
         $action= new CreateNewCashdropRoundAction(
-            new CashdropRepository, 
-            $this->mockFirestoreService(),
-            $this->mockFirestoreHelper()
+            new CashdropRepository,
         );
 
     
@@ -40,13 +36,5 @@ class CreateNewCashdropActionTest extends TestCase
             'percentage_stake' => ($this->cashdrop->percentage_stake ),
             'pooled_amount' => 0.0,
         ]);
-    }
-    private function mockFirestoreService()
-    {
-        return $this->createMock(FirestoreService::class);
-    }
-    private function mockFirestoreHelper()
-    {
-        return $this->createMock(CashdropFirestoreHelper::class);
     }
 }

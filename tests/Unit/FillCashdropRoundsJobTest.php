@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Actions\Cashdrop\CreateNewCashdropRoundAction;
 use App\Actions\Cashdrop\DropCashdropAction;
 use App\Actions\Cashdrop\FillCashdropRoundsAction;
@@ -51,19 +50,13 @@ class FillCashdropRoundsJobTest extends TestCase
 
     public function test_fill_up_cashdrop_pool(): void
     {
-        $mockedFirestoreHelper = $this->mockFirestoreHelper();
-        $mockedFirestoreHelper
-            ->expects($this->once())
-            ->method('updateCashdropFirestore');
 
         $job = new FillCashdropRounds(200, $this->user,'testing');
         $cashdropRepository = new CashdropRepository;
         $cashdropAction = new FillCashdropRoundsAction(
             $cashdropRepository,
             $this->mockdropCashdropAction(),
-            $mockedFirestoreHelper,
-           
-          );
+        );
 
 
         $job->handle($cashdropAction);
@@ -98,7 +91,6 @@ class FillCashdropRoundsJobTest extends TestCase
         $cashdropAction = new FillCashdropRoundsAction(
             $cashdropRepository,
             $dropAction,
-            $this->mockFirestoreHelper()
         );
 
         $job->handle($cashdropAction);
@@ -116,9 +108,5 @@ class FillCashdropRoundsJobTest extends TestCase
     private function mockCreateNewCashdropRoundAction()
     {
         return $this->createMock(CreateNewCashdropRoundAction::class);
-    }
-    private function mockFirestoreHelper()
-    {
-        return $this->createMock(CashdropFirestoreHelper::class);
     }
 }

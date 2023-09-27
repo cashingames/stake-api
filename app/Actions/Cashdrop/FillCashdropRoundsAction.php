@@ -2,7 +2,6 @@
 
 namespace App\Actions\Cashdrop;
 
-use App\Actions\ActionHelpers\CashdropFirestoreHelper;
 use App\Models\User;
 use App\Repositories\Cashingames\CashdropRepository;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +11,6 @@ class FillCashdropRoundsAction
     public function __construct(
         private readonly CashdropRepository $cashdropRepository,
         private readonly DropCashdropAction $dropCashdropAction,
-        private readonly CashdropFirestoreHelper $cashdropFirestoreHelper
     ) {
     }
 
@@ -32,7 +30,6 @@ class FillCashdropRoundsAction
             });
         });
 
-        $this->cashdropFirestoreHelper->updateCashdropFirestore($env);
     }
 
   
