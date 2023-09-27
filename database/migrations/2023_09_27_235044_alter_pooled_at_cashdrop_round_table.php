@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('cashdrop_rounds', function (Blueprint $table) {
+            $table->decimal('pooled_amount', $precision = 9, $scale = 2)->default(0)->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('cashdrop_rounds', function (Blueprint $table) {
+            $table->bigInteger('pooled_amount')->default(0)->change();
+        });
+    }
+};

@@ -23,6 +23,8 @@ class CashdropRepository
             'dropped_at' => null
         ]);
     }
+
+    //@TODO Refractor this method to remove this from repo
     public function getCashdrops(): array
     {
         return [
@@ -52,7 +54,7 @@ class CashdropRepository
     {
         return DB::select(
             'SELECT
-                profiles.first_name, profiles.last_name, users.username, profiles.avatar,
+                users.username, profiles.avatar,
                 cashdrops.icon , cashdrops.name as cashdropsName,
                 cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId,
                 cashdrop_rounds.pooled_amount as pooledAmount FROM profiles
