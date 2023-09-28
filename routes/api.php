@@ -53,6 +53,9 @@ Route::middleware('api')->prefix('v3')->group(
         Route::get('faq/fetch', [MessagesController::class, 'fetchFaqAndAnswers'])->middleware(['cacheResponse:300']);
         Route::post('category/icon/save', [CategoryController::class, 'saveCategoryIcon']);
         Route::post('log/frontend-info', FrontEndLogsController::class);
+        Route::controller(CashdropsController::class)->group(function () {
+            Route::get('cashdrops', 'index')->middleware(['cacheResponse:60']);
+        });
     }
 );
 
@@ -92,6 +95,5 @@ Route::middleware(['auth:api'])->prefix('v3')->group(
         Route::post('challenges/practice/create', StartPracticeChallengeRequestController::class);
         Route::post('challenges/practice/submit', EndPracticeChallengeGameController::class);
         Route::get('wallet/transactions/{wallet_type}', GetUserTransactionsController::class);
-        Route::resource('cashdrops', CashdropsController::class);
     }
 );

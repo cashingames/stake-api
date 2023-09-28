@@ -24,18 +24,6 @@ class CashdropRepository
         ]);
     }
 
-    //@TODO Refractor this method to remove this from repo
-    public function getCashdrops(): array
-    {
-        return [
-
-            'cashdropRounds' =>  $this->getRunningCashdrops(),
-            'cashdropWinners' =>  $this->getCashdropWinners(),
-            'nextToDrop' => $this->getActiveCashdrops()->random()->cashdrop_id,
-
-        ];
-    }
-
     public function getRunningCashdrops(): array
     {
         return DB::select(
