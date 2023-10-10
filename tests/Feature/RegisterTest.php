@@ -285,6 +285,7 @@ class RegisterTest extends TestCase
             'meta_data->device_model' => "Camon",
             'meta_data->device_brand' => "Tecno",
             'meta_data->device_token' => "255366367484THD",
+            'meta_data->kyc_verified' => false,
             'meta_data->registration_ip_address' => request()->ip(),
         ]);
     }
