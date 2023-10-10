@@ -121,6 +121,7 @@ class RegisterController extends BaseController
                     'device_model' => $data['device_model'] ?? "",
                     'device_brand' => $data['device_brand'] ?? "",
                     'device_token' => $data['device_token'] ?? "",
+                    'kyc_verified' => false,
                     'registration_ip_address' => request()->ip(),
                 ])
             ]);
