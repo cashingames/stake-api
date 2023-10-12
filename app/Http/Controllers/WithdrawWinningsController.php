@@ -147,7 +147,7 @@ class WithdrawWinningsController extends BaseController
             ->where('transaction_action', WalletTransactionAction::WinningsWithdrawn)
             ->sum('amount');
 
-        $verified = $this->user->meta_data && $this->user->meta_data['kyc_verified'];
+        $verified = $this->user->meta_data && json_decode($this->user->meta_data)->kyc_verified;
 
         if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$verified) {
             $msg = $this->user->username .

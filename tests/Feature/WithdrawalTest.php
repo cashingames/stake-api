@@ -328,9 +328,9 @@ class WithdrawalTest extends TestCase
             ]);
         });
 
-        $this->user->meta_data = [
+        $this->user->meta_data = json_encode([
             'kyc_verified' => true
-        ];
+        ]);
         $this->user->save();
 
         $this->user->wallet->withdrawable = 20000;
@@ -362,9 +362,11 @@ class WithdrawalTest extends TestCase
     public function test_that_a_user_cannot_withdraw_more_than_exceeded_amount_if_not_verified()
     {
         Config::set('trivia.max_withdrawal_amount', 10000);
-        $this->user->meta_data = [
+
+        $this->user->meta_data = json_encode([
             'kyc_verified' => false
-        ];
+        ]);
+
         $this->user->save();
 
         $this->user->wallet->withdrawable = 20000;
