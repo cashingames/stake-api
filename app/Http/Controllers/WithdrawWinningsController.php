@@ -6,6 +6,7 @@ use App\Enums\WalletBalanceType;
 use App\Enums\WalletTransactionAction;
 use App\Enums\WalletTransactionType;
 use App\Jobs\SendAdminErrorEmailUpdate;
+use App\Models\User;
 use App\Repositories\Cashingames\WalletRepository;
 use App\Repositories\Cashingames\WalletTransactionDto;
 use App\Services\Payments\PaystackService;
@@ -147,7 +148,7 @@ class WithdrawWinningsController extends BaseController
             ->where('transaction_action', WalletTransactionAction::WinningsWithdrawn)
             ->sum('amount');
 
-        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
+        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->verifiedUser($this->user->id)) {
             $msg = $this->user->username .
                 " has reached max withdrawal amount of " .
                 config('trivia.max_withdrawal_amount') . " but has not been verified" .
@@ -164,15 +165,21 @@ class WithdrawWinningsController extends BaseController
         }
     }
 
-    private function identifyVerified($userId)
-    {
-        $verified = [29031959, 29043239, 29032509, 29039894, 29040540, 29043337, 29042975, 29043765];
-        return in_array($userId, $verified);
-    }
+    // private function identifyVerified($userId)
+    // {
+    //     $verified = [29031959, 29043239, 29032509, 29039894, 29040540, 29043337, 29042975, 29043765];
+    //     return in_array($userId, $verified);
+    // }
 
     private function cleanName($name)
     {
         $specialChars = array('-', ',');
         return strtoupper(str_replace($specialChars, ' ', trim($name)));
+    }
+
+    private function verifiedUser($userId)
+    {
+        $verifiedUser = User::where('id', $userId)->where('meta_data->kyc_verified', true)->first();
+        return $verifiedUser;
     }
 }

@@ -306,6 +306,95 @@ class WithdrawalTest extends TestCase
     }
 
 
+    public function test_that_a_user_can_withdraw_max_withdrawal_limit_if_verified()
+    {
+
+        Config::set('trivia.max_withdrawal_amount', 10000);
+
+        $banksMock = $this->banksMock;
+        $this->mock(PaystackService::class, function (MockInterface $mock) use ($banksMock) {
+            $mock->shouldReceive('getBanks')->once()->andReturn(
+                $banksMock
+            );
+            $mock->shouldReceive('verifyAccount')->andReturn((object)[
+                'status' => true,
+                'data' => (object)[
+                    'account_name' => strtoupper($this->user->profile->full_name)
+                ]
+            ]);
+            $mock->shouldReceive('createTransferRecipient')->andReturn('randomrecipientcode');
+            $mock->shouldReceive('initiateTransfer')->andReturn((object)[
+                'status' => 'pending',
+                'reference' => 'randomref'
+            ]);
+        });
+        
+        $this->user->meta_data = [
+            'kyc_verified' => true
+        ];
+        $this->user->save();
+
+        $this->user->wallet->withdrawable = 20000;
+        $this->user->wallet->save();
+
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 15000,
+            'balance' => $this->user->wallet->withdrawable,
+            'description' => 'Wallet Top-up',
+            'reference' => Str::random(10),
+            'created_at' => now()->subHours(3),
+            'balance_type' => WalletBalanceType::WinningsBalance->value,
+            'transaction_action' => WalletTransactionAction::WinningsWithdrawn->value
+        ]);
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+        ]);
+
+        $response->assertJson([
+            'message' => 'Transfer processing, wait for your bank account to reflect'
+        ]);
+    }
+
+    public function test_that_a_user_cannot_withdraw_more_than_exceeded_amount_if_not_verified()
+    {
+        Config::set('trivia.max_withdrawal_amount', 10000);
+        $this->user->meta_data = [
+            'kyc_verified' => false
+        ];
+        $this->user->save();
+
+        $this->user->wallet->withdrawable = 20000;
+        $this->user->wallet->save();
+
+        WalletTransaction::create([
+            'wallet_id' => $this->user->wallet->id,
+            'transaction_type' => 'CREDIT',
+            'amount' => 15000,
+            'balance' => $this->user->wallet->withdrawable,
+            'description' => 'Wallet Top-up',
+            'reference' => Str::random(10),
+            'created_at' => now()->subHours(3),
+            'balance_type' => WalletBalanceType::WinningsBalance->value,
+            'transaction_action' => WalletTransactionAction::WinningsWithdrawn->value
+        ]);
+
+        $response = $this->post(self::WITHDRAWAL_URL, [
+            'account_number' => '124567890',
+            'amount' => 500,
+            'bank_name' => 'Test Bank'
+        ]);
+
+        $response->assertJsonFragment([
+            'message' => 'Please contact support to verify your identity to proceed with this withdrawal'
+        ]);
+    }
+
+
     public function wrongAccountNamesDataProvider()
     {
         // name from bank, supplied first name, supplied last name
