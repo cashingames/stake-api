@@ -147,7 +147,7 @@ class WithdrawWinningsController extends BaseController
             ->where('transaction_action', WalletTransactionAction::WinningsWithdrawn)
             ->sum('amount');
 
-        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->identifyVerified($this->user->id)) {
+        if ($totalWithdrawals >= config('trivia.max_withdrawal_amount') && !$this->user->meta_data['kyc_verified']) {
             $msg = $this->user->username .
                 " has reached max withdrawal amount of " .
                 config('trivia.max_withdrawal_amount') . " but has not been verified" .
@@ -162,12 +162,6 @@ class WithdrawWinningsController extends BaseController
                 'Please contact support to verify your identity to proceed with this withdrawal'
             );
         }
-    }
-
-    private function identifyVerified($userId)
-    {
-        $verified = [29031959, 29043239, 29032509, 29039894, 29040540, 29043337, 29042975, 29043765];
-        return in_array($userId, $verified);
     }
 
     private function cleanName($name)
