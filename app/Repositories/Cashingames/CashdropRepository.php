@@ -45,7 +45,7 @@ class CashdropRepository
                 users.username, profiles.avatar,
                 cashdrops.icon , cashdrops.name as cashdropsName,
                 cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId,
-                DATE_FORMAT(cashdrop_rounds.dropped_at, "%b %D") as winningDate,
+                strftime("%b %d", cashdrop_rounds.dropped_at) as winningDate,
                ROUND(cashdrop_rounds.pooled_amount * cashdrop_rounds.percentage_stake * 10, 2) as pooledAmount FROM profiles
             LEFT JOIN users on users.id = profiles.user_id
             LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
