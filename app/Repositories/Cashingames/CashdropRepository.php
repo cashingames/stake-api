@@ -9,6 +9,7 @@ use App\Jobs\SendCashdropDroppedNotification;
 use App\Models\CashdropRound;
 use App\Models\Cashdrop;
 use App\Models\User;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -40,21 +41,33 @@ class CashdropRepository
 
     public function getCashdropWinners(): array
     {
-        return DB::select(
+        $results = DB::select(
             'SELECT
-                users.username, profiles.avatar,
-                cashdrops.icon , cashdrops.name as cashdropsName,
-                cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId,
-                strftime("%b %d", cashdrop_rounds.dropped_at) as winningDate,
-               ROUND(cashdrop_rounds.pooled_amount * cashdrop_rounds.percentage_stake * 10, 2) as pooledAmount FROM profiles
-            LEFT JOIN users on users.id = profiles.user_id
-            LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
-            LEFT JOIN cashdrop_rounds on cashdrop_users.cashdrop_round_id = cashdrop_rounds.id
-            LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
-            WHERE cashdrop_users.winner is true
-            ORDER BY cashdrop_users.updated_at DESC
-            LIMIT 20;'
+            users.username, profiles.avatar,
+            cashdrops.icon, cashdrops.name as cashdropsName,
+            cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId,
+            cashdrop_rounds.dropped_at as winningDate,
+            ROUND(cashdrop_rounds.pooled_amount * cashdrop_rounds.percentage_stake * 10, 2) as pooledAmount FROM profiles
+        LEFT JOIN users on users.id = profiles.user_id
+        LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
+        LEFT JOIN cashdrop_rounds on cashdrop_users.cashdrop_round_id = cashdrop_rounds.id
+        LEFT JOIN cashdrops on cashdrops.id = cashdrop_rounds.cashdrop_id
+        WHERE cashdrop_users.winner is true
+        ORDER BY cashdrop_users.updated_at DESC
+        LIMIT 20;'
         );
+
+        $formattedResults = [];
+
+        foreach ($results as $row) {
+            $date = new DateTime($row->winningDate);
+            $day = $date->format('j');
+            $suffix = date('S', strtotime($day)) == '1' ? 'st' : (date('S', strtotime($day)) == '2' ? 'nd' : (date('S', strtotime($day)) == '3' ? 'rd' : 'th'));
+            $row->winningDate = $date->format("M j") . $suffix;
+            $formattedResults[] = (array) $row;
+        }
+
+        return $formattedResults;
     }
 
     public function getActiveCashdrops()
