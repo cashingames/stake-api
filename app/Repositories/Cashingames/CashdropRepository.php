@@ -9,6 +9,7 @@ use App\Jobs\SendCashdropDroppedNotification;
 use App\Models\CashdropRound;
 use App\Models\Cashdrop;
 use App\Models\User;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -45,7 +46,7 @@ class CashdropRepository
                 users.username, profiles.avatar,
                 cashdrops.icon , cashdrops.name as cashdropsName,
                 cashdrops.background_colour as backgroundColor, cashdrop_rounds.id as cashdropRoundId,
-                strftime("%b %d", cashdrop_rounds.dropped_at) as winningDate,
+                cashdrop_rounds.dropped_at as winningDate,
                ROUND(cashdrop_rounds.pooled_amount * cashdrop_rounds.percentage_stake * 10, 2) as pooledAmount FROM profiles
             LEFT JOIN users on users.id = profiles.user_id
             LEFT JOIN cashdrop_users on cashdrop_users.user_id = profiles.user_id
